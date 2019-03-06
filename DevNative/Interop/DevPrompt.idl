@@ -1,0 +1,91 @@
+﻿import "oaidl.idl";
+import "ocidl.idl";
+
+interface IAppHost;
+interface IApp;
+interface IProcessHost;
+interface IProcess;
+
+// MUST match IAppHost.cs
+[object, uuid("42d16e5c-8acf-4dcb-882d-b41974190e53")]
+interface IAppHost : IUnknown
+{
+    HRESULT GetMainWindow([out, retval] HWND* hwnd);
+    HRESULT CanGrab(const wchar_t* exePath, VARIANT_BOOL automatic, [out, retval] int* value);
+
+    // Keyboard handling (since WPF will not see most key presses since focus will mostly be in a hosted process)
+    HRESULT OnAltLetter(int vk);
+    HRESULT OnAlt();
+
+    // Processes
+    HRESULT OnProcessOpening(IProcess* process, VARIANT_BOOL activate, const wchar_t* path);
+    HRESULT OnProcessClosing(IProcess* process);
+    HRESULT OnProcessEnvChanged(IProcess* process, const wchar_t* env);
+    HRESULT OnProcessTitleChanged(IProcess* process, const wchar_t* title);
+    HRESULT CloneActiveProcess();
+    HRESULT CloseActiveProcess();
+    HRESULT DetachActiveProcess();
+    HRESULT SetTabName();
+
+    // Ctrl-Tab and Ctrl-Shift-Tab
+    HRESULT TabCycleStop();
+    HRESULT TabCycleNext();
+    HRESULT TabCyclePrev();
+};
+
+[object, uuid("151c2791-131f-43b6-9384-0f5a8c1c9461")]
+interface IApp : IUnknown
+{
+    HRESULT Dispose();
+    HRESULT Activate();
+    HRESULT Deactivate();
+    HRESULT GetGrabProcesses(BSTR* processes);
+    HRESULT GrabProcess(int id);
+    HRESULT CreateProcessHostWindow(HWND parentHwnd, [out, retval] IProcessHost** obj);
+};
+
+[object, uuid("cedddf4b-b229-4a17-8b10-140e53464efd")]
+interface IProcessHost : IUnknown
+{
+    HRESULT Dispose();
+    HRESULT Activate();
+    HRESULT Deactivate();
+    HRESULT GetWindow([out, retval] HWND* hwnd);
+    HRESULT DpiChanged(double oldScale, double newScale);
+    HRESULT Focus();
+
+    HRESULT RunProcess(
+        const wchar_t* executable,
+        const wchar_t* arguments,
+        const wchar_t* startingDirectory,
+        [out, retval] IProcess** obj);
+
+    HRESULT RestoreProcess(
+        const wchar_t* executable,
+        const wchar_t* arguments,
+        const wchar_t* currentDirectory,
+        const wchar_t* environment,
+        const wchar_t* aliases,
+        const wchar_t* windowTitle,
+        [out, retval] IProcess** obj);
+
+    HRESULT CloneProcess(IProcess* process, [out, retval] IProcess** obj);
+};
+
+[object, uuid("e3b1d8b5-bce5-4522-ad92-44ce6edda69c")]
+interface IProcess : IUnknown
+{
+    HRESULT Dispose();
+    HRESULT Detach();
+    HRESULT Activate();
+    HRESULT Deactivate();
+    HRESULT GetWindow([out, retval] HWND* hwnd);
+    HRESULT GetWindowTitle([out, retval] BSTR* value);
+    HRESULT GetExe([out, retval] BSTR* value);
+    HRESULT GetEnv([out, retval] BSTR* value);
+    HRESULT GetAliases([out, retval] BSTR* value);
+    HRESULT GetCurrentDirectory([out, retval] BSTR* value);
+    HRESULT Focus();
+    HRESULT SystemCommandDefaults();
+    HRESULT SystemCommandProperties();
+};

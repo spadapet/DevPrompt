@@ -1,0 +1,27 @@
+﻿using DevPrompt.Utility;
+
+namespace DevPrompt.UI
+{
+    internal class TabNameDialogVM : PropertyNotifier
+    {
+        private string name;
+
+        public TabNameDialogVM(string name)
+        {
+            this.name = name;
+        }
+
+        public string Name
+        {
+            get
+            {
+                return this.name;
+            }
+
+            set
+            {
+                this.SetPropertyValue(ref this.name, value ?? string.Empty);
+            }
+        }
+    }
+}

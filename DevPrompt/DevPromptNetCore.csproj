@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>netcoreapp3.0</TargetFramework>
+        <UseWPF>true</UseWPF>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <ApplicationIcon>appicon.ico</ApplicationIcon>
+        <Platforms>x64</Platforms>
+        <StartupObject>DevPrompt.Program</StartupObject>
+        <RootNamespace>DevPrompt</RootNamespace>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <OutputPath>..\$(Platform)\$(Configuration)\</OutputPath>
+        <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Remove="packages.config" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="App.xaml.cs">
+        <SubType>Code</SubType>
+        <DependentUpon>App.xaml</DependentUpon>
+      </Compile>
+      <Compile Update="UI\CustomizeConsolesDialog.xaml.cs">
+        <DependentUpon>CustomizeConsolesDialog.xaml</DependentUpon>
+      </Compile>
+      <Compile Update="UI\CustomizeGrabConsolesDialog.xaml.cs">
+        <DependentUpon>CustomizeGrabConsolesDialog.xaml</DependentUpon>
+      </Compile>
+      <Compile Update="UI\CustomizeLinksDialog.xaml.cs">
+        <DependentUpon>CustomizeLinksDialog.xaml</DependentUpon>
+      </Compile>
+      <Compile Update="UI\CustomizeToolsDialog.xaml.cs">
+        <DependentUpon>CustomizeToolsDialog.xaml</DependentUpon>
+      </Compile>
+      <Compile Update="UI\InstallBranchDialog.xaml.cs">
+        <DependentUpon>InstallBranchDialog.xaml</DependentUpon>
+      </Compile>
+      <Compile Update="UI\MainWindow.xaml.cs">
+        <SubType>Code</SubType>
+        <DependentUpon>MainWindow.xaml</DependentUpon>
+      </Compile>
+      <Compile Update="UI\TabNameDialog.xaml.cs">
+        <DependentUpon>TabNameDialog.xaml</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ApplicationDefinition Update="App.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </ApplicationDefinition>
+    </ItemGroup>
+
+</Project>
