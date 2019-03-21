@@ -6,6 +6,9 @@ using System.Runtime.Serialization;
 
 namespace DevPrompt.Settings
 {
+    /// <summary>
+    /// User customizable info about a process that can be "Grabbed" by the UI
+    /// </summary>
     [DataContract]
     [DebuggerDisplay("{ExeName}")]
     public class GrabConsoleSettings : PropertyNotifier, ICloneable

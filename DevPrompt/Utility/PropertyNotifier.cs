@@ -5,6 +5,9 @@ using System.Runtime.Serialization;
 
 namespace DevPrompt.Utility
 {
+    /// <summary>
+    /// Base class for all WPF models/view models that notify listeners of property changes
+    /// </summary>
     [DataContract]
     public class PropertyNotifier : INotifyPropertyChanged
     {

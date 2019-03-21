@@ -7,7 +7,7 @@ using System.Windows.Threading;
 
 namespace DevPrompt.Utility
 {
-    internal static class Helpers
+    internal static class CommandHelpers
     {
         public const string SeparatorName = "Separator";
         private const string NewItemPlaceholder = "{NewItemPlaceholder}";
@@ -27,7 +27,7 @@ namespace DevPrompt.Utility
                             menuItem.Focus();
                             menuItem.IsSubmenuOpen = true;
 
-                            Action action = () => Helpers.FocusFirstMenuItem(menuItem);
+                            Action action = () => CommandHelpers.FocusFirstMenuItem(menuItem);
                             mainMenu.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, action);
 
                             break;
@@ -65,7 +65,7 @@ namespace DevPrompt.Utility
             () =>
             {
                 DataGrid dataGrid = dataGridAccessor();
-                return dataGrid.SelectedItem != null && dataGrid.SelectedItem.ToString() != Helpers.NewItemPlaceholder && dataGrid.SelectedIndex > 0;
+                return dataGrid.SelectedItem != null && dataGrid.SelectedItem.ToString() != CommandHelpers.NewItemPlaceholder && dataGrid.SelectedIndex > 0;
             });
         }
 
@@ -82,7 +82,7 @@ namespace DevPrompt.Utility
             () =>
             {
                 DataGrid dataGrid = dataGridAccessor();
-                return dataGrid.SelectedItem != null && dataGrid.SelectedItem.ToString() != Helpers.NewItemPlaceholder && dataGrid.SelectedIndex + 1 < items.Count;
+                return dataGrid.SelectedItem != null && dataGrid.SelectedItem.ToString() != CommandHelpers.NewItemPlaceholder && dataGrid.SelectedIndex + 1 < items.Count;
             });
         }
 
@@ -105,7 +105,7 @@ namespace DevPrompt.Utility
             () =>
             {
                 DataGrid dataGrid = dataGridAccessor();
-                return dataGrid.SelectedItem != null && dataGrid.SelectedItem.ToString() != Helpers.NewItemPlaceholder;
+                return dataGrid.SelectedItem != null && dataGrid.SelectedItem.ToString() != CommandHelpers.NewItemPlaceholder;
             });
         }
 

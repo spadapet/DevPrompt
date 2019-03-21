@@ -10,6 +10,9 @@ using Microsoft.VisualStudio.Setup.Configuration;
 
 namespace DevPrompt.Utility
 {
+    /// <summary>
+    /// Helper for getting all the installed versions of Visual Studio
+    /// </summary>
     internal static class VisualStudioSetup
     {
         public class Instance

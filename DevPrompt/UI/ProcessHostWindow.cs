@@ -5,6 +5,9 @@ using System.Windows.Interop;
 
 namespace DevPrompt.UI
 {
+    /// <summary>
+    /// Hooks the native process host window into WPF
+    /// </summary>
     public class ProcessHostWindow : HwndHost
     {
         internal IProcessHost ProcessHost { get; private set; }

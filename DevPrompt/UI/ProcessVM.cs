@@ -7,6 +7,9 @@ using System.Windows.Input;
 
 namespace DevPrompt.UI
 {
+    /// <summary>
+    /// View model for each process tab (handles context menu items, etc)
+    /// </summary>
     internal class ProcessVM : PropertyNotifier
     {
         private readonly MainWindowVM window;

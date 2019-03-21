@@ -10,6 +10,9 @@ using System.Xml;
 
 namespace DevPrompt.Settings
 {
+    /// <summary>
+    /// Saves/loads application settings
+    /// </summary>
     [DataContract]
     public class AppSettings : PropertyNotifier, ICloneable
     {

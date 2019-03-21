@@ -27,6 +27,13 @@ namespace DevPrompt
             }
         }
 
+        /// <summary>
+        /// When there are multiple processes running, only one can be the "Main" process.
+        /// The main process is the one that is allowed to auto-grab consoles.
+        /// This method will wait until either:
+        /// - It's time to become the main process (the other main process exited)
+        /// - It's time to exit the program
+        /// </summary>
         private static void WaitToBecomeMainProcess(EventWaitHandle exitEvent)
         {
             using (Mutex mainProcessMutex = new Mutex(false, "{5553691f-212c-4535-a82a-586b11fbd1bb}", out bool firstInstance))

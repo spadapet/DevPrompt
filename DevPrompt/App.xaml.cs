@@ -8,6 +8,11 @@ using System.Windows.Interop;
 
 namespace DevPrompt
 {
+    /// <summary>
+    /// Singleton WPF app object (get using App.Current).
+    /// The native code will call into here using the IAppHost interface. We call into
+    /// native code using the IApp interface.
+    /// </summary>
     internal partial class App : Application, IAppHost
     {
         public AppSettings Settings { get; }

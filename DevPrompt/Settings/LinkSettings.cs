@@ -5,6 +5,9 @@ using System.Runtime.Serialization;
 
 namespace DevPrompt.Settings
 {
+    /// <summary>
+    /// A single "Link" customizable by the user
+    /// </summary>
     [DataContract]
     [DebuggerDisplay("{Name}")]
     public class LinkSettings : PropertyNotifier, ICloneable
@@ -14,7 +17,7 @@ namespace DevPrompt.Settings
 
         public LinkSettings()
         {
-            this.name = DevPrompt.Utility.Helpers.SeparatorName;
+            this.name = DevPrompt.Utility.CommandHelpers.SeparatorName;
             this.address = string.Empty;
         }
 

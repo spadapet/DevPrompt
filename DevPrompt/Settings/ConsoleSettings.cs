@@ -7,6 +7,9 @@ using System.Runtime.Serialization;
 
 namespace DevPrompt.Settings
 {
+    /// <summary>
+    /// User customizable info about a console process that can be run
+    /// </summary>
     [DataContract]
     [DebuggerDisplay("{MenuName}")]
     public class ConsoleSettings : PropertyNotifier, ICloneable

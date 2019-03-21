@@ -41,7 +41,7 @@ namespace DevPrompt.UI
 
         private void OnGrabMenuOpened(object sender, RoutedEventArgs args)
         {
-            List<string> names = new List<string>(Helpers.GetGrabProcesses());
+            List<string> names = new List<string>(CommandHelpers.GetGrabProcesses());
 
             MainWindow.UpdateMenu((MenuItem)sender, names, (string name) =>
             {
@@ -207,14 +207,14 @@ namespace DevPrompt.UI
 
         public void OnAltLetter(int vk)
         {
-            Helpers.ShowMenuFromAltLetter(this.MainMenu, vk);
+            CommandHelpers.ShowMenuFromAltLetter(this.MainMenu, vk);
         }
 
         public void OnAlt()
         {
             if (!this.MainMenu.IsKeyboardFocusWithin)
             {
-                Helpers.FocusFirstMenuItem(this.MainMenu);
+                CommandHelpers.FocusFirstMenuItem(this.MainMenu);
             }
         }
 
@@ -232,7 +232,7 @@ namespace DevPrompt.UI
         {
             if (sender is ContextMenu menu)
             {
-                Helpers.FocusFirstMenuItem(menu);
+                CommandHelpers.FocusFirstMenuItem(menu);
             }
         }
     }

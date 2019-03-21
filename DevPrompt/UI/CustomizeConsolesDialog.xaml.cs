@@ -21,10 +21,10 @@ namespace DevPrompt.UI
             this.settings = new ObservableCollection<ConsoleSettings>(consoles.Select(i => i.Clone()));
             this.settings.CollectionChanged += this.OnConsoleSettingsChanged;
 
-            this.MoveUpCommand = Helpers.CreateMoveUpCommand(() => this.dataGrid, this.settings);
-            this.MoveDownCommand = Helpers.CreateMoveDownCommand(() => this.dataGrid, this.settings);
-            this.DeleteCommand = Helpers.CreateDeleteCommand(() => this.dataGrid, this.settings);
-            this.ResetCommand = Helpers.CreateResetCommand((s) => s.Consoles, this.settings,
+            this.MoveUpCommand = CommandHelpers.CreateMoveUpCommand(() => this.dataGrid, this.settings);
+            this.MoveDownCommand = CommandHelpers.CreateMoveDownCommand(() => this.dataGrid, this.settings);
+            this.DeleteCommand = CommandHelpers.CreateDeleteCommand(() => this.dataGrid, this.settings);
+            this.ResetCommand = CommandHelpers.CreateResetCommand((s) => s.Consoles, this.settings,
                 AppSettings.DefaultSettingsFilter.DevPrompts | AppSettings.DefaultSettingsFilter.RawPrompts);
 
             this.InitializeComponent();
@@ -45,12 +45,12 @@ namespace DevPrompt.UI
 
         private void OnSelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs args)
         {
-            Helpers.UpdateCommands(this.MoveUpCommand, this.MoveDownCommand, this.DeleteCommand);
+            CommandHelpers.UpdateCommands(this.MoveUpCommand, this.MoveDownCommand, this.DeleteCommand);
         }
 
         private void OnConsoleSettingsChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
-            Helpers.UpdateCommands(this.MoveUpCommand, this.MoveDownCommand, this.DeleteCommand);
+            CommandHelpers.UpdateCommands(this.MoveUpCommand, this.MoveDownCommand, this.DeleteCommand);
         }
     }
 }

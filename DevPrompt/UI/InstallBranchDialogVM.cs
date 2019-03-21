@@ -3,6 +3,9 @@ using System.Windows.Input;
 
 namespace DevPrompt.UI
 {
+    /// <summary>
+    /// View model for the dialog to install a VS branch
+    /// </summary>
     internal class InstallBranchDialogVM : PropertyNotifier
     {
         private readonly InstallBranchDialog dialog;

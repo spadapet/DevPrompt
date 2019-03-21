@@ -22,10 +22,10 @@ namespace DevPrompt.UI
             this.settings = new ObservableCollection<ToolSettings>(tools.Select(i => i.Clone()));
             this.settings.CollectionChanged += this.OnSettingsChanged;
 
-            this.MoveUpCommand = Helpers.CreateMoveUpCommand(() => this.dataGrid, this.settings);
-            this.MoveDownCommand = Helpers.CreateMoveDownCommand(() => this.dataGrid, this.settings);
-            this.DeleteCommand = Helpers.CreateDeleteCommand(() => this.dataGrid, this.settings);
-            this.ResetCommand = Helpers.CreateResetCommand((s) => s.Tools, this.settings, AppSettings.DefaultSettingsFilter.Tools);
+            this.MoveUpCommand = CommandHelpers.CreateMoveUpCommand(() => this.dataGrid, this.settings);
+            this.MoveDownCommand = CommandHelpers.CreateMoveDownCommand(() => this.dataGrid, this.settings);
+            this.DeleteCommand = CommandHelpers.CreateDeleteCommand(() => this.dataGrid, this.settings);
+            this.ResetCommand = CommandHelpers.CreateResetCommand((s) => s.Tools, this.settings, AppSettings.DefaultSettingsFilter.Tools);
 
             this.InitializeComponent();
         }
@@ -45,12 +45,12 @@ namespace DevPrompt.UI
 
         private void OnSelectionChanged(object sender, SelectionChangedEventArgs args)
         {
-            Helpers.UpdateCommands(this.MoveUpCommand, this.MoveDownCommand, this.DeleteCommand);
+            CommandHelpers.UpdateCommands(this.MoveUpCommand, this.MoveDownCommand, this.DeleteCommand);
         }
 
         private void OnSettingsChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
-            Helpers.UpdateCommands(this.MoveUpCommand, this.MoveDownCommand, this.DeleteCommand);
+            CommandHelpers.UpdateCommands(this.MoveUpCommand, this.MoveDownCommand, this.DeleteCommand);
         }
     }
 }

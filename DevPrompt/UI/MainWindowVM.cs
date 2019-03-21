@@ -14,6 +14,9 @@ using System.Windows.Threading;
 
 namespace DevPrompt.UI
 {
+    /// <summary>
+    /// View model for the main window (handles all menu items, etc)
+    /// </summary>
     internal class MainWindowVM : PropertyNotifier
     {
         public MainWindow Window { get; }

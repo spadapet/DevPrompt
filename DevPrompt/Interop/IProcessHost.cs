@@ -4,6 +4,10 @@ using System.Runtime.InteropServices;
 namespace DevPrompt.Interop
 {
     // MUST match DevPrompt.idl
+
+    /// <summary>
+    /// Allows managed code to talk to the native process host object
+    /// </summary>
     [Guid("cedddf4b-b229-4a17-8b10-140e53464efd")]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     interface IProcessHost

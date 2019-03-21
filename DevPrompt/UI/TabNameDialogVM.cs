@@ -2,6 +2,9 @@
 
 namespace DevPrompt.UI
 {
+    /// <summary>
+    /// View model for the tab name dialog
+    /// </summary>
     internal class TabNameDialogVM : PropertyNotifier
     {
         private string name;

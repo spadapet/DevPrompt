@@ -5,6 +5,9 @@ using System.Runtime.Serialization;
 
 namespace DevPrompt.Settings
 {
+    /// <summary>
+    /// A single "Tool" customizable by the user
+    /// </summary>
     [DataContract]
     [DebuggerDisplay("{Name}")]
     public class ToolSettings : PropertyNotifier, ICloneable
@@ -15,7 +18,7 @@ namespace DevPrompt.Settings
 
         public ToolSettings()
         {
-            this.name = DevPrompt.Utility.Helpers.SeparatorName;
+            this.name = DevPrompt.Utility.CommandHelpers.SeparatorName;
             this.command = string.Empty;
             this.arguments = string.Empty;
         }
