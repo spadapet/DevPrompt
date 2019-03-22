@@ -213,6 +213,41 @@ HRESULT ProcessInterop::GetCurrentDirectory(BSTR* value)
     return E_UNEXPECTED;
 }
 
+HRESULT ProcessInterop::GetColorTable(BSTR* value)
+{
+    if (!value)
+    {
+        return E_INVALIDARG;
+    }
+
+    std::shared_ptr<App> app = this->app.lock();
+    if (app && this->hwnd)
+    {
+        std::wstring str = app->GetProcessColorTable(this->hwnd);
+        *value = ::SysAllocStringLen(str.c_str(), static_cast<UINT>(str.size()));
+        return S_OK;
+    }
+
+    return E_UNEXPECTED;
+}
+
+HRESULT ProcessInterop::SetColorTable(const wchar_t* value)
+{
+    if (!value)
+    {
+        return E_INVALIDARG;
+    }
+
+    std::shared_ptr<App> app = this->app.lock();
+    if (app && this->hwnd)
+    {
+        app->SetProcessColorTable(this->hwnd, value);
+        return S_OK;
+    }
+
+    return E_UNEXPECTED;
+}
+
 HRESULT ProcessInterop::Focus()
 {
     std::shared_ptr<App> app = this->app.lock();

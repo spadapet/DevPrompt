@@ -34,6 +34,7 @@ public:
         const wchar_t* currentDirectory,
         const wchar_t* environment,
         const wchar_t* aliases,
+        const wchar_t* colorTable,
         const wchar_t* windowTitle,
         IProcess** obj) override;
 

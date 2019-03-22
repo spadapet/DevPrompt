@@ -32,6 +32,7 @@ namespace DevPrompt.Interop
             [MarshalAs(UnmanagedType.LPWStr)] string currentDirectory,
             [MarshalAs(UnmanagedType.LPWStr)] string environment,
             [MarshalAs(UnmanagedType.LPWStr)] string aliases,
+            [MarshalAs(UnmanagedType.LPWStr)] string colorTable,
             [MarshalAs(UnmanagedType.LPWStr)] string windowTitle);
 
         [return: MarshalAs(UnmanagedType.Interface)]

@@ -120,7 +120,7 @@ static void NotifyOwnerOfChanges(std::wstring & oldTitle, std::wstring & oldEnvi
             oldEnvironment.assign(env, len);
 
             Message message(PIPE_COMMAND_ENV_CHANGED);
-            message.ParseNameValuePairs(env);
+            message.ParseNameValuePairs(env, '\0');
             ::SendToOwner(message);
         }
 

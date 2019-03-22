@@ -159,7 +159,6 @@ std::wstring Process::GetProcessAliases()
 {
     assert(App::IsMainThread());
 
-    // Not cached, so have to do a pipe transaction
     Message response;
     if (this->TransactCommand(Message(PIPE_COMMAND_GET_ALIASES), response))
     {
@@ -173,7 +172,6 @@ std::wstring Process::GetProcessCurrentDirectory()
 {
     assert(App::IsMainThread());
 
-    // Not cached, so have to do a pipe transaction
     Message response;
     if (this->TransactCommand(Message(PIPE_COMMAND_GET_CURRENT_DIRECTORY), response))
     {
@@ -181,6 +179,30 @@ std::wstring Process::GetProcessCurrentDirectory()
     }
 
     return std::wstring();
+}
+
+std::wstring Process::GetProcessColorTable()
+{
+    assert(App::IsMainThread());
+
+    Message response;
+    if (this->TransactCommand(Message(PIPE_COMMAND_GET_COLOR_TABLE), response))
+    {
+        return response.GetValue(PIPE_PROPERTY_VALUE);
+    }
+
+    return std::wstring();
+}
+
+void Process::SetProcessColorTable(const wchar_t* value)
+{
+    assert(App::IsMainThread());
+
+    Message command(PIPE_COMMAND_SET_COLOR_TABLE);
+    command.SetValue(PIPE_PROPERTY_VALUE, value);
+
+    Message response;
+    this->TransactCommand(command, response);
 }
 
 void Process::SendDpiChanged(double oldScale, double newScale)
@@ -497,11 +519,15 @@ void Process::BackgroundClone(const std::shared_ptr<Process> & process)
     Message dirResponse;
     Message envResponse;
     Message aliasesResponse;
+    Message colorTableResponse;
+    Message titleResponse;
 
     if (!process->TransactCommand(Message(PIPE_COMMAND_GET_EXE), exeResponse) || exeResponse.GetValue(PIPE_PROPERTY_VALUE).empty() ||
         !process->TransactCommand(Message(PIPE_COMMAND_GET_CURRENT_DIRECTORY), dirResponse) || dirResponse.GetValue(PIPE_PROPERTY_VALUE).empty() ||
         !process->TransactCommand(Message(PIPE_COMMAND_GET_ENV), envResponse) ||
-        !process->TransactCommand(Message(PIPE_COMMAND_GET_ALIASES), aliasesResponse))
+        !process->TransactCommand(Message(PIPE_COMMAND_GET_ALIASES), aliasesResponse) ||
+        !process->TransactCommand(Message(PIPE_COMMAND_GET_COLOR_TABLE), colorTableResponse) ||
+        !process->TransactCommand(Message(PIPE_COMMAND_GET_TITLE), titleResponse))
     {
         this->PostDispose();
         return;
@@ -512,6 +538,8 @@ void Process::BackgroundClone(const std::shared_ptr<Process> & process)
     info.environment = envResponse.GetNamesAndValues();
     info.startingDirectory = dirResponse.GetValue(PIPE_PROPERTY_VALUE);
     info.aliases = std::move(aliasesResponse);
+    info.colorTable = colorTableResponse.GetValue(PIPE_PROPERTY_VALUE);
+    info.windowTitle = titleResponse.GetValue(PIPE_PROPERTY_VALUE);
 
     this->BackgroundStart(info);
 }
@@ -542,6 +570,13 @@ void Process::BackgroundSendCommands(HANDLE process)
 // Initialize a newly created process after pipes are connected
 void Process::InitNewProcess(const ProcessStartInfo & info)
 {
+    if (info.colorTable.size())
+    {
+        Message message(PIPE_COMMAND_SET_COLOR_TABLE);
+        message.SetValue(PIPE_PROPERTY_VALUE, info.colorTable);
+        this->SendCommandAsync(std::move(message));
+    }
+
     if (info.aliases.HasAnyName())
     {
         Message aliases = info.aliases;

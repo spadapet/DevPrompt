@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Message.h"
 
 static std::wstring EMPTY_STRING;
@@ -140,13 +140,32 @@ std::vector<BYTE> Message::Convert() const
     return bytes;
 }
 
-// foo=bar\0bar=foo\0\0
-void Message::ParseNameValuePairs(const wchar_t* cur, std::function<std::wstring(const std::wstring&)> nameFilter)
+Message Message::CreateResponse() const
 {
+    return Message(GetCommand(), GetId(), true);
+}
+
+// foo=bar\0bar=foo\0\0
+void Message::ParseNameValuePairs(const wchar_t* cur, wchar_t separator, std::function<std::wstring(const std::wstring&)> nameFilter)
+{
+    std::wstring line;
+
     while (cur && *cur)
     {
-        std::wstring line = cur;
-        cur += line.size() + 1;
+        size_t lineLen = 0;
+        for (const wchar_t* end = cur; *end && *end != separator; end++)
+        {
+            lineLen++;
+        }
+
+        line.assign(cur, lineLen);
+        cur += lineLen;
+
+        // Skip the separator (don't skip a null unless the separator is null)
+        if (*cur || !separator)
+        {
+            cur++;
+        }
 
         size_t equals = line.find('=');
         if (equals != std::wstring::npos)

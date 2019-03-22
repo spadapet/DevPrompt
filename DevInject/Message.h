@@ -8,12 +8,14 @@
 #define PIPE_COMMAND_DETACH L"Detach"
 #define PIPE_COMMAND_ENV_CHANGED L"EnvChanged"
 #define PIPE_COMMAND_GET_ALIASES L"GetAliases"
+#define PIPE_COMMAND_GET_COLOR_TABLE L"GetColorTable"
 #define PIPE_COMMAND_GET_CURRENT_DIRECTORY L"GetCurrentDirectory"
 #define PIPE_COMMAND_GET_ENV L"GetEnv"
 #define PIPE_COMMAND_GET_EXE L"GetExe"
 #define PIPE_COMMAND_GET_TITLE L"GetTitle"
 #define PIPE_COMMAND_PIPE_CREATED L"PipeCreated"
 #define PIPE_COMMAND_SET_ALIASES L"SetAliases"
+#define PIPE_COMMAND_SET_COLOR_TABLE L"SetColorTable"
 #define PIPE_COMMAND_SET_ENV L"SetEnv"
 #define PIPE_COMMAND_SET_TITLE L"SetTitle"
 #define PIPE_COMMAND_TITLE_CHANGED L"TitleChanged"
@@ -46,10 +48,11 @@ public:
     DEV_INJECT_API std::vector<std::wstring> GetNames() const;
     DEV_INJECT_API bool HasAnyName() const;
     DEV_INJECT_API std::wstring GetNamesAndValues() const;
-    DEV_INJECT_API void ParseNameValuePairs(const wchar_t* cur, std::function<std::wstring(const std::wstring&)> nameFilter = nullptr);
+    DEV_INJECT_API void ParseNameValuePairs(const wchar_t* cur, wchar_t separator, std::function<std::wstring(const std::wstring&)> nameFilter = nullptr);
 
     static Message Parse(const BYTE* data, size_t size);
     std::vector<BYTE> Convert() const;
+    Message CreateResponse() const;
 
 private:
     std::unordered_map<std::wstring, std::wstring> properties;

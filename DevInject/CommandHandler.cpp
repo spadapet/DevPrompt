@@ -9,10 +9,10 @@ namespace DevInject
 
 static Message HandleGetEnv(const Message& input)
 {
-    Message result(input.GetCommand(), input.GetId(), true);
+    Message result = input.CreateResponse();
 
     wchar_t* env = ::GetEnvironmentStrings();
-    result.ParseNameValuePairs(env);
+    result.ParseNameValuePairs(env, '\0');
     ::FreeEnvironmentStrings(env);
 
     return result;
@@ -20,7 +20,7 @@ static Message HandleGetEnv(const Message& input)
 
 static Message HandleGetDir(const Message& input)
 {
-    Message result(input.GetCommand(), input.GetId(), true);
+    Message result = input.CreateResponse();
 
     wchar_t value[MAX_PATH];
     if (::GetCurrentDirectory(_countof(value), value))
@@ -33,7 +33,7 @@ static Message HandleGetDir(const Message& input)
 
 static Message HandleGetExe(const Message& input)
 {
-    Message result(input.GetCommand(), input.GetId(), true);
+    Message result = input.CreateResponse();
 
     wchar_t value[MAX_PATH];
     if (::GetModuleFileName(nullptr, value, _countof(value)))
@@ -46,7 +46,7 @@ static Message HandleGetExe(const Message& input)
 
 static Message HandleGetTitle(const Message& input)
 {
-    Message result(input.GetCommand(), input.GetId(), true);
+    Message result = input.CreateResponse();
 
     HWND hwnd = ::GetConsoleWindow();
     if (hwnd)
@@ -63,7 +63,7 @@ static Message HandleGetTitle(const Message& input)
 
 static Message HandleGetAliases(const Message& input)
 {
-    Message result(input.GetCommand(), input.GetId(), true);
+    Message result = input.CreateResponse();
 
     DWORD exesLength = ::GetConsoleAliasExesLength();
     exesLength = exesLength * 2 + 2; // return value was wrong, it was wchar_t count divided by 2, rather than multiplied by 2
@@ -81,7 +81,7 @@ static Message HandleGetAliases(const Message& input)
 
             if (::GetConsoleAliases(aliasBuffer.data(), static_cast<DWORD>(size), cur))
             {
-                result.ParseNameValuePairs(aliasBuffer.data(), [cur](const std::wstring & s)
+                result.ParseNameValuePairs(aliasBuffer.data(), '\0', [cur](const std::wstring & s)
                     {
                         return std::wstring(cur) + std::wstring(L"|") + s;
                     });
@@ -94,8 +94,6 @@ static Message HandleGetAliases(const Message& input)
 
 static Message HandleSetAliases(const Message& input)
 {
-    Message result(input.GetCommand(), input.GetId(), true);
-
     for (const std::wstring& name : input.GetNames())
     {
         size_t pipe = name.find(L'|');
@@ -112,20 +110,18 @@ static Message HandleSetAliases(const Message& input)
         }
     }
 
-    return result;
+    return input.CreateResponse();
 }
 
 static Message HandleSetTitle(const Message& input)
 {
-    Message result(input.GetCommand(), input.GetId(), true);
-
     std::wstring title = input.GetValue(PIPE_PROPERTY_VALUE);
     if (title.size())
     {
         ::SetConsoleTitle(title.c_str());
     }
 
-    return result;
+    return input.CreateResponse();
 }
 
 static DWORD __stdcall DetachThread(void*)
@@ -142,7 +138,72 @@ static Message HandleDetach(const Message& input)
         ::CloseHandle(thread);
     }
 
-    return Message(input.GetCommand(), input.GetId(), true);
+    return input.CreateResponse();
+}
+
+static Message HandleGetColorTable(const Message& input)
+{
+    Message result = input.CreateResponse();
+
+    HANDLE handle = ::GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFOEX info;
+    info.cbSize = sizeof(info);
+
+    if (::GetConsoleScreenBufferInfoEx(handle, &info))
+    {
+        std::wstringstream str;
+        str << L"indexes=" << static_cast<unsigned int>(info.wAttributes & 0xFF) << L"\n";
+
+        for (size_t i = 0; i < _countof(info.ColorTable); i++)
+        {
+            str << i << L"=" << info.ColorTable[i] << L"\n";
+        }
+
+        result.SetValue(PIPE_PROPERTY_VALUE, str.str());
+    }
+
+    return result;
+}
+
+static Message HandleSetColorTable(const Message& input)
+{
+    HANDLE handle = ::GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFOEX info;
+    info.cbSize = sizeof(info);
+
+    if (::GetConsoleScreenBufferInfoEx(handle, &info))
+    {
+        Message values;
+        std::wstring value = input.GetValue(PIPE_PROPERTY_VALUE);
+        values.ParseNameValuePairs(value.c_str(), '\n');
+
+        std::wstring str = values.GetValue(L"indexes");
+        if (str.size())
+        {
+            unsigned long value = std::wcstoul(str.c_str(), nullptr, 10);
+            if (value)
+            {
+                info.wAttributes = (info.wAttributes & 0xFF00) | static_cast<WORD>(value & 0xFF);
+            }
+        }
+
+        for (size_t i = 0; i < _countof(info.ColorTable); i++)
+        {
+            str = values.GetValue(std::to_wstring(i));
+            if (str.size())
+            {
+                unsigned long value = std::wcstoul(str.c_str(), nullptr, 10);
+                if (value)
+                {
+                    info.ColorTable[i] = value;
+                }
+            }
+        }
+
+        ::SetConsoleScreenBufferInfoEx(handle, &info);
+    }
+
+    return input.CreateResponse();
 }
 
 // Handles commands comming in from the owner app
@@ -182,6 +243,14 @@ Message DevInject::CommandHandler(const Message & input)
     else if (command == PIPE_COMMAND_DETACH)
     {
         result = ::HandleDetach(input);
+    }
+    else if (command == PIPE_COMMAND_GET_COLOR_TABLE)
+    {
+        result = ::HandleGetColorTable(input);
+    }
+    else if (command == PIPE_COMMAND_SET_COLOR_TABLE)
+    {
+        result = ::HandleSetColorTable(input);
     }
 
     return result;

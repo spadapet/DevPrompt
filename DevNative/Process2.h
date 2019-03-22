@@ -15,6 +15,7 @@ struct ProcessStartInfo
     std::wstring environment;
     std::wstring startingDirectory;
     std::wstring windowTitle;
+    std::wstring colorTable;
     Message aliases;
 };
 
@@ -38,6 +39,8 @@ public:
     std::wstring GetProcessEnv();
     std::wstring GetProcessAliases();
     std::wstring GetProcessCurrentDirectory();
+    std::wstring GetProcessColorTable();
+    void SetProcessColorTable(const wchar_t* value);
     void SendDpiChanged(double oldScale, double newScale);
     void SendSystemCommand(UINT id);
 

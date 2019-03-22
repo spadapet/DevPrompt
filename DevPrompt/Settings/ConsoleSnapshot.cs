@@ -17,6 +17,7 @@ namespace DevPrompt.Settings
         private string currentDirectory;
         private string environment;
         private string aliases;
+        private string colorTable;
 
         public ConsoleSnapshot()
             : this((ProcessVM)null)
@@ -31,6 +32,7 @@ namespace DevPrompt.Settings
             this.currentDirectory = process?.Process?.GetCurrentDirectory() ?? string.Empty;
             this.environment = process?.Env ?? string.Empty;
             this.aliases = process?.Process?.GetAliases() ?? string.Empty;
+            this.colorTable = process?.Process?.GetColorTable() ?? string.Empty;
         }
 
         public ConsoleSnapshot(ConsoleSnapshot copyFrom)
@@ -41,6 +43,7 @@ namespace DevPrompt.Settings
             this.currentDirectory = copyFrom.currentDirectory;
             this.environment = copyFrom.environment;
             this.aliases = copyFrom.aliases;
+            this.colorTable = copyFrom.colorTable;
         }
 
         object ICloneable.Clone()
@@ -134,6 +137,20 @@ namespace DevPrompt.Settings
             set
             {
                 this.SetPropertyValue(ref this.aliases, value ?? string.Empty);
+            }
+        }
+
+        [DataMember]
+        public string ColorTable
+        {
+            get
+            {
+                return this.colorTable;
+            }
+
+            set
+            {
+                this.SetPropertyValue(ref this.colorTable, value ?? string.Empty);
             }
         }
     }

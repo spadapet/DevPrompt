@@ -66,6 +66,7 @@ interface IProcessHost : IUnknown
         const wchar_t* currentDirectory,
         const wchar_t* environment,
         const wchar_t* aliases,
+        const wchar_t* colorTable,
         const wchar_t* windowTitle,
         [out, retval] IProcess** obj);
 
@@ -85,6 +86,8 @@ interface IProcess : IUnknown
     HRESULT GetEnv([out, retval] BSTR* value);
     HRESULT GetAliases([out, retval] BSTR* value);
     HRESULT GetCurrentDirectory([out, retval] BSTR* value);
+    HRESULT GetColorTable([out, retval] BSTR* value);
+    HRESULT SetColorTable(const wchar_t* value);
     HRESULT Focus();
     HRESULT SystemCommandDefaults();
     HRESULT SystemCommandProperties();

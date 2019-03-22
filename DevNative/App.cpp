@@ -701,8 +701,6 @@ std::shared_ptr<Process> App::FindActiveProcess()
 
 void App::ActivateProcess(HWND hwnd)
 {
-    assert(App::IsMainThread());
-
     std::shared_ptr<Process> process = this->FindProcess(hwnd);
     if (process)
     {
@@ -713,8 +711,6 @@ void App::ActivateProcess(HWND hwnd)
 
 void App::DeactivateProcess(HWND hwnd)
 {
-    assert(App::IsMainThread());
-
     std::shared_ptr<Process> process = this->FindProcess(hwnd);
     if (process)
     {
@@ -724,8 +720,6 @@ void App::DeactivateProcess(HWND hwnd)
 
 void App::DisposeProcess(HWND hwnd)
 {
-    assert(App::IsMainThread());
-
     std::shared_ptr<Process> process = this->FindProcess(hwnd);
     if (process)
     {
@@ -735,8 +729,6 @@ void App::DisposeProcess(HWND hwnd)
 
 void App::DetachProcess(HWND hwnd)
 {
-    assert(App::IsMainThread());
-
     std::shared_ptr<Process> process = this->FindProcess(hwnd);
     if (process)
     {
@@ -746,8 +738,6 @@ void App::DetachProcess(HWND hwnd)
 
 void App::SendProcessSystemCommand(HWND hwnd, UINT id)
 {
-    assert(App::IsMainThread());
-
     std::shared_ptr<Process> process = this->FindProcess(hwnd);
     if (process)
     {
@@ -757,72 +747,47 @@ void App::SendProcessSystemCommand(HWND hwnd, UINT id)
 
 std::wstring App::GetProcessExe(HWND hwnd)
 {
-    assert(App::IsMainThread());
-
     std::shared_ptr<Process> process = this->FindProcess(hwnd);
-    if (process)
-    {
-        return process->GetProcessExe();
-    }
-
-    assert(false);
-    return std::wstring();
+    return process ? process->GetProcessExe() : std::wstring();
 }
 
 std::wstring App::GetProcessWindowTitle(HWND hwnd)
 {
-    assert(App::IsMainThread());
-
     std::shared_ptr<Process> process = this->FindProcess(hwnd);
-    if (process)
-    {
-        return process->GetProcessWindowTitle();
-    }
-
-    assert(false);
-    return std::wstring();
+    return process ? process->GetProcessWindowTitle() : std::wstring();
 }
 
 std::wstring App::GetProcessEnv(HWND hwnd)
 {
-    assert(App::IsMainThread());
-
     std::shared_ptr<Process> process = this->FindProcess(hwnd);
-    if (process)
-    {
-        return process->GetProcessEnv();
-    }
-
-    assert(false);
-    return std::wstring();
+    return process ? process->GetProcessEnv() : std::wstring();
 }
 
 std::wstring App::GetProcessAliases(HWND hwnd)
 {
-    assert(App::IsMainThread());
-
     std::shared_ptr<Process> process = this->FindProcess(hwnd);
-    if (process)
-    {
-        return process->GetProcessAliases();
-    }
-
-    assert(false);
-    return std::wstring();
+    return process ? process->GetProcessAliases() : std::wstring();
 }
 
 std::wstring App::GetProcessCurrentDirectory(HWND hwnd)
 {
-    assert(App::IsMainThread());
+    std::shared_ptr<Process> process = this->FindProcess(hwnd);
+    return process ? process->GetProcessCurrentDirectory() : std::wstring();
+}
 
+std::wstring App::GetProcessColorTable(HWND hwnd)
+{
+    std::shared_ptr<Process> process = this->FindProcess(hwnd);
+    return process ? process->GetProcessColorTable() : std::wstring();
+}
+
+void App::SetProcessColorTable(HWND hwnd, const wchar_t* value)
+{
     std::shared_ptr<Process> process = this->FindProcess(hwnd);
     if (process)
     {
-        return process->GetProcessCurrentDirectory();
+        process->SetProcessColorTable(value);
     }
-
-    assert(false);
-    return std::wstring();
 }
 
 void App::OnProcessCreated(Process * process)

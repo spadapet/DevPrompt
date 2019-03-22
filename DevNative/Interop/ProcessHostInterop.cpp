@@ -146,7 +146,7 @@ HRESULT ProcessHostInterop::RunProcess(
     const wchar_t* startingDirectory,
     IProcess** obj)
 {
-    return this->RestoreProcess(executable, arguments, startingDirectory, nullptr, nullptr, nullptr, obj);
+    return this->RestoreProcess(executable, arguments, startingDirectory, nullptr, nullptr, nullptr, nullptr, obj);
 }
 
 HRESULT ProcessHostInterop::RestoreProcess(
@@ -155,6 +155,7 @@ HRESULT ProcessHostInterop::RestoreProcess(
     const wchar_t* currentDirectory,
     const wchar_t* environment,
     const wchar_t* aliases,
+    const wchar_t* colorTable,
     const wchar_t* windowTitle,
     IProcess** obj)
 {
@@ -172,11 +173,8 @@ HRESULT ProcessHostInterop::RestoreProcess(
         info.startingDirectory = currentDirectory ? currentDirectory : L"";
         info.environment = environment ? environment : L"";
         info.windowTitle = windowTitle ? windowTitle : L"";
-
-        std::wstring aliasesBuffer = aliases ? aliases : L"";
-        std::replace(aliasesBuffer.begin(), aliasesBuffer.end(), L'\n', L'\0');
-        aliasesBuffer += L'\0'; // just in case
-        info.aliases.ParseNameValuePairs(aliasesBuffer.c_str());
+        info.colorTable = colorTable ? colorTable : L"";
+        info.aliases.ParseNameValuePairs(aliases, '\n');
 
         HWND hwnd = app->RunProcess(this->hwnd, info);
         if (hwnd)

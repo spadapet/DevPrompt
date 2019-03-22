@@ -54,6 +54,8 @@ public:
     std::wstring GetProcessEnv(HWND hwnd);
     std::wstring GetProcessAliases(HWND hwnd);
     std::wstring GetProcessCurrentDirectory(HWND hwnd);
+    std::wstring GetProcessColorTable(HWND hwnd);
+    void SetProcessColorTable(HWND hwnd, const wchar_t* value);
     std::wstring GetGrabProcesses();
     void GrabProcess(DWORD id);
     void NoAutoGrabWindow(HWND hwnd);

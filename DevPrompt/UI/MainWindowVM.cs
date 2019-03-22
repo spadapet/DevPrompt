@@ -528,6 +528,7 @@ namespace DevPrompt.UI
                 console.CurrentDirectory,
                 console.Environment,
                 console.Aliases,
+                console.ColorTable,
                 console.WindowTitle);
             IntPtr hwndNew = processNew?.GetWindow() ?? IntPtr.Zero;
 
