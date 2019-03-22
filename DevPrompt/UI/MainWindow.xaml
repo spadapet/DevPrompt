@@ -150,6 +150,7 @@
                 <Separator Tag="[End]" />
                 <MenuItem Header="_Customize..." Command="{Binding CustomizeLinksCommand}" />
             </MenuItem>
+            <MenuItem Header="_About" Command="{Binding AboutCommand}" />
         </Menu>
 
         <Button

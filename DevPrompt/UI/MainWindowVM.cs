@@ -245,6 +245,22 @@ namespace DevPrompt.UI
             }
         }
 
+        public ICommand AboutCommand
+        {
+            get
+            {
+                return new DelegateCommand(() =>
+                {
+                    AboutDialog dialog = new AboutDialog()
+                    {
+                        Owner = this.Window
+                    };
+
+                    dialog.ShowDialog();
+                });
+            }
+        }
+
         public string WindowTitle
         {
             get

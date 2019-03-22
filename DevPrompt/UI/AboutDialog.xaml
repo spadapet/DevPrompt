@@ -1,0 +1,36 @@
+﻿<Window x:Class="DevPrompt.UI.AboutDialog"
+        x:ClassModifier="internal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="About DevPrompt" Width="350" Height="200"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        WindowStyle="SingleBorderWindow"
+        Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <StackPanel Margin="10">
+            <Image Source="/DevPrompt;component/appicon.ico" Width="32" Height="32" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Margin="10" HorizontalAlignment="Left">
+            <TextBlock><Bold>DevPrompt <Run Text="{Binding AppVersion, Mode=OneTime}" /></Bold></TextBlock>
+            <TextBlock Text="{Binding CopyrightYear, Mode=OneTime}" />
+            <TextBlock Margin="0,10"><Hyperlink NavigateUri="https://github.com/spadapet/DevPrompt" RequestNavigate="OnHyperlink">https://github.com/spadapet/DevPrompt</Hyperlink></TextBlock>
+            <TextBlock>Peter Spada</TextBlock>
+            <TextBlock><Hyperlink NavigateUri="mailto:spadapet@hotmail.com" RequestNavigate="OnHyperlink">spadapet@hotmail.com</Hyperlink></TextBlock>
+        </StackPanel>
+        <Button Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right" Margin="0,0,10,10" Padding="15,2" IsCancel="True">Close</Button>
+    </Grid>
+</Window>

@@ -70,6 +70,9 @@
     <Compile Include="UI\InstallBranchDialog.xaml.cs">
       <DependentUpon>InstallBranchDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\AboutDialog.xaml.cs">
+      <DependentUpon>AboutDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\TabNameDialog.xaml.cs">
       <DependentUpon>TabNameDialog.xaml</DependentUpon>
     </Compile>
@@ -93,6 +96,10 @@
     <Compile Include="Settings\AppSettings.cs" />
     <Compile Include="Utility\VisualStudioSetup.cs" />
     <Page Include="UI\InstallBranchDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\AboutDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

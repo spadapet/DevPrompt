@@ -2,11 +2,11 @@
 using System.Runtime.InteropServices;
 using System.Windows;
 
-[assembly: AssemblyTitle("Dev Prompt")]
+[assembly: AssemblyTitle("DevPrompt")]
 [assembly: AssemblyDescription("Tabbed command prompts for developers")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Dev Prompt")]
+[assembly: AssemblyProduct("DevPrompt")]
 [assembly: AssemblyCopyright("Copyright © 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
