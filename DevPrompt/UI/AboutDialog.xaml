@@ -5,7 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="About DevPrompt" Width="350" Height="200"
+        Title="About DevPrompt" Width="375" Height="225"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         ShowInTaskbar="False"
@@ -25,12 +25,24 @@
             <Image Source="/DevPrompt;component/appicon.ico" Width="32" Height="32" />
         </StackPanel>
         <StackPanel Grid.Column="1" Margin="10" HorizontalAlignment="Left">
-            <TextBlock><Bold>DevPrompt <Run Text="{Binding AppVersion, Mode=OneTime}" /></Bold></TextBlock>
+            <TextBlock><Bold><Run Text="DevPrompt "/></Bold><Run Text="{Binding AppVersion, Mode=OneTime}" /></TextBlock>
             <TextBlock Text="{Binding CopyrightYear, Mode=OneTime}" />
-            <TextBlock Margin="0,10"><Hyperlink NavigateUri="https://github.com/spadapet/DevPrompt" RequestNavigate="OnHyperlink">https://github.com/spadapet/DevPrompt</Hyperlink></TextBlock>
+            <RichTextBox Margin="-5,10,0,10" IsReadOnly="True" BorderThickness="0" IsDocumentEnabled="True" Background="Transparent">
+                <FlowDocument PagePadding="0">
+                    <Paragraph>
+                        <Hyperlink NavigateUri="https://github.com/spadapet/DevPrompt" RequestNavigate="OnHyperlink">https://github.com/spadapet/DevPrompt</Hyperlink>
+                    </Paragraph>
+                </FlowDocument>
+            </RichTextBox>
             <TextBlock>Peter Spada</TextBlock>
-            <TextBlock><Hyperlink NavigateUri="mailto:spadapet@hotmail.com" RequestNavigate="OnHyperlink">spadapet@hotmail.com</Hyperlink></TextBlock>
+            <RichTextBox Margin="-5,0,0,0" IsReadOnly="True" BorderThickness="0" IsDocumentEnabled="True" Background="Transparent">
+                <FlowDocument PagePadding="0">
+                    <Paragraph>
+                        <Hyperlink NavigateUri="mailto:spadapet@hotmail.com" RequestNavigate="OnHyperlink">spadapet@hotmail.com</Hyperlink>
+                    </Paragraph>
+                </FlowDocument>
+            </RichTextBox>
         </StackPanel>
-        <Button Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right" Margin="0,0,10,10" Padding="15,2" IsCancel="True">Close</Button>
+        <Button Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right" Margin="0,0,10,10" Padding="15,2" IsCancel="True" IsDefault="True">Close</Button>
     </Grid>
 </Window>
