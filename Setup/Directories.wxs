@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <?include "variables.wxi"?>
+    <Fragment>
+        <Directory Id="TARGETDIR" Name="SourceDir">
+
+            <Directory Id="LocalAppDataFolder">
+                <Directory Id="INSTALLDIR" Name="DevPrompt" />
+            </Directory>
+
+            <Directory Id="ProgramMenuFolder">
+                <!--<Directory Id="CompanyProgramMenuFolder" Name="$(var.CompanyName)">
+                    <Directory Id="ProductProgramMenuFolder" Name="$(var.ProductName)$(var.ProductNameSuffix)" />
+                </Directory>-->
+            </Directory>
+
+        </Directory>
+    </Fragment>
+</Wix>

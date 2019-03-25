@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <?include "variables.wxi"?>
+    <Fragment>
+        <!--<DirectoryRef Id="TARGETDIR">
+            <Merge Id="VC141_Runtime" SourceFile="$(var.ProgramFilesFolder)\Microsoft Visual Studio\2019\Preview\VC\Redist\MSVC\14.20.27508\MergeModules\Microsoft_VC141_CRT_$(var.BuildArch).msm" DiskId="1" Language="0"/>
+        </DirectoryRef>-->
+    </Fragment>
+</Wix>

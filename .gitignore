@@ -1,6 +1,10 @@
-/.vs/
-/DevPrompt/obj/
 /out/
 /packages/
+/SetupNetCore/AppPackages/
+/SetupNetCore/BundleArtifacts/
+
+.vs/
+bin/
+obj/
 
 *.user

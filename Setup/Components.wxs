@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <?include "variables.wxi"?>
+    <Fragment>
+        <DirectoryRef Id="INSTALLDIR">
+            <Component Id="DevPrompt.exe" Guid="$(var.Id_DevPrompt.exe)">
+                <File Source="$(var.Bin64)\DevPrompt.exe" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistryRootKey)" Type="string" Name="InstallVersion" Value="$(var.ProductVersion)" KeyPath="yes"/>
+            </Component>
+
+            <Component Id="InstallDir" Guid="$(var.Id_InstallDir)">
+                <CreateFolder />
+                <RemoveFolder On="uninstall" Id="INSTALLDIR" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistryRootKey)" Type="string" Name="InstallDir" Value="[INSTALLDIR]" KeyPath="yes"/>
+            </Component>
+        </DirectoryRef>
+
+        <DirectoryRef Id="ProgramMenuFolder">
+            <Component Id="StartMenuShortcut" Guid="$(var.Id_StartMenuShortcut)">
+                <Shortcut Id="StartMenuDevPrompt" Name="$(var.ProductName)" Target="[INSTALLDIR]DevPrompt.exe" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistryRootKey)" Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes"/>
+            </Component>
+        </DirectoryRef>
+    </Fragment>
+</Wix>
