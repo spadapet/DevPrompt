@@ -1,126 +1,49 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-  </ItemGroup>
-  <PropertyGroup Label="Globals">
-    <ProjectName>DevNative</ProjectName>
-    <ProjectGuid>{36C4CDB6-17CA-4915-8CCD-6860AED09ADF}</ProjectGuid>
-    <Keyword>Win32Proj</Keyword>
-    <RootNamespace>DevNative</RootNamespace>
-    <VCProjectVersion>15.0</VCProjectVersion>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
-    <PlatformToolset>v142</PlatformToolset>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="Shared">
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;DEVNATIVE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;DEVNATIVE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="App.h" />
-    <ClInclude Include="Interop\AppInterop.h" />
-    <ClInclude Include="Interop\ProcessHostInterop.h" />
-    <ClInclude Include="Interop\ProcessInterop.h" />
-    <ClInclude Include="Process2.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="WindowProc.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="App.cpp" />
-    <ClCompile Include="Interop\AppInterop.cpp" />
-    <ClCompile Include="Interop\ProcessHostInterop.cpp" />
-    <ClCompile Include="Interop\ProcessInterop.cpp" />
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Process2.cpp" />
-    <ClCompile Include="stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="WindowProc.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DevInject\DevInject.vcxproj">
-      <Project>{4e07b01f-76b4-4e52-b876-338eb9eddf3e}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Midl Include="Interop\DevPrompt.idl">
-      <OutputDirectory>$(IntDir)</OutputDirectory>
-    </Midl>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="cpp.hint" />
-  </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+    <Import Project="..\cpp.props" />
+    <PropertyGroup Label="Globals">
+        <ProjectGuid>{36C4CDB6-17CA-4915-8CCD-6860AED09ADF}</ProjectGuid>
+    </PropertyGroup>
+
+    <ItemDefinitionGroup>
+        <ClCompile>
+            <PreprocessorDefinitions>DEVNATIVE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+        </ClCompile>
+    </ItemDefinitionGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\DevInject\DevInject.vcxproj">
+            <Project>{4e07b01f-76b4-4e52-b876-338eb9eddf3e}</Project>
+        </ProjectReference>
+    </ItemGroup>
+    <ItemGroup>
+        <ClInclude Include="App.h" />
+        <ClInclude Include="Interop\AppInterop.h" />
+        <ClInclude Include="Interop\ProcessHostInterop.h" />
+        <ClInclude Include="Interop\ProcessInterop.h" />
+        <ClInclude Include="Process2.h" />
+        <ClInclude Include="stdafx.h" />
+        <ClInclude Include="WindowProc.h" />
+    </ItemGroup>
+    <ItemGroup>
+        <ClCompile Include="App.cpp" />
+        <ClCompile Include="Interop\AppInterop.cpp" />
+        <ClCompile Include="Interop\ProcessHostInterop.cpp" />
+        <ClCompile Include="Interop\ProcessInterop.cpp" />
+        <ClCompile Include="Main.cpp" />
+        <ClCompile Include="Process2.cpp" />
+        <ClCompile Include="stdafx.cpp">
+            <PrecompiledHeader>Create</PrecompiledHeader>
+        </ClCompile>
+        <ClCompile Include="WindowProc.cpp" />
+    </ItemGroup>
+    <ItemGroup>
+        <Midl Include="Interop\DevPrompt.idl">
+            <OutputDirectory>$(IntDir)</OutputDirectory>
+        </Midl>
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="cpp.hint" />
+    </ItemGroup>
+    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

@@ -597,45 +597,7 @@ HMODULE Process::Inject(HANDLE process)
 {
     assert(!App::IsMainThread());
 
-    HMODULE remoteModule = nullptr;
-    wchar_t dllBuffer[MAX_PATH];
-    ::GetModuleFileName(this->app->GetInstance(), dllBuffer, _countof(dllBuffer));
-
-    std::wstring dllPath = dllBuffer;
-    size_t lastSlash = dllPath.rfind('\\');
-
-    dllPath.erase(lastSlash, dllPath.size() - lastSlash);
-    dllPath.append(L"\\DevInject.dll");
-
-    size_t dllPathSize = (dllPath.size() + 1) * sizeof(wchar_t);
-    wchar_t* dllPathRemote = reinterpret_cast<wchar_t*>(::VirtualAllocEx(process, nullptr, dllPathSize, MEM_COMMIT, PAGE_READWRITE));
-    if (dllPathRemote)
-    {
-        if (::WriteProcessMemory(process, dllPathRemote, dllPath.c_str(), dllPathSize, nullptr))
-        {
-            HMODULE kernelModule = ::GetModuleHandle(L"Kernel32");
-            LPTHREAD_START_ROUTINE loadLibrary = reinterpret_cast<LPTHREAD_START_ROUTINE>(::GetProcAddress(kernelModule, "LoadLibraryW"));
-            HANDLE remoteLoadLibrary = ::CreateRemoteThread(process, nullptr, 0, loadLibrary, dllPathRemote, 0, nullptr);
-
-            if (remoteLoadLibrary)
-            {
-                std::array<HANDLE, 3> handles = { remoteLoadLibrary, this->disposeEvent, process };
-                if (::WaitForMultipleObjects(static_cast<DWORD>(handles.size()), handles.data(), FALSE, INFINITE) == WAIT_OBJECT_0)
-                {
-                    if (::GetExitCodeThread(remoteLoadLibrary, reinterpret_cast<DWORD*>(&remoteModule)))
-                    {
-                        // Should be injected now...
-                    }
-                }
-
-                ::CloseHandle(remoteLoadLibrary);
-            }
-        }
-
-        ::VirtualFreeEx(process, dllPathRemote, dllPathSize, MEM_RELEASE);
-    }
-
-    return remoteModule;
+    return DevInject::InjectDll(process, this->disposeEvent);
 }
 
 // Adds a command to the queue to send to the other process. It may never be sent if the other process dies.

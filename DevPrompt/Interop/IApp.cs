@@ -26,7 +26,7 @@ namespace DevPrompt.Interop
 
     internal static class App
     {
-        [DllImport("DevNative")]
+        [DllImport("DevNative", CallingConvention = CallingConvention.Cdecl)]
         public static extern void CreateApp(IAppHost host, out IApp app);
     }
 }

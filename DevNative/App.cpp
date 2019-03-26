@@ -385,7 +385,7 @@ static bool IsKeyPressed(int vk)
 // This method is used to spy on all key presses before the console window gets a chance to see them
 bool App::HandleKeyboardInput(const RAWINPUT & ri)
 {
-    int vkey = static_cast<int>(ri.data.keyboard.VKey);
+    wchar_t vkey = ri.data.keyboard.VKey;
     if (vkey < this->keysPressed.size())
     {
         bool pressed = !(ri.data.keyboard.Flags & 1);

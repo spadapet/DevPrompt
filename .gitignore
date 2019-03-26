@@ -1,7 +1,5 @@
-.vs/
-bin/
-obj/
-packages/
-x64/
+/.vs/
+/out/
+/packages/
 
 *.user

@@ -12,6 +12,7 @@
         Activated="OnActivated"
         Deactivated="OnDeactivated"
         Loaded="OnLoaded"
+        Unloaded="OnUnloaded"
         Closing="OnClosing"
         Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
         DataContext="{Binding ViewModel, RelativeSource={RelativeSource Mode=Self}}"
@@ -171,6 +172,6 @@
             ItemsPanel="{StaticResource TabItemsPanelTemplate}"
             ItemTemplate="{StaticResource TabItemTemplate}" />
 
-        <local:ProcessHostWindow x:Name="processHostWindow" Grid.Row="4" />
+        <Border Grid.Row="4" x:Name="processHostHolder" BorderThickness="0" />
     </Grid>
 </Window>

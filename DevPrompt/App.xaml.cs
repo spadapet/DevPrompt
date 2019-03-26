@@ -48,92 +48,93 @@ namespace DevPrompt
             }
         }
 
+        public new MainWindow MainWindow
+        {
+            get
+            {
+                return base.MainWindow as MainWindow;
+            }
+
+            set
+            {
+                base.MainWindow = value;
+            }
+        }
+
         private async void OnStartup(object sender, StartupEventArgs args)
         {
-            DevPrompt.Interop.App.CreateApp(this, out this.nativeApp);
+            TypeLoadException nativeAppException = null;
+            try
+            {
+                DevPrompt.Interop.App.CreateApp(this, out this.nativeApp);
+            }
+            catch (TypeLoadException ex)
+            {
+                nativeAppException = ex;
+            }
 
-            this.MainWindow = new MainWindow(this.Settings);
+            this.MainWindow = new MainWindow(this.Settings, nativeAppException?.Message);
+            this.MainWindow.Show();
 
             this.Settings.CopyFrom(await AppSettings.Load(AppSettings.DefaultPath));
-            this.MainWindow.Show();
+            this.MainWindow.OnAppInitComplete();
         }
 
         private void OnExit(object sender, ExitEventArgs args)
         {
-            this.nativeApp?.Dispose();
-            Marshal.FinalReleaseComObject(this.nativeApp);
-            this.nativeApp = null;
+            if (this.nativeApp != null)
+            {
+                this.nativeApp.Dispose();
+                Marshal.FinalReleaseComObject(this.nativeApp);
+                this.nativeApp = null;
+            }
         }
 
         void IAppHost.OnProcessOpening(IProcess process, bool activate, string path)
         {
-            if (this.MainWindow is MainWindow mainWindow)
-            {
-                mainWindow.ViewModel.OnProcessOpening(process, activate, path);
-            }
+            this.MainWindow?.ViewModel.OnProcessOpening(process, activate, path);
         }
 
         void IAppHost.OnProcessClosing(IProcess process)
         {
-            if (this.MainWindow is MainWindow mainWindow)
-            {
-                mainWindow.ViewModel.OnProcessClosing(process);
-            }
+            this.MainWindow?.ViewModel.OnProcessClosing(process);
         }
 
         void IAppHost.OnProcessEnvChanged(IProcess process, string env)
         {
-            if (this.MainWindow is MainWindow mainWindow)
-            {
-                mainWindow.ViewModel.OnProcessEnvChanged(process, env);
-            }
+            this.MainWindow?.ViewModel.OnProcessEnvChanged(process, env);
         }
 
         void IAppHost.OnProcessTitleChanged(IProcess process, string title)
         {
-            if (this.MainWindow is MainWindow mainWindow)
-            {
-                mainWindow.ViewModel.OnProcessTitleChanged(process, title);
-            }
+            this.MainWindow?.ViewModel.OnProcessTitleChanged(process, title);
         }
 
         void IAppHost.CloneActiveProcess()
         {
-            if (this.MainWindow is MainWindow mainWindow)
-            {
-                mainWindow.ViewModel.ActiveProcess?.CloneCommand.Execute(null);
-            }
+            this.MainWindow?.ViewModel.ActiveProcess?.CloneCommand.Execute(null);
         }
 
         void IAppHost.SetTabName()
         {
-            if (this.MainWindow is MainWindow mainWindow)
-            {
-                mainWindow.ViewModel.ActiveProcess?.SetTabNameCommand.Execute(null);
-            }
+            this.MainWindow?.ViewModel.ActiveProcess?.SetTabNameCommand.Execute(null);
         }
 
         void IAppHost.CloseActiveProcess()
         {
-            if (this.MainWindow is MainWindow mainWindow)
-            {
-                mainWindow.ViewModel.ActiveProcess?.CloseCommand.Execute(null);
-            }
+            this.MainWindow?.ViewModel.ActiveProcess?.CloseCommand.Execute(null);
         }
 
         void IAppHost.DetachActiveProcess()
         {
-            if (this.MainWindow is MainWindow mainWindow)
-            {
-                mainWindow.ViewModel.ActiveProcess?.DetachCommand.Execute(null);
-            }
+            this.MainWindow?.ViewModel.ActiveProcess?.DetachCommand.Execute(null);
         }
 
         IntPtr IAppHost.GetMainWindow()
         {
-            if (this.MainWindow is MainWindow mainWindow)
+            if (this.MainWindow != null)
             {
-                WindowInteropHelper helper = new WindowInteropHelper(mainWindow);
+                WindowInteropHelper helper = new WindowInteropHelper(this.MainWindow);
                 return helper.Handle;
             }
 
@@ -164,42 +165,27 @@ namespace DevPrompt
 
         void IAppHost.OnAltLetter(int vk)
         {
-            if (this.MainWindow is MainWindow mainWindow)
-            {
-                mainWindow.OnAltLetter(vk);
-            }
+            this.MainWindow?.OnAltLetter(vk);
         }
 
         void IAppHost.OnAlt()
         {
-            if (this.MainWindow is MainWindow mainWindow)
-            {
-                mainWindow.OnAlt();
-            }
+            this.MainWindow?.OnAlt();
         }
 
         void IAppHost.TabCycleStop()
         {
-            if (this.MainWindow is MainWindow mainWindow)
-            {
-                mainWindow.ViewModel.TabCycleStop();
-            }
+            this.MainWindow?.ViewModel.TabCycleStop();
         }
 
         void IAppHost.TabCycleNext()
         {
-            if (this.MainWindow is MainWindow mainWindow)
-            {
-                mainWindow.ViewModel.TabCycleNext();
-            }
+            this.MainWindow?.ViewModel.TabCycleNext();
         }
 
         void IAppHost.TabCyclePrev()
         {
-            if (this.MainWindow is MainWindow mainWindow)
-            {
-                mainWindow.ViewModel.TabCyclePrev();
-            }
+            this.MainWindow?.ViewModel.TabCyclePrev();
         }
     }
 }

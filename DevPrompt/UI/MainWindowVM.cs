@@ -80,7 +80,7 @@ namespace DevPrompt.UI
         {
             get
             {
-                return this.Window.ProcessHostWindow.ProcessHost;
+                return this.Window.ProcessHostWindow?.ProcessHost;
             }
         }
 
@@ -557,7 +557,7 @@ namespace DevPrompt.UI
 
         private void GrabConsole(int processId)
         {
-            App.Current.NativeApp.GrabProcess(processId);
+            App.Current.NativeApp?.GrabProcess(processId);
         }
 
         private void StartLink(LinkSettings settings)

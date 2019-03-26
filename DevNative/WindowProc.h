@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 class IWindowProc
 {
@@ -8,7 +8,7 @@ public:
     static HWND Create(IWindowProc* windowProc, WNDCLASSEX& windowClass, DWORD style, RECT pos, HWND parent);
 
 private:
-    static LRESULT StaticWindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+    static LRESULT __stdcall StaticWindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 };
 
 namespace WindowProc

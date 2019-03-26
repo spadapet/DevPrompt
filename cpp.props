@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project  ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <DevRoot>$(MSBuildThisFileDirectory)\</DevRoot>
+        <OutRoot>$(DevRoot)out\</OutRoot>
+
+        <!-- Project config -->
+        <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <XPlatform>$(Platform)</XPlatform>
+        <XPlatform Condition=" '$(Platform)' == 'Win32' ">x86</XPlatform>
+
+        <!-- Project properties -->
+        <CharacterSet Condition=" '$(CharacterSet)' == '' ">Unicode</CharacterSet>
+        <ConfigurationType Condition=" '$(ConfigurationType)' == '' ">DynamicLibrary</ConfigurationType>
+        <DefaultLanguage Condition=" '$(DefaultLanguage)' == '' ">en-US</DefaultLanguage>
+        <Keyword Condition=" '$(Keyword)' == '' ">Win32Proj</Keyword>
+        <WindowsTargetPlatformVersion Condition=" '$(WindowsTargetPlatformVersion)' == '' ">10.0.17763.0</WindowsTargetPlatformVersion>
+        <PlatformToolset Condition=" '$(PlatformToolset)' == '' ">v142</PlatformToolset>
+        <ProjectName Condition=" '$(ProjectName)' == '' ">$(MSBuildProjectName)</ProjectName>
+        <RootNamespace Condition=" '$(RootNamespace)' == '' ">$(ProjectName)</RootNamespace>
+        <VCProjectVersion Condition=" '$(VCProjectVersion)' == '' ">15.0</VCProjectVersion>
+
+        <!-- Output paths -->
+        <ConfigOutRoot>$(OutRoot)$(Configuration).$(XPlatform)\</ConfigOutRoot>
+        <ProjectOutRoot>$(ConfigOutRoot)$(ProjectName)\</ProjectOutRoot>
+        <OutDir>$(ConfigOutRoot)bin\</OutDir>
+        <IntDir>$(ProjectOutRoot)</IntDir>
+        <GeneratedFilesDir>$(ProjectOutRoot)\</GeneratedFilesDir>
+    </PropertyGroup>
+
+    <ItemGroup Label="ProjectConfigurations">
+        <ProjectConfiguration Include="Debug|Win32">
+            <Configuration>Debug</Configuration>
+            <Platform>Win32</Platform>
+        </ProjectConfiguration>
+        <ProjectConfiguration Include="Debug|x64">
+            <Configuration>Debug</Configuration>
+            <Platform>x64</Platform>
+        </ProjectConfiguration>
+        <ProjectConfiguration Include="Release|Win32">
+            <Configuration>Release</Configuration>
+            <Platform>Win32</Platform>
+        </ProjectConfiguration>
+        <ProjectConfiguration Include="Release|x64">
+            <Configuration>Release</Configuration>
+            <Platform>x64</Platform>
+        </ProjectConfiguration>
+    </ItemGroup>
+
+    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+
+    <!-- Debug-only properties, possibly used by Cpp.props -->
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' " Label="Configuration">
+        <LinkIncremental>true</LinkIncremental>
+        <UseDebugLibraries>true</UseDebugLibraries>
+        <WholeProgramOptimization>false</WholeProgramOptimization>
+    </PropertyGroup>
+
+    <!-- Release-only properties, possibly used by Cpp.props -->
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' " Label="Configuration">
+        <LinkIncremental>false</LinkIncremental>
+        <UseDebugLibraries>false</UseDebugLibraries>
+        <UseDotNetNativeToolchain Condition=" '$(UseDotNetNativeToolchain)' == '' And '$(AppType)' == 'Metro' And '$(ConfigurationType)' == 'Application' ">true</UseDotNetNativeToolchain>
+        <WholeProgramOptimization>true</WholeProgramOptimization>
+    </PropertyGroup>
+
+    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+
+    <ItemDefinitionGroup>
+        <ClCompile>
+            <PrecompiledHeader>Use</PrecompiledHeader>
+            <WarningLevel>Level3</WarningLevel>
+            <Optimization Condition=" '$(Configuration)' == 'Debug' ">Disabled</Optimization>
+            <Optimization Condition=" '$(Configuration)' == 'Release' ">MaxSpeed</Optimization>
+            <FunctionLevelLinking Condition=" '$(Configuration)' == 'Release' ">true</FunctionLevelLinking>
+            <IntrinsicFunctions Condition=" '$(Configuration)' == 'Release' ">true</IntrinsicFunctions>
+            <SDLCheck>true</SDLCheck>
+            <PreprocessorDefinitions>_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <PreprocessorDefinitions Condition=" '$(Configuration)' == 'Debug' ">_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <PreprocessorDefinitions Condition=" '$(Configuration)' == 'Release' ">NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <ConformanceMode>true</ConformanceMode>
+            <AdditionalIncludeDirectories>$(ProjectDir);$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+            <LanguageStandard>stdcpp17</LanguageStandard>
+        </ClCompile>
+        <Link>
+            <SubSystem>Windows</SubSystem>
+            <GenerateDebugInformation>true</GenerateDebugInformation>
+            <EnableCOMDATFolding Condition=" '$(Configuration)' == 'Release' ">true</EnableCOMDATFolding>
+            <OptimizeReferences Condition=" '$(Configuration)' == 'Release' ">true</OptimizeReferences>
+        </Link>
+    </ItemDefinitionGroup>
+
+</Project>

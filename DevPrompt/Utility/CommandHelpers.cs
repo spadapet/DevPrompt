@@ -140,7 +140,7 @@ namespace DevPrompt.Utility
 
         public static IEnumerable<string> GetGrabProcesses()
         {
-            string names = App.Current.NativeApp.GetGrabProcesses();
+            string names = App.Current.NativeApp?.GetGrabProcesses();
             return !string.IsNullOrEmpty(names) ? names.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries) : new string[0];
         }
     }

@@ -15,15 +15,22 @@ namespace DevPrompt.UI
     {
         public MainWindowVM ViewModel { get; }
         public AppSettings AppSettings { get; }
-        public ProcessHostWindow ProcessHostWindow => this.processHostWindow;
-        private bool everLoaded;
 
-        public MainWindow(AppSettings settings)
+        public MainWindow(AppSettings settings, string initialErrorText)
         {
             this.AppSettings = settings;
             this.ViewModel = new MainWindowVM(this);
+            this.ViewModel.ErrorText = initialErrorText;
 
             this.InitializeComponent();
+        }
+
+        public ProcessHostWindow ProcessHostWindow
+        {
+            get
+            {
+                return this.processHostHolder?.Child as ProcessHostWindow;
+            }
         }
 
         private void OnFileMenuOpened(object sender, RoutedEventArgs args)
@@ -157,14 +164,14 @@ namespace DevPrompt.UI
 
         private void OnActivated(object sender, EventArgs args)
         {
-            App.Current.NativeApp.Activate();
-            this.ProcessHostWindow.OnActivated();
+            App.Current.NativeApp?.Activate();
+            this.ProcessHostWindow?.OnActivated();
         }
 
         private void OnDeactivated(object sender, EventArgs args)
         {
-            App.Current.NativeApp.Deactivate();
-            this.ProcessHostWindow.OnDeactivated();
+            App.Current.NativeApp?.Deactivate();
+            this.ProcessHostWindow?.OnDeactivated();
         }
 
         private IntPtr WindowProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -173,19 +180,30 @@ namespace DevPrompt.UI
             return IntPtr.Zero;
         }
 
-        private void OnLoaded(object sender, RoutedEventArgs args)
+        public void OnAppInitComplete()
         {
-            if (!this.everLoaded)
+            if (App.Current.NativeApp != null)
             {
-                this.everLoaded = true;
-
-                if (PresentationSource.FromVisual(this) is HwndSource source)
-                {
-                    source.AddHook(this.WindowProc);
-                }
+                this.processHostHolder.Child = new ProcessHostWindow();
 
                 Action action = () => this.ViewModel.RunStartupConsoles();
                 this.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, action);
+            }
+        }
+
+        private void OnLoaded(object sender, RoutedEventArgs args)
+        {
+            if (PresentationSource.FromVisual(this) is HwndSource source)
+            {
+                source.AddHook(this.WindowProc);
+            }
+        }
+
+        private void OnUnloaded(object sender, RoutedEventArgs args)
+        {
+            if (PresentationSource.FromVisual(this) is HwndSource source)
+            {
+                source.RemoveHook(this.WindowProc);
             }
         }
 
