@@ -14,6 +14,7 @@
       <Filter>Interop</Filter>
     </ClInclude>
     <ClInclude Include="Process2.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -43,5 +44,8 @@
     <Midl Include="Interop\DevPrompt.idl">
       <Filter>Interop</Filter>
     </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
 </Project>

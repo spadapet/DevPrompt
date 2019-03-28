@@ -7,6 +7,17 @@ indent_size = 4
 insert_final_newline = true
 charset = utf-8-bom
 
+[*.rc]
+charset = unset
+
+# Match how VS is going to auto-reformat the file
+[*.csproj]
+indent_size = 2
+
+# Match how VS is going to auto-reformat the file
+[*.vcxproj]
+indent_size = 2
+
 [*.cs]
 
 #### Core EditorConfig Options ####

@@ -3,7 +3,6 @@
 
 #include "WindowProc.h"
 
-#include "../DevInject/Message.h"
 #include "../DevInject/Pipe.h"
 
 class App;
@@ -61,7 +60,6 @@ private:
     void BackgroundClone(const std::shared_ptr<Process>& process);
     void BackgroundSendCommands(HANDLE process);
     void InitNewProcess(const ProcessStartInfo& info);
-    HMODULE Inject(HANDLE process);
 
     Message CommandHandler(HANDLE process, const Message& input);
     void SendCommandAsync(Message&& command);

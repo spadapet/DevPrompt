@@ -115,11 +115,7 @@ namespace DevPrompt.Settings
             if ((filter & DefaultSettingsFilter.DevPrompts) != 0)
             {
                 settings.AddVisualStudioEnlistments();
-
-                if (settings.consoles.Count == 0)
-                {
-                    await settings.AddVisualStudioDevPrompts();
-                }
+                await settings.AddVisualStudioDevPrompts();
             }
 
             if ((filter & DefaultSettingsFilter.RawPrompts) != 0)

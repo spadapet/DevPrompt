@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "App.h"
 #include "Process2.h"
+#include "../DevInject/Inject.h"
 
 Process::Process(App& app)
     : app(app.shared_from_this())
@@ -79,7 +80,7 @@ bool Process::Attach(HANDLE process)
     assert(App::IsMainThread());
 
     HANDLE dupeProcess = nullptr;
-    if (::DuplicateHandle(::GetCurrentProcess(), process, ::GetCurrentProcess(), &dupeProcess, PROCESS_ALL_ACCESS, FALSE, 0))
+    if (::DuplicateHandle(::GetCurrentProcess(), process, ::GetCurrentProcess(), &dupeProcess, PROCESS_ALL_ACCESS, TRUE, 0))
     {
         std::shared_ptr<Process> self = shared_from_this();
 
@@ -398,8 +399,9 @@ void Process::BackgroundAttach(HANDLE process, HANDLE mainThread, const ProcessS
     ::InterlockedExchange(&this->processId, ::GetProcessId(process));
 
     Pipe pipe = Pipe::Create(process, self->disposeEvent);
+    bool injected = DevInject::InjectDll(process, this->disposeEvent, true);
 
-    if (this->Inject(process))
+    if (injected)
     {
         if (mainThread)
         {
@@ -431,10 +433,20 @@ void Process::BackgroundAttach(HANDLE process, HANDLE mainThread, const ProcessS
 
     this->PostDispose();
 
+    // Make sure we didn't detach from the process before waiting for it or killing it
     if (GetProcessId())
     {
-        // The process should die when the owner HWND closes and SC_CLOSE gets sent
-        ::WaitForSingleObject(process, INFINITE);
+        if (!injected && mainThread)
+        {
+            // We created the process, so we have to kill it when injection fails
+            ::TerminateProcess(process, 0);
+        }
+
+        if (injected || mainThread)
+        {
+            // The process will die if we created it or if injection succeeded
+            ::WaitForSingleObject(process, INFINITE);
+        }
     }
 
     if (mainThread)
@@ -499,7 +511,12 @@ void Process::BackgroundStart(const ProcessStartInfo & info)
     PROCESS_INFORMATION pi;
     DWORD flags = CREATE_NEW_CONSOLE | CREATE_SUSPENDED | CREATE_UNICODE_ENVIRONMENT;
 
-    if (::CreateProcess(nullptr, commandLineBuffer, nullptr, nullptr, FALSE, flags, envBlock, startingDirectory, &si, &pi))
+    SECURITY_ATTRIBUTES processSecurity;
+    processSecurity.nLength = sizeof(processSecurity);
+    processSecurity.lpSecurityDescriptor = nullptr;
+    processSecurity.bInheritHandle = TRUE;
+
+    if (::CreateProcess(nullptr, commandLineBuffer, &processSecurity, nullptr, FALSE, flags, envBlock, startingDirectory, &si, &pi))
     {
         this->BackgroundAttach(pi.hProcess, pi.hThread, &info);
     }
@@ -590,14 +607,6 @@ void Process::InitNewProcess(const ProcessStartInfo & info)
         message.SetValue(PIPE_PROPERTY_VALUE, info.windowTitle);
         this->SendCommandAsync(std::move(message));
     }
-}
-
-// Starts running code in the other process
-HMODULE Process::Inject(HANDLE process)
-{
-    assert(!App::IsMainThread());
-
-    return DevInject::InjectDll(process, this->disposeEvent);
 }
 
 // Adds a command to the queue to send to the other process. It may never be sent if the other process dies.

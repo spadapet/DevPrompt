@@ -5,6 +5,10 @@
     <ClInclude Include="Api.h" />
     <ClInclude Include="Pipe.h" />
     <ClInclude Include="Message.h" />
+    <ClInclude Include="Inject.h" />
+    <ClInclude Include="CommandHandler.h" />
+    <ClInclude Include="Main.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -12,8 +16,12 @@
     <ClCompile Include="CommandHandler.cpp" />
     <ClCompile Include="Pipe.cpp" />
     <ClCompile Include="Message.cpp" />
+    <ClCompile Include="Inject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
 </Project>

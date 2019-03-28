@@ -23,10 +23,4 @@ namespace DevPrompt.Interop
         [return: MarshalAs(UnmanagedType.Interface)]
         IProcessHost CreateProcessHostWindow(IntPtr parentHwnd);
     }
-
-    internal static class App
-    {
-        [DllImport("DevNative", CallingConvention = CallingConvention.Cdecl)]
-        public static extern void CreateApp(IAppHost host, out IApp app);
-    }
 }

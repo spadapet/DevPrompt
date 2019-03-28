@@ -63,17 +63,10 @@ namespace DevPrompt
 
         private async void OnStartup(object sender, StartupEventArgs args)
         {
-            TypeLoadException nativeAppException = null;
-            try
-            {
-                DevPrompt.Interop.App.CreateApp(this, out this.nativeApp);
-            }
-            catch (TypeLoadException ex)
-            {
-                nativeAppException = ex;
-            }
+            string errorMessage;
 
-            this.MainWindow = new MainWindow(this.Settings, nativeAppException?.Message);
+            this.nativeApp = Interop.App.CreateApp(this, out errorMessage);
+            this.MainWindow = new MainWindow(this.Settings, errorMessage);
             this.MainWindow.Show();
 
             this.Settings.CopyFrom(await AppSettings.Load(AppSettings.DefaultPath));

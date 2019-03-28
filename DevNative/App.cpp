@@ -122,7 +122,10 @@ void App::Task::RunCallback(PTP_CALLBACK_INSTANCE instance, void* context)
 void App::PostBackgroundTask(std::function<void()> && func)
 {
     Task* task = new Task(*this, std::move(func));
-    ::TrySubmitThreadpoolCallback(App::Task::RunCallback, task, nullptr);
+    if (!::TrySubmitThreadpoolCallback(App::Task::RunCallback, task, nullptr))
+    {
+        assert(false);
+    }
 }
 
 void App::PostToMainThread(std::function<void()> && func)
@@ -1005,7 +1008,7 @@ LRESULT App::WindowProc(HWND hwnd, UINT message, WPARAM wp, LPARAM lp)
         case WM_INPUT:
         {
             HRAWINPUT hri = reinterpret_cast<HRAWINPUT>(lp);
-            UINT size;
+            UINT size = 0;
             if (::GetRawInputData(hri, RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER)) == 0)
             {
                 rawInput.resize(size);

@@ -1,11 +1,6 @@
 ﻿#include "stdafx.h"
-#include "Message.h"
-
-namespace DevInject
-{
-    HMODULE Dispose();
-    Message CommandHandler(const Message& input);
-}
+#include "CommandHandler.h"
+#include "Main.h"
 
 static Message HandleGetEnv(const Message& input)
 {

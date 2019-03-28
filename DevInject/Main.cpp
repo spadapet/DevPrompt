@@ -1,4 +1,6 @@
 ﻿#include "stdafx.h"
+#include "CommandHandler.h"
+#include "Main.h"
 #include "Pipe.h"
 
 static HMODULE module = nullptr;
@@ -9,13 +11,6 @@ static HANDLE watchdogThread = nullptr;
 static HANDLE findMainWindowThread = nullptr;
 static std::mutex ownerPipeMutex;
 static Pipe ownerPipe;
-
-namespace DevInject
-{
-    static void Initialize(HMODULE module);
-    HMODULE Dispose();
-    Message CommandHandler(const Message& input);
-}
 
 BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID)
 {
@@ -189,9 +184,11 @@ static BOOL CALLBACK FindOwnerProcessWindow(HWND hwnd, LPARAM lp)
                 wchar_t path[MAX_PATH];
                 if (::GetProcessImageFileName(hwndProcess, path, _countof(path)))
                 {
+                    const wchar_t* ownerSuffix = L"\\DevPrompt.exe";
+                    const size_t suffixLen = std::wcslen(ownerSuffix);
+
                     size_t len = std::wcslen(path);
-                    if ((len >= 14 && !_wcsicmp(L"\\DevPrompt.exe", path + (len - 14))) ||
-                        (len >= 21 && !_wcsicmp(L"\\DevPromptNetCore.exe", path + (len - 21))))
+                    if ((len >= suffixLen && !_wcsicmp(ownerSuffix, path + (len - suffixLen))))
                     {
                         ::ownerPipe = Pipe::Connect(hwndProcess, ::disposeEvent);
                         if (::ownerPipe)
@@ -279,41 +276,7 @@ HMODULE DevInject::Dispose()
     return ::module;
 }
 
-HMODULE DevInject::InjectDll(HANDLE process, HANDLE stopEvent)
+HMODULE DevInject::GetModule()
 {
-    HMODULE remoteModule = nullptr;
-    wchar_t dllBuffer[MAX_PATH];
-    ::GetModuleFileName(::module, dllBuffer, _countof(dllBuffer));
-
-    std::wstring dllPath = dllBuffer;
-    size_t dllPathSize = (dllPath.size() + 1) * sizeof(wchar_t);
-
-    wchar_t* dllPathRemote = reinterpret_cast<wchar_t*>(::VirtualAllocEx(process, nullptr, dllPathSize, MEM_COMMIT, PAGE_READWRITE));
-    if (dllPathRemote)
-    {
-        if (::WriteProcessMemory(process, dllPathRemote, dllPath.c_str(), dllPathSize, nullptr))
-        {
-            HMODULE kernelModule = ::GetModuleHandle(L"Kernel32");
-            LPTHREAD_START_ROUTINE loadLibrary = reinterpret_cast<LPTHREAD_START_ROUTINE>(::GetProcAddress(kernelModule, "LoadLibraryW"));
-            HANDLE remoteLoadLibrary = ::CreateRemoteThread(process, nullptr, 0, loadLibrary, dllPathRemote, 0, nullptr);
-
-            if (remoteLoadLibrary)
-            {
-                std::array<HANDLE, 3> handles = { remoteLoadLibrary, stopEvent, process };
-                if (::WaitForMultipleObjects(static_cast<DWORD>(handles.size()), handles.data(), FALSE, INFINITE) == WAIT_OBJECT_0)
-                {
-                    if (::GetExitCodeThread(remoteLoadLibrary, reinterpret_cast<DWORD*>(&remoteModule)))
-                    {
-                        // Should be injected now...
-                    }
-                }
-
-                ::CloseHandle(remoteLoadLibrary);
-            }
-        }
-
-        ::VirtualFreeEx(process, dllPathRemote, dllPathSize, MEM_RELEASE);
-    }
-
-    return remoteModule;
+    return ::module;
 }

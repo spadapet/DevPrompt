@@ -94,6 +94,18 @@ Pipe Pipe::Connect(HANDLE serverProcess, HANDLE disposeEvent)
 
     if (pipe != INVALID_HANDLE_VALUE)
     {
+        DWORD pipeServerId;
+        if (!::GetNamedPipeServerProcessId(pipe, &pipeServerId) || pipeServerId != ::GetProcessId(serverProcess))
+        {
+            // Connected to wrong server
+            assert(false);
+            ::CloseHandle(pipe);
+            pipe = INVALID_HANDLE_VALUE;
+        }
+    }
+
+    if (pipe != INVALID_HANDLE_VALUE)
+    {
         return Pipe(pipe, disposeEvent, serverProcess);
     }
 
@@ -130,6 +142,14 @@ bool Pipe::WaitForClient() const
                 DWORD result = 0;
                 status = (::GetOverlappedResult(this->pipe, &oio, &result, TRUE) != FALSE);
             }
+        }
+
+        DWORD pipeClientId;
+        if (status && (!::GetNamedPipeClientProcessId(this->pipe, &pipeClientId) || pipeClientId != ::GetProcessId(this->otherProcess)))
+        {
+            // Bad client connected
+            assert(false);
+            status = false;
         }
     }
     else

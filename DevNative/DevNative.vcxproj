@@ -1,49 +1,51 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <Import Project="..\cpp.props" />
-    <PropertyGroup Label="Globals">
-        <ProjectGuid>{36C4CDB6-17CA-4915-8CCD-6860AED09ADF}</ProjectGuid>
-    </PropertyGroup>
-
-    <ItemDefinitionGroup>
-        <ClCompile>
-            <PreprocessorDefinitions>DEVNATIVE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-        </ClCompile>
-    </ItemDefinitionGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\DevInject\DevInject.vcxproj">
-            <Project>{4e07b01f-76b4-4e52-b876-338eb9eddf3e}</Project>
-        </ProjectReference>
-    </ItemGroup>
-    <ItemGroup>
-        <ClInclude Include="App.h" />
-        <ClInclude Include="Interop\AppInterop.h" />
-        <ClInclude Include="Interop\ProcessHostInterop.h" />
-        <ClInclude Include="Interop\ProcessInterop.h" />
-        <ClInclude Include="Process2.h" />
-        <ClInclude Include="stdafx.h" />
-        <ClInclude Include="WindowProc.h" />
-    </ItemGroup>
-    <ItemGroup>
-        <ClCompile Include="App.cpp" />
-        <ClCompile Include="Interop\AppInterop.cpp" />
-        <ClCompile Include="Interop\ProcessHostInterop.cpp" />
-        <ClCompile Include="Interop\ProcessInterop.cpp" />
-        <ClCompile Include="Main.cpp" />
-        <ClCompile Include="Process2.cpp" />
-        <ClCompile Include="stdafx.cpp">
-            <PrecompiledHeader>Create</PrecompiledHeader>
-        </ClCompile>
-        <ClCompile Include="WindowProc.cpp" />
-    </ItemGroup>
-    <ItemGroup>
-        <Midl Include="Interop\DevPrompt.idl">
-            <OutputDirectory>$(IntDir)</OutputDirectory>
-        </Midl>
-    </ItemGroup>
-    <ItemGroup>
-        <None Include="cpp.hint" />
-    </ItemGroup>
-    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{36C4CDB6-17CA-4915-8CCD-6860AED09ADF}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="..\cpp.props" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>DEVNATIVE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DevInject\DevInject.vcxproj">
+      <Project>{4e07b01f-76b4-4e52-b876-338eb9eddf3e}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="App.h" />
+    <ClInclude Include="Interop\AppInterop.h" />
+    <ClInclude Include="Interop\ProcessHostInterop.h" />
+    <ClInclude Include="Interop\ProcessInterop.h" />
+    <ClInclude Include="Process2.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="WindowProc.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="App.cpp" />
+    <ClCompile Include="Interop\AppInterop.cpp" />
+    <ClCompile Include="Interop\ProcessHostInterop.cpp" />
+    <ClCompile Include="Interop\ProcessInterop.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Process2.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="WindowProc.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="Interop\DevPrompt.idl">
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

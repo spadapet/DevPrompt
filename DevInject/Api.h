@@ -5,8 +5,3 @@
 #else
 #define DEV_INJECT_API __declspec(dllimport)
 #endif
-
-namespace DevInject
-{
-    DEV_INJECT_API HMODULE InjectDll(HANDLE process, HANDLE stopEvent);
-}
