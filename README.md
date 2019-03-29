@@ -1,4 +1,4 @@
-# Dev Prompt
+﻿# Dev Prompt
 Tabbed command prompts for developers
 
 ## Features
@@ -10,9 +10,10 @@ Tabbed command prompts for developers
 
 ## Project overview
 * Open __DevPrompt.sln__ in Visual Studio 2019 on Windows 10
-* __DevPrompt.exe__: C# project with UI written in WPF. This is the shell that hosts processes owned by DevNative.dll.
-* __DevNative.dll__: C++ project that contains the global app and state of running processes. It uses COM interfaces to communicate with the managed UI in DevPrompt.exe.
-* __DevInject.dll__: C++ project that gets injected into every hosted command prompt process. Threads are created to communicate with DevNative.dll through pipes.
+* __DevPrompt__: C# project with UI written in WPF. This is the shell that hosts processes owned by DevNative.
+* __DevNative__: C++ project that contains the global app and state of running processes. It uses COM interfaces to communicate with the managed UI in DevPrompt.exe.
+* __DevInject__: C++ project that gets injected into every hosted command prompt process. Threads are created to communicate with DevNative through pipes.
+* __DevInjector__: C++ project for a helper executable to inject DevInject into command prompt processes of opposite bitness.
 
 ## Coding Standards
 * Use default formatting for C# and C++ in VS2019 (as if Format Document command was run)
