@@ -76,7 +76,7 @@ namespace DevPrompt.Settings
         }
 
         [OnDeserializing]
-        private void Initialize(StreamingContext context = default)
+        private void Initialize(StreamingContext context = default(StreamingContext))
         {
             this.consoles = new ObservableCollection<ConsoleSnapshot>();
         }
