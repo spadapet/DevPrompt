@@ -187,8 +187,12 @@ static BOOL CALLBACK FindOwnerProcessWindow(HWND hwnd, LPARAM lp)
                     const wchar_t* ownerSuffix = L"\\DevPrompt.exe";
                     const size_t suffixLen = std::wcslen(ownerSuffix);
 
+                    const wchar_t* ownerSuffix2 = L"\\DevPromptNetCore.exe";
+                    const size_t suffixLen2 = std::wcslen(ownerSuffix2);
+
                     size_t len = std::wcslen(path);
-                    if ((len >= suffixLen && !_wcsicmp(ownerSuffix, path + (len - suffixLen))))
+                    if ((len >= suffixLen && !_wcsicmp(ownerSuffix, path + (len - suffixLen))) || 
+                        (len >= suffixLen2 && !_wcsicmp(ownerSuffix2, path + (len - suffixLen2))))
                     {
                         ::ownerPipe = Pipe::Connect(hwndProcess, ::disposeEvent);
                         if (::ownerPipe)

@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>netcoreapp3.0</TargetFramework>
+        <UseWPF>true</UseWPF>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <ApplicationIcon>appicon.ico</ApplicationIcon>
+        <Platforms>x64;x86</Platforms>
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <StartupObject>DevPrompt.Program</StartupObject>
+        <RootNamespace>DevPrompt</RootNamespace>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+        <DevRoot>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), cpp.props))\</DevRoot>
+        <ConfigOutRoot>$(DevRoot)out\$(Configuration).$(Platform)\</ConfigOutRoot>
+        <ProjectOutRoot>$(ConfigOutRoot)$(MSBuildProjectName)\</ProjectOutRoot>
+        <IntermediateOutputPath>$(ProjectOutRoot)</IntermediateOutputPath>
+        <OutputPath>$(ConfigOutRoot)bin\</OutputPath>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+      <Prefer32Bit>true</Prefer32Bit>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+      <Prefer32Bit>true</Prefer32Bit>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Remove="packages.config" />
+    </ItemGroup>
+
+</Project>

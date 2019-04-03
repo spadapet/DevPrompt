@@ -4,7 +4,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+#if NET_FRAMEWORK
 using Microsoft.VisualStudio.Setup.Configuration;
+#endif
 
 namespace DevPrompt.Utility
 {
@@ -23,6 +25,7 @@ namespace DevPrompt.Utility
             public string Version { get; }
             public string Channel { get; }
 
+#if NET_FRAMEWORK
             public Instance(ISetupInstance2 instance)
             {
                 this.Name = instance.GetInstallationName();
@@ -61,6 +64,7 @@ namespace DevPrompt.Utility
             {
                 return obj is Instance other && this.Id == other.Id && this.Version == other.Version;
             }
+#endif
         }
 
         public static Task<IEnumerable<Instance>> GetInstancesAsync()
@@ -72,6 +76,7 @@ namespace DevPrompt.Utility
         {
             List<Instance> instances = new List<Instance>();
 
+#if NET_FRAMEWORK
             try
             {
                 SetupConfiguration setup = new SetupConfiguration();
@@ -93,6 +98,7 @@ namespace DevPrompt.Utility
             {
                 // VS installer may not be installed or fail in some way
             }
+#endif
 
             return instances;
         }
