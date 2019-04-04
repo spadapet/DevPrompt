@@ -20,6 +20,11 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DevInjector", "DevInjector\DevInjector.vcxproj", "{614AB4D5-0ADE-4D21-93A6-CBB6ED7D504C}"
 EndProject
 Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "SetupNetCore", "SetupNetCore\SetupNetCore.wapproj", "{83494626-246D-4DF0-871A-22D1CE681B99}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4E07B01F-76B4-4E52-B876-338EB9EDDF3E} = {4E07B01F-76B4-4E52-B876-338EB9EDDF3E}
+		{36C4CDB6-17CA-4915-8CCD-6860AED09ADF} = {36C4CDB6-17CA-4915-8CCD-6860AED09ADF}
+		{614AB4D5-0ADE-4D21-93A6-CBB6ED7D504C} = {614AB4D5-0ADE-4D21-93A6-CBB6ED7D504C}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,17 +67,9 @@ Global
 		{614AB4D5-0ADE-4D21-93A6-CBB6ED7D504C}.Release|x86.ActiveCfg = Release|Win32
 		{614AB4D5-0ADE-4D21-93A6-CBB6ED7D504C}.Release|x86.Build.0 = Release|Win32
 		{83494626-246D-4DF0-871A-22D1CE681B99}.Debug|x64.ActiveCfg = Debug|x64
-		{83494626-246D-4DF0-871A-22D1CE681B99}.Debug|x64.Build.0 = Debug|x64
-		{83494626-246D-4DF0-871A-22D1CE681B99}.Debug|x64.Deploy.0 = Debug|x64
 		{83494626-246D-4DF0-871A-22D1CE681B99}.Debug|x86.ActiveCfg = Debug|x86
-		{83494626-246D-4DF0-871A-22D1CE681B99}.Debug|x86.Build.0 = Debug|x86
-		{83494626-246D-4DF0-871A-22D1CE681B99}.Debug|x86.Deploy.0 = Debug|x86
 		{83494626-246D-4DF0-871A-22D1CE681B99}.Release|x64.ActiveCfg = Release|x64
-		{83494626-246D-4DF0-871A-22D1CE681B99}.Release|x64.Build.0 = Release|x64
-		{83494626-246D-4DF0-871A-22D1CE681B99}.Release|x64.Deploy.0 = Release|x64
 		{83494626-246D-4DF0-871A-22D1CE681B99}.Release|x86.ActiveCfg = Release|x86
-		{83494626-246D-4DF0-871A-22D1CE681B99}.Release|x86.Build.0 = Release|x86
-		{83494626-246D-4DF0-871A-22D1CE681B99}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
