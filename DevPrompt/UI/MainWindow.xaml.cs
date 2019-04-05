@@ -1,8 +1,10 @@
-﻿using DevPrompt.Settings;
+﻿using DevPrompt.Interop;
+using DevPrompt.Settings;
 using DevPrompt.Utility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -73,9 +75,9 @@ namespace DevPrompt.UI
 
         private async void OnVsMenuOpened(object sender, RoutedEventArgs args)
         {
-            List<VisualStudioSetup.Instance> instances = new List<VisualStudioSetup.Instance>(await VisualStudioSetup.GetInstancesAsync());
+            IEnumerable<VisualStudioSetup.Instance> instances = await VisualStudioSetup.GetInstances();
 
-            MainWindow.UpdateMenu((MenuItem)sender, instances, (VisualStudioSetup.Instance instance) =>
+            MainWindow.UpdateMenu((MenuItem)sender, instances.ToArray(), (VisualStudioSetup.Instance instance) =>
             {
                 return new MenuItem()
                 {

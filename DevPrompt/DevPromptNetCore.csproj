@@ -42,8 +42,4 @@
     <RuntimeIdentifiers>win-x86</RuntimeIdentifiers>
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="packages.config" />
-  </ItemGroup>
-
 </Project>

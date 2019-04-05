@@ -1,4 +1,5 @@
-﻿using DevPrompt.Utility;
+﻿using DevPrompt.Interop;
+using DevPrompt.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -182,8 +183,7 @@ namespace DevPrompt.Settings
 
         private async Task AddVisualStudioDevPrompts()
         {
-            List<VisualStudioSetup.Instance> instances = new List<VisualStudioSetup.Instance>(await VisualStudioSetup.GetInstancesAsync());
-            foreach (VisualStudioSetup.Instance instance in instances)
+            foreach (VisualStudioSetup.Instance instance in await VisualStudioSetup.GetInstances())
             {
                 string file = Path.Combine(instance.Path, "Common7", "Tools", "VsDevCmd.bat");
                 if (File.Exists(file))

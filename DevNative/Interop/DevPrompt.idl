@@ -5,6 +5,8 @@ interface IAppHost;
 interface IApp;
 interface IProcessHost;
 interface IProcess;
+interface IVisualStudioInstance;
+interface IVisualStudioInstances;
 
 // MUST match IAppHost.cs
 [object, uuid("42d16e5c-8acf-4dcb-882d-b41974190e53")]
@@ -91,4 +93,22 @@ interface IProcess : IUnknown
     HRESULT Focus();
     HRESULT SystemCommandDefaults();
     HRESULT SystemCommandProperties();
+};
+
+[object, uuid("4c1047a1-e701-4024-aeed-08a38c70584e")]
+interface IVisualStudioInstance : IUnknown
+{
+    HRESULT GetInstallationName([out, retval] BSTR* value);
+    HRESULT GetInstanceId([out, retval] BSTR* value);
+    HRESULT GetInstallationPath([out, retval] BSTR* value);
+    HRESULT GetProductPath([out, retval] BSTR* value);
+    HRESULT GetInstallationVersion([out, retval] BSTR* value);
+    HRESULT GetChannelId([out, retval] BSTR* value);
+};
+
+[object, uuid("8a4b9d86-da6e-4d15-9ee0-58080da25282")]
+interface IVisualStudioInstances : IUnknown
+{
+    HRESULT GetCount([out, retval] int* count);
+    HRESULT GetValue(int index, [out, retval] IVisualStudioInstance** value);
 };

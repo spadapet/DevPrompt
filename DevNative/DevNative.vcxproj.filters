@@ -15,6 +15,12 @@
     </ClInclude>
     <ClInclude Include="Process2.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Interop\VisualStudioInstance.h">
+      <Filter>Interop</Filter>
+    </ClInclude>
+    <ClInclude Include="Interop\VisualStudioInstances.h">
+      <Filter>Interop</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -31,9 +37,16 @@
       <Filter>Interop</Filter>
     </ClCompile>
     <ClCompile Include="Process2.cpp" />
+    <ClCompile Include="Interop\VisualStudioInstance.cpp">
+      <Filter>Interop</Filter>
+    </ClCompile>
+    <ClCompile Include="Interop\VisualStudioInstances.cpp">
+      <Filter>Interop</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Interop">

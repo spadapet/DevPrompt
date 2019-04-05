@@ -1,12 +1,10 @@
-﻿using System;
+﻿using DevPrompt.Interop;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-#if NET_FRAMEWORK
-using Microsoft.VisualStudio.Setup.Configuration;
-#endif
 
 namespace DevPrompt.Utility
 {
@@ -25,17 +23,14 @@ namespace DevPrompt.Utility
             public string Version { get; }
             public string Channel { get; }
 
-#if NET_FRAMEWORK
-            public Instance(ISetupInstance2 instance)
+            public Instance(IVisualStudioInstance instance)
             {
                 this.Name = instance.GetInstallationName();
                 this.Id = instance.GetInstanceId();
                 this.Path = instance.GetInstallationPath();
                 this.ProductPath = System.IO.Path.Combine(this.Path, instance.GetProductPath());
                 this.Version = instance.GetInstallationVersion();
-
-                ISetupPropertyStore props = instance as ISetupPropertyStore;
-                this.Channel = props?.GetValue("channelId") as string ?? string.Empty;
+                this.Channel = instance.GetChannelId();
 
                 Match match = Regex.Match(this.Name, @"\A.+\+(?<Version>\d+\.\d+)\.(?<Branch>.+)\Z");
                 if (!match.Success)
@@ -64,43 +59,24 @@ namespace DevPrompt.Utility
             {
                 return obj is Instance other && this.Id == other.Id && this.Version == other.Version;
             }
-#endif
         }
 
-        public static Task<IEnumerable<Instance>> GetInstancesAsync()
+        public static async Task<IEnumerable<Instance>> GetInstances()
         {
-            return Task.Run(() => VisualStudioSetup.GetInstances());
-        }
-
-        public static IEnumerable<Instance> GetInstances()
-        {
-            List<Instance> instances = new List<Instance>();
-
-#if NET_FRAMEWORK
-            try
+            return await Task.Run(() =>
             {
-                SetupConfiguration setup = new SetupConfiguration();
-                IEnumSetupInstances instanceEnumerator = setup.EnumInstances();
-                ISetupInstance[] enumInstances = new ISetupInstance[1];
-                int fetched = 0;
+                IVisualStudioInstances instances = Interop.App.CreateVisualStudioInstances();
 
-                do
+                int count = (instances != null) ? instances.GetCount() : 0;
+                List<Instance> result = new List<Instance>(count);
+
+                for (int i = 0; i < count; i++)
                 {
-                    instanceEnumerator.Next(1, enumInstances, out fetched);
-                    if (fetched == 1 && enumInstances[0] is ISetupInstance2 instance && instance.IsLaunchable())
-                    {
-                        instances.Add(new Instance(instance));
-                    }
+                    result.Add(new Instance(instances.GetValue(i)));
                 }
-                while (fetched == 1);
-            }
-            catch
-            {
-                // VS installer may not be installed or fail in some way
-            }
-#endif
 
-            return instances;
+                return result;
+            });
         }
 
         public static string InstallerPath

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // Windows
 #define WIN32_LEAN_AND_MEAN
@@ -7,6 +7,9 @@
 #include <wrl.h>
 #include <Psapi.h>
 #include <TlHelp32.h>
+
+// NuGet
+#include <Setup.Configuration.h>
 
 // C++
 #include <array>
