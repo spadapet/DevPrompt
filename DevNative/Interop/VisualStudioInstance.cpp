@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "VisualStudioInstance.h"
 
-static std::wstring GetString(ISetupInstance2* instance, HRESULT (ISetupInstance2::*func)(BSTR*))
+static std::wstring GetString(ISetupInstance2* instance, HRESULT (__stdcall ISetupInstance2::*func)(BSTR*))
 {
     std::wstring result;
 
