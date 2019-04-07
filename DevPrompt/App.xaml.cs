@@ -156,6 +156,11 @@ namespace DevPrompt
             return 0;
         }
 
+        void IAppHost.OnSystemShutdown()
+        {
+            this.MainWindow?.OnSystemShutdown();
+        }
+
         void IAppHost.OnAltLetter(int vk)
         {
             this.MainWindow?.OnAltLetter(vk);

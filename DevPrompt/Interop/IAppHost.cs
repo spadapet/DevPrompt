@@ -14,6 +14,7 @@ namespace DevPrompt.Interop
     {
         IntPtr GetMainWindow();
         int CanGrab([MarshalAs(UnmanagedType.LPWStr)] string exePath, [MarshalAs(UnmanagedType.VariantBool)] bool automatic);
+        void OnSystemShutdown();
 
         // Keyboard handling (since WPF will not see most key presses since focus will mostly be in a hosted process)
         void OnAltLetter(int vk);

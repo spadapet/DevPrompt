@@ -24,11 +24,11 @@ namespace DevPrompt.Settings
         {
         }
 
-        internal AppSnapshot(MainWindowVM window)
+        internal AppSnapshot(MainWindowVM window, bool force = false)
         {
             this.Initialize();
 
-            if (window != null && window.AppSettings.SaveTabsOnExit)
+            if (window != null && (force || window.AppSettings.SaveTabsOnExit))
             {
                 foreach (ProcessVM process in window.Processes)
                 {

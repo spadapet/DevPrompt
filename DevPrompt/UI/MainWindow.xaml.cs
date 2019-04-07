@@ -1,5 +1,4 @@
-﻿using DevPrompt.Interop;
-using DevPrompt.Settings;
+﻿using DevPrompt.Settings;
 using DevPrompt.Utility;
 using System;
 using System.Collections.Generic;
@@ -17,6 +16,7 @@ namespace DevPrompt.UI
     {
         public MainWindowVM ViewModel { get; }
         public AppSettings AppSettings { get; }
+        private bool systemShuttingDown;
 
         public MainWindow(AppSettings settings, string initialErrorText)
         {
@@ -178,7 +178,7 @@ namespace DevPrompt.UI
 
         private IntPtr WindowProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            //System.Diagnostics.Debug.WriteLine($"HWND:{hwnd}, MSG:{msg}, WP:{wParam}, LP:{lParam}");
+            App.Current.NativeApp?.MainWindowProc(hwnd, msg, wParam, lParam);
             return IntPtr.Zero;
         }
 
@@ -211,8 +211,24 @@ namespace DevPrompt.UI
 
         private async void OnClosing(object sender, CancelEventArgs args)
         {
-            AppSnapshot snapshot = new AppSnapshot(this.ViewModel);
-            await snapshot.Save();
+            if (!this.systemShuttingDown)
+            {
+                AppSnapshot snapshot = new AppSnapshot(this.ViewModel);
+                await snapshot.Save();
+            }
+        }
+
+        /// <summary>
+        /// Last chance to save snapshot before restart
+        /// </summary>
+        public void OnSystemShutdown()
+        {
+            if (!this.systemShuttingDown)
+            {
+                this.systemShuttingDown = true;
+                AppSnapshot snapshot = new AppSnapshot(this.ViewModel, force: true);
+                snapshot.Save().Wait();
+            }
         }
 
         protected override void OnGotKeyboardFocus(KeyboardFocusChangedEventArgs args)

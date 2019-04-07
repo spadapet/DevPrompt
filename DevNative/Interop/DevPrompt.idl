@@ -14,6 +14,7 @@ interface IAppHost : IUnknown
 {
     HRESULT GetMainWindow([out, retval] HWND* hwnd);
     HRESULT CanGrab(const wchar_t* exePath, VARIANT_BOOL automatic, [out, retval] int* value);
+    HRESULT OnSystemShutdown();
 
     // Keyboard handling (since WPF will not see most key presses since focus will mostly be in a hosted process)
     HRESULT OnAltLetter(int vk);
@@ -44,6 +45,7 @@ interface IApp : IUnknown
     HRESULT GetGrabProcesses(BSTR* processes);
     HRESULT GrabProcess(int id);
     HRESULT CreateProcessHostWindow(HWND parentHwnd, [out, retval] IProcessHost** obj);
+    HRESULT MainWindowProc(HWND hwnd, int msg, WPARAM wp, LPARAM lp);
 };
 
 [object, uuid("cedddf4b-b229-4a17-8b10-140e53464efd")]

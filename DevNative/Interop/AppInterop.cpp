@@ -147,3 +147,13 @@ HRESULT AppInterop::CreateProcessHostWindow(HWND parentHwnd, IProcessHost** obj)
 
     return E_UNEXPECTED;
 }
+
+HRESULT AppInterop::MainWindowProc(HWND hwnd, int msg, WPARAM wp, LPARAM lp)
+{
+    if (this->app)
+    {
+        this->app->MainWindowProc(hwnd, msg, wp, lp);
+    }
+
+    return S_OK;
+}

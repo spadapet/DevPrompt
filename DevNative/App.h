@@ -32,6 +32,7 @@ public:
     void AddListener(IAppListener* obj);
     void RemoveListener(IAppListener* obj);
     HFONT GetMessageFont(HWND hwnd);
+    void MainWindowProc(HWND hwnd, int msg, WPARAM wp, LPARAM lp);
 
     // Process host windows (basically a parent window for all process HWNDs)
     HWND CreateProcessHostWindow(HWND parentWnd);

@@ -22,5 +22,6 @@ namespace DevPrompt.Interop
 
         [return: MarshalAs(UnmanagedType.Interface)]
         IProcessHost CreateProcessHostWindow(IntPtr parentHwnd);
+        void MainWindowProc(IntPtr hwnd, int msg, IntPtr wp, IntPtr lp);
     }
 }

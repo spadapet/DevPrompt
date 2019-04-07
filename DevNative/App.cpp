@@ -74,8 +74,9 @@ void App::Initialize()
 
     this->messageWindow = IWindowProc::Create(this, windowClass, 0, RECT{}, HWND_MESSAGE);
 
-    // This may be used to watch for related console apps to create a window and to take ownership of them
     ::RegisterShellHookWindow(this->messageWindow);
+    ::RegisterApplicationRestart(nullptr, RESTART_NO_CRASH | RESTART_NO_HANG);
+    ::SetProcessShutdownParameters(0x300, 0); // shut down before hosted processes
 }
 
 void App::Dispose()
@@ -912,6 +913,19 @@ void App::NoAutoGrabWindow(HWND hwnd)
     if (std::find(this->noAutoGrabWindows.begin(), this->noAutoGrabWindows.end(), hwnd) == this->noAutoGrabWindows.end())
     {
         this->noAutoGrabWindows.push_back(hwnd);
+    }
+}
+
+void App::MainWindowProc(HWND hwnd, int msg, WPARAM wp, LPARAM lp)
+{
+    switch (msg)
+    {
+    case WM_ENDSESSION:
+        if (wp && (lp & ENDSESSION_CLOSEAPP) != 0)
+        {
+            this->host->OnSystemShutdown();
+        }
+        break;
     }
 }
 
