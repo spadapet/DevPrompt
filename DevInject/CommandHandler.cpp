@@ -96,7 +96,7 @@ static Message HandleSetAliases(const Message& input)
         {
             std::wstring exeName = name.substr(0, pipe);
             std::wstring aliasName = name.substr(pipe + 1);
-            const std::wstring & aliasValue = input.GetValue(name);
+            const std::wstring& aliasValue = input.GetValue(name);
 
             ::AddConsoleAlias(
                 const_cast<wchar_t*>(aliasName.c_str()),
@@ -201,8 +201,28 @@ static Message HandleSetColorTable(const Message& input)
     return input.CreateResponse();
 }
 
+static Message SetConsoleWindowDpi(const Message& input)
+{
+    HWND hwnd = ::GetConsoleWindow();
+    if (hwnd)
+    {
+        RECT rect;
+        HWND parent = ::GetParent(hwnd);
+        if (parent && ::GetClientRect(parent, &rect))
+        {
+            UINT dpi = ::GetDpiForWindow(hwnd);
+            WPARAM wp = MAKEWPARAM(dpi, dpi);
+            LPARAM lp = reinterpret_cast<LPARAM>(&rect);
+
+            ::SendMessage(hwnd, WM_DPICHANGED, wp, lp);
+        }
+    }
+
+    return input.CreateResponse();
+}
+
 // Handles commands comming in from the owner app
-Message DevInject::CommandHandler(const Message & input)
+Message DevInject::CommandHandler(const Message& input)
 {
     Message result;
 
@@ -246,6 +266,20 @@ Message DevInject::CommandHandler(const Message & input)
     else if (command == PIPE_COMMAND_SET_COLOR_TABLE)
     {
         result = ::HandleSetColorTable(input);
+    }
+    else if (command == PIPE_COMMAND_CHECK_WINDOW_SIZE)
+    {
+        DevInject::CheckConsoleWindowSize(false);
+        result = input.CreateResponse();
+    }
+    else if (command == PIPE_COMMAND_CHECK_WINDOW_DPI)
+    {
+        result = ::SetConsoleWindowDpi(input);
+    }
+    else if (command == PIPE_COMMAND_ACTIVATED)
+    {
+        DevInject::CheckConsoleWindowSize(false);
+        result = ::SetConsoleWindowDpi(input);
     }
 
     return result;

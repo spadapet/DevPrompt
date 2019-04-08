@@ -4,6 +4,8 @@
 
 #define PIPE_COMMAND_ACTIVATED L"Activated"
 #define PIPE_COMMAND_CLOSED L"Closed"
+#define PIPE_COMMAND_CHECK_WINDOW_DPI L"CheckWindowDpi"
+#define PIPE_COMMAND_CHECK_WINDOW_SIZE L"CheckWindowSize"
 #define PIPE_COMMAND_DEACTIVATED L"Deactivated"
 #define PIPE_COMMAND_DETACH L"Detach"
 #define PIPE_COMMAND_ENV_CHANGED L"EnvChanged"

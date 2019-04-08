@@ -123,6 +123,24 @@ static void NotifyOwnerOfChanges(std::wstring & oldTitle, std::wstring & oldEnvi
     }
 }
 
+void DevInject::CheckConsoleWindowSize(bool visibleOnly)
+{
+    HWND hwnd = ::GetConsoleWindow();
+    if (hwnd && (!visibleOnly || ::IsWindowVisible(hwnd)))
+    {
+        HWND parent = ::GetParent(hwnd);
+        if (parent)
+        {
+            RECT rect, rect2;
+            if (::GetWindowRect(parent, &rect) && ::GetWindowRect(hwnd, &rect2) && ::memcmp(&rect, &rect2, sizeof(rect)))
+            {
+                ::SetWindowPos(hwnd, nullptr, 0, 0, rect.right - rect.left, rect.bottom - rect.top,
+                    SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS);
+            }
+        }
+    }
+}
+
 // A thread that detects if the owner process has died, and if it does then kills this process too.
 // Normally the owner process will politely close all console processes first, but it might crash.
 static DWORD __stdcall WatchdogThread(void*)
@@ -141,6 +159,7 @@ static DWORD __stdcall WatchdogThread(void*)
 
         case WAIT_TIMEOUT:
             ::NotifyOwnerOfChanges(oldTitle, oldEnvironment);
+            DevInject::CheckConsoleWindowSize(true);
             break;
 
         default:

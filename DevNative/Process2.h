@@ -63,6 +63,7 @@ private:
 
     Message CommandHandler(HANDLE process, const Message& input);
     void SendCommandAsync(Message&& command);
+    bool TransactCommand(const Message& command);
     bool TransactCommand(const Message& command, Message& response);
     void SendCommands(const std::vector<Message>& commands);
     void FlushRemainingCommands();

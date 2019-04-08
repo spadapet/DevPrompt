@@ -95,7 +95,7 @@ bool Process::Attach(HANDLE process)
     return false;
 }
 
-bool Process::Start(const ProcessStartInfo & info)
+bool Process::Start(const ProcessStartInfo& info)
 {
     assert(App::IsMainThread());
 
@@ -109,7 +109,7 @@ bool Process::Start(const ProcessStartInfo & info)
     return true;
 }
 
-bool Process::Clone(const std::shared_ptr<Process> & process)
+bool Process::Clone(const std::shared_ptr<Process>& process)
 {
     assert(App::IsMainThread());
 
@@ -202,25 +202,14 @@ void Process::SetProcessColorTable(const wchar_t* value)
     Message command(PIPE_COMMAND_SET_COLOR_TABLE);
     command.SetValue(PIPE_PROPERTY_VALUE, value);
 
-    Message response;
-    this->TransactCommand(command, response);
+    this->SendCommandAsync(std::move(command));
 }
 
 void Process::SendDpiChanged(double oldScale, double newScale)
 {
     assert(App::IsMainThread());
 
-    RECT rect;
-    if (this->GetChildWindow() && ::GetClientRect(this->hostWnd, &rect))
-    {
-        int dpi = (int)(newScale * 96.0);
-        WPARAM wp = MAKEWPARAM(dpi, dpi);
-        LPARAM lp = reinterpret_cast<LPARAM>(&rect);
-
-        // Don't really care to wait for the message to be processed, just wait 1ms. PostMessage doesn't work.
-        DWORD_PTR result;
-        ::SendMessageTimeout(this->GetChildWindow(), WM_DPICHANGED, wp, lp, 0, 1, &result);
-    }
+    this->SendCommandAsync(Message(PIPE_COMMAND_CHECK_WINDOW_DPI));
 }
 
 void Process::SendSystemCommand(UINT id)
@@ -285,8 +274,7 @@ void Process::SetChildWindow(HWND hwnd)
     {
         if (hwnd && !this->GetChildWindow())
         {
-            double oldDpiScale = ::GetDpiForWindow(hwnd) / 96.0;
-
+            UINT oldDpi = ::GetDpiForWindow(hwnd);
             LONG style = ::GetWindowLong(hwnd, GWL_STYLE);
             style = style & ~(WS_CAPTION | WS_BORDER | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_CLIPSIBLINGS) | WS_CHILD;
 
@@ -297,10 +285,10 @@ void Process::SetChildWindow(HWND hwnd)
             ::SetWindowLong(hwnd, GWL_EXSTYLE, exstyle);
             ::SetParent(hwnd, this->hostWnd);
 
-            double newDpiScale = ::GetDpiForWindow(hwnd) / 96.0;
-            if (newDpiScale != oldDpiScale)
+            if (::GetDpiForWindow(hwnd) != oldDpi)
             {
-                this->SendDpiChanged(oldDpiScale, newDpiScale);
+                // Update DPI before the window is visible
+                this->TransactCommand(Message(PIPE_COMMAND_CHECK_WINDOW_DPI));
             }
 
             RECT rect;
@@ -316,6 +304,7 @@ void Process::SetChildWindow(HWND hwnd)
             this->SendCommandAsync(Message(PIPE_COMMAND_GET_EXE));
             this->SendCommandAsync(Message(PIPE_COMMAND_GET_TITLE));
             this->SendCommandAsync(Message(PIPE_COMMAND_GET_ENV));
+            this->SendCommandAsync(Message(PIPE_COMMAND_CHECK_WINDOW_SIZE));
         }
         else if (!hwnd && this->GetChildWindow())
         {
@@ -346,7 +335,7 @@ LRESULT Process::WindowProc(HWND hwnd, UINT message, WPARAM wp, LPARAM lp)
     switch (message)
     {
     case WM_SIZE:
-        WindowProc::ResizeChildren(hwnd);
+        this->SendCommandAsync(Message(PIPE_COMMAND_CHECK_WINDOW_SIZE));
         break;
 
     case WM_SETFOCUS:
@@ -392,7 +381,7 @@ void Process::PostDispose()
 
 // Creates a pipe server to listen to the other process, and injects a thread
 // into that process to create another pipe server that listens to this process. Whew...
-void Process::BackgroundAttach(HANDLE process, HANDLE mainThread, const ProcessStartInfo * info)
+void Process::BackgroundAttach(HANDLE process, HANDLE mainThread, const ProcessStartInfo* info)
 {
     assert(!App::IsMainThread());
     std::shared_ptr<Process> self = shared_from_this();
@@ -483,7 +472,7 @@ static bool DirectoryExists(const wchar_t* path)
     return false;
 }
 
-void Process::BackgroundStart(const ProcessStartInfo & info)
+void Process::BackgroundStart(const ProcessStartInfo& info)
 {
     assert(!App::IsMainThread());
 
@@ -527,7 +516,7 @@ void Process::BackgroundStart(const ProcessStartInfo & info)
     }
 }
 
-void Process::BackgroundClone(const std::shared_ptr<Process> & process)
+void Process::BackgroundClone(const std::shared_ptr<Process>& process)
 {
     assert(!App::IsMainThread());
     std::shared_ptr<Process> self = shared_from_this();
@@ -585,7 +574,7 @@ void Process::BackgroundSendCommands(HANDLE process)
 }
 
 // Initialize a newly created process after pipes are connected
-void Process::InitNewProcess(const ProcessStartInfo & info)
+void Process::InitNewProcess(const ProcessStartInfo& info)
 {
     if (info.colorTable.size())
     {
@@ -610,7 +599,7 @@ void Process::InitNewProcess(const ProcessStartInfo & info)
 }
 
 // Adds a command to the queue to send to the other process. It may never be sent if the other process dies.
-void Process::SendCommandAsync(Message && command)
+void Process::SendCommandAsync(Message&& command)
 {
     // call from any thread
 
@@ -619,7 +608,7 @@ void Process::SendCommandAsync(Message && command)
     ::SetEvent(this->commandEvent);
 }
 
-void Process::SendCommands(const std::vector<Message> & commands)
+void Process::SendCommands(const std::vector<Message>& commands)
 {
     for (const Message& command : commands)
     {
@@ -638,7 +627,14 @@ void Process::SendCommands(const std::vector<Message> & commands)
 }
 
 // Blocks while a command is sent
-bool Process::TransactCommand(const Message & command, Message & response)
+bool Process::TransactCommand(const Message& command)
+{
+    Message result;
+    return this->TransactCommand(command, result);
+}
+
+// Blocks while a command is sent
+bool Process::TransactCommand(const Message& command, Message& response)
 {
     std::scoped_lock<std::mutex> lock(this->processPipeMutex);
     return this->processPipe&& this->processPipe.Transact(command, response);
@@ -668,7 +664,7 @@ void Process::FlushRemainingCommands()
 }
 
 // Handles commands that come in from the other process through my pipe server
-Message Process::CommandHandler(HANDLE process, const Message & input)
+Message Process::CommandHandler(HANDLE process, const Message& input)
 {
     assert(!App::IsMainThread());
 
@@ -730,7 +726,7 @@ Message Process::CommandHandler(HANDLE process, const Message & input)
 }
 
 // Handles command responses that come from the other process after we send it a command
-void Process::ResponseHandler(const Message & response)
+void Process::ResponseHandler(const Message& response)
 {
     assert(!App::IsMainThread());
 
