@@ -215,6 +215,8 @@ static Message SetConsoleWindowDpi(const Message& input)
             LPARAM lp = reinterpret_cast<LPARAM>(&rect);
 
             ::SendMessage(hwnd, WM_DPICHANGED, wp, lp);
+
+            DevInject::CheckConsoleWindowSize(true);
         }
     }
 
@@ -279,7 +281,7 @@ Message DevInject::CommandHandler(const Message& input)
     else if (command == PIPE_COMMAND_ACTIVATED)
     {
         DevInject::CheckConsoleWindowSize(false);
-        result = ::SetConsoleWindowDpi(input);
+        result = input.CreateResponse();
     }
 
     return result;

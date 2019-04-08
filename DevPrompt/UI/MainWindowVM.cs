@@ -30,6 +30,7 @@ namespace DevPrompt.UI
         private readonly ObservableCollection<ProcessVM> processes;
         private readonly LinkedList<ProcessVM> tabOrder;
         private LinkedListNode<ProcessVM> currentTabCycle;
+        private int newTabIndex;
         private ProcessVM activeProcess;
         private string errorText;
         private bool saveAppSettingsPending;
@@ -49,6 +50,7 @@ namespace DevPrompt.UI
             this.processes = new ObservableCollection<ProcessVM>();
             this.processes.CollectionChanged += this.OnProcessesCollectionChanged;
             this.tabOrder = new LinkedList<ProcessVM>();
+            this.newTabIndex = -1;
 
             this.ConsoleCommand = new DelegateCommand((object arg) => this.StartConsole((ConsoleSettings)arg));
             this.GrabConsoleCommand = new DelegateCommand((object arg) => this.GrabConsole((int)arg));
@@ -390,7 +392,9 @@ namespace DevPrompt.UI
                 }
             }
 
-            this.processes.Add(processVM);
+            int index = (this.newTabIndex < 0) ? this.processes.Count : Math.Min(this.processes.Count, this.newTabIndex);
+            this.processes.Insert(index, processVM);
+
             this.tabOrder.AddFirst(processVM);
             Debug.Assert(this.processes.Count == this.tabOrder.Count);
 
@@ -511,6 +515,33 @@ namespace DevPrompt.UI
             get
             {
                 return !string.IsNullOrEmpty(this.ErrorText);
+            }
+        }
+
+        public void OnDrop(ProcessVM process, int droppedIndex, bool copy)
+        {
+            int index = this.processes.IndexOf(process);
+            if (index >= 0)
+            {
+                if (copy)
+                {
+                    int oldTabIndex = this.newTabIndex;
+                    this.newTabIndex = droppedIndex;
+
+                    try
+                    {
+                        this.CloneProcess(process);
+                    }
+                    finally
+                    {
+                        this.newTabIndex = oldTabIndex;
+                    }
+                }
+                else if (index != droppedIndex)
+                {
+                    int finalIndex = (droppedIndex > index) ? droppedIndex - 1 : droppedIndex;
+                    this.processes.Move(index, finalIndex);
+                }
             }
         }
 

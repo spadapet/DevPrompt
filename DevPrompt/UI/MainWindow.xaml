@@ -40,12 +40,13 @@
         <DataTemplate x:Key="TabButtonContentTemplate" DataType="{x:Type local:ProcessVM}">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" MinWidth="48" />
+                    <ColumnDefinition Width="*" MinWidth="48" />
                     <ColumnDefinition Width="16" />
                 </Grid.ColumnDefinitions>
                 <TextBlock
                     Grid.Column="0"
                     Margin="4"
+                    HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Text="{Binding ExpandedTabName, Mode=OneWay}" />
                 <Button
@@ -80,14 +81,18 @@
                 Selector.IsSelected="{Binding Active, Mode=OneWay}"
                 Command="{Binding ActivateCommand}"
                 MouseDown="OnTabButtonMouseDown"
+                PreviewMouseMove="OnTabButtonMouseMoveEvent"
+                GotMouseCapture="OnTabButtonMouseCaptureEvent"
+                LostMouseCapture="OnTabButtonMouseCaptureEvent"
                 Padding="0"
                 BorderThickness="1,1,1,0"
                 Focusable="False"
                 Foreground="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}"
                 Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
-                BorderBrush="{x:Null}"
+                BorderBrush="Transparent"
                 Content="{Binding}"
                 ToolTip="{Binding Title}"
+                HorizontalContentAlignment="Stretch"
                 ContentTemplate="{StaticResource TabButtonContentTemplate}">
                 <Button.ContextMenu>
                     <ContextMenu Opened="OnTabContextMenuOpened">
@@ -165,7 +170,8 @@
             Content="{Binding ErrorText}"
             Visibility="{Binding HasErrorText, Converter={StaticResource BoolToVisibility}}"/>
 
-        <ItemsControl
+        <local:DragItemsControl
+            x:Name="tabItemsControl"
             Grid.Row="3"
             Focusable="False"
             ItemsSource="{Binding Processes}"

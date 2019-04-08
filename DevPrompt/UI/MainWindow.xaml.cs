@@ -12,7 +12,7 @@ using System.Windows.Threading;
 
 namespace DevPrompt.UI
 {
-    internal partial class MainWindow : Window
+    internal partial class MainWindow : Window, DragItemsControl.IDragHost
     {
         public MainWindowVM ViewModel { get; }
         public AppSettings AppSettings { get; }
@@ -264,12 +264,44 @@ namespace DevPrompt.UI
             }
         }
 
+        private void OnTabButtonMouseMoveEvent(object sender, MouseEventArgs args)
+        {
+            if (sender is Button button)
+            {
+                this.tabItemsControl.NotifyMouseMove(button, args);
+            }
+        }
+
+        private void OnTabButtonMouseCaptureEvent(object sender, MouseEventArgs args)
+        {
+            if (sender is Button button)
+            {
+                this.tabItemsControl.NotifyMouseCapture(button, args);
+            }
+        }
+
         private void OnTabContextMenuOpened(object sender, RoutedEventArgs args)
         {
             if (sender is ContextMenu menu)
             {
                 CommandHelpers.FocusFirstMenuItem(menu);
             }
+        }
+
+        void DragItemsControl.IDragHost.OnDrop(ItemsControl source, object droppedModel, int droppedIndex, bool copy)
+        {
+            if (source == this.tabItemsControl && droppedModel is ProcessVM process)
+            {
+                this.ViewModel.OnDrop(process, droppedIndex, copy);
+            }
+        }
+
+        /// <summary>
+        /// Allows cloning of a process
+        /// </summary>
+        bool DragItemsControl.IDragHost.CanDropCopy(object droppedModel)
+        {
+            return true;
         }
     }
 }
