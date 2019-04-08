@@ -1,5 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project>
   <Import Project="..\shared.props" />
+
+  <PropertyGroup>
+    <ConfigOutRoot>$(OutRoot)$(Configuration).$(Platform)\</ConfigOutRoot>
+    <ProjectOutRoot>$(ConfigOutRoot)$(MSBuildProjectName)\</ProjectOutRoot>
+    <BaseIntermediateOutputPath>$(ProjectOutRoot)</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <BaseOutputPath>$(ConfigOutRoot)bin\</BaseOutputPath>
+    <OutputPath>$(BaseOutputPath)</OutputPath>
+  </PropertyGroup>
+
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk.WindowsDesktop" />
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -12,10 +23,6 @@
     <RootNamespace>DevPrompt</RootNamespace>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <ConfigOutRoot>$(OutRoot)$(Configuration).$(Platform)\</ConfigOutRoot>
-    <ProjectOutRoot>$(ConfigOutRoot)$(MSBuildProjectName)\</ProjectOutRoot>
-    <IntermediateOutputPath>$(ProjectOutRoot)</IntermediateOutputPath>
-    <OutputPath>$(ConfigOutRoot)bin\</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -41,5 +48,7 @@
     <ReadyToRun>True</ReadyToRun>
     <RuntimeIdentifiers>win-x86</RuntimeIdentifiers>
   </PropertyGroup>
+
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk.WindowsDesktop" />
 
 </Project>
