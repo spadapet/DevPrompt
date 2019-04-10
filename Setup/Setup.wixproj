@@ -10,13 +10,12 @@
     <OutputName>DevPrompt</OutputName>
     <OutputType>Package</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
-    <IncludeSearchPaths>..\$(Platform)\$(Configuration)\</IncludeSearchPaths>
     <ConfigOutRoot>$(OutRoot)$(Configuration).$(XPlatform)\</ConfigOutRoot>
     <ProjectOutRoot>$(ConfigOutRoot)$(ProjectName)\</ProjectOutRoot>
     <OutputPath>$(ProjectOutRoot)bin\</OutputPath>
     <IntermediateOutputPath>$(ProjectOutRoot)obj\</IntermediateOutputPath>
-    <DefineConstants>Bin32=$(OutRoot)$(Configuration).x86\bin;Bin64=$(OutRoot)$(Configuration).x64\bin</DefineConstants>
-	<LinkerAdditionalOptions>-ext WixUIExtension</LinkerAdditionalOptions>
+    <DefineConstants>Bin32=$(OutRoot)$(Configuration).x86\bin\;Bin64=$(OutRoot)$(Configuration).x64\bin\;DevRoot=$(DevRoot);DevPromptVersion=$(DevPromptVersion)</DefineConstants>
+    <LinkerAdditionalOptions>-ext WixUIExtension</LinkerAdditionalOptions>
     <SuppressIces>ICE91</SuppressIces>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -30,7 +29,11 @@
     <Compile Include="Directories.wxs" />
     <Compile Include="MergeModules.wxs" />
     <Compile Include="Product.wxs" />
+    <Content Include="license.rtf" />
     <Content Include="Variables.wxi" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Strings.wxl" />
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" Condition=" Exists('$(WixTargetsPath)') " />
   <Target Name="EnsureWixToolsetInstalled" Condition=" !Exists('$(WixTargetsPath)') ">

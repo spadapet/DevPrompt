@@ -3,16 +3,8 @@
     <?include "variables.wxi"?>
     <Fragment>
         <Feature Id="Main" Title="Files" Absent="disallow" AllowAdvertise="no" ConfigurableDirectory="INSTALLDIR">
-            <ComponentRef Id="DevPrompt.exe" />
-            <!--<ComponentRef Id="DevNative.dll" />
-            <ComponentRef Id="DevInject.dll" />-->
-            <ComponentRef Id="InstallDir" />
-            <!--<MergeRef     Id="VC141_Runtime" />-->
+            <ComponentRef Id="Main" />
+            <!--<MergeRef Id="VC141_Runtime" />-->
         </Feature>
-
-        <Feature Id="StartMenuShortcut" Title="Start menu shortcut" AllowAdvertise="no">
-            <ComponentRef Id="StartMenuShortcut" />
-        </Feature>
-
     </Fragment>
 </Wix>

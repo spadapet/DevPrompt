@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="en-us" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+    <String Id="WelcomeEulaDlgTitle">{\WixUI_Font_Title}DevPrompt - Tabbed command prompts</String>
+    <String Id="WelcomeEulaDlgLicenseAcceptedCheckBox">Sounds good to me (must be checked to install)</String>
+</WixLocalization>

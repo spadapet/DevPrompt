@@ -1,20 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <?include "variables.wxi"?>
-    <Product Id="*" Name="Setup" Language="1033" Version="$(var.ProductVersion)" Manufacturer="$(var.CompanyName)" UpgradeCode="e29215c9-12cb-41e7-acea-a0734996786d">
+    <Product Id="*" Name="$(var.ProductName)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="$(var.CompanyName)" UpgradeCode="e29215c9-12cb-41e7-acea-a0734996786d">
         <Package InstallerVersion="200" Compressed="yes" InstallScope="perUser" InstallPrivileges="limited" />
-        <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+        <MajorUpgrade DowngradeErrorMessage="A newer version of $(var.ProductName) is already installed." />
         <MediaTemplate EmbedCab="yes" />
+        <Icon Id="AppIcon" SourceFile="$(var.DevRoot)DevPrompt\appicon.ico" />
+        <CustomAction Id="RunApp" FileKey="DevPrompt.exe" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait" />
 
+        <Property Id="ARPPRODUCTICON" Value="AppIcon" />
         <Property Id="ARPHELPLINK" Value="$(var.ProductLink)" />
         <Property Id="MSIFASTINSTALL" Value="1" />
-        <Property Id="WIXUI_INSTALLDIR" Value="PROGRAMDIR" />
+        <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
         <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Run DevPrompt" />
         <Property Id="LicenseAccepted" Value="1" />
 
-        <UIRef Id="WixUI_Minimal" />
+        <WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
+
+        <UI>
+            <UIRef Id="WixUI_Minimal" />
+            <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="RunApp">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+        </UI>
 
         <FeatureRef Id="Main" />
-        <FeatureRef Id="StartMenuShortcut" />
     </Product>
 </Wix>
