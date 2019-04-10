@@ -111,6 +111,7 @@
     <Compile Include="Utility\PropertyNotifier.cs" />
     <Compile Include="Settings\AppSettings.cs" />
     <Compile Include="Utility\VisualStudioSetup.cs" />
+    <Compile Include="Utility\WpfHelpers.cs" />
     <Page Include="UI\InstallBranchDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DevPrompt.Utility;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -36,7 +37,7 @@ namespace DevPrompt.UI
         {
             get
             {
-                return DragItemsControl.FindVisualAncestor<IDragHost>(this);
+                return WpfHelpers.FindVisualAncestor<IDragHost>(this);
             }
         }
 
@@ -66,9 +67,9 @@ namespace DevPrompt.UI
 
         private void OnDragOver(object sender, DragEventArgs args)
         {
-            if (this.GetDropTarget(args, out int index, out bool firstHalf))
+            if (this.GetDropTarget(args, out int index, out bool left))
             {
-                this.EnsureDropAdorner(this.ItemContainerGenerator.ContainerFromIndex(index) as ContentPresenter, firstHalf);
+                this.EnsureDropAdorner(this.ItemContainerGenerator.ContainerFromIndex(index) as ContentPresenter, left);
             }
             else
             {
@@ -82,13 +83,13 @@ namespace DevPrompt.UI
             this.RemoveDropAdorner();
         }
 
-        private bool GetDropTarget(DragEventArgs args, out int index, out bool firstHalf)
+        private bool GetDropTarget(DragEventArgs args, out int index, out bool left)
         {
             ItemContainerGenerator itemGen = this.ItemContainerGenerator;
             ItemCollection items = this.Items;
             Point point = args.GetPosition(this);
             IInputElement hit = this.InputHitTest(point);
-            ContentPresenter item = DragItemsControl.FindItemContainer(this, hit as DependencyObject, includeSelf: true);
+            ContentPresenter item = WpfHelpers.FindItemContainer<ContentPresenter>(this, hit as DependencyObject, includeSelf: true);
 
             if (item == null)
             {
@@ -102,60 +103,24 @@ namespace DevPrompt.UI
             {
                 index = itemGen.IndexFromContainer(item);
                 Point itemPoint = args.GetPosition(item);
-                firstHalf = itemPoint.X < item.ActualWidth / 2;
+                left = itemPoint.X < item.ActualWidth / 2;
                 return true;
             }
 
             index = 0;
-            firstHalf = false;
+            left = false;
             return false;
         }
 
-        private static T FindVisualAncestor<T>(DependencyObject item, bool includeSelf = false) where T : class
+        private void EnsureDropAdorner(ContentPresenter item, bool left)
         {
-            if (item is Visual)
-            {
-                for (DependencyObject parent = item != null ? (includeSelf ? item : VisualTreeHelper.GetParent(item)) : null;
-                    parent != null;
-                    parent = VisualTreeHelper.GetParent(parent))
-                {
-                    if (parent is T typedParent)
-                    {
-                        return typedParent;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        private static ContentPresenter FindItemContainer(ItemsControl control, DependencyObject child, bool includeSelf)
-        {
-            ContentPresenter parent = null;
-
-            if (control.IsAncestorOf(child))
-            {
-                parent = DragItemsControl.FindVisualAncestor<ContentPresenter>(child, includeSelf: true);
-                while (parent != null && control.ItemContainerGenerator.ItemFromContainer(parent) == DependencyProperty.UnsetValue)
-                {
-                    parent = DragItemsControl.FindVisualAncestor<ContentPresenter>(parent, includeSelf: false);
-                }
-            }
-
-            return parent;
-        }
-
-        private void EnsureDropAdorner(ContentPresenter item, bool firstHalf)
-        {
-            DragItemAdorner.Position adornerPos = firstHalf ? DragItemAdorner.Position.Left : DragItemAdorner.Position.Right;
-
-            if (this.dropAdorner == null || this.dropAdorner.AdornedElement != item || adornerPos != this.dropAdorner.Pos)
+            if (this.dropAdorner == null || this.dropAdorner.AdornedElement != item || left != this.dropAdorner.Left)
             {
                 this.RemoveDropAdorner();
 
                 if (item != null)
                 {
-                    this.dropAdorner = new DragItemAdorner(item, adornerPos);
+                    this.dropAdorner = new DragItemAdorner(item, left);
 
                     AdornerLayer layer = AdornerLayer.GetAdornerLayer(item);
                     if (layer != null)
@@ -221,7 +186,7 @@ namespace DevPrompt.UI
         {
             if (args.MouseDevice.Captured != null)
             {
-                ContentPresenter item = DragItemsControl.FindItemContainer(this, sender, includeSelf: true);
+                ContentPresenter item = WpfHelpers.FindItemContainer<ContentPresenter>(this, sender, includeSelf: true);
                 if (item != null && !this.dragging)
                 {
                     this.mouseCapturePoint = args.GetPosition(this);
@@ -237,25 +202,19 @@ namespace DevPrompt.UI
 
         private class DragItemAdorner : Adorner
         {
-            public enum Position
-            {
-                Left,
-                Right,
-            }
+            public bool Left { get; private set; }
 
-            public Position Pos { get; private set; }
-
-            public DragItemAdorner(UIElement adornedElement, Position position)
+            public DragItemAdorner(UIElement adornedElement, bool left)
                 : base(adornedElement)
             {
-                this.Pos = position;
+                this.Left = left;
                 this.IsHitTestVisible = false;
             }
 
             protected override void OnRender(DrawingContext drawing)
             {
                 Size size = this.AdornedElement.RenderSize;
-                double x = (this.Pos == Position.Left) ? 0.0 : size.Width;
+                double x = this.Left ? 0.0 : size.Width;
 
                 drawing.DrawRectangle(SystemColors.HighlightBrush, null, new Rect(x - 1.5, 0, 3.0, size.Height));
             }

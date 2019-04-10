@@ -15,13 +15,13 @@ namespace DevPrompt.Utility
     {
         public class Instance
         {
-            public string DisplayName { get; }
             public string Name { get; }
             public string Id { get; }
             public string Path { get; }
             public string ProductPath { get; }
             public string Version { get; }
             public string Channel { get; }
+            public string DisplayName { get; }
 
             public Instance(IVisualStudioInstance instance)
             {
