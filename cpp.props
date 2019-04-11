@@ -80,13 +80,18 @@
             <FunctionLevelLinking Condition=" '$(Configuration)' == 'Release' ">true</FunctionLevelLinking>
             <IntrinsicFunctions Condition=" '$(Configuration)' == 'Release' ">true</IntrinsicFunctions>
             <SDLCheck>true</SDLCheck>
-            <PreprocessorDefinitions>PLATFORM_BITS=$(PlatformBits);_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <PreprocessorDefinitions>PLATFORM_BITS=$(PlatformBits);DEVPROMPT_VERSION=$(DevPromptVersion);_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <PreprocessorDefinitions Condition=" '$(Configuration)' == 'Debug' ">_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <PreprocessorDefinitions Condition=" '$(Configuration)' == 'Release' ">NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
             <AdditionalIncludeDirectories>$(ProjectDir);$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
             <LanguageStandard>stdcpp17</LanguageStandard>
         </ClCompile>
+        <ResourceCompile>
+            <PreprocessorDefinitions>DEVPROMPT_VERSION=$(DevPromptVersion);DEVPROMPT_VERSION_COMMAS=$(DevPromptVersion.Replace(".", ","));%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <PreprocessorDefinitions>DEVPROMPT_COMPANY=$(DevPromptCompanyName);DEVPROMPT_PRODUCT=$(DevPromptProductName);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <PreprocessorDefinitions>PLATFORM_BITS=$(PlatformBits);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+        </ResourceCompile>
         <Link>
             <SubSystem>Windows</SubSystem>
             <GenerateDebugInformation>true</GenerateDebugInformation>

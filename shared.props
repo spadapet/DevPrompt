@@ -3,6 +3,9 @@
     <!-- Shared properties for all projects -->
     <PropertyGroup>
         <DevPromptVersion>1.0.0.0</DevPromptVersion>
+        <DevPromptCompanyName>Peter Spada</DevPromptCompanyName>
+        <DevPromptProductName>DevPrompt</DevPromptProductName>
+
         <DevRoot>$(MSBuildThisFileDirectory)</DevRoot>
         <OutRoot>$(DevRoot)out\</OutRoot>
         <TPV>10.0.17763.0</TPV>
