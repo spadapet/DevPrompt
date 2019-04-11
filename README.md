@@ -1,6 +1,13 @@
 ﻿# Dev Prompt
 Tabbed command prompts for developers
 
+## Download
+[DevPrompt.msi](http://www.peterspada.com/Download/DevPrompt) - Latest version 1.0.0.0
+
+The installation does not run with administrator rights.
+Windows will warn you not to install it since the MSI file is unsigned.
+It’s perfectly safe though, just click the More Info link and install anyway.
+
 ## Features
 * Hosts cmd.exe and powershell.exe command prompts in multiple tabs
 * Quickly clone a command prompt
