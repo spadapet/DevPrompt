@@ -164,7 +164,7 @@ bool Pipe::WaitForClient() const
     return status;
 }
 
-bool Pipe::ReadMessage(Message & input) const
+bool Pipe::ReadMessage(Message& input) const
 {
     OVERLAPPED oio{};
     oio.hEvent = ::CreateEvent(nullptr, TRUE, FALSE, nullptr);
@@ -178,7 +178,7 @@ bool Pipe::ReadMessage(Message & input) const
         buffer.resize(readBufferSize + ::PIPE_BUFFER_SIZE);
 
         DWORD bytesRead = 0;
-        BYTE * mem = buffer.data() + readBufferSize;
+        BYTE* mem = buffer.data() + readBufferSize;
 
         if ((status = ::ReadFile(this->pipe, mem, ::PIPE_BUFFER_SIZE, &bytesRead, &oio)) || ::GetLastError() == ERROR_MORE_DATA)
         {
@@ -216,7 +216,7 @@ bool Pipe::ReadMessage(Message & input) const
     return status;
 }
 
-bool Pipe::WriteMessage(const Message & output) const
+bool Pipe::WriteMessage(const Message& output) const
 {
     bool status = false;
     std::vector<BYTE> buffer = output.Convert();
@@ -248,7 +248,7 @@ bool Pipe::WriteMessage(const Message & output) const
     return status;
 }
 
-void Pipe::RunServer(const MessageHandler & handler) const
+void Pipe::RunServer(const MessageHandler& handler) const
 {
     for (bool status = (this->pipe != nullptr); status; )
     {
@@ -262,18 +262,18 @@ void Pipe::RunServer(const MessageHandler & handler) const
     }
 }
 
-bool Pipe::Transact(const Message & request, Message & response) const
+bool Pipe::Transact(const Message& request, Message& response) const
 {
     return this->WriteMessage(request) && this->ReadMessage(response);
 }
 
-bool Pipe::Send(const Message & request) const
+bool Pipe::Send(const Message& request) const
 {
     Message response;
     return this->Transact(request, response);
 }
 
-std::array<HANDLE, 3> Pipe::GetWaitHandles(const OVERLAPPED & oio) const
+std::array<HANDLE, 3> Pipe::GetWaitHandles(const OVERLAPPED& oio) const
 {
     return std::array<HANDLE, 3>
     {

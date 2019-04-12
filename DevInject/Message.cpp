@@ -11,14 +11,14 @@ static void AppendString(std::vector<BYTE>& data, const std::wstring& str)
     size_t oldDataSize = data.size();
     data.resize(data.size() + sizeof(DWORD) + str.size() * sizeof(wchar_t));
 
-    BYTE * writeData = data.data() + oldDataSize;
+    BYTE* writeData = data.data() + oldDataSize;
     DWORD strLen = static_cast<DWORD>(str.size());
 
     std::memcpy(writeData, &strLen, sizeof(DWORD));
     std::memcpy(writeData + sizeof(DWORD), str.c_str(), str.size() * sizeof(wchar_t));
 }
 
-static std::wstring GetString(const BYTE * &data, size_t & size)
+static std::wstring GetString(const BYTE*& data, size_t& size)
 {
     if (size >= sizeof(DWORD))
     {
@@ -53,17 +53,17 @@ Message::Message()
 {
 }
 
-Message::Message(const Message & rhs)
+Message::Message(const Message& rhs)
     : properties(rhs.properties)
 {
 }
 
-Message::Message(Message && rhs)
+Message::Message(Message&& rhs)
     : properties(std::move(rhs.properties))
 {
 }
 
-Message::Message(const std::wstring & commandName, unsigned int id, bool isResponse)
+Message::Message(const std::wstring& commandName, unsigned int id, bool isResponse)
 {
     if (isResponse)
     {
@@ -80,7 +80,7 @@ Message::Message(const std::wstring & commandName, unsigned int id, bool isRespo
     }
 }
 
-Message& Message::operator=(const Message & rhs)
+Message& Message::operator=(const Message& rhs)
 {
     if (this != &rhs)
     {
@@ -90,7 +90,7 @@ Message& Message::operator=(const Message & rhs)
     return *this;
 }
 
-Message& Message::operator=(Message && rhs)
+Message& Message::operator=(Message&& rhs)
 {
     if (this != &rhs)
     {
@@ -100,7 +100,7 @@ Message& Message::operator=(Message && rhs)
     return *this;
 }
 
-Message Message::Parse(const BYTE * data, size_t size)
+Message Message::Parse(const BYTE* data, size_t size)
 {
     Message output;
 
@@ -186,13 +186,13 @@ void Message::ParseNameValuePairs(const wchar_t* cur, wchar_t separator, std::fu
     }
 }
 
-void Message::SetCommand(const std::wstring & name)
+void Message::SetCommand(const std::wstring& name)
 {
     this->SetValue(PIPE_MAP_TYPE_COMMAND, name);
     this->properties.erase(PIPE_MAP_TYPE_RESPONSE);
 }
 
-void Message::SetResponse(const std::wstring & name)
+void Message::SetResponse(const std::wstring& name)
 {
     this->SetValue(PIPE_MAP_TYPE_RESPONSE, name);
     this->properties.erase(PIPE_MAP_TYPE_COMMAND);
@@ -204,7 +204,7 @@ void Message::SetId(unsigned int id)
     this->SetValue(PIPE_MAP_TYPE_ID, std::to_wstring(id));
 }
 
-void Message::SetValue(const std::wstring & name, const std::wstring & value)
+void Message::SetValue(const std::wstring& name, const std::wstring& value)
 {
     this->properties[name] = value;
 }
@@ -239,7 +239,7 @@ unsigned int Message::GetId() const
     return 0;
 }
 
-const std::wstring& Message::GetValue(const std::wstring & name) const
+const std::wstring& Message::GetValue(const std::wstring& name) const
 {
     auto i = this->properties.find(name);
     return (i != this->properties.end()) ? i->second : ::EMPTY_STRING;

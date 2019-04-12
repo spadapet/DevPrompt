@@ -71,7 +71,7 @@ static DWORD __stdcall PipeServerThread(void*)
     return 0;
 }
 
-static void NotifyOwnerOfChanges(std::wstring & oldTitle, std::wstring & oldEnvironment)
+static void NotifyOwnerOfChanges(std::wstring& oldTitle, std::wstring& oldEnvironment)
 {
     if (!::ownerPipe)
     {
@@ -210,7 +210,7 @@ static BOOL CALLBACK FindOwnerProcessWindow(HWND hwnd, LPARAM lp)
                     const size_t suffixLen2 = std::wcslen(ownerSuffix2);
 
                     size_t len = std::wcslen(path);
-                    if ((len >= suffixLen && !_wcsicmp(ownerSuffix, path + (len - suffixLen))) || 
+                    if ((len >= suffixLen && !_wcsicmp(ownerSuffix, path + (len - suffixLen))) ||
                         (len >= suffixLen2 && !_wcsicmp(ownerSuffix2, path + (len - suffixLen2))))
                     {
                         ::ownerPipe = Pipe::Connect(hwndProcess, ::disposeEvent);

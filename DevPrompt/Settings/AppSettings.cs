@@ -1,5 +1,4 @@
-﻿using DevPrompt.Interop;
-using DevPrompt.Utility;
+﻿using DevPrompt.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

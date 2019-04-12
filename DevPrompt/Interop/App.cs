@@ -17,55 +17,53 @@ namespace DevPrompt.Interop
         [DllImport("DevNative32", CallingConvention = CallingConvention.Cdecl, EntryPoint = "CreateVisualStudioInstances")]
         private static extern void CreateVisualStudioInstances32(out IVisualStudioInstances obj);
 
-        public static IApp CreateApp(IAppHost host, out string errorMessage)
+        private static bool CallDevNative<T>(Func<T> func64, Func<T> func32, out T result, out string errorMessage) where T : class
         {
-            IApp app;
-
             try
             {
-                if (Environment.Is64BitProcess)
-                {
-                    App.CreateApp64(host, out app);
-                }
-                else
-                {
-                    App.CreateApp32(host, out app);
-                }
-
+                result = Environment.Is64BitProcess ? func64() : func32();
                 errorMessage = null;
             }
             catch (TypeLoadException ex)
             {
                 // Probably missing a DLL
-                app = null;
+                result = null;
                 errorMessage = ex.Message;
             }
 
-            return app;
+            return result != null;
+        }
+
+        public static IApp CreateApp(IAppHost host, out string errorMessage)
+        {
+            return App.CallDevNative(
+                () =>
+                {
+                    App.CreateApp64(host, out IApp app64);
+                    return app64;
+                },
+                () =>
+                {
+                    App.CreateApp32(host, out IApp app32);
+                    return app32;
+                },
+                out IApp app, out errorMessage) ? app : null;
         }
 
         public static IVisualStudioInstances CreateVisualStudioInstances()
         {
-            IVisualStudioInstances instances;
-
-            try
-            {
-                if (Environment.Is64BitProcess)
+            return App.CallDevNative(
+                () =>
                 {
-                    App.CreateVisualStudioInstances64(out instances);
-                }
-                else
+                    App.CreateVisualStudioInstances64(out IVisualStudioInstances instances64);
+                    return instances64;
+                },
+                () =>
                 {
-                    App.CreateVisualStudioInstances32(out instances);
-                }
-            }
-            catch (TypeLoadException)
-            {
-                // Probably missing a DLL
-                instances = null;
-            }
-
-            return instances;
+                    App.CreateVisualStudioInstances32(out IVisualStudioInstances instances32);
+                    return instances32;
+                },
+                out IVisualStudioInstances instances, out string errorMessage) ? instances : null;
         }
     }
 }
