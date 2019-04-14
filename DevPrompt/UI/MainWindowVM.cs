@@ -307,10 +307,19 @@ namespace DevPrompt.UI
                         oldProcess.InternalActive = false;
                     }
 
+                    this.OnPropertyChanged(nameof(this.HasActiveProcess));
                     this.OnPropertyChanged(nameof(this.WindowTitle));
                 }
 
                 this.FocusActiveProcess();
+            }
+        }
+
+        public bool HasActiveProcess
+        {
+            get
+            {
+                return this.ActiveProcess != null;
             }
         }
 

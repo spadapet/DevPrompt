@@ -134,6 +134,16 @@
                 <MenuItem Header="Save _tabs on exit" IsCheckable="True" IsChecked="{Binding AppSettings.SaveTabsOnExit, Mode=TwoWay}" ToolTip="When tabs are saved, they will be restored the next time you start the app." />
                 <MenuItem Header="E_xit" InputGestureText="Alt+F4" Command="{Binding ExitCommand}" />
             </MenuItem>
+            <MenuItem Header="Ta_b" Visibility="{Binding HasActiveProcess, Converter={StaticResource BoolToVisibility}}">
+                <MenuItem Header="_Set tab name..." InputGestureText="Ctrl+Shift+T" Command="{Binding ActiveProcess.SetTabNameCommand}" />
+                <Separator />
+                <MenuItem Header="_Clone" InputGestureText="Ctrl+T" Command="{Binding ActiveProcess.CloneCommand}" />
+                <MenuItem Header="_Defaults" Command="{Binding ActiveProcess.DefaultsCommand}" />
+                <MenuItem Header="_Properties" Command="{Binding ActiveProcess.PropertiesCommand}" />
+                <Separator />
+                <MenuItem Header="D_etach" InputGestureText="Ctrl+Shift+F4" Command="{Binding ActiveProcess.DetachCommand}" />
+                <MenuItem Header="C_lose" InputGestureText="Ctrl+F4" Command="{Binding ActiveProcess.CloseCommand}" />
+            </MenuItem>
             <MenuItem Header="_Grab" SubmenuOpened="OnGrabMenuOpened">
                 <Separator Tag="[End]" />
                 <MenuItem Header="_Auto Grab" IsCheckable="True" IsChecked="{Binding AppSettings.ConsoleGrabEnabled, Mode=TwoWay}" />
