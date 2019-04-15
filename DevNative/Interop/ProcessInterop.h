@@ -20,13 +20,7 @@ public:
     virtual HRESULT __stdcall Activate() override;
     virtual HRESULT __stdcall Deactivate() override;
     virtual HRESULT __stdcall GetWindow(HWND* hwnd) override;
-    virtual HRESULT __stdcall GetWindowTitle(BSTR* value) override;
-    virtual HRESULT __stdcall GetExe(BSTR* value) override;
-    virtual HRESULT __stdcall GetEnv(BSTR* value) override;
-    virtual HRESULT __stdcall GetAliases(BSTR* value) override;
-    virtual HRESULT __stdcall GetCurrentDirectory(BSTR* value) override;
-    virtual HRESULT __stdcall GetColorTable(BSTR* value) override;
-    virtual HRESULT __stdcall SetColorTable(const wchar_t* value) override;
+    virtual HRESULT __stdcall GetState(BSTR* value) override;
     virtual HRESULT __stdcall Focus() override;
     virtual HRESULT __stdcall SystemCommandDefaults() override;
     virtual HRESULT __stdcall SystemCommandProperties() override;

@@ -18,13 +18,8 @@ namespace DevPrompt.Interop
         void Deactivate();
         IntPtr GetWindow();
 
-        [return: MarshalAs(UnmanagedType.BStr)] string GetWindowTitle();
-        [return: MarshalAs(UnmanagedType.BStr)] string GetExe();
-        [return: MarshalAs(UnmanagedType.BStr)] string GetEnv();
-        [return: MarshalAs(UnmanagedType.BStr)] string GetAliases();
-        [return: MarshalAs(UnmanagedType.BStr)] string GetCurrentDirectory();
-        [return: MarshalAs(UnmanagedType.BStr)] string GetColorTable();
-        void SetColorTable([MarshalAs(UnmanagedType.LPWStr)] string value);
+        [return: MarshalAs(UnmanagedType.BStr)]
+        string GetState();
 
         void Focus();
         void SystemCommandDefaults();

@@ -52,6 +52,11 @@
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(DevRoot)DevInject</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Import Project="..\packages\Microsoft.VisualStudio.Setup.Configuration.Native.1.16.30\build\native\Microsoft.VisualStudio.Setup.Configuration.Native.targets" Condition="Exists('..\packages\Microsoft.VisualStudio.Setup.Configuration.Native.1.16.30\build\native\Microsoft.VisualStudio.Setup.Configuration.Native.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

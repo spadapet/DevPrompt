@@ -26,8 +26,8 @@ namespace DevPrompt.UI
 
             this.Process = process;
             this.Hwnd = process.GetWindow();
-            this.Env = process.GetEnv();
-            this.Title = process.GetWindowTitle();
+            this.Env = string.Empty;
+            this.Title = string.Empty;
             this.TabName = string.Empty;
         }
 

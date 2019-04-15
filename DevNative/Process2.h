@@ -1,22 +1,11 @@
 ﻿// Called Process2.h because Process.h conflicts with a Windows header (only started with v142 toolset)
 #pragma once
 
+#include "Json/Message.h"
+#include "Pipe.h"
 #include "WindowProc.h"
 
-#include "../DevInject/Pipe.h"
-
 class App;
-
-struct ProcessStartInfo
-{
-    std::wstring executable;
-    std::wstring arguments;
-    std::wstring environment;
-    std::wstring startingDirectory;
-    std::wstring windowTitle;
-    std::wstring colorTable;
-    Message aliases;
-};
 
 class Process : public std::enable_shared_from_this<Process>, public IWindowProc
 {
@@ -29,17 +18,11 @@ public:
     void Detach();
 
     bool Attach(HANDLE process);
-    bool Start(const ProcessStartInfo& info);
+    bool Start(const Json::Dict& info);
     bool Clone(const std::shared_ptr<Process>& process);
     HWND GetHostWindow() const;
     DWORD GetProcessId() const;
-    std::wstring GetProcessExe();
-    std::wstring GetProcessWindowTitle();
-    std::wstring GetProcessEnv();
-    std::wstring GetProcessAliases();
-    std::wstring GetProcessCurrentDirectory();
-    std::wstring GetProcessColorTable();
-    void SetProcessColorTable(const wchar_t* value);
+    std::wstring GetProcessState();
     void SendDpiChanged(double oldScale, double newScale);
     void SendSystemCommand(UINT id);
 
@@ -55,33 +38,36 @@ private:
     HWND GetChildWindow() const;
     void PostDispose();
 
-    void BackgroundAttach(HANDLE process, HANDLE mainThread = nullptr, const ProcessStartInfo* info = nullptr);
-    void BackgroundStart(const ProcessStartInfo& info);
+    void BackgroundAttach(HANDLE process, HANDLE mainThread = nullptr, const Json::Dict* info = nullptr);
+    void BackgroundStart(const Json::Dict& info);
     void BackgroundClone(const std::shared_ptr<Process>& process);
     void BackgroundSendCommands(HANDLE process);
-    void InitNewProcess(const ProcessStartInfo& info);
+    void InitNewProcess(const Json::Dict& info);
 
-    Message CommandHandler(HANDLE process, const Message& input);
-    void SendCommandAsync(Message&& command);
-    bool TransactCommand(const Message& command);
-    bool TransactCommand(const Message& command, Message& response);
-    void SendCommands(const std::vector<Message>& commands);
-    void FlushRemainingCommands();
-    void ResponseHandler(const Message& response);
+    Json::Dict HandleMessage(HANDLE process, const Json::Dict& input);
+    void HandleResponse(const std::wstring& name, const Json::Dict& output);
+    void HandleNewState(const Json::Dict& state);
+
+    void SendMessageAsync(std::wstring&& name);
+    void SendMessageAsync(Json::Dict&& input);
+    bool TransactMessage(std::wstring&& name);
+    bool TransactMessage(std::wstring&& name, Json::Dict& output);
+    bool TransactMessage(const Json::Dict& input, Json::Dict& output);
+    void SendMessages(HANDLE process, const std::vector<Json::Dict>& messages);
+    void FlushRemainingMessages(HANDLE process);
 
     std::shared_ptr<App> app;
     std::thread backgroundThread;
     HANDLE disposeEvent;
     HWND hostWnd;
     DWORD processId;
-    std::wstring processExe;
     std::wstring processWindowTitle;
     std::wstring processEnv;
 
     std::mutex processPipeMutex;
     Pipe processPipe;
 
-    HANDLE commandEvent;
-    std::mutex commandsMutex;
-    std::vector<Message> commands;
+    HANDLE messageEvent;
+    std::mutex messageMutex;
+    std::vector<Json::Dict> messages;
 };

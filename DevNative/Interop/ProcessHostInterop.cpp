@@ -1,5 +1,7 @@
 ﻿#include "stdafx.h"
 #include "App.h"
+#include "Json/Dict.h"
+#include "Json/Persist.h"
 #include "Process2.h"
 #include "ProcessInterop.h"
 #include "ProcessHostInterop.h"
@@ -146,18 +148,28 @@ HRESULT ProcessHostInterop::RunProcess(
     const wchar_t* startingDirectory,
     IProcess** obj)
 {
-    return this->RestoreProcess(executable, arguments, startingDirectory, nullptr, nullptr, nullptr, nullptr, obj);
+    Json::Dict dict;
+
+    if (executable && *executable)
+    {
+        dict.Set(PIPE_PROPERTY_EXECUTABLE, Json::Value(std::wstring(executable)));
+    }
+
+    if (arguments && *arguments)
+    {
+        dict.Set(PIPE_PROPERTY_ARGUMENTS, Json::Value(std::wstring(arguments)));
+    }
+
+    if (startingDirectory && *startingDirectory)
+    {
+        dict.Set(PIPE_PROPERTY_DIRECTORY, Json::Value(std::wstring(startingDirectory)));
+    }
+
+    std::wstring state = Json::Write(dict);
+    return this->RestoreProcess(state.c_str(), obj);
 }
 
-HRESULT ProcessHostInterop::RestoreProcess(
-    const wchar_t* executable,
-    const wchar_t* arguments,
-    const wchar_t* currentDirectory,
-    const wchar_t* environment,
-    const wchar_t* aliases,
-    const wchar_t* colorTable,
-    const wchar_t* windowTitle,
-    IProcess** obj)
+HRESULT ProcessHostInterop::RestoreProcess(const wchar_t* state, IProcess** obj)
 {
     if (!obj)
     {
@@ -167,15 +179,7 @@ HRESULT ProcessHostInterop::RestoreProcess(
     std::shared_ptr<App> app = this->app.lock();
     if (app && this->hwnd)
     {
-        ProcessStartInfo info;
-        info.executable = executable ? executable : L"";
-        info.arguments = arguments ? arguments : L"";
-        info.startingDirectory = currentDirectory ? currentDirectory : L"";
-        info.environment = environment ? environment : L"";
-        info.windowTitle = windowTitle ? windowTitle : L"";
-        info.colorTable = colorTable ? colorTable : L"";
-        info.aliases.ParseNameValuePairs(aliases, '\n');
-
+        Json::Dict info = Json::Parse(state);
         HWND hwnd = app->RunProcess(this->hwnd, info);
         if (hwnd)
         {

@@ -28,16 +28,7 @@ public:
         const wchar_t* startingDirectory,
         IProcess** obj) override;
 
-    virtual HRESULT __stdcall RestoreProcess(
-        const wchar_t* executable,
-        const wchar_t* arguments,
-        const wchar_t* currentDirectory,
-        const wchar_t* environment,
-        const wchar_t* aliases,
-        const wchar_t* colorTable,
-        const wchar_t* windowTitle,
-        IProcess** obj) override;
-
+    virtual HRESULT __stdcall RestoreProcess(const wchar_t* state, IProcess** obj) override;
     virtual HRESULT __stdcall CloneProcess(IProcess* process, IProcess** obj) override;
 
     // IAppListener

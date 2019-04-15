@@ -1,4 +1,5 @@
 ﻿#include "stdafx.h"
+#include "Json/Persist.h"
 #include "Pipe.h"
 
 static const DWORD PIPE_BUFFER_SIZE = 65536;
@@ -90,10 +91,7 @@ Pipe Pipe::Connect(HANDLE serverProcess, HANDLE disposeEvent)
     {
         DWORD mode = PIPE_READMODE_MESSAGE;
         ::SetNamedPipeHandleState(pipe, &mode, nullptr, nullptr);
-    }
 
-    if (pipe != INVALID_HANDLE_VALUE)
-    {
         DWORD pipeServerId;
         if (!::GetNamedPipeServerProcessId(pipe, &pipeServerId) || pipeServerId != ::GetProcessId(serverProcess))
         {
@@ -104,7 +102,7 @@ Pipe Pipe::Connect(HANDLE serverProcess, HANDLE disposeEvent)
         }
     }
 
-    if (pipe != INVALID_HANDLE_VALUE)
+    if (pipe && pipe != INVALID_HANDLE_VALUE)
     {
         return Pipe(pipe, disposeEvent, serverProcess);
     }
@@ -164,96 +162,112 @@ bool Pipe::WaitForClient() const
     return status;
 }
 
-bool Pipe::ReadMessage(Message& input) const
+bool Pipe::ReadMessage(Json::Dict& input) const
 {
-    OVERLAPPED oio{};
-    oio.hEvent = ::CreateEvent(nullptr, TRUE, FALSE, nullptr);
-
+    HANDLE oioEvent = ::CreateEvent(nullptr, TRUE, FALSE, nullptr);
     std::vector<BYTE> buffer;
     size_t readBufferSize = 0;
-    bool status = false;
+    bool done = false;
 
-    while (!status)
+    while (!done)
     {
         buffer.resize(readBufferSize + ::PIPE_BUFFER_SIZE);
 
+        bool moreData = false;
         DWORD bytesRead = 0;
-        BYTE* mem = buffer.data() + readBufferSize;
+        OVERLAPPED oio{};
+        oio.hEvent = oioEvent;
 
-        if ((status = ::ReadFile(this->pipe, mem, ::PIPE_BUFFER_SIZE, &bytesRead, &oio)) || ::GetLastError() == ERROR_MORE_DATA)
+        if (::ReadFile(this->pipe, buffer.data() + readBufferSize, ::PIPE_BUFFER_SIZE, nullptr, &oio) || ::GetLastError() == ERROR_MORE_DATA)
         {
-            // Sync read is done
-            readBufferSize += bytesRead;
+            if (::GetOverlappedResult(this->pipe, &oio, &bytesRead, TRUE))
+            {
+                readBufferSize += bytesRead;
+                done = true;
+            }
+            else if (::GetLastError() == ERROR_MORE_DATA)
+            {
+                readBufferSize += bytesRead;
+                moreData = true;
+            }
         }
         else if (::GetLastError() == ERROR_IO_PENDING)
         {
-            // Wait for reading to finish
-
             auto handles = this->GetWaitHandles(oio);
             if (::WaitForMultipleObjects(static_cast<DWORD>(handles.size()), handles.data(), FALSE, INFINITE) == WAIT_OBJECT_0)
             {
-                // Async read is done
-                DWORD bytesRead = 0;
-                if ((status = ::GetOverlappedResult(this->pipe, &oio, &bytesRead, TRUE)) || ::GetLastError() == ERROR_MORE_DATA)
+                if (::GetOverlappedResult(this->pipe, &oio, &bytesRead, TRUE))
                 {
                     readBufferSize += bytesRead;
-                    continue;
+                    done = true;
+                }
+                else if (::GetLastError() == ERROR_MORE_DATA)
+                {
+                    readBufferSize += bytesRead;
+                    moreData = true;
                 }
             }
+        }
 
-            // Error
+        if (!done && !moreData)
+        {
             break;
         }
     }
 
-    if (status)
+    if (done)
     {
-        input = Message::Parse(buffer.data(), readBufferSize);
+        input = Json::Parse(reinterpret_cast<const wchar_t*>(buffer.data()), readBufferSize - sizeof(wchar_t));
     }
 
-    ::CloseHandle(oio.hEvent);
+    ::CloseHandle(oioEvent);
 
-    return status;
+    return done;
 }
 
-bool Pipe::WriteMessage(const Message& output) const
+bool Pipe::WriteMessage(const Json::Dict& output) const
 {
     bool status = false;
-    std::vector<BYTE> buffer = output.Convert();
-
-    DWORD bytesWritten = 0;
+    std::wstring buffer = Json::Write(output);
+    DWORD byteSize = static_cast<DWORD>((buffer.size() + 1) * sizeof(wchar_t));
     OVERLAPPED oio{};
     oio.hEvent = ::CreateEvent(nullptr, TRUE, FALSE, nullptr);
 
-    if (::WriteFile(this->pipe, buffer.data(), static_cast<DWORD>(buffer.size()), &bytesWritten, &oio))
+    if (::WriteFile(this->pipe, buffer.c_str(), byteSize, nullptr, &oio))
     {
-        // Finished immediately
         status = true;
     }
     else if (::GetLastError() == ERROR_IO_PENDING)
     {
-        // Handle the results of any completed read/write operations
-
         auto handles = this->GetWaitHandles(oio);
-        if (::WaitForMultipleObjects(static_cast<DWORD>(handles.size()), handles.data(), FALSE, INFINITE) == WAIT_OBJECT_0)
-        {
-            // Async write is done
-            status = (::GetOverlappedResult(this->pipe, &oio, &bytesWritten, TRUE) != FALSE);
-        }
+        status = (::WaitForMultipleObjects(static_cast<DWORD>(handles.size()), handles.data(), FALSE, INFINITE) == WAIT_OBJECT_0);
+    }
+
+    if (status)
+    {
+        DWORD bytesWritten = 0;
+        status = (::GetOverlappedResult(this->pipe, &oio, &bytesWritten, TRUE) != FALSE);
+        assert(!status || bytesWritten == byteSize);
     }
 
     ::CloseHandle(oio.hEvent);
 
-    assert(!status || bytesWritten == buffer.size());
     return status;
 }
 
-void Pipe::RunServer(const MessageHandler& handler) const
+void Pipe::RunServer(const Json::MessageHandler& handler) const
 {
     for (bool status = (this->pipe != nullptr); status; )
     {
-        Message request;
-        status = this->ReadMessage(request) && this->WriteMessage(handler(request));
+        Json::Dict input;
+        if ((status = this->ReadMessage(input)) != false)
+        {
+            Json::Dict output = handler(input);
+            output.Set(PIPE_PROPERTY_ID, input.Get(PIPE_PROPERTY_ID));
+            output.Set(PIPE_PROPERTY_COMMAND, input.Get(PIPE_PROPERTY_COMMAND));
+
+            status = this->WriteMessage(output);
+        }
     }
 
     if (this->pipe)
@@ -262,15 +276,30 @@ void Pipe::RunServer(const MessageHandler& handler) const
     }
 }
 
-bool Pipe::Transact(const Message& request, Message& response) const
+bool Pipe::Transact(const Json::Dict& input, Json::Dict& output) const
 {
-    return this->WriteMessage(request) && this->ReadMessage(response);
+    Json::Dict inputCopy = input;
+    if (inputCopy.Get(PIPE_PROPERTY_ID).IsUnset())
+    {
+        static long TRANSACTION_ID = 0;
+        int id = ::InterlockedIncrement(&TRANSACTION_ID);
+        inputCopy.Set(PIPE_PROPERTY_ID, Json::Value(id));
+    }
+
+    if (this->WriteMessage(inputCopy) && this->ReadMessage(output))
+    {
+        assert(inputCopy.Get(PIPE_PROPERTY_ID) == output.Get(PIPE_PROPERTY_ID));
+        assert(inputCopy.Get(PIPE_PROPERTY_COMMAND) == output.Get(PIPE_PROPERTY_COMMAND));
+        return true;
+    }
+
+    return false;
 }
 
-bool Pipe::Send(const Message& request) const
+bool Pipe::Send(const Json::Dict& input) const
 {
-    Message response;
-    return this->Transact(request, response);
+    Json::Dict response;
+    return this->Transact(input, response);
 }
 
 std::array<HANDLE, 3> Pipe::GetWaitHandles(const OVERLAPPED& oio) const

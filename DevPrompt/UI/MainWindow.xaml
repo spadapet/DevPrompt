@@ -96,11 +96,12 @@
                 ContentTemplate="{StaticResource TabButtonContentTemplate}">
                 <Button.ContextMenu>
                     <ContextMenu Opened="OnTabContextMenuOpened">
+                        <!-- NOTE: Keep in sync with Tab menu -->
                         <MenuItem Header="_Set tab name..." InputGestureText="Ctrl+Shift+T" Command="{Binding SetTabNameCommand}" />
                         <Separator />
                         <MenuItem Header="_Clone" InputGestureText="Ctrl+T" Command="{Binding CloneCommand}" />
-                        <MenuItem Header="_Defaults" Command="{Binding DefaultsCommand}" />
-                        <MenuItem Header="_Properties" Command="{Binding PropertiesCommand}" />
+                        <MenuItem Header="Console _Defaults" Command="{Binding DefaultsCommand}" />
+                        <MenuItem Header="Console _Properties" Command="{Binding PropertiesCommand}" />
                         <Separator />
                         <MenuItem Header="D_etach" InputGestureText="Ctrl+Shift+F4" Command="{Binding DetachCommand}" />
                         <MenuItem Header="C_lose" InputGestureText="Ctrl+F4" Command="{Binding CloseCommand}" />
@@ -135,11 +136,12 @@
                 <MenuItem Header="E_xit" InputGestureText="Alt+F4" Command="{Binding ExitCommand}" />
             </MenuItem>
             <MenuItem Header="Ta_b" Visibility="{Binding HasActiveProcess, Converter={StaticResource BoolToVisibility}}">
+                <!-- NOTE: Keep in sync with tab's ContextMenu -->
                 <MenuItem Header="_Set tab name..." InputGestureText="Ctrl+Shift+T" Command="{Binding ActiveProcess.SetTabNameCommand}" />
                 <Separator />
                 <MenuItem Header="_Clone" InputGestureText="Ctrl+T" Command="{Binding ActiveProcess.CloneCommand}" />
-                <MenuItem Header="_Defaults" Command="{Binding ActiveProcess.DefaultsCommand}" />
-                <MenuItem Header="_Properties" Command="{Binding ActiveProcess.PropertiesCommand}" />
+                <MenuItem Header="Console _Defaults" Command="{Binding ActiveProcess.DefaultsCommand}" />
+                <MenuItem Header="Console _Properties" Command="{Binding ActiveProcess.PropertiesCommand}" />
                 <Separator />
                 <MenuItem Header="D_etach" InputGestureText="Ctrl+Shift+F4" Command="{Binding ActiveProcess.DetachCommand}" />
                 <MenuItem Header="C_lose" InputGestureText="Ctrl+F4" Command="{Binding ActiveProcess.CloseCommand}" />

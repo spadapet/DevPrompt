@@ -4,24 +4,57 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Api.h" />
     <ClInclude Include="Pipe.h" />
-    <ClInclude Include="Message.h" />
     <ClInclude Include="Inject.h" />
-    <ClInclude Include="CommandHandler.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Json\Dict.h">
+      <Filter>Json</Filter>
+    </ClInclude>
+    <ClInclude Include="Json\Persist.h">
+      <Filter>Json</Filter>
+    </ClInclude>
+    <ClInclude Include="Json\Tokenizer.h">
+      <Filter>Json</Filter>
+    </ClInclude>
+    <ClInclude Include="Json\Value.h">
+      <Filter>Json</Filter>
+    </ClInclude>
+    <ClInclude Include="Json\Message.h">
+      <Filter>Json</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="CommandHandler.cpp" />
     <ClCompile Include="Pipe.cpp" />
-    <ClCompile Include="Message.cpp" />
     <ClCompile Include="Inject.cpp" />
+    <ClCompile Include="Json\Dict.cpp">
+      <Filter>Json</Filter>
+    </ClCompile>
+    <ClCompile Include="Json\Persist.cpp">
+      <Filter>Json</Filter>
+    </ClCompile>
+    <ClCompile Include="Json\Tokenizer.cpp">
+      <Filter>Json</Filter>
+    </ClCompile>
+    <ClCompile Include="Json\Value.cpp">
+      <Filter>Json</Filter>
+    </ClCompile>
+    <ClCompile Include="Json\Message.cpp">
+      <Filter>Json</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Json">
+      <UniqueIdentifier>{5e3fa1ed-b275-4313-9a9f-d58993d7d6c2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

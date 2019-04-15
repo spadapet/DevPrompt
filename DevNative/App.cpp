@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "App.h"
 #include "Interop/ProcessInterop.h"
+#include "Json/Persist.h"
 #include "Process2.h"
 #include "DevPrompt_h.h"
 
@@ -99,7 +100,7 @@ App* App::Get()
 
 bool App::IsMainThread()
 {
-    return ::app&& ::app->mainThread == ::GetCurrentThreadId();
+    return ::app && ::app->mainThread == ::GetCurrentThreadId();
 }
 
 HINSTANCE App::GetInstance() const
@@ -107,7 +108,7 @@ HINSTANCE App::GetInstance() const
     return this->instance;
 }
 
-App::Task::Task(App & app, std::function<void()> && func)
+App::Task::Task(App& app, std::function<void()>&& func)
     : app(app.shared_from_this())
     , func(std::move(func))
 {
@@ -120,7 +121,7 @@ void App::Task::RunCallback(PTP_CALLBACK_INSTANCE instance, void* context)
     delete task;
 }
 
-void App::PostBackgroundTask(std::function<void()> && func)
+void App::PostBackgroundTask(std::function<void()>&& func)
 {
     Task* task = new Task(*this, std::move(func));
     if (!::TrySubmitThreadpoolCallback(App::Task::RunCallback, task, nullptr))
@@ -129,7 +130,7 @@ void App::PostBackgroundTask(std::function<void()> && func)
     }
 }
 
-void App::PostToMainThread(std::function<void()> && func)
+void App::PostToMainThread(std::function<void()>&& func)
 {
     bool runNow = false;
     bool postMessage = false;
@@ -159,7 +160,7 @@ void App::PostToMainThread(std::function<void()> && func)
     }
 }
 
-void App::AddListener(IAppListener * obj)
+void App::AddListener(IAppListener* obj)
 {
     auto i = std::find(this->listeners.begin(), this->listeners.end(), nullptr);
     if (i != this->listeners.end())
@@ -172,7 +173,7 @@ void App::AddListener(IAppListener * obj)
     }
 }
 
-void App::RemoveListener(IAppListener * obj)
+void App::RemoveListener(IAppListener* obj)
 {
     auto i = std::find(this->listeners.begin(), this->listeners.end(), obj);
     if (i != this->listeners.end())
@@ -387,7 +388,7 @@ static bool IsKeyPressed(int vk)
 }
 
 // This method is used to spy on all key presses before the console window gets a chance to see them
-bool App::HandleKeyboardInput(const RAWINPUT & ri)
+bool App::HandleKeyboardInput(const RAWINPUT& ri)
 {
     wchar_t vkey = ri.data.keyboard.VKey;
     if (vkey < this->keysPressed.size())
@@ -555,18 +556,18 @@ void App::ProcessHostWindowDpiChanged(HWND hwnd, double oldScale, double newScal
     std::shared_ptr<App> self = this->shared_from_this();
 
     this->PostToMainThread([self, hwnd, oldScale, newScale]()
+    {
+        for (std::shared_ptr<Process>& i : self->processes)
         {
-            for (std::shared_ptr<Process>& i : self->processes)
+            if (i->GetHostWindow() && ::GetParent(i->GetHostWindow()) == hwnd)
             {
-                if (i->GetHostWindow() && ::GetParent(i->GetHostWindow()) == hwnd)
-                {
-                    i->SendDpiChanged(oldScale, newScale);
-                }
+                i->SendDpiChanged(oldScale, newScale);
             }
-        });
+        }
+    });
 }
 
-HWND App::RunProcess(HWND processHostWindow, const ProcessStartInfo & info)
+HWND App::RunProcess(HWND processHostWindow, const Json::Dict& info)
 {
     assert(App::IsMainThread());
 
@@ -749,52 +750,13 @@ void App::SendProcessSystemCommand(HWND hwnd, UINT id)
     }
 }
 
-std::wstring App::GetProcessExe(HWND hwnd)
+std::wstring App::GetProcessState(HWND hwnd)
 {
     std::shared_ptr<Process> process = this->FindProcess(hwnd);
-    return process ? process->GetProcessExe() : std::wstring();
+    return process ? process->GetProcessState() : std::wstring();
 }
 
-std::wstring App::GetProcessWindowTitle(HWND hwnd)
-{
-    std::shared_ptr<Process> process = this->FindProcess(hwnd);
-    return process ? process->GetProcessWindowTitle() : std::wstring();
-}
-
-std::wstring App::GetProcessEnv(HWND hwnd)
-{
-    std::shared_ptr<Process> process = this->FindProcess(hwnd);
-    return process ? process->GetProcessEnv() : std::wstring();
-}
-
-std::wstring App::GetProcessAliases(HWND hwnd)
-{
-    std::shared_ptr<Process> process = this->FindProcess(hwnd);
-    return process ? process->GetProcessAliases() : std::wstring();
-}
-
-std::wstring App::GetProcessCurrentDirectory(HWND hwnd)
-{
-    std::shared_ptr<Process> process = this->FindProcess(hwnd);
-    return process ? process->GetProcessCurrentDirectory() : std::wstring();
-}
-
-std::wstring App::GetProcessColorTable(HWND hwnd)
-{
-    std::shared_ptr<Process> process = this->FindProcess(hwnd);
-    return process ? process->GetProcessColorTable() : std::wstring();
-}
-
-void App::SetProcessColorTable(HWND hwnd, const wchar_t* value)
-{
-    std::shared_ptr<Process> process = this->FindProcess(hwnd);
-    if (process)
-    {
-        process->SetProcessColorTable(value);
-    }
-}
-
-void App::OnProcessCreated(Process * process)
+void App::OnProcessCreated(Process* process)
 {
     ::EnterCriticalSection(&this->processCountCS);
 
@@ -803,7 +765,7 @@ void App::OnProcessCreated(Process * process)
     ::LeaveCriticalSection(&this->processCountCS);
 }
 
-void App::OnProcessDestroyed(Process * process)
+void App::OnProcessDestroyed(Process* process)
 {
     ::EnterCriticalSection(&this->processCountCS);
 
@@ -817,7 +779,7 @@ void App::OnProcessDestroyed(Process * process)
     }
 }
 
-void App::OnProcessClosing(Process * process)
+void App::OnProcessClosing(Process* process)
 {
     assert(App::IsMainThread());
 
@@ -835,13 +797,13 @@ void App::OnProcessClosing(Process * process)
     }
 }
 
-void App::OnProcessEnvChanged(Process * process, const std::wstring & env)
+void App::OnProcessEnvChanged(Process* process, const Json::Dict& env)
 {
     Microsoft::WRL::ComPtr<IProcess> processInterop = new ProcessInterop(this, process->GetHostWindow());
-    this->host->OnProcessEnvChanged(processInterop.Get(), env.c_str());
+    this->host->OnProcessEnvChanged(processInterop.Get(), Json::WriteNameValuePairs(env, L'\n').c_str());
 }
 
-void App::OnProcessTitleChanged(Process * process, const std::wstring & title)
+void App::OnProcessTitleChanged(Process* process, const std::wstring& title)
 {
     Microsoft::WRL::ComPtr<IProcess> processInterop = new ProcessInterop(this, process->GetHostWindow());
     this->host->OnProcessTitleChanged(processInterop.Get(), title.c_str());

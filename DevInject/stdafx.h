@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 #include <SDKDDKVer.h>
@@ -13,6 +13,7 @@
 #include <thread>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 
 // Defines
 #undef MAX_PATH

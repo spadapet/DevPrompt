@@ -578,14 +578,7 @@ namespace DevPrompt.UI
 
         private void RestoreConsole(ConsoleSnapshot console)
         {
-            IProcess processNew = this.ProcessHost?.RestoreProcess(
-                console.Executable,
-                string.Empty,
-                console.CurrentDirectory,
-                console.Environment,
-                console.Aliases,
-                console.ColorTable,
-                console.WindowTitle);
+            IProcess processNew = this.ProcessHost?.RestoreProcess(console.State);
             IntPtr hwndNew = processNew?.GetWindow() ?? IntPtr.Zero;
 
             ProcessVM process = this.processes.FirstOrDefault(p => p.Hwnd == hwndNew);

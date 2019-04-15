@@ -11,20 +11,28 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Api.h" />
-    <ClInclude Include="CommandHandler.h" />
+    <ClInclude Include="MessageHandler.h" />
     <ClInclude Include="Inject.h" />
+    <ClInclude Include="Json\Dict.h" />
+    <ClInclude Include="Json\Message.h" />
+    <ClInclude Include="Json\Persist.h" />
+    <ClInclude Include="Json\Tokenizer.h" />
+    <ClInclude Include="Json\Value.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="Pipe.h" />
-    <ClInclude Include="Message.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CommandHandler.cpp" />
+    <ClCompile Include="MessageHandler.cpp" />
     <ClCompile Include="Inject.cpp" />
+    <ClCompile Include="Json\Dict.cpp" />
+    <ClCompile Include="Json\Message.cpp" />
+    <ClCompile Include="Json\Persist.cpp" />
+    <ClCompile Include="Json\Tokenizer.cpp" />
+    <ClCompile Include="Json\Value.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Pipe.cpp" />
-    <ClCompile Include="Message.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>

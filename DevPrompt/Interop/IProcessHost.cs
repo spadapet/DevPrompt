@@ -26,14 +26,7 @@ namespace DevPrompt.Interop
             [MarshalAs(UnmanagedType.LPWStr)] string startingDirectory);
 
         [return: MarshalAs(UnmanagedType.Interface)]
-        IProcess RestoreProcess(
-            [MarshalAs(UnmanagedType.LPWStr)] string executable,
-            [MarshalAs(UnmanagedType.LPWStr)] string arguments,
-            [MarshalAs(UnmanagedType.LPWStr)] string currentDirectory,
-            [MarshalAs(UnmanagedType.LPWStr)] string environment,
-            [MarshalAs(UnmanagedType.LPWStr)] string aliases,
-            [MarshalAs(UnmanagedType.LPWStr)] string colorTable,
-            [MarshalAs(UnmanagedType.LPWStr)] string windowTitle);
+        IProcess RestoreProcess([MarshalAs(UnmanagedType.LPWStr)] string state);
 
         [return: MarshalAs(UnmanagedType.Interface)]
         IProcess CloneProcess([MarshalAs(UnmanagedType.Interface)] IProcess process);

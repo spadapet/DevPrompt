@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 
 #include "Api.h"
-#include "Message.h"
+#include "Json/Message.h"
 
 // Helper class for sending info back and forth through pipes. When a dispose event
 // gets set, then the pipe will stop doing work.
@@ -21,16 +21,16 @@ public:
     DEV_INJECT_API void Dispose();
 
     DEV_INJECT_API bool WaitForClient() const;
-    DEV_INJECT_API void RunServer(const MessageHandler& handler) const;
-    DEV_INJECT_API bool Transact(const Message& request, Message& response) const;
-    DEV_INJECT_API bool Send(const Message& request) const;
+    DEV_INJECT_API void RunServer(const Json::MessageHandler& handler) const;
+    DEV_INJECT_API bool Transact(const Json::Dict& input, Json::Dict& output) const;
+    DEV_INJECT_API bool Send(const Json::Dict& input) const;
 
 private:
     Pipe(HANDLE pipe, HANDLE disposeEvent, HANDLE otherProcess);
 
     std::array<HANDLE, 3> GetWaitHandles(const OVERLAPPED& oio) const;
-    bool ReadMessage(Message& input) const;
-    bool WriteMessage(const Message& output) const;
+    bool ReadMessage(Json::Dict& input) const;
+    bool WriteMessage(const Json::Dict& output) const;
 
     HANDLE pipe;
     HANDLE disposeEvent;

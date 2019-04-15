@@ -123,7 +123,7 @@ HRESULT ProcessInterop::GetWindow(HWND* hwnd)
     return E_UNEXPECTED;
 }
 
-HRESULT ProcessInterop::GetExe(BSTR* value)
+HRESULT ProcessInterop::GetState(BSTR* value)
 {
     if (!value)
     {
@@ -133,115 +133,8 @@ HRESULT ProcessInterop::GetExe(BSTR* value)
     std::shared_ptr<App> app = this->app.lock();
     if (app && this->hwnd)
     {
-        std::wstring str = app->GetProcessExe(this->hwnd);
+        std::wstring str = app->GetProcessState(this->hwnd);
         *value = ::SysAllocStringLen(str.c_str(), static_cast<UINT>(str.size()));
-        return S_OK;
-    }
-
-    return E_UNEXPECTED;
-}
-
-HRESULT ProcessInterop::GetWindowTitle(BSTR* value)
-{
-    if (!value)
-    {
-        return E_INVALIDARG;
-    }
-
-    std::shared_ptr<App> app = this->app.lock();
-    if (app && this->hwnd)
-    {
-        std::wstring str = app->GetProcessWindowTitle(this->hwnd);
-        *value = ::SysAllocStringLen(str.c_str(), static_cast<UINT>(str.size()));
-        return S_OK;
-    }
-
-    return E_UNEXPECTED;
-}
-
-HRESULT ProcessInterop::GetEnv(BSTR* value)
-{
-    if (!value)
-    {
-        return E_INVALIDARG;
-    }
-
-    std::shared_ptr<App> app = this->app.lock();
-    if (app && this->hwnd)
-    {
-        std::wstring str = app->GetProcessEnv(this->hwnd);
-        *value = ::SysAllocStringLen(str.c_str(), static_cast<UINT>(str.size()));
-        return S_OK;
-    }
-
-    return E_UNEXPECTED;
-}
-
-HRESULT ProcessInterop::GetAliases(BSTR* value)
-{
-    if (!value)
-    {
-        return E_INVALIDARG;
-    }
-
-    std::shared_ptr<App> app = this->app.lock();
-    if (app && this->hwnd)
-    {
-        std::wstring str = app->GetProcessAliases(this->hwnd);
-        *value = ::SysAllocStringLen(str.c_str(), static_cast<UINT>(str.size()));
-        return S_OK;
-    }
-
-    return E_UNEXPECTED;
-}
-
-HRESULT ProcessInterop::GetCurrentDirectory(BSTR* value)
-{
-    if (!value)
-    {
-        return E_INVALIDARG;
-    }
-
-    std::shared_ptr<App> app = this->app.lock();
-    if (app && this->hwnd)
-    {
-        std::wstring str = app->GetProcessCurrentDirectory(this->hwnd);
-        *value = ::SysAllocStringLen(str.c_str(), static_cast<UINT>(str.size()));
-        return S_OK;
-    }
-
-    return E_UNEXPECTED;
-}
-
-HRESULT ProcessInterop::GetColorTable(BSTR* value)
-{
-    if (!value)
-    {
-        return E_INVALIDARG;
-    }
-
-    std::shared_ptr<App> app = this->app.lock();
-    if (app && this->hwnd)
-    {
-        std::wstring str = app->GetProcessColorTable(this->hwnd);
-        *value = ::SysAllocStringLen(str.c_str(), static_cast<UINT>(str.size()));
-        return S_OK;
-    }
-
-    return E_UNEXPECTED;
-}
-
-HRESULT ProcessInterop::SetColorTable(const wchar_t* value)
-{
-    if (!value)
-    {
-        return E_INVALIDARG;
-    }
-
-    std::shared_ptr<App> app = this->app.lock();
-    if (app && this->hwnd)
-    {
-        app->SetProcessColorTable(this->hwnd, value);
         return S_OK;
     }
 

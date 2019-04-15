@@ -1,12 +1,13 @@
 ﻿#include "stdafx.h"
 #include "App.h"
+#include "Inject.h"
+#include "Json/Persist.h"
 #include "Process2.h"
-#include "../DevInject/Inject.h"
 
 Process::Process(App& app)
     : app(app.shared_from_this())
     , disposeEvent(::CreateEventEx(nullptr, nullptr, CREATE_EVENT_MANUAL_RESET, EVENT_ALL_ACCESS))
-    , commandEvent(::CreateEventEx(nullptr, nullptr, CREATE_EVENT_MANUAL_RESET, EVENT_ALL_ACCESS))
+    , messageEvent(::CreateEventEx(nullptr, nullptr, CREATE_EVENT_MANUAL_RESET, EVENT_ALL_ACCESS))
     , hostWnd(nullptr)
     , processId(0)
 {
@@ -29,7 +30,7 @@ Process::~Process()
         }
     }
 
-    ::CloseHandle(this->commandEvent);
+    ::CloseHandle(this->messageEvent);
     ::CloseHandle(this->disposeEvent);
 
     this->app->OnProcessDestroyed(this);
@@ -69,7 +70,7 @@ void Process::Detach()
     {
         this->SetChildWindow(nullptr);
         ::InterlockedExchange(&this->processId, 0);
-        this->SendCommandAsync(Message(PIPE_COMMAND_DETACH));
+        this->SendMessageAsync(PIPE_COMMAND_DETACH);
     }
 
     this->Dispose();
@@ -85,9 +86,9 @@ bool Process::Attach(HANDLE process)
         std::shared_ptr<Process> self = shared_from_this();
 
         this->backgroundThread = std::thread([self, dupeProcess]()
-            {
-                self->BackgroundAttach(dupeProcess);
-            });
+        {
+            self->BackgroundAttach(dupeProcess);
+        });
 
         return true;
     }
@@ -95,16 +96,16 @@ bool Process::Attach(HANDLE process)
     return false;
 }
 
-bool Process::Start(const ProcessStartInfo& info)
+bool Process::Start(const Json::Dict& info)
 {
     assert(App::IsMainThread());
 
     std::shared_ptr<Process> self = shared_from_this();
 
     this->backgroundThread = std::thread([self, info]()
-        {
-            self->BackgroundStart(info);
-        });
+    {
+        self->BackgroundStart(info);
+    });
 
     return true;
 }
@@ -116,9 +117,9 @@ bool Process::Clone(const std::shared_ptr<Process>& process)
     std::shared_ptr<Process> self = shared_from_this();
 
     this->backgroundThread = std::thread([self, process]()
-        {
-            self->BackgroundClone(process);
-        });
+    {
+        self->BackgroundClone(process);
+    });
 
     return true;
 }
@@ -135,81 +136,24 @@ DWORD Process::GetProcessId() const
     return ::InterlockedXor(const_cast<long*>(reinterpret_cast<const long*>(&this->processId)), 0);
 }
 
-std::wstring Process::GetProcessExe()
+std::wstring Process::GetProcessState()
 {
     assert(App::IsMainThread());
 
-    return this->processExe;
-}
-
-std::wstring Process::GetProcessWindowTitle()
-{
-    assert(App::IsMainThread());
-
-    return this->processWindowTitle;
-}
-
-std::wstring Process::GetProcessEnv()
-{
-    assert(App::IsMainThread());
-
-    return this->processEnv;
-}
-
-std::wstring Process::GetProcessAliases()
-{
-    assert(App::IsMainThread());
-
-    Message response;
-    if (this->TransactCommand(Message(PIPE_COMMAND_GET_ALIASES), response))
+    Json::Dict output;
+    if (this->TransactMessage(PIPE_COMMAND_GET_STATE, output))
     {
-        return response.GetNamesAndValues();
+        return Json::Write(output);
     }
 
     return std::wstring();
-}
-
-std::wstring Process::GetProcessCurrentDirectory()
-{
-    assert(App::IsMainThread());
-
-    Message response;
-    if (this->TransactCommand(Message(PIPE_COMMAND_GET_CURRENT_DIRECTORY), response))
-    {
-        return response.GetValue(PIPE_PROPERTY_VALUE);
-    }
-
-    return std::wstring();
-}
-
-std::wstring Process::GetProcessColorTable()
-{
-    assert(App::IsMainThread());
-
-    Message response;
-    if (this->TransactCommand(Message(PIPE_COMMAND_GET_COLOR_TABLE), response))
-    {
-        return response.GetValue(PIPE_PROPERTY_VALUE);
-    }
-
-    return std::wstring();
-}
-
-void Process::SetProcessColorTable(const wchar_t* value)
-{
-    assert(App::IsMainThread());
-
-    Message command(PIPE_COMMAND_SET_COLOR_TABLE);
-    command.SetValue(PIPE_PROPERTY_VALUE, value);
-
-    this->SendCommandAsync(std::move(command));
 }
 
 void Process::SendDpiChanged(double oldScale, double newScale)
 {
     assert(App::IsMainThread());
 
-    this->SendCommandAsync(Message(PIPE_COMMAND_CHECK_WINDOW_DPI));
+    this->SendMessageAsync(PIPE_COMMAND_CHECK_WINDOW_DPI);
 }
 
 void Process::SendSystemCommand(UINT id)
@@ -238,7 +182,7 @@ void Process::Activate()
         ::ShowWindow(this->hostWnd, SW_SHOW);
     }
 
-    this->SendCommandAsync(Message(PIPE_COMMAND_ACTIVATED));
+    this->SendMessageAsync(PIPE_COMMAND_ACTIVATED);
 }
 
 void Process::Deactivate()
@@ -250,7 +194,7 @@ void Process::Deactivate()
         ::ShowWindow(this->hostWnd, SW_HIDE);
     }
 
-    this->SendCommandAsync(Message(PIPE_COMMAND_DEACTIVATED));
+    this->SendMessageAsync(PIPE_COMMAND_DEACTIVATED);
 }
 
 bool Process::IsActive()
@@ -288,7 +232,7 @@ void Process::SetChildWindow(HWND hwnd)
             if (::GetDpiForWindow(hwnd) != oldDpi)
             {
                 // Update DPI before the window is visible
-                this->TransactCommand(Message(PIPE_COMMAND_CHECK_WINDOW_DPI));
+                this->TransactMessage(PIPE_COMMAND_CHECK_WINDOW_DPI);
             }
 
             RECT rect;
@@ -301,10 +245,8 @@ void Process::SetChildWindow(HWND hwnd)
             }
 
             // Now's the chance to ask the process for a bunch of info
-            this->SendCommandAsync(Message(PIPE_COMMAND_GET_EXE));
-            this->SendCommandAsync(Message(PIPE_COMMAND_GET_TITLE));
-            this->SendCommandAsync(Message(PIPE_COMMAND_GET_ENV));
-            this->SendCommandAsync(Message(PIPE_COMMAND_CHECK_WINDOW_SIZE));
+            this->SendMessageAsync(PIPE_COMMAND_GET_STATE);
+            this->SendMessageAsync(PIPE_COMMAND_CHECK_WINDOW_SIZE);
         }
         else if (!hwnd && this->GetChildWindow())
         {
@@ -335,7 +277,7 @@ LRESULT Process::WindowProc(HWND hwnd, UINT message, WPARAM wp, LPARAM lp)
     switch (message)
     {
     case WM_SIZE:
-        this->SendCommandAsync(Message(PIPE_COMMAND_CHECK_WINDOW_SIZE));
+        this->SendMessageAsync(PIPE_COMMAND_CHECK_WINDOW_SIZE);
         break;
 
     case WM_SETFOCUS:
@@ -344,7 +286,7 @@ LRESULT Process::WindowProc(HWND hwnd, UINT message, WPARAM wp, LPARAM lp)
 
     case WM_DESTROY:
         this->app->OnProcessClosing(this);
-        this->SendCommandAsync(Message(PIPE_COMMAND_CLOSED));
+        this->SendMessageAsync(PIPE_COMMAND_CLOSED);
 
         if (this->GetChildWindow())
         {
@@ -374,14 +316,14 @@ void Process::PostDispose()
     std::shared_ptr<Process> self = shared_from_this();
 
     this->app->PostToMainThread([self]()
-        {
-            self->Dispose();
-        });
+    {
+        self->Dispose();
+    });
 }
 
 // Creates a pipe server to listen to the other process, and injects a thread
 // into that process to create another pipe server that listens to this process. Whew...
-void Process::BackgroundAttach(HANDLE process, HANDLE mainThread, const ProcessStartInfo* info)
+void Process::BackgroundAttach(HANDLE process, HANDLE mainThread, const Json::Dict* info)
 {
     assert(!App::IsMainThread());
     std::shared_ptr<Process> self = shared_from_this();
@@ -405,18 +347,18 @@ void Process::BackgroundAttach(HANDLE process, HANDLE mainThread, const ProcessS
         if (pipe.WaitForClient())
         {
             std::thread sendCommandsThread([self, process]()
-                {
-                    self->BackgroundSendCommands(process);
-                });
+            {
+                self->BackgroundSendCommands(process);
+            });
 
-            pipe.RunServer([self, process](const Message & input)
-                {
-                    return self->CommandHandler(process, input);
-                });
+            pipe.RunServer([self, process](const Json::Dict& input)
+            {
+                return self->HandleMessage(process, input);
+            });
 
             sendCommandsThread.join();
 
-            this->FlushRemainingCommands();
+            this->FlushRemainingMessages(process);
         }
     }
 
@@ -472,21 +414,27 @@ static bool DirectoryExists(const wchar_t* path)
     return false;
 }
 
-void Process::BackgroundStart(const ProcessStartInfo& info)
+void Process::BackgroundStart(const Json::Dict& info)
 {
     assert(!App::IsMainThread());
 
-    std::wstring environment = info.environment;
-    std::replace(environment.begin(), environment.end(), L'\n', L'\0');
-    environment += L'\0'; // just in case
+    std::wstring environment;
+    std::wstring executable = info.Get(PIPE_PROPERTY_EXECUTABLE).TryGetString();
+    std::wstring arguments = info.Get(PIPE_PROPERTY_ARGUMENTS).TryGetString();
+    std::wstring directory = info.Get(PIPE_PROPERTY_DIRECTORY).TryGetString();
+
+    if (info.Get(PIPE_PROPERTY_ENVIRONMENT).IsDict())
+    {
+        environment = Json::WriteNameValuePairs(info.Get(PIPE_PROPERTY_ENVIRONMENT).GetDict(), L'\0');
+    }
 
     std::wstringstream commandLine;
-    commandLine << L"\"" << info.executable << L"\" " << info.arguments;
+    commandLine << L"\"" << executable << L"\" " << arguments;
     std::wstring commandLineString = commandLine.str();
     wchar_t* commandLineBuffer = const_cast<wchar_t*>(commandLineString.c_str());
     void* envBlock = const_cast<wchar_t*>(environment.size() > 1 ? environment.c_str() : nullptr);
 
-    const wchar_t* startingDirectory = info.startingDirectory.size() ? info.startingDirectory.c_str() : nullptr;
+    const wchar_t* startingDirectory = directory.size() ? directory.c_str() : nullptr;
     if (startingDirectory && !::DirectoryExists(startingDirectory))
     {
         startingDirectory = nullptr;
@@ -519,142 +467,143 @@ void Process::BackgroundStart(const ProcessStartInfo& info)
 void Process::BackgroundClone(const std::shared_ptr<Process>& process)
 {
     assert(!App::IsMainThread());
-    std::shared_ptr<Process> self = shared_from_this();
 
-    Message exeResponse;
-    Message dirResponse;
-    Message envResponse;
-    Message aliasesResponse;
-    Message colorTableResponse;
-    Message titleResponse;
-
-    if (!process->TransactCommand(Message(PIPE_COMMAND_GET_EXE), exeResponse) || exeResponse.GetValue(PIPE_PROPERTY_VALUE).empty() ||
-        !process->TransactCommand(Message(PIPE_COMMAND_GET_CURRENT_DIRECTORY), dirResponse) || dirResponse.GetValue(PIPE_PROPERTY_VALUE).empty() ||
-        !process->TransactCommand(Message(PIPE_COMMAND_GET_ENV), envResponse) ||
-        !process->TransactCommand(Message(PIPE_COMMAND_GET_ALIASES), aliasesResponse) ||
-        !process->TransactCommand(Message(PIPE_COMMAND_GET_COLOR_TABLE), colorTableResponse) ||
-        !process->TransactCommand(Message(PIPE_COMMAND_GET_TITLE), titleResponse))
+    Json::Dict output;
+    if (process->TransactMessage(PIPE_COMMAND_GET_STATE, output))
+    {
+        this->BackgroundStart(output);
+    }
+    else
     {
         this->PostDispose();
-        return;
     }
-
-    ProcessStartInfo info;
-    info.executable = exeResponse.GetValue(PIPE_PROPERTY_VALUE);
-    info.environment = envResponse.GetNamesAndValues();
-    info.startingDirectory = dirResponse.GetValue(PIPE_PROPERTY_VALUE);
-    info.aliases = std::move(aliasesResponse);
-    info.colorTable = colorTableResponse.GetValue(PIPE_PROPERTY_VALUE);
-    info.windowTitle = titleResponse.GetValue(PIPE_PROPERTY_VALUE);
-
-    this->BackgroundStart(info);
 }
 
-// Thread that just sends commands to the other pipe server when a command is put in a queue
+// Thread that just sends messages to the other pipe server when a command is put in a queue
 void Process::BackgroundSendCommands(HANDLE process)
 {
-    std::array<HANDLE, 3> handles = { this->commandEvent, this->disposeEvent, process };
+    std::array<HANDLE, 3> handles = { this->messageEvent, this->disposeEvent, process };
     while (::WaitForMultipleObjects(static_cast<DWORD>(handles.size()), handles.data(), FALSE, INFINITE) == WAIT_OBJECT_0)
     {
-        std::vector<Message> commands;
+        std::vector<Json::Dict> messages;
         {
             std::scoped_lock<std::mutex> pipeLock(this->processPipeMutex);
-            std::scoped_lock<std::mutex> lock(this->commandsMutex);
+            std::scoped_lock<std::mutex> lock(this->messageMutex);
 
             if (this->processPipe)
             {
-                commands = std::move(this->commands);
+                messages = std::move(this->messages);
             }
 
-            ::ResetEvent(this->commandEvent);
+            ::ResetEvent(this->messageEvent);
         }
 
-        this->SendCommands(commands);
+        this->SendMessages(process, messages);
     }
 }
 
 // Initialize a newly created process after pipes are connected
-void Process::InitNewProcess(const ProcessStartInfo& info)
+void Process::InitNewProcess(const Json::Dict& info)
 {
-    if (info.colorTable.size())
-    {
-        Message message(PIPE_COMMAND_SET_COLOR_TABLE);
-        message.SetValue(PIPE_PROPERTY_VALUE, info.colorTable);
-        this->SendCommandAsync(std::move(message));
-    }
+    Json::Dict infoCopy = info;
 
-    if (info.aliases.HasAnyName())
-    {
-        Message aliases = info.aliases;
-        aliases.SetCommand(PIPE_COMMAND_SET_ALIASES);
-        this->SendCommandAsync(std::move(aliases));
-    }
+    // These values are only useful when first creating the process
+    infoCopy.Set(PIPE_PROPERTY_ARGUMENTS, Json::Value());
+    infoCopy.Set(PIPE_PROPERTY_ENVIRONMENT, Json::Value());
+    infoCopy.Set(PIPE_PROPERTY_EXECUTABLE, Json::Value());
+    infoCopy.Set(PIPE_PROPERTY_DIRECTORY, Json::Value());
 
-    if (info.windowTitle.size())
+    if (infoCopy.Size())
     {
-        Message message(PIPE_COMMAND_SET_TITLE);
-        message.SetValue(PIPE_PROPERTY_VALUE, info.windowTitle);
-        this->SendCommandAsync(std::move(message));
+        infoCopy.Set(PIPE_PROPERTY_COMMAND, Json::Value(PIPE_COMMAND_SET_STATE));
+        this->SendMessageAsync(std::move(infoCopy));
     }
+}
+
+void Process::SendMessageAsync(std::wstring&& name)
+{
+    Json::Dict message;
+    message.Set(PIPE_PROPERTY_COMMAND, Json::Value(std::move(name)));
+    this->SendMessageAsync(std::move(message));
 }
 
 // Adds a command to the queue to send to the other process. It may never be sent if the other process dies.
-void Process::SendCommandAsync(Message&& command)
+void Process::SendMessageAsync(Json::Dict&& command)
 {
     // call from any thread
 
-    std::scoped_lock<std::mutex> lock(this->commandsMutex);
-    this->commands.push_back(std::move(command));
-    ::SetEvent(this->commandEvent);
+    std::scoped_lock<std::mutex> lock(this->messageMutex);
+    this->messages.push_back(std::move(command));
+    ::SetEvent(this->messageEvent);
 }
 
-void Process::SendCommands(const std::vector<Message>& commands)
+void Process::SendMessages(HANDLE process, const std::vector<Json::Dict>& messages)
 {
-    for (const Message& command : commands)
+    for (const Json::Dict& message : messages)
     {
-        Message response;
+        Json::Dict output;
         bool status = false;
         {
             std::scoped_lock<std::mutex> lock(this->processPipeMutex);
-            status = this->processPipe && this->processPipe.Transact(command, response);
+            status = this->processPipe && this->processPipe.Transact(message, output);
         }
 
         if (status)
         {
-            this->ResponseHandler(response);
+            Json::Value name = message.Get(PIPE_PROPERTY_COMMAND);
+            this->HandleResponse(name.TryGetString(), output);
         }
     }
 }
 
 // Blocks while a command is sent
-bool Process::TransactCommand(const Message& command)
+bool Process::TransactMessage(std::wstring&& name)
 {
-    Message result;
-    return this->TransactCommand(command, result);
+    Json::Dict output;
+    return this->TransactMessage(std::move(name), output);
 }
 
 // Blocks while a command is sent
-bool Process::TransactCommand(const Message& command, Message& response)
+bool Process::TransactMessage(std::wstring&& name, Json::Dict& output)
 {
-    std::scoped_lock<std::mutex> lock(this->processPipeMutex);
-    return this->processPipe&& this->processPipe.Transact(command, response);
+    Json::Dict message;
+    message.Set(PIPE_PROPERTY_COMMAND, Json::Value(std::move(name)));
+    return this->TransactMessage(message, output);
 }
 
-// Called after the BackgroundSendCommands thread is gone to flush any remaining commands
-void Process::FlushRemainingCommands()
+// Blocks while a command is sent
+bool Process::TransactMessage(const Json::Dict& input, Json::Dict& output)
+{
+    Json::Value name = input.Get(PIPE_PROPERTY_COMMAND);
+    bool result = false;
+    {
+        std::scoped_lock<std::mutex> lock(this->processPipeMutex);
+        result = this->processPipe && this->processPipe.Transact(input, output);
+    }
+
+    if (result)
+    {
+        this->HandleResponse(name.TryGetString(), output);
+    }
+
+    return result;
+}
+
+// Called after the BackgroundSendCommands thread is gone to flush any remaining messages
+void Process::FlushRemainingMessages(HANDLE process)
 {
     while (true)
     {
-        std::vector<Message> commands;
+        std::vector<Json::Dict> messages;
         {
-            std::scoped_lock<std::mutex> lock(this->commandsMutex);
-            commands = std::move(this->commands);
-            ::ResetEvent(this->commandEvent);
+            std::scoped_lock<std::mutex> lock(this->messageMutex);
+            messages = std::move(this->messages);
+            ::ResetEvent(this->messageEvent);
         }
 
-        if (commands.size())
+        if (messages.size())
         {
-            this->SendCommands(commands);
+            this->SendMessages(process, messages);
         }
         else
         {
@@ -663,30 +612,29 @@ void Process::FlushRemainingCommands()
     }
 }
 
-// Handles commands that come in from the other process through my pipe server
-Message Process::CommandHandler(HANDLE process, const Message& input)
+// Handles messages that come in from the other process through my pipe server
+Json::Dict Process::HandleMessage(HANDLE process, const Json::Dict& input)
 {
     assert(!App::IsMainThread());
 
-    Message result;
+    Json::Dict result;
     std::shared_ptr<Process> self = this->shared_from_this();
-    std::wstring command = input.GetCommand();
+    std::wstring name = input.Get(PIPE_PROPERTY_COMMAND).TryGetString();
 
-    if (command == PIPE_COMMAND_PIPE_CREATED)
+    if (name == PIPE_COMMAND_PIPE_CREATED)
     {
-        std::wstring name = input.GetValue(PIPE_PROPERTY_VALUE);
         Pipe info = Pipe::Connect(process, this->disposeEvent);
 
         std::scoped_lock<std::mutex> pipeLock(this->processPipeMutex);
         this->processPipe = std::move(info);
         {
-            std::scoped_lock<std::mutex> commandLock(this->commandsMutex);
-            ::SetEvent(this->commandEvent);
+            std::scoped_lock<std::mutex> commandLock(this->messageMutex);
+            ::SetEvent(this->messageEvent);
         }
     }
-    else if (command == PIPE_COMMAND_WINDOW_CREATED)
+    else if (name == PIPE_COMMAND_WINDOW_CREATED)
     {
-        std::wstring hwndString = input.GetValue(PIPE_PROPERTY_VALUE);
+        std::wstring hwndString = input.Get(PIPE_PROPERTY_HWND).TryGetString();
         const wchar_t* start = hwndString.c_str();
         wchar_t* end = nullptr;
         unsigned long long hwndSize = std::wcstoull(start, &end, 10);
@@ -696,70 +644,48 @@ Message Process::CommandHandler(HANDLE process, const Message& input)
             HWND hwnd = reinterpret_cast<HWND>(hwndSize);
 
             this->app->PostToMainThread([self, hwnd]()
-                {
-                    self->SetChildWindow(hwnd);
-                });
+            {
+                self->SetChildWindow(hwnd);
+            });
         }
     }
-    else if (command == PIPE_COMMAND_TITLE_CHANGED)
+    else if (name == PIPE_COMMAND_STATE_CHANGED)
     {
-        std::wstring title = input.GetValue(PIPE_PROPERTY_VALUE);
-
-        this->app->PostToMainThread([self, title]()
-            {
-                self->processWindowTitle = title;
-                self->app->OnProcessTitleChanged(self.get(), title);
-            });
-    }
-    else if (command == PIPE_COMMAND_ENV_CHANGED)
-    {
-        std::wstring env = input.GetNamesAndValues();
-
-        this->app->PostToMainThread([self, env]()
-            {
-                self->processEnv = env;
-                self->app->OnProcessEnvChanged(self.get(), env);
-            });
+        this->HandleNewState(input);
     }
 
     return result;
 }
 
 // Handles command responses that come from the other process after we send it a command
-void Process::ResponseHandler(const Message& response)
+void Process::HandleResponse(const std::wstring& name, const Json::Dict& output)
 {
-    assert(!App::IsMainThread());
+    if (name == PIPE_COMMAND_GET_STATE)
+    {
+        this->HandleNewState(output);
+    }
+}
 
+// Handles PIPE_COMMAND_GET_STATE response or PIPE_COMMAND_STATE_CHANGED message
+void Process::HandleNewState(const Json::Dict& state)
+{
     std::shared_ptr<Process> self = this->shared_from_this();
-    std::wstring command = response.GetResponse();
 
-    if (command == PIPE_COMMAND_GET_EXE)
+    Json::Value title = state.Get(PIPE_PROPERTY_TITLE);
+    if (title.IsString())
     {
-        std::wstring path = response.GetValue(PIPE_PROPERTY_VALUE);
-
-        this->app->PostToMainThread([self, path]()
-            {
-                self->processExe = path;
-            });
-    }
-    else if (command == PIPE_COMMAND_GET_TITLE)
-    {
-        std::wstring title = response.GetValue(PIPE_PROPERTY_VALUE);
-
         this->app->PostToMainThread([self, title]()
-            {
-                self->processWindowTitle = title;
-                self->app->OnProcessTitleChanged(self.get(), title);
-            });
+        {
+            self->app->OnProcessTitleChanged(self.get(), title.GetString());
+        });
     }
-    else if (command == PIPE_COMMAND_GET_ENV)
-    {
-        std::wstring env = response.GetNamesAndValues();
 
-        this->app->PostToMainThread([self, env]()
-            {
-                self->processEnv = env;
-                self->app->OnProcessEnvChanged(self.get(), env);
-            });
+    Json::Value environment = state.Get(PIPE_PROPERTY_ENVIRONMENT);
+    if (environment.IsDict())
+    {
+        this->app->PostToMainThread([self, environment]()
+        {
+            self->app->OnProcessEnvChanged(self.get(), environment.GetDict());
+        });
     }
 }

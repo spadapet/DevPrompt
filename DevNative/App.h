@@ -1,10 +1,10 @@
 ﻿#pragma once
 
+#include "Json/Dict.h"
 #include "WindowProc.h"
 
 class Process;
 struct IAppHost;
-struct ProcessStartInfo;
 
 struct IAppListener
 {
@@ -42,7 +42,7 @@ public:
     void ProcessHostWindowDpiChanged(HWND hwnd, double oldScale, double newScale);
 
     // Process functions, each process is identified by its HWND
-    HWND RunProcess(HWND processHostWindow, const ProcessStartInfo& info);
+    HWND RunProcess(HWND processHostWindow, const Json::Dict& info);
     HWND CloneProcess(HWND processHostWindow, HWND hwnd);
     HWND AttachProcess(HWND processHostWindow, HANDLE handle, bool activate);
     void ActivateProcess(HWND hwnd);
@@ -50,13 +50,7 @@ public:
     void DisposeProcess(HWND hwnd);
     void DetachProcess(HWND hwnd);
     void SendProcessSystemCommand(HWND hwnd, UINT id);
-    std::wstring GetProcessExe(HWND hwnd);
-    std::wstring GetProcessWindowTitle(HWND hwnd);
-    std::wstring GetProcessEnv(HWND hwnd);
-    std::wstring GetProcessAliases(HWND hwnd);
-    std::wstring GetProcessCurrentDirectory(HWND hwnd);
-    std::wstring GetProcessColorTable(HWND hwnd);
-    void SetProcessColorTable(HWND hwnd, const wchar_t* value);
+    std::wstring GetProcessState(HWND hwnd);
     std::wstring GetGrabProcesses();
     void GrabProcess(DWORD id);
     void NoAutoGrabWindow(HWND hwnd);
@@ -65,8 +59,8 @@ public:
     void OnProcessCreated(Process* process);
     void OnProcessDestroyed(Process* process);
     void OnProcessClosing(Process* process);
-    void OnProcessEnvChanged(Process* process, const std::wstring &env);
-    void OnProcessTitleChanged(Process* process, const std::wstring &title);
+    void OnProcessEnvChanged(Process* process, const Json::Dict& env);
+    void OnProcessTitleChanged(Process* process, const std::wstring& title);
 
     // IWindowProc
     virtual LRESULT WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) override;

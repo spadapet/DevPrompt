@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
-#include "CommandHandler.h"
+#include "Json/Persist.h"
 #include "Main.h"
+#include "MessageHandler.h"
 #include "Pipe.h"
 
 static HMODULE module = nullptr;
@@ -32,7 +33,7 @@ BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID)
     return TRUE;
 }
 
-static void SendToOwner(const Message& message)
+static void SendToOwner(const Json::Dict& message)
 {
     std::scoped_lock<std::mutex> lock(::ownerPipeMutex);
     if (::ownerPipe)
@@ -41,31 +42,16 @@ static void SendToOwner(const Message& message)
     }
 }
 
-static bool NotifyOwnerOfPipe(const Pipe& pipe)
-{
-    Message message(PIPE_COMMAND_PIPE_CREATED);
-
-    wchar_t buffer[MAX_PATH];
-    if (!pipe || !::GetFileInformationByHandleEx(pipe, FileNameInfo, &buffer, sizeof(buffer)))
-    {
-        return false;
-    }
-
-    FILE_NAME_INFO* nameInfo = reinterpret_cast<FILE_NAME_INFO*>(&buffer);
-    message.SetValue(PIPE_PROPERTY_VALUE, std::wstring(nameInfo->FileName, nameInfo->FileNameLength / sizeof(wchar_t)));
-
-    ::SendToOwner(message);
-    return true;
-}
-
 // A thread that listens for commands coming from the owner process, and responds to them
 static DWORD __stdcall PipeServerThread(void*)
 {
     Pipe pipe = Pipe::Create(::ownerProcess, ::disposeEvent);
 
-    if (::NotifyOwnerOfPipe(pipe) && pipe.WaitForClient())
+    ::SendToOwner(Json::CreateMessage(PIPE_COMMAND_PIPE_CREATED));
+
+    if (pipe.WaitForClient())
     {
-        pipe.RunServer(DevInject::CommandHandler);
+        pipe.RunServer(DevInject::CreateMessageHandler());
     }
 
     return 0;
@@ -95,8 +81,8 @@ static void NotifyOwnerOfChanges(std::wstring& oldTitle, std::wstring& oldEnviro
         {
             oldTitle = title;
 
-            Message message(PIPE_COMMAND_TITLE_CHANGED);
-            message.SetValue(PIPE_PROPERTY_VALUE, oldTitle);
+            Json::Dict message = Json::CreateMessage(PIPE_COMMAND_STATE_CHANGED);
+            message.Set(PIPE_PROPERTY_TITLE, Json::Value(std::wstring(oldTitle)));
             ::SendToOwner(message);
         }
     }
@@ -114,8 +100,8 @@ static void NotifyOwnerOfChanges(std::wstring& oldTitle, std::wstring& oldEnviro
         {
             oldEnvironment.assign(env, len);
 
-            Message message(PIPE_COMMAND_ENV_CHANGED);
-            message.ParseNameValuePairs(env, '\0');
+            Json::Dict message = Json::CreateMessage(PIPE_COMMAND_STATE_CHANGED);
+            message.Set(PIPE_PROPERTY_ENVIRONMENT, Json::Value(Json::ParseNameValuePairs(env, '\0')));
             ::SendToOwner(message);
         }
 
@@ -181,8 +167,8 @@ static DWORD __stdcall FindMainWindowThread(void*)
 
     if (hwnd)
     {
-        Message message(PIPE_COMMAND_WINDOW_CREATED);
-        message.SetValue(PIPE_PROPERTY_VALUE, std::to_wstring(reinterpret_cast<size_t>(hwnd)));
+        Json::Dict message = Json::CreateMessage(PIPE_COMMAND_WINDOW_CREATED);
+        message.Set(PIPE_PROPERTY_HWND, Json::Value(std::to_wstring(reinterpret_cast<size_t>(hwnd))));
         ::SendToOwner(message);
     }
 
@@ -259,7 +245,7 @@ void DevInject::Initialize(HMODULE module)
         ::watchdogThread = ::CreateThread(nullptr, 0, ::WatchdogThread, nullptr, 0, nullptr);
         ::findMainWindowThread = ::CreateThread(nullptr, 0, ::FindMainWindowThread, nullptr, 0, nullptr);
     }
-    else
+    else if (::disposeEvent)
     {
         assert(!::ownerPipe);
 

@@ -64,16 +64,7 @@ interface IProcessHost : IUnknown
         const wchar_t* startingDirectory,
         [out, retval] IProcess** obj);
 
-    HRESULT RestoreProcess(
-        const wchar_t* executable,
-        const wchar_t* arguments,
-        const wchar_t* currentDirectory,
-        const wchar_t* environment,
-        const wchar_t* aliases,
-        const wchar_t* colorTable,
-        const wchar_t* windowTitle,
-        [out, retval] IProcess** obj);
-
+    HRESULT RestoreProcess(const wchar_t* state, [out, retval] IProcess** obj);
     HRESULT CloneProcess(IProcess* process, [out, retval] IProcess** obj);
 };
 
@@ -85,13 +76,7 @@ interface IProcess : IUnknown
     HRESULT Activate();
     HRESULT Deactivate();
     HRESULT GetWindow([out, retval] HWND* hwnd);
-    HRESULT GetWindowTitle([out, retval] BSTR* value);
-    HRESULT GetExe([out, retval] BSTR* value);
-    HRESULT GetEnv([out, retval] BSTR* value);
-    HRESULT GetAliases([out, retval] BSTR* value);
-    HRESULT GetCurrentDirectory([out, retval] BSTR* value);
-    HRESULT GetColorTable([out, retval] BSTR* value);
-    HRESULT SetColorTable(const wchar_t* value);
+    HRESULT GetState([out, retval] BSTR* value);
     HRESULT Focus();
     HRESULT SystemCommandDefaults();
     HRESULT SystemCommandProperties();

@@ -12,12 +12,7 @@ namespace DevPrompt.Settings
     public class ConsoleSnapshot : PropertyNotifier, ICloneable
     {
         private string tabName;
-        private string windowTitle;
-        private string executable;
-        private string currentDirectory;
-        private string environment;
-        private string aliases;
-        private string colorTable;
+        private string state;
 
         public ConsoleSnapshot()
             : this((ProcessVM)null)
@@ -27,23 +22,13 @@ namespace DevPrompt.Settings
         internal ConsoleSnapshot(ProcessVM process)
         {
             this.tabName = process?.TabName ?? string.Empty;
-            this.windowTitle = process?.Title ?? string.Empty;
-            this.executable = process?.Process?.GetExe() ?? string.Empty;
-            this.currentDirectory = process?.Process?.GetCurrentDirectory() ?? string.Empty;
-            this.environment = process?.Env ?? string.Empty;
-            this.aliases = process?.Process?.GetAliases() ?? string.Empty;
-            this.colorTable = process?.Process?.GetColorTable() ?? string.Empty;
+            this.state = process?.Process?.GetState() ?? string.Empty;
         }
 
         public ConsoleSnapshot(ConsoleSnapshot copyFrom)
         {
             this.tabName = copyFrom.tabName;
-            this.windowTitle = copyFrom.windowTitle;
-            this.executable = copyFrom.executable;
-            this.currentDirectory = copyFrom.currentDirectory;
-            this.environment = copyFrom.environment;
-            this.aliases = copyFrom.aliases;
-            this.colorTable = copyFrom.colorTable;
+            this.state = copyFrom.state;
         }
 
         object ICloneable.Clone()
@@ -71,86 +56,16 @@ namespace DevPrompt.Settings
         }
 
         [DataMember]
-        public string WindowTitle
+        public string State
         {
             get
             {
-                return this.windowTitle;
+                return this.state;
             }
 
             set
             {
-                this.SetPropertyValue(ref this.windowTitle, value ?? string.Empty);
-            }
-        }
-
-        [DataMember]
-        public string Executable
-        {
-            get
-            {
-                return this.executable;
-            }
-
-            set
-            {
-                this.SetPropertyValue(ref this.executable, value ?? string.Empty);
-            }
-        }
-
-        [DataMember]
-        public string CurrentDirectory
-        {
-            get
-            {
-                return this.currentDirectory;
-            }
-
-            set
-            {
-                this.SetPropertyValue(ref this.currentDirectory, value ?? string.Empty);
-            }
-        }
-
-        [DataMember]
-        public string Environment
-        {
-            get
-            {
-                return this.environment;
-            }
-
-            set
-            {
-                this.SetPropertyValue(ref this.environment, value ?? string.Empty);
-            }
-        }
-
-        [DataMember]
-        public string Aliases
-        {
-            get
-            {
-                return this.aliases;
-            }
-
-            set
-            {
-                this.SetPropertyValue(ref this.aliases, value ?? string.Empty);
-            }
-        }
-
-        [DataMember]
-        public string ColorTable
-        {
-            get
-            {
-                return this.colorTable;
-            }
-
-            set
-            {
-                this.SetPropertyValue(ref this.colorTable, value ?? string.Empty);
+                this.SetPropertyValue(ref this.state, value ?? string.Empty);
             }
         }
     }
