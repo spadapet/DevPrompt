@@ -10,6 +10,7 @@
     <OutputName>DevPrompt</OutputName>
     <OutputType>Package</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+    <WixTargetsPath Condition=" !Exists('$(WixTargetsPath)') ">$(MSBuildProgramFiles32)\MSBuild\Microsoft\WiX\v3.x\wix.targets</WixTargetsPath>
     <ConfigOutRoot>$(OutRoot)$(Configuration).$(XPlatform)\</ConfigOutRoot>
     <ProjectOutRoot>$(ConfigOutRoot)$(ProjectName)\</ProjectOutRoot>
     <OutputPath>$(ProjectOutRoot)bin\</OutputPath>
