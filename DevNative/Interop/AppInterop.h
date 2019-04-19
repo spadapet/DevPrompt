@@ -7,7 +7,7 @@ class App;
 class AppInterop : public IApp
 {
 public:
-    AppInterop(IAppHost* host, HINSTANCE instance);
+    AppInterop(IAppHost* host, bool elevated, HINSTANCE instance);
     ~AppInterop();
 
     // IUnknown

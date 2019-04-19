@@ -4,9 +4,9 @@
 
 static HINSTANCE instance = nullptr;
 
-extern "C" __declspec(dllexport) void CreateApp(IAppHost* host, IApp** app)
+extern "C" __declspec(dllexport) void CreateApp(IAppHost* host, BOOL elevated, IApp** app)
 {
-    *app = new AppInterop(host, ::instance);
+    *app = new AppInterop(host, elevated != FALSE, ::instance);
     (*app)->AddRef();
 }
 

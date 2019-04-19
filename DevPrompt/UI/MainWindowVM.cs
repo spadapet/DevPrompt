@@ -267,13 +267,15 @@ namespace DevPrompt.UI
         {
             get
             {
+                string intro = Program.IsElevated ? "[Dev Admin]" : "[Dev]";
                 string title = this.ActiveProcess?.Title;
+
                 if (!string.IsNullOrEmpty(title))
                 {
-                    return $"[Dev] {title}";
+                    return $"{intro} {title}";
                 }
 
-                return "[Dev]";
+                return intro;
             }
         }
 

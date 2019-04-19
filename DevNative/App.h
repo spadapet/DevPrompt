@@ -14,7 +14,7 @@ struct IAppListener
 class App : public std::enable_shared_from_this<App>, public IWindowProc
 {
 public:
-    App(IAppHost* host, HINSTANCE instance, HANDLE destructEvent);
+    App(IAppHost* host, bool elevated, HINSTANCE instance, HANDLE destructEvent);
     ~App();
 
     void Initialize();
@@ -101,6 +101,7 @@ private:
     HWND messageWindow;
     UINT shellMessage;
     bool active;
+    bool elevated;
     std::vector<IAppListener*> listeners;
     std::vector<HWND> pendingWindows;
     std::vector<HWND> noAutoGrabWindows;

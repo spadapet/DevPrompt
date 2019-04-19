@@ -3,11 +3,11 @@
 #include "AppInterop.h"
 #include "ProcessHostInterop.h"
 
-AppInterop::AppInterop(IAppHost* host, HINSTANCE instance)
+AppInterop::AppInterop(IAppHost* host, bool elevated, HINSTANCE instance)
     : refs(0)
     , appDestructEvent(::CreateEvent(nullptr, TRUE, FALSE, nullptr))
 {
-    this->app = std::make_shared<App>(host, instance, this->appDestructEvent);
+    this->app = std::make_shared<App>(host, elevated, instance, this->appDestructEvent);
     this->app->Initialize();
 }
 

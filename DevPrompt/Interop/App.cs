@@ -6,10 +6,10 @@ namespace DevPrompt.Interop
     internal static class App
     {
         [DllImport("DevNative64", CallingConvention = CallingConvention.Cdecl, EntryPoint = "CreateApp")]
-        private static extern void CreateApp64(IAppHost host, out IApp app);
+        private static extern void CreateApp64(IAppHost host, [MarshalAs(UnmanagedType.Bool)] bool elevated, out IApp app);
 
         [DllImport("DevNative32", CallingConvention = CallingConvention.Cdecl, EntryPoint = "CreateApp")]
-        private static extern void CreateApp32(IAppHost host, out IApp app);
+        private static extern void CreateApp32(IAppHost host, [MarshalAs(UnmanagedType.Bool)] bool elevated, out IApp app);
 
         [DllImport("DevNative64", CallingConvention = CallingConvention.Cdecl, EntryPoint = "CreateVisualStudioInstances")]
         private static extern void CreateVisualStudioInstances64(out IVisualStudioInstances obj);
@@ -39,12 +39,12 @@ namespace DevPrompt.Interop
             return App.CallDevNative(
                 () =>
                 {
-                    App.CreateApp64(host, out IApp app64);
+                    App.CreateApp64(host, Program.IsElevated, out IApp app64);
                     return app64;
                 },
                 () =>
                 {
-                    App.CreateApp32(host, out IApp app32);
+                    App.CreateApp32(host, Program.IsElevated, out IApp app32);
                     return app32;
                 },
                 out IApp app, out errorMessage) ? app : null;

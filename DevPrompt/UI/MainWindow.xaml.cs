@@ -21,8 +21,10 @@ namespace DevPrompt.UI
         public MainWindow(AppSettings settings, string initialErrorText)
         {
             this.AppSettings = settings;
-            this.ViewModel = new MainWindowVM(this);
-            this.ViewModel.ErrorText = initialErrorText;
+            this.ViewModel = new MainWindowVM(this)
+            {
+                ErrorText = initialErrorText
+            };
 
             this.InitializeComponent();
         }

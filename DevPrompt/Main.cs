@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
+using System.Security.Principal;
 using System.Threading;
 
 namespace DevPrompt
@@ -7,24 +9,69 @@ namespace DevPrompt
     public static class Program
     {
         [STAThread]
-        public static void Main()
+        public static void Main(string[] args)
         {
-            using (ManualResetEvent exitEvent = new ManualResetEvent(false))
+            if (!Program.RestartAsAdmin(args))
             {
-                Thread mainProcessThread = new Thread(() => Program.WaitToBecomeMainProcess(exitEvent));
-                mainProcessThread.Start();
-
-                try
+                using (ManualResetEvent exitEvent = new ManualResetEvent(false))
                 {
-                    App.Main();
-                }
-                finally
-                {
-                    exitEvent.Set();
-                }
+                    Thread mainProcessThread = new Thread(() => Program.WaitToBecomeMainProcess(exitEvent));
+                    mainProcessThread.Start();
 
-                mainProcessThread.Join();
+                    try
+                    {
+                        App.Main();
+                    }
+                    finally
+                    {
+                        exitEvent.Set();
+                    }
+
+                    mainProcessThread.Join();
+                }
             }
+        }
+
+        private static bool RestartAsAdmin(string[] args)
+        {
+            const string adminSwitch = "/admin";
+
+            if (args.Length > 0 && args[0] == adminSwitch && !Program.IsElevated)
+            {
+                // Try to run again as admin
+                int adminIndex = Environment.CommandLine.IndexOf(adminSwitch, StringComparison.Ordinal);
+                if (adminIndex >= 0)
+                {
+                    string newExe = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                    string newArgs = Environment.CommandLine.Remove(0, adminIndex + adminSwitch.Length).Trim();
+
+                    ProcessStartInfo info = new ProcessStartInfo(newExe, newArgs)
+                    {
+                        UseShellExecute = true
+                    };
+
+                    if (info.Verbs.Contains("runas"))
+                    {
+                        info.Verb = "runas";
+                        try
+                        {
+                            Process process = Process.Start(info);
+                            if (process != null)
+                            {
+                                // Quit and let the new process take over
+                                return true;
+                            }
+                        }
+                        catch
+                        {
+                            // Just keep running this process
+                        }
+                    }
+                }
+            }
+
+            // No need to restart
+            return false;
         }
 
         /// <summary>
@@ -36,7 +83,7 @@ namespace DevPrompt
         /// </summary>
         private static void WaitToBecomeMainProcess(EventWaitHandle exitEvent)
         {
-            using (Mutex mainProcessMutex = new Mutex(false, "{5553691f-212c-4535-a82a-586b11fbd1bb}", out bool firstInstance))
+            using (Mutex mainProcessMutex = new Mutex(false, "{5553691f-212c-4535-a82a-586b11fbd1bb}", out _))
             {
                 try
                 {
@@ -66,6 +113,7 @@ namespace DevPrompt
 
         public static bool IsMicrosoftDomain { get; }
         public static bool IsNotMicrosoftDomain => !Program.IsMicrosoftDomain;
+        public static bool IsElevated { get; }
         private static long isMainProcessCount;
 
         public static bool IsMainProcess
@@ -87,6 +135,10 @@ namespace DevPrompt
                 Environment.GetEnvironmentVariable("USERDNSDOMAIN"),
                 "REDMOND.CORP.MICROSOFT.COM",
                 StringComparison.OrdinalIgnoreCase);
+
+            WindowsIdentity identity = WindowsIdentity.GetCurrent();
+            WindowsPrincipal principal = new WindowsPrincipal(identity);
+            Program.IsElevated = principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
     }
 }

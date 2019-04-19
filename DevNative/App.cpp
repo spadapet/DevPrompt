@@ -20,8 +20,9 @@ static const UINT WM_USER_CLONE_ACTIVE_PROCESS = WM_USER + 9;
 static const UINT WM_USER_SET_TAB_NAME = WM_USER + 10;
 static const UINT WM_USER_DETACH_ACTIVE_PROCESS = WM_USER + 11;
 
-App::App(IAppHost* host, HINSTANCE instance, HANDLE destructEvent)
+App::App(IAppHost* host, bool elevated, HINSTANCE instance, HANDLE destructEvent)
     : host(host)
+    , elevated(elevated)
     , instance(instance)
     , mainWindow(nullptr)
     , destructEvent(destructEvent)
@@ -76,7 +77,7 @@ void App::Initialize()
     this->messageWindow = IWindowProc::Create(this, windowClass, 0, RECT{}, HWND_MESSAGE);
 
     ::RegisterShellHookWindow(this->messageWindow);
-    ::RegisterApplicationRestart(nullptr, RESTART_NO_CRASH | RESTART_NO_HANG);
+    ::RegisterApplicationRestart(this->elevated ? L"/admin /restarted" : L"/restarted", RESTART_NO_CRASH | RESTART_NO_HANG);
     ::SetProcessShutdownParameters(0x300, 0); // shut down before hosted processes
 }
 
