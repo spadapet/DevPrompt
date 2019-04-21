@@ -8,5 +8,7 @@
     <?define RegistryRootKey = "Software\$(var.ProductName)" ?>
 
     <?define ProductUpgradeCode = "78EF1CAA-FDDD-4109-BD01-94F9E439E222" ?>
+    <?define Id_Folder = "7621530A-B617-448B-BA56-2DF0AE8F0F7A" ?>
     <?define Id_Main = "ABB6124A-A803-4889-BDFE-ECADBEA2B5C0" ?>
+    <?define Id_Shortcut = "35FE78FA-B9FE-4F9A-8719-003B5DDA58C8" ?>
 </Include>

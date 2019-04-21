@@ -3,7 +3,9 @@
     <?include "variables.wxi"?>
     <Fragment>
         <Feature Id="Main" Title="Files" Absent="disallow" AllowAdvertise="no" ConfigurableDirectory="INSTALLDIR">
+            <ComponentRef Id="Folder" />
             <ComponentRef Id="Main" />
+            <ComponentRef Id="Shortcut" />
             <!--<MergeRef Id="VC141_Runtime" />-->
         </Feature>
     </Fragment>

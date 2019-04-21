@@ -8,11 +8,7 @@
                 <Directory Id="INSTALLDIR" Name="DevPrompt" />
             </Directory>
 
-            <Directory Id="ProgramMenuFolder">
-                <!--<Directory Id="CompanyProgramMenuFolder" Name="$(var.CompanyName)">
-                    <Directory Id="ProductProgramMenuFolder" Name="$(var.ProductName)$(var.ProductNameSuffix)" />
-                </Directory>-->
-            </Directory>
+            <Directory Id="ProgramMenuFolder" />
 
         </Directory>
     </Fragment>

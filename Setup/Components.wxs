@@ -3,25 +3,30 @@
     <?include "variables.wxi"?>
     <Fragment>
         <DirectoryRef Id="INSTALLDIR">
-            <Component Id="Main" Guid="$(var.Id_Main)">
+            <Component Id="Folder" Guid="$(var.Id_Folder)">
                 <CreateFolder />
+                <RemoveFolder On="uninstall" Id="INSTALLDIR" />
                 <RemoveFile Id="RemoveStateFiles" Name="*.xml" On="uninstall"/>
                 <RemoveFile Id="RemoveLogFiles" Name="*.log" On="uninstall"/>
-                <RemoveFolder On="uninstall" Id="INSTALLDIR" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistryRootKey)" Type="string" Name="InstallDir" Value="[INSTALLDIR]" KeyPath="yes" />
+            </Component>
 
-                <RegistryValue Root="HKCU" Key="$(var.RegistryRootKey)" Type="string" Name="InstallVersion" Value="$(var.ProductVersion)" KeyPath="yes"/>
-                <RegistryValue Root="HKCU" Key="$(var.RegistryRootKey)" Type="string" Name="InstallDir" Value="[INSTALLDIR]" />
-
+            <Component Id="Main" Guid="$(var.Id_Main)">
                 <File Source="$(var.Bin64)DevInjector64.exe" />
                 <File Source="$(var.Bin64)DevInject64.dll" />
                 <File Source="$(var.Bin64)DevNative64.dll" />
                 <File Source="$(var.Bin32)DevInjector32.exe" />
                 <File Source="$(var.Bin32)DevInject32.dll" />
                 <File Source="$(var.Bin32)DevNative32.dll" />
+                <File Source="$(var.Bin64)DevPrompt.exe" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistryRootKey)" Type="string" Name="InstallVersion" Value="$(var.ProductVersion)" KeyPath="yes" />
+            </Component>
+        </DirectoryRef>
 
-                <File Source="$(var.Bin64)DevPrompt.exe">
-                    <Shortcut Id="StartMenuDevPrompt" Directory="ProgramMenuFolder" Name="$(var.ProductName)" />
-                </File>
+        <DirectoryRef Id="ProgramMenuFolder">
+            <Component Id="Shortcut" Guid="$(var.Id_Shortcut)">
+                <Shortcut Id="StartMenuDevPrompt" Name="$(var.ProductName)" Target="[INSTALLDIR]DevPrompt.exe" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistryRootKey)" Type="integer" Name="MainShortcut" Value="1" KeyPath="yes"/>
             </Component>
         </DirectoryRef>
     </Fragment>
