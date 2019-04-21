@@ -1,6 +1,7 @@
 ﻿using DevPrompt.Interop;
 using DevPrompt.Settings;
 using DevPrompt.Utility;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,6 +10,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Threading;
 
@@ -33,7 +35,7 @@ namespace DevPrompt.UI
         private int newTabIndex;
         private ProcessVM activeProcess;
         private string errorText;
-        private bool saveAppSettingsPending;
+        private DispatcherOperation savingAppSettings;
 
         /// <summary>
         /// For designer
@@ -58,23 +60,24 @@ namespace DevPrompt.UI
             this.ToolCommand = new DelegateCommand((object arg) => this.StartTool((ToolSettings)arg));
             this.VisualStudioCommand = new DelegateCommand((object arg) => this.StartVisualStudio((VisualStudioSetup.Instance)arg));
             this.ClearErrorTextCommand = new DelegateCommand((object arg) => this.ClearErrorText());
+
             this.AppSettings.PropertyChanged += this.OnAppSettingsPropertyChanged;
+            this.AppSettings.ObservableConsoles.CollectionChanged += this.OnAppSettingsCollectionChanged;
+            this.AppSettings.ObservableGrabConsoles.CollectionChanged += this.OnAppSettingsCollectionChanged;
+            this.AppSettings.ObservableLinks.CollectionChanged += this.OnAppSettingsCollectionChanged;
+            this.AppSettings.ObservableTools.CollectionChanged += this.OnAppSettingsCollectionChanged;
         }
 
-        private void OnAppSettingsPropertyChanged(object sender, PropertyChangedEventArgs args)
+        private void OnAppSettingsCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
-            // Don't want to lose any setting changes if the app dies, so make sure they are saved
-            if (!this.saveAppSettingsPending && this.Window.IsVisible)
+            this.OnAppSettingsPropertyChanged(sender, null);
+        }
+
+        private async void OnAppSettingsPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if (this.Window.IsVisible)
             {
-                this.saveAppSettingsPending = true;
-
-                Action action = () =>
-                {
-                    this.saveAppSettingsPending = false;
-                    this.AppSettings.Save();
-                };
-
-                this.Window.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, action);
+                await this.SaveAppSettings();
             }
         }
 
@@ -91,6 +94,46 @@ namespace DevPrompt.UI
             get
             {
                 return this.Window.AppSettings;
+            }
+        }
+
+        private async Task SaveAppSettings(string path = null)
+        {
+            if (this.savingAppSettings == null)
+            {
+                Action action = async () =>
+                {
+                    this.savingAppSettings = null;
+
+                    Exception exception = await this.AppSettings.Save(path);
+                    if (exception != null)
+                    {
+                        this.ErrorText = exception.Message;
+                    }
+                };
+
+                this.savingAppSettings = this.Window.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, action);
+            }
+
+            await this.savingAppSettings;
+        }
+
+        public ICommand DetachAndExitCommand
+        {
+            get
+            {
+                return new DelegateCommand(() =>
+                {
+                    foreach (ProcessVM process in this.Processes.ToArray())
+                    {
+                        if (process.DetachCommand.CanExecute(null))
+                        {
+                            process.DetachCommand.Execute(null);
+                        }
+                    }
+
+                    this.Window.Close();
+                });
             }
         }
 
@@ -162,8 +205,73 @@ namespace DevPrompt.UI
                         {
                             this.AppSettings.Consoles.Add(settings.Clone());
                         }
+                    }
+                });
+            }
+        }
 
-                        this.AppSettings.Save();
+        public ICommand SettingsImportCommand
+        {
+            get
+            {
+                return new DelegateCommand(async () =>
+                {
+                    OpenFileDialog dialog = new OpenFileDialog
+                    {
+                        Title = "Import Settings",
+                        Filter = "XML Files|*.xml",
+                        DefaultExt = "xml",
+                        CheckFileExists = true
+                    };
+
+                    if (dialog.ShowDialog(this.Window) == true)
+                    {
+                        AppSettings settings = null;
+                        try
+                        {
+                            settings = await AppSettings.UnsafeLoad(dialog.FileName);
+                        }
+                        catch (Exception exception)
+                        {
+                            this.ErrorText = exception.Message;
+                        }
+
+                        if (settings != null)
+                        {
+                            SettingsImportDialog dialog2 = new SettingsImportDialog(settings)
+                            {
+                                Owner = this.Window
+                            };
+
+                            if (dialog2.ShowDialog() == true)
+                            {
+                                dialog2.ViewModel.Import(this.AppSettings);
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        public ICommand SettingsExportCommand
+        {
+            get
+            {
+                return new DelegateCommand(async () =>
+                {
+                    OpenFileDialog dialog = new OpenFileDialog
+                    {
+                        Title = "Export Settings",
+                        Filter = "XML Files|*.xml",
+                        DefaultExt = "xml",
+                        CheckPathExists = true,
+                        CheckFileExists = false,
+                        ValidateNames = true
+                    };
+
+                    if (dialog.ShowDialog(this.Window) == true)
+                    {
+                        await this.SaveAppSettings(dialog.FileName);
                     }
                 });
             }
@@ -188,8 +296,6 @@ namespace DevPrompt.UI
                         {
                             this.AppSettings.GrabConsoles.Add(settings.Clone());
                         }
-
-                        this.AppSettings.Save();
                     }
                 });
             }
@@ -214,8 +320,6 @@ namespace DevPrompt.UI
                         {
                             this.AppSettings.Tools.Add(settings.Clone());
                         }
-
-                        this.AppSettings.Save();
                     }
                 });
             }
@@ -240,8 +344,6 @@ namespace DevPrompt.UI
                         {
                             this.AppSettings.Links.Add(settings.Clone());
                         }
-
-                        this.AppSettings.Save();
                     }
                 });
             }

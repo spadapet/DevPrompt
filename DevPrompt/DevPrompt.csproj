@@ -89,6 +89,9 @@
       <DependentUpon>AboutDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\DragItemsControl.cs" />
+    <Compile Include="UI\SettingsImportDialog.xaml.cs">
+      <DependentUpon>SettingsImportDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\TabNameDialog.xaml.cs">
       <DependentUpon>TabNameDialog.xaml</DependentUpon>
     </Compile>
@@ -106,6 +109,7 @@
     </Compile>
     <Compile Include="UI\ProcessVM.cs" />
     <Compile Include="UI\InstallBranchDialogVM.cs" />
+    <Compile Include="UI\SettingsImportDialogVM.cs" />
     <Compile Include="UI\TabNameDialogVM.cs" />
     <Compile Include="Utility\CommandHelpers.cs" />
     <Compile Include="Utility\PropertyNotifier.cs" />
@@ -117,6 +121,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\AboutDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SettingsImportDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -262,6 +262,26 @@ namespace DevPrompt.Settings
             });
         }
 
+        public static async Task<AppSettings> UnsafeLoad(string path)
+        {
+            return await Task.Run(() =>
+            {
+                XmlReaderSettings xmlSettings = new XmlReaderSettings()
+                {
+                    XmlResolver = null
+                };
+
+                lock (AppSettings.fileLock)
+                {
+                    using (Stream stream = File.OpenRead(path))
+                    using (XmlReader reader = XmlReader.Create(stream, xmlSettings))
+                    {
+                        return (AppSettings)AppSettings.DataContractSerializer.ReadObject(reader);
+                    }
+                }
+            });
+        }
+
         public static async Task<AppSettings> Load(string path)
         {
             AppSettings settings = null;
@@ -270,23 +290,7 @@ namespace DevPrompt.Settings
             {
                 if (File.Exists(path))
                 {
-                    settings = await Task.Run(() =>
-                    {
-                        XmlReaderSettings xmlSettings = new XmlReaderSettings()
-                        {
-                            XmlResolver = null
-                        };
-
-                        lock (AppSettings.fileLock)
-                        {
-                            using (Stream stream = File.OpenRead(path))
-                            using (XmlReader reader = XmlReader.Create(stream, xmlSettings))
-                            {
-                                return (AppSettings)AppSettings.DataContractSerializer.ReadObject(reader);
-                            }
-                        }
-                    });
-
+                    settings = await AppSettings.UnsafeLoad(path);
                     settings.EnsureValid();
                 }
             }
@@ -303,12 +307,7 @@ namespace DevPrompt.Settings
             return settings;
         }
 
-        public Task Save()
-        {
-            return this.Save(AppSettings.DefaultPath);
-        }
-
-        public Task Save(string path)
+        public Task<Exception> Save(string path = null)
         {
             AppSettings clone = this.Clone();
 
@@ -321,16 +320,62 @@ namespace DevPrompt.Settings
 
                 lock (AppSettings.fileLock)
                 {
-                    if (Directory.CreateDirectory(Path.GetDirectoryName(path)) != null)
+                    try
                     {
-                        using (Stream stream = File.Create(path))
-                        using (XmlWriter writer = XmlWriter.Create(stream, xmlSettings))
+                        if (string.IsNullOrEmpty(path))
                         {
-                            AppSettings.DataContractSerializer.WriteObject(writer, clone);
+                            path = AppSettings.DefaultPath;
+                        }
+
+                        if (Directory.CreateDirectory(Path.GetDirectoryName(path)) != null)
+                        {
+                            using (Stream stream = File.Create(path))
+                            using (XmlWriter writer = XmlWriter.Create(stream, xmlSettings))
+                            {
+                                AppSettings.DataContractSerializer.WriteObject(writer, clone);
+                            }
                         }
                     }
+                    catch (Exception exception)
+                    {
+                        return exception;
+                    }
                 }
+
+                return null;
             });
+        }
+
+        public ObservableCollection<ConsoleSettings> ObservableConsoles
+        {
+            get
+            {
+                return this.consoles;
+            }
+        }
+
+        public ObservableCollection<GrabConsoleSettings> ObservableGrabConsoles
+        {
+            get
+            {
+                return this.grabConsoles;
+            }
+        }
+
+        public ObservableCollection<LinkSettings> ObservableLinks
+        {
+            get
+            {
+                return this.links;
+            }
+        }
+
+        public ObservableCollection<ToolSettings> ObservableTools
+        {
+            get
+            {
+                return this.tools;
+            }
         }
 
         [DataMember]
@@ -426,7 +471,7 @@ namespace DevPrompt.Settings
             }
         }
 
-        private void EnsureValid()
+        public void EnsureValid()
         {
             if (this.consoles.Count == 0)
             {
