@@ -10,7 +10,7 @@ namespace DevPrompt.UI
     /// <summary>
     /// View model for each process tab (handles context menu items, etc)
     /// </summary>
-    internal class ProcessVM : PropertyNotifier
+    internal class ProcessVM : PropertyNotifier, ITabVM
     {
         private readonly MainWindowVM window;
         private string env;
@@ -176,13 +176,21 @@ namespace DevPrompt.UI
             }
         }
 
+        public bool UsesProcessHost
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public ICommand ActivateCommand
         {
             get
             {
                 return new DelegateCommand((object arg) =>
                 {
-                    this.window.ActiveProcess = this;
+                    this.window.ActiveTab = this;
                 });
             }
         }
@@ -259,6 +267,11 @@ namespace DevPrompt.UI
                     }
                 });
             }
+        }
+
+        public void Focus()
+        {
+            this.Process?.Focus();
         }
     }
 }

@@ -27,6 +27,16 @@ namespace DevPrompt.UI
             this.ProcessHost?.Deactivate();
         }
 
+        public void Show()
+        {
+            this.ProcessHost?.Show();
+        }
+
+        public void Hide()
+        {
+            this.ProcessHost?.Hide();
+        }
+
         protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
         {
             base.OnDpiChanged(oldDpi, newDpi);

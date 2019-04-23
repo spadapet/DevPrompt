@@ -239,7 +239,7 @@ namespace DevPrompt.UI
 
             if (args.NewFocus == this)
             {
-                this.ViewModel.FocusActiveProcess();
+                this.ViewModel.FocusActiveTab();
             }
         }
 
@@ -260,9 +260,9 @@ namespace DevPrompt.UI
         {
             if (args.ChangedButton == MouseButton.Middle &&
                 sender is Button button &&
-                button.DataContext is ProcessVM process)
+                button.DataContext is ITabVM tab)
             {
-                process.CloseCommand.Execute(null);
+                tab.CloseCommand?.Execute(null);
             }
         }
 
@@ -292,9 +292,9 @@ namespace DevPrompt.UI
 
         void DragItemsControl.IDragHost.OnDrop(ItemsControl source, object droppedModel, int droppedIndex, bool copy)
         {
-            if (source == this.tabItemsControl && droppedModel is ProcessVM process)
+            if (source == this.tabItemsControl && droppedModel is ITabVM tab)
             {
-                this.ViewModel.OnDrop(process, droppedIndex, copy);
+                this.ViewModel.OnDrop(tab, droppedIndex, copy);
             }
         }
 
@@ -303,7 +303,7 @@ namespace DevPrompt.UI
         /// </summary>
         bool DragItemsControl.IDragHost.CanDropCopy(object droppedModel)
         {
-            return true;
+            return droppedModel is ITabVM tab && tab.CloneCommand?.CanExecute(null) == true;
         }
     }
 }

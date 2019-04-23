@@ -15,6 +15,8 @@ namespace DevPrompt.Interop
         void Dispose();
         void Activate();
         void Deactivate();
+        void Show();
+        void Hide();
         IntPtr GetWindow();
         void DpiChanged(double oldScale, double newScale);
         void Focus();

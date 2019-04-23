@@ -105,22 +105,22 @@ namespace DevPrompt
 
         void IAppHost.CloneActiveProcess()
         {
-            this.MainWindow?.ViewModel.ActiveProcess?.CloneCommand.Execute(null);
+            this.MainWindow?.ViewModel.ActiveTab?.CloneCommand.Execute(null);
         }
 
         void IAppHost.SetTabName()
         {
-            this.MainWindow?.ViewModel.ActiveProcess?.SetTabNameCommand.Execute(null);
+            this.MainWindow?.ViewModel.ActiveTab?.SetTabNameCommand.Execute(null);
         }
 
         void IAppHost.CloseActiveProcess()
         {
-            this.MainWindow?.ViewModel.ActiveProcess?.CloseCommand.Execute(null);
+            this.MainWindow?.ViewModel.ActiveTab?.CloseCommand.Execute(null);
         }
 
         void IAppHost.DetachActiveProcess()
         {
-            this.MainWindow?.ViewModel.ActiveProcess?.DetachCommand.Execute(null);
+            this.MainWindow?.ViewModel.ActiveTab?.DetachCommand.Execute(null);
         }
 
         IntPtr IAppHost.GetMainWindow()

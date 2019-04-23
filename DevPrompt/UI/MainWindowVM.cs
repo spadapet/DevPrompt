@@ -29,13 +29,16 @@ namespace DevPrompt.UI
         public ICommand VisualStudioCommand { get; }
         public ICommand ClearErrorTextCommand { get; }
 
-        private readonly ObservableCollection<ProcessVM> processes;
-        private readonly LinkedList<ProcessVM> tabOrder;
-        private LinkedListNode<ProcessVM> currentTabCycle;
+        private readonly ObservableCollection<ITabVM> tabs;
+        private readonly LinkedList<ITabVM> tabOrder;
+        private LinkedListNode<ITabVM> currentTabCycle;
         private int newTabIndex;
-        private ProcessVM activeProcess;
+        private ITabVM activeTab;
         private string errorText;
         private DispatcherOperation savingAppSettings;
+
+        private const int NewTabAtEnd = -1;
+        private const int NewTabAtEndNoActivate = -2;
 
         /// <summary>
         /// For designer
@@ -49,10 +52,10 @@ namespace DevPrompt.UI
             this.Window = window;
             this.Window.Activated += this.OnWindowActivated;
             this.Window.Deactivated += this.OnWindowDeactivated;
-            this.processes = new ObservableCollection<ProcessVM>();
-            this.processes.CollectionChanged += this.OnProcessesCollectionChanged;
-            this.tabOrder = new LinkedList<ProcessVM>();
-            this.newTabIndex = -1;
+            this.tabs = new ObservableCollection<ITabVM>();
+            this.tabs.CollectionChanged += this.OnTabsCollectionChanged;
+            this.tabOrder = new LinkedList<ITabVM>();
+            this.newTabIndex = MainWindowVM.NewTabAtEnd;
 
             this.ConsoleCommand = new DelegateCommand((object arg) => this.StartConsole((ConsoleSettings)arg));
             this.GrabConsoleCommand = new DelegateCommand((object arg) => this.GrabConsole((int)arg));
@@ -81,11 +84,19 @@ namespace DevPrompt.UI
             }
         }
 
+        private ProcessHostWindow ProcessHostWindow
+        {
+            get
+            {
+                return this.Window.ProcessHostWindow;
+            }
+        }
+
         private IProcessHost ProcessHost
         {
             get
             {
-                return this.Window.ProcessHostWindow?.ProcessHost;
+                return this.ProcessHostWindow?.ProcessHost;
             }
         }
 
@@ -124,11 +135,11 @@ namespace DevPrompt.UI
             {
                 return new DelegateCommand(() =>
                 {
-                    foreach (ProcessVM process in this.Processes.ToArray())
+                    foreach (ITabVM tab in this.Tabs.ToArray())
                     {
-                        if (process.DetachCommand.CanExecute(null))
+                        if (tab.DetachCommand != null && tab.DetachCommand.CanExecute(null))
                         {
-                            process.DetachCommand.Execute(null);
+                            tab.DetachCommand.Execute(null);
                         }
                     }
 
@@ -370,7 +381,7 @@ namespace DevPrompt.UI
             get
             {
                 string intro = Program.IsElevated ? "[Dev Admin]" : "[Dev]";
-                string title = this.ActiveProcess?.Title;
+                string title = this.ActiveTab?.Title;
 
                 if (!string.IsNullOrEmpty(title))
                 {
@@ -381,70 +392,79 @@ namespace DevPrompt.UI
             }
         }
 
-        public IList<ProcessVM> Processes
+        public IList<ITabVM> Tabs
         {
             get
             {
-                return this.processes;
+                return this.tabs;
             }
         }
 
-        public ProcessVM ActiveProcess
+        public ITabVM ActiveTab
         {
             get
             {
-                return this.activeProcess;
+                return this.activeTab;
             }
 
             set
             {
-                ProcessVM oldProcess = this.activeProcess;
-                if (this.SetPropertyValue(ref this.activeProcess, value))
+                ITabVM oldTab = this.activeTab;
+                if (this.SetPropertyValue(ref this.activeTab, value))
                 {
-                    if (this.activeProcess != null)
+                    if (this.activeTab != null)
                     {
-                        this.activeProcess.InternalActive = true;
+                        this.activeTab.InternalActive = true;
                     }
 
-                    if (oldProcess != null)
+                    if (oldTab != null)
                     {
-                        oldProcess.InternalActive = false;
+                        oldTab.InternalActive = false;
                     }
 
-                    this.OnPropertyChanged(nameof(this.HasActiveProcess));
+                    if (this.activeTab?.UsesProcessHost == true)
+                    {
+                        this.ProcessHostWindow?.Show();
+                    }
+                    else
+                    {
+                        this.ProcessHostWindow?.Hide();
+                    }
+
+                    this.OnPropertyChanged(nameof(this.HasActiveTab));
                     this.OnPropertyChanged(nameof(this.WindowTitle));
                 }
 
-                this.FocusActiveProcess();
+                this.FocusActiveTab();
             }
         }
 
-        public bool HasActiveProcess
+        public bool HasActiveTab
         {
             get
             {
-                return this.ActiveProcess != null;
+                return this.ActiveTab != null;
             }
         }
 
-        public void FocusActiveProcess()
+        public void FocusActiveTab()
         {
-            if (this.activeProcess != null)
+            if (this.activeTab != null)
             {
                 if (this.currentTabCycle != null)
                 {
-                    if (this.currentTabCycle.Value != this.activeProcess)
+                    if (this.currentTabCycle.Value != this.activeTab)
                     {
-                        this.currentTabCycle = this.tabOrder.Find(this.activeProcess);
+                        this.currentTabCycle = this.tabOrder.Find(this.activeTab);
                     }
                 }
                 else
                 {
-                    this.tabOrder.Remove(this.activeProcess);
-                    this.tabOrder.AddFirst(this.activeProcess);
+                    this.tabOrder.Remove(this.activeTab);
+                    this.tabOrder.AddFirst(this.activeTab);
                 }
 
-                this.activeProcess.Process.Focus();
+                this.activeTab.Focus();
             }
         }
 
@@ -468,7 +488,7 @@ namespace DevPrompt.UI
                 }
 
                 this.currentTabCycle = this.currentTabCycle.Next ?? this.tabOrder.First;
-                this.ActiveProcess = this.currentTabCycle.Value;
+                this.ActiveTab = this.currentTabCycle.Value;
             }
         }
 
@@ -482,7 +502,42 @@ namespace DevPrompt.UI
                 }
 
                 this.currentTabCycle = this.currentTabCycle.Previous ?? this.tabOrder.Last;
-                this.ActiveProcess = this.currentTabCycle.Value;
+                this.ActiveTab = this.currentTabCycle.Value;
+            }
+        }
+
+        public void AddTab(ITabVM tab, bool activate)
+        {
+            this.ClearErrorText();
+
+            if (this.newTabIndex == MainWindowVM.NewTabAtEndNoActivate)
+            {
+                activate = false;
+            }
+
+            int index = (this.newTabIndex < 0) ? this.tabs.Count : Math.Min(this.tabs.Count, this.newTabIndex);
+            this.tabs.Insert(index, tab);
+
+            this.tabOrder.AddFirst(tab);
+            Debug.Assert(this.tabs.Count == this.tabOrder.Count);
+
+            if (activate || this.ActiveTab == null)
+            {
+                this.ActiveTab = tab;
+            }
+        }
+
+        public void RemoveTab(ITabVM tab)
+        {
+            bool removingActive = (this.ActiveTab == tab);
+
+            this.tabs.Remove(tab);
+            this.tabOrder.Remove(tab);
+            Debug.Assert(this.tabs.Count == this.tabOrder.Count);
+
+            if (removingActive)
+            {
+                this.ActiveTab = this.tabOrder.First?.Value;
             }
         }
 
@@ -491,7 +546,7 @@ namespace DevPrompt.UI
         /// </summary>
         public void OnProcessOpening(IProcess process, bool activate, string path)
         {
-            ProcessVM processVM = new ProcessVM(this, process)
+            ITabVM tab = new ProcessVM(this, process)
             {
                 TabName = !string.IsNullOrEmpty(path) ? Path.GetFileName(path) : "Tab"
             };
@@ -500,21 +555,12 @@ namespace DevPrompt.UI
             {
                 if (grab.CanGrab(path))
                 {
-                    processVM.TabName = grab.TabName;
+                    tab.TabName = grab.TabName;
                     break;
                 }
             }
 
-            int index = (this.newTabIndex < 0) ? this.processes.Count : Math.Min(this.processes.Count, this.newTabIndex);
-            this.processes.Insert(index, processVM);
-
-            this.tabOrder.AddFirst(processVM);
-            Debug.Assert(this.processes.Count == this.tabOrder.Count);
-
-            if (activate || this.ActiveProcess == null)
-            {
-                this.ActiveProcess = processVM;
-            }
+            this.AddTab(tab, activate);
         }
 
         /// <summary>
@@ -522,20 +568,10 @@ namespace DevPrompt.UI
         /// </summary>
         public void OnProcessClosing(IProcess process)
         {
-            IntPtr processHwnd = process.GetWindow();
-            ProcessVM processVM = this.processes.FirstOrDefault(p => p.Hwnd == processHwnd);
-            if (processVM != null)
+            ITabVM tab = this.FindProcess(process);
+            if (tab != null)
             {
-                bool removingActive = (this.ActiveProcess == processVM);
-
-                this.processes.Remove(processVM);
-                this.tabOrder.Remove(processVM);
-                Debug.Assert(this.processes.Count == this.tabOrder.Count);
-
-                if (removingActive)
-                {
-                    this.ActiveProcess = this.tabOrder.First?.Value;
-                }
+                this.RemoveTab(tab);
             }
         }
 
@@ -544,11 +580,10 @@ namespace DevPrompt.UI
         /// </summary>
         public void OnProcessEnvChanged(IProcess process, string env)
         {
-            IntPtr processHwnd = process.GetWindow();
-            ProcessVM processVM = this.processes.FirstOrDefault(p => p.Hwnd == processHwnd);
-            if (processVM != null)
+            ProcessVM tab = this.FindProcess(process);
+            if (tab != null)
             {
-                processVM.Env = env;
+                tab.Env = env;
             }
         }
 
@@ -557,13 +592,12 @@ namespace DevPrompt.UI
         /// </summary>
         public void OnProcessTitleChanged(IProcess process, string title)
         {
-            IntPtr processHwnd = process.GetWindow();
-            ProcessVM processVM = this.processes.FirstOrDefault(p => p.Hwnd == processHwnd);
-            if (processVM != null)
+            ITabVM tab = this.FindProcess(process);
+            if (tab != null)
             {
-                processVM.Title = title;
+                tab.Title = title;
 
-                if (this.ActiveProcess == processVM)
+                if (this.ActiveTab == tab)
                 {
                     this.OnPropertyChanged(nameof(this.WindowTitle));
                 }
@@ -572,17 +606,11 @@ namespace DevPrompt.UI
 
         public void CloneProcess(ProcessVM process)
         {
-            this.ClearErrorText();
-
-            if (process != null)
+            IProcess processClone = this.ProcessHost?.CloneProcess(process.Process);
+            ITabVM tab = this.FindProcess(processClone);
+            if (tab != null)
             {
-                IProcess processClone = this.ProcessHost?.CloneProcess(process.Process);
-                IntPtr hwndClone = processClone?.GetWindow() ?? IntPtr.Zero;
-                ProcessVM clone = this.processes.FirstOrDefault(p => p.Hwnd == hwndClone);
-                if (clone != null)
-                {
-                    clone.TabName = process.TabName;
-                }
+                tab.TabName = process.TabName;
             }
         }
 
@@ -590,20 +618,29 @@ namespace DevPrompt.UI
         {
             AppSnapshot snapshot = await AppSnapshot.Load(AppSnapshot.DefaultPath);
 
-            foreach (ConsoleSnapshot console in snapshot.Consoles)
+            try
             {
-                this.RestoreConsole(console);
-            }
+                this.newTabIndex = MainWindowVM.NewTabAtEndNoActivate;
 
-            if (this.Processes.Count == 0)
-            {
-                foreach (ConsoleSettings settings in this.AppSettings.Consoles)
+                foreach (ConsoleSnapshot console in snapshot.Consoles)
                 {
-                    if (settings.RunAtStartup)
+                    this.RestoreConsole(console);
+                }
+
+                if (this.Tabs.Count == 0)
+                {
+                    foreach (ConsoleSettings settings in this.AppSettings.Consoles)
                     {
-                        this.StartConsole(settings);
+                        if (settings.RunAtStartup)
+                        {
+                            this.StartConsole(settings);
+                        }
                     }
                 }
+            }
+            finally
+            {
+                this.newTabIndex = MainWindowVM.NewTabAtEnd;
             }
         }
 
@@ -631,19 +668,19 @@ namespace DevPrompt.UI
             }
         }
 
-        public void OnDrop(ProcessVM process, int droppedIndex, bool copy)
+        public void OnDrop(ITabVM tab, int droppedIndex, bool copy)
         {
-            int index = this.processes.IndexOf(process);
+            int index = this.tabs.IndexOf(tab);
             if (index >= 0)
             {
-                if (copy)
+                if (copy && tab.CloneCommand?.CanExecute(null) == true)
                 {
                     int oldTabIndex = this.newTabIndex;
                     this.newTabIndex = droppedIndex;
 
                     try
                     {
-                        this.CloneProcess(process);
+                        tab.CloneCommand.Execute(null);
                     }
                     finally
                     {
@@ -653,9 +690,15 @@ namespace DevPrompt.UI
                 else if (index != droppedIndex)
                 {
                     int finalIndex = (droppedIndex > index) ? droppedIndex - 1 : droppedIndex;
-                    this.processes.Move(index, finalIndex);
+                    this.tabs.Move(index, finalIndex);
                 }
             }
+        }
+
+        private ProcessVM FindProcess(IProcess process)
+        {
+            IntPtr processHwnd = process?.GetWindow() ?? IntPtr.Zero;
+            return this.tabs.OfType<ProcessVM>().FirstOrDefault(p => p.Hwnd == processHwnd);
         }
 
         private void ClearErrorText()
@@ -665,30 +708,25 @@ namespace DevPrompt.UI
 
         private void StartConsole(ConsoleSettings settings)
         {
-            this.ClearErrorText();
-
-            IProcess processNew = this.ProcessHost?.RunProcess(
+            IProcess process = this.ProcessHost?.RunProcess(
                 settings.Executable,
                 settings.ExpandedArguments,
                 settings.ExpandedStartingDirectory);
-            IntPtr hwndNew = processNew?.GetWindow() ?? IntPtr.Zero;
 
-            ProcessVM process = this.processes.FirstOrDefault(p => p.Hwnd == hwndNew);
-            if (process != null)
+            ITabVM tab = this.FindProcess(process);
+            if (tab != null)
             {
-                process.TabName = settings.TabName;
+                tab.TabName = settings.TabName;
             }
         }
 
         private void RestoreConsole(ConsoleSnapshot console)
         {
-            IProcess processNew = this.ProcessHost?.RestoreProcess(console.State);
-            IntPtr hwndNew = processNew?.GetWindow() ?? IntPtr.Zero;
-
-            ProcessVM process = this.processes.FirstOrDefault(p => p.Hwnd == hwndNew);
-            if (process != null)
+            IProcess process = this.ProcessHost?.RestoreProcess(console.State);
+            ITabVM tab = this.FindProcess(process);
+            if (tab != null)
             {
-                process.TabName = console.TabName;
+                tab.TabName = console.TabName;
             }
         }
 
@@ -743,7 +781,7 @@ namespace DevPrompt.UI
             this.TabCycleStop();
         }
 
-        private void OnProcessesCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
+        private void OnTabsCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
             this.TabCycleStop();
         }

@@ -30,7 +30,7 @@ namespace DevPrompt.Settings
 
             if (window != null && (force || window.AppSettings.SaveTabsOnExit))
             {
-                foreach (ProcessVM process in window.Processes)
+                foreach (ProcessVM process in window.Tabs)
                 {
                     this.consoles.Add(new ConsoleSnapshot(process));
                 }

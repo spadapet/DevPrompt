@@ -89,6 +89,7 @@
       <DependentUpon>AboutDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\DragItemsControl.cs" />
+    <Compile Include="UI\ITabVM.cs" />
     <Compile Include="UI\SettingsImportDialog.xaml.cs">
       <DependentUpon>SettingsImportDialog.xaml</DependentUpon>
     </Compile>
@@ -112,6 +113,7 @@
     <Compile Include="UI\SettingsImportDialogVM.cs" />
     <Compile Include="UI\TabNameDialogVM.cs" />
     <Compile Include="Utility\CommandHelpers.cs" />
+    <Compile Include="Utility\ObjectToVisibilityConverter.cs" />
     <Compile Include="Utility\PropertyNotifier.cs" />
     <Compile Include="Settings\AppSettings.cs" />
     <Compile Include="Utility\VisualStudioSetup.cs" />

@@ -6,6 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:dp="clr-namespace:DevPrompt"
         xmlns:local="clr-namespace:DevPrompt.UI"
+        xmlns:util="clr-namespace:DevPrompt.Utility"
         mc:Ignorable="d"
         Width="980"
         Height="800"
@@ -21,6 +22,7 @@
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+        <util:ObjectToVisibilityConverter x:Key="ObjectToVisibility" />
 
         <ItemsPanelTemplate x:Key="TabItemsPanelTemplate">
             <TabPanel Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
@@ -37,7 +39,7 @@
             </ControlTemplate.Triggers>
         </ControlTemplate>
 
-        <DataTemplate x:Key="TabButtonContentTemplate" DataType="{x:Type local:ProcessVM}">
+        <DataTemplate x:Key="TabButtonContentTemplate" DataType="{x:Type local:ITabVM}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" MinWidth="48" />
@@ -57,6 +59,7 @@
                     Background="#3FFF0000"
                     Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"
                     Command="{Binding CloseCommand}"
+                    Visibility="{Binding CloseCommand, Converter={StaticResource ObjectToVisibility}}"
                     Template="{StaticResource TabCommandButtonTemplate}">
                     <Path Data="M 0,0 L 8,8 M 0,8 L 8,0" StrokeThickness="1" Stroke="{Binding Foreground, Mode=OneWay, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" />
                 </Button>
@@ -75,7 +78,7 @@
             </DataTemplate.Triggers>
         </DataTemplate>
 
-        <DataTemplate x:Key="TabItemTemplate" DataType="{x:Type local:ProcessVM}">
+        <DataTemplate x:Key="TabItemTemplate" DataType="{x:Type local:ITabVM}">
             <Button
                 x:Name="RootButton"
                 Selector.IsSelected="{Binding Active, Mode=OneWay}"
@@ -97,14 +100,14 @@
                 <Button.ContextMenu>
                     <ContextMenu Opened="OnTabContextMenuOpened">
                         <!-- NOTE: Keep in sync with Tab menu -->
-                        <MenuItem Header="_Set tab name..." InputGestureText="Ctrl+Shift+T" Command="{Binding SetTabNameCommand}" />
+                        <MenuItem Header="_Set tab name..." InputGestureText="Ctrl+Shift+T" Command="{Binding SetTabNameCommand}" Visibility="{Binding SetTabNameCommand, Converter={StaticResource ObjectToVisibility}}" />
                         <Separator />
-                        <MenuItem Header="_Clone" InputGestureText="Ctrl+T" Command="{Binding CloneCommand}" />
-                        <MenuItem Header="Console _Defaults" Command="{Binding DefaultsCommand}" />
-                        <MenuItem Header="Console _Properties" Command="{Binding PropertiesCommand}" />
+                        <MenuItem Header="_Clone" InputGestureText="Ctrl+T" Command="{Binding CloneCommand}" Visibility="{Binding CloneCommand, Converter={StaticResource ObjectToVisibility}}" />
+                        <MenuItem Header="Console _Defaults" Command="{Binding DefaultsCommand}" Visibility="{Binding DefaultsCommand, Converter={StaticResource ObjectToVisibility}}" />
+                        <MenuItem Header="Console _Properties" Command="{Binding PropertiesCommand}" Visibility="{Binding PropertiesCommand, Converter={StaticResource ObjectToVisibility}}" />
                         <Separator />
-                        <MenuItem Header="D_etach" InputGestureText="Ctrl+Shift+F4" Command="{Binding DetachCommand}" />
-                        <MenuItem Header="C_lose" InputGestureText="Ctrl+F4" Command="{Binding CloseCommand}" />
+                        <MenuItem Header="D_etach" InputGestureText="Ctrl+Shift+F4" Command="{Binding DetachCommand}" Visibility="{Binding DetachCommand, Converter={StaticResource ObjectToVisibility}}" />
+                        <MenuItem Header="C_lose" InputGestureText="Ctrl+F4" Command="{Binding CloseCommand}" Visibility="{Binding CloseCommand, Converter={StaticResource ObjectToVisibility}}" />
                     </ContextMenu>
                 </Button.ContextMenu>
             </Button>
@@ -140,16 +143,16 @@
                 <MenuItem Header="Exit (_Detach tabs)" Command="{Binding DetachAndExitCommand}" />
                 <MenuItem Header="E_xit" InputGestureText="Alt+F4" Command="{Binding ExitCommand}" />
             </MenuItem>
-            <MenuItem Header="Ta_b" Visibility="{Binding HasActiveProcess, Converter={StaticResource BoolToVisibility}}">
+            <MenuItem Header="Ta_b" Visibility="{Binding HasActiveTab, Converter={StaticResource BoolToVisibility}}">
                 <!-- NOTE: Keep in sync with tab's ContextMenu -->
-                <MenuItem Header="_Set tab name..." InputGestureText="Ctrl+Shift+T" Command="{Binding ActiveProcess.SetTabNameCommand}" />
+                <MenuItem Header="_Set tab name..." InputGestureText="Ctrl+Shift+T" Command="{Binding ActiveTab.SetTabNameCommand}" Visibility="{Binding ActiveTab.SetTabNameCommand, Converter={StaticResource ObjectToVisibility}}" />
                 <Separator />
-                <MenuItem Header="_Clone" InputGestureText="Ctrl+T" Command="{Binding ActiveProcess.CloneCommand}" />
-                <MenuItem Header="Console _Defaults" Command="{Binding ActiveProcess.DefaultsCommand}" />
-                <MenuItem Header="Console _Properties" Command="{Binding ActiveProcess.PropertiesCommand}" />
+                <MenuItem Header="_Clone" InputGestureText="Ctrl+T" Command="{Binding ActiveTab.CloneCommand}" Visibility="{Binding ActiveTab.CloneCommand, Converter={StaticResource ObjectToVisibility}}" />
+                <MenuItem Header="Console _Defaults" Command="{Binding ActiveTab.DefaultsCommand}" Visibility="{Binding ActiveTab.DefaultsCommand, Converter={StaticResource ObjectToVisibility}}" />
+                <MenuItem Header="Console _Properties" Command="{Binding ActiveTab.PropertiesCommand}" Visibility="{Binding ActiveTab.PropertiesCommand, Converter={StaticResource ObjectToVisibility}}" />
                 <Separator />
-                <MenuItem Header="D_etach" InputGestureText="Ctrl+Shift+F4" Command="{Binding ActiveProcess.DetachCommand}" />
-                <MenuItem Header="C_lose" InputGestureText="Ctrl+F4" Command="{Binding ActiveProcess.CloseCommand}" />
+                <MenuItem Header="D_etach" InputGestureText="Ctrl+Shift+F4" Command="{Binding ActiveTab.DetachCommand}" Visibility="{Binding ActiveTab.DetachCommand, Converter={StaticResource ObjectToVisibility}}" />
+                <MenuItem Header="C_lose" InputGestureText="Ctrl+F4" Command="{Binding ActiveTab.CloseCommand}" Visibility="{Binding ActiveTab.CloseCommand, Converter={StaticResource ObjectToVisibility}}" />
             </MenuItem>
             <MenuItem Header="_Grab" SubmenuOpened="OnGrabMenuOpened">
                 <Separator Tag="[End]" />
@@ -191,7 +194,7 @@
             x:Name="tabItemsControl"
             Grid.Row="3"
             Focusable="False"
-            ItemsSource="{Binding Processes}"
+            ItemsSource="{Binding Tabs}"
             ItemsPanel="{StaticResource TabItemsPanelTemplate}"
             ItemTemplate="{StaticResource TabItemTemplate}" />
 

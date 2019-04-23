@@ -39,6 +39,8 @@ public:
     void DisposeProcessHostWindow(HWND hwnd);
     void ActivateProcessHostWindow(HWND hwnd);
     void DeactivateProcessHostWindow(HWND hwnd);
+    void ShowProcessHostWindow(HWND hwnd);
+    void HideProcessHostWindow(HWND hwnd);
     void ProcessHostWindowDpiChanged(HWND hwnd, double oldScale, double newScale);
 
     // Process functions, each process is identified by its HWND

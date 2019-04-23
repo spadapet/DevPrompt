@@ -18,6 +18,8 @@ public:
     virtual HRESULT __stdcall Dispose() override;
     virtual HRESULT __stdcall Activate() override;
     virtual HRESULT __stdcall Deactivate() override;
+    virtual HRESULT __stdcall Show() override;
+    virtual HRESULT __stdcall Hide() override;
     virtual HRESULT __stdcall GetWindow(HWND* hwnd) override;
     virtual HRESULT __stdcall DpiChanged(double oldScale, double newScale) override;
     virtual HRESULT __stdcall Focus() override;

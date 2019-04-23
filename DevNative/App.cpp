@@ -552,6 +552,20 @@ void App::DeactivateProcessHostWindow(HWND hwnd)
     assert(App::IsMainThread());
 }
 
+void App::ShowProcessHostWindow(HWND hwnd)
+{
+    assert(App::IsMainThread());
+
+    ::ShowWindow(hwnd, SW_SHOW);
+}
+
+void App::HideProcessHostWindow(HWND hwnd)
+{
+    assert(App::IsMainThread());
+
+    ::ShowWindow(hwnd, SW_HIDE);
+}
+
 void App::ProcessHostWindowDpiChanged(HWND hwnd, double oldScale, double newScale)
 {
     std::shared_ptr<App> self = this->shared_from_this();

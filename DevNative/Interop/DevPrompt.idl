@@ -54,6 +54,8 @@ interface IProcessHost : IUnknown
     HRESULT Dispose();
     HRESULT Activate();
     HRESULT Deactivate();
+    HRESULT Show();
+    HRESULT Hide();
     HRESULT GetWindow([out, retval] HWND* hwnd);
     HRESULT DpiChanged(double oldScale, double newScale);
     HRESULT Focus();

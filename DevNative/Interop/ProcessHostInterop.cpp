@@ -98,6 +98,30 @@ HRESULT ProcessHostInterop::Deactivate()
     return E_UNEXPECTED;
 }
 
+HRESULT ProcessHostInterop::Show()
+{
+    std::shared_ptr<App> app = this->app.lock();
+    if (app && this->hwnd)
+    {
+        app->ShowProcessHostWindow(this->hwnd);
+        return S_OK;
+    }
+
+    return E_UNEXPECTED;
+}
+
+HRESULT ProcessHostInterop::Hide()
+{
+    std::shared_ptr<App> app = this->app.lock();
+    if (app && this->hwnd)
+    {
+        app->HideProcessHostWindow(this->hwnd);
+        return S_OK;
+    }
+
+    return E_UNEXPECTED;
+}
+
 HRESULT ProcessHostInterop::GetWindow(HWND* hwnd)
 {
     if (!hwnd)
