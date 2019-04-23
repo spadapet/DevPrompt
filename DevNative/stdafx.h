@@ -7,6 +7,7 @@
 #include <wrl.h>
 #include <Psapi.h>
 #include <TlHelp32.h>
+#include <UserEnv.h>
 
 // NuGet
 #include <Setup.Configuration.h>

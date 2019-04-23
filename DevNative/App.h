@@ -72,6 +72,7 @@ private:
     std::shared_ptr<Process> FindProcess(DWORD procId);
     std::shared_ptr<Process> FindActiveProcess();
 
+    void UpdateEnvironmentVariables();
     void DisposeMessageWindow();
     void DisposeAllProcessesAndWait();
     void RunAllTasks();

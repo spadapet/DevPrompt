@@ -79,6 +79,8 @@ void App::Initialize()
     ::RegisterShellHookWindow(this->messageWindow);
     ::RegisterApplicationRestart(this->elevated ? L"/admin /restarted" : L"/restarted", RESTART_NO_CRASH | RESTART_NO_HANG);
     ::SetProcessShutdownParameters(0x300, 0); // shut down before hosted processes
+
+    this->UpdateEnvironmentVariables();
 }
 
 void App::Dispose()
@@ -269,6 +271,18 @@ void App::CheckPendingWindows()
                 ::CloseHandle(hwndProcess);
             }
         }
+    }
+}
+
+void App::UpdateEnvironmentVariables()
+{
+    assert(App::IsMainThread());
+
+    void* env;
+    if (::CreateEnvironmentBlock(&env, ::GetCurrentProcessToken(), FALSE))
+    {
+        ::SetEnvironmentStrings(reinterpret_cast<wchar_t*>(env));
+        ::DestroyEnvironmentBlock(env);
     }
 }
 
@@ -897,6 +911,10 @@ void App::MainWindowProc(HWND hwnd, int msg, WPARAM wp, LPARAM lp)
 {
     switch (msg)
     {
+    case WM_SETTINGCHANGE:
+        this->UpdateEnvironmentVariables();
+        break;
+
     case WM_ENDSESSION:
         if (wp && (lp & ENDSESSION_CLOSEAPP) != 0)
         {
