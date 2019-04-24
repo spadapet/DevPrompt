@@ -274,6 +274,34 @@ void App::CheckPendingWindows()
     }
 }
 
+static void UpdateEnvironmentVariablesFromKey(HKEY key)
+{
+    DWORD valueCount;
+    DWORD maxNameLength;
+    DWORD maxValueLength;
+    if (::RegQueryInfoKey(key, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, &valueCount, &maxNameLength, &maxValueLength, nullptr, nullptr) == ERROR_SUCCESS)
+    {
+        std::vector<wchar_t> nameBuffer;
+        std::vector<BYTE> valueBuffer;
+
+        nameBuffer.resize(static_cast<size_t>(maxNameLength) + 1, 0);
+        valueBuffer.resize(maxValueLength, 0);
+
+        for (DWORD i = 0; i < valueCount; i++)
+        {
+            DWORD type;
+            DWORD nameBufferSize = static_cast<DWORD>(nameBuffer.size());
+            DWORD valueBufferSize = static_cast<DWORD>(valueBuffer.size());
+            if (::RegEnumValue(key, i, nameBuffer.data(), &nameBufferSize, nullptr, &type, valueBuffer.data(), &valueBufferSize) == ERROR_SUCCESS && type == REG_SZ)
+            {
+                const wchar_t* name = nameBuffer.data();
+                const wchar_t* value = reinterpret_cast<const wchar_t*>(valueBuffer.data());
+                ::SetEnvironmentVariable(name, *value ? value : nullptr);
+            }
+        }
+    }
+}
+
 void App::UpdateEnvironmentVariables()
 {
     assert(App::IsMainThread());
@@ -283,6 +311,28 @@ void App::UpdateEnvironmentVariables()
     {
         ::SetEnvironmentStrings(reinterpret_cast<wchar_t*>(env));
         ::DestroyEnvironmentBlock(env);
+    }
+
+    // CreateEnvironmentBlock doesn't include the "Volatile Environment" for some reason
+    HKEY envKey;
+    if (::RegOpenKeyEx(HKEY_CURRENT_USER, L"Volatile Environment", 0, KEY_READ, &envKey) == ERROR_SUCCESS)
+    {
+        ::UpdateEnvironmentVariablesFromKey(envKey);
+
+        DWORD sessionId;
+        if (::ProcessIdToSessionId(::GetCurrentProcessId(), &sessionId))
+        {
+            std::wstring sessionString = std::to_wstring(sessionId);
+
+            HKEY sessionKey;
+            if (::RegOpenKeyEx(envKey, sessionString.c_str(), 0, KEY_READ, &sessionKey) == ERROR_SUCCESS)
+            {
+                ::UpdateEnvironmentVariablesFromKey(sessionKey);
+                ::RegCloseKey(sessionKey);
+            }
+
+            ::RegCloseKey(envKey);
+        }
     }
 }
 
