@@ -6,8 +6,6 @@
             <Component Id="Folder" Guid="$(var.Id_Folder)">
                 <CreateFolder />
                 <RemoveFolder On="uninstall" Id="INSTALLDIR" />
-                <RemoveFile Id="RemoveStateFiles" Name="*.xml" On="uninstall"/>
-                <RemoveFile Id="RemoveLogFiles" Name="*.log" On="uninstall"/>
                 <RegistryValue Root="HKCU" Key="$(var.RegistryRootKey)" Type="string" Name="InstallDir" Value="[INSTALLDIR]" KeyPath="yes" />
             </Component>
 
