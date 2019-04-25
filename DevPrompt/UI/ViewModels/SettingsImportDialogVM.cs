@@ -3,7 +3,7 @@ using DevPrompt.Utility;
 using System;
 using System.Collections.Generic;
 
-namespace DevPrompt.UI
+namespace DevPrompt.UI.ViewModels
 {
     /// <summary>
     /// View model for the settings import dialog

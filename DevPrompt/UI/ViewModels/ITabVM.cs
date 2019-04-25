@@ -1,0 +1,26 @@
+﻿using System.Windows;
+using System.Windows.Input;
+
+namespace DevPrompt.UI.ViewModels
+{
+    public interface ITabVM
+    {
+        void Focus();
+
+        string TabName { get; }
+        string ExpandedTabName { get; } // expands environment variables from TabName
+        string Title { get; }
+        bool Active { get; set; }
+        UIElement ViewElement { get; }
+
+        // Tab context menu commands. Any of them can return null if the command doesn't make sense.
+
+        ICommand ActivateCommand { get; }
+        ICommand CloneCommand { get; }
+        ICommand CloseCommand { get; }
+        ICommand DetachCommand { get; }
+        ICommand DefaultsCommand { get; }
+        ICommand PropertiesCommand { get; }
+        ICommand SetTabNameCommand { get; }
+    }
+}

@@ -1,5 +1,6 @@
 ﻿using DevPrompt.Interop;
 using DevPrompt.Settings;
+using DevPrompt.UI.Controls;
 using DevPrompt.Utility;
 using Microsoft.Win32;
 using System;
@@ -14,12 +15,12 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Threading;
 
-namespace DevPrompt.UI
+namespace DevPrompt.UI.ViewModels
 {
     /// <summary>
     /// View model for the main window (handles all menu items, etc)
     /// </summary>
-    internal class MainWindowVM : PropertyNotifier
+    internal class MainWindowVM : PropertyNotifier, IMainWindowVM
     {
         public MainWindow Window { get; }
         public ICommand ConsoleCommand { get; }
@@ -84,19 +85,11 @@ namespace DevPrompt.UI
             }
         }
 
-        private ProcessHostWindow ProcessHostWindow
+        public IProcessHost ProcessHost
         {
             get
             {
-                return this.Window.ProcessHostWindow;
-            }
-        }
-
-        private IProcessHost ProcessHost
-        {
-            get
-            {
-                return this.ProcessHostWindow?.ProcessHost;
+                return this.Window.ProcessHostWindow?.ProcessHost;
             }
         }
 
@@ -414,22 +407,15 @@ namespace DevPrompt.UI
                 {
                     if (this.activeTab != null)
                     {
-                        this.activeTab.InternalActive = true;
+                        this.activeTab.Active = true;
                     }
 
                     if (oldTab != null)
                     {
-                        oldTab.InternalActive = false;
+                        oldTab.Active = false;
                     }
 
-                    if (this.activeTab?.UsesProcessHost == true)
-                    {
-                        this.ProcessHostWindow?.Show();
-                    }
-                    else
-                    {
-                        this.ProcessHostWindow?.Hide();
-                    }
+                    this.Window.ViewElement = this.activeTab?.ViewElement;
 
                     this.OnPropertyChanged(nameof(this.HasActiveTab));
                     this.OnPropertyChanged(nameof(this.WindowTitle));
@@ -546,7 +532,7 @@ namespace DevPrompt.UI
         /// </summary>
         public void OnProcessOpening(IProcess process, bool activate, string path)
         {
-            ITabVM tab = new ProcessVM(this, process)
+            ProcessVM tab = new ProcessVM(this, process)
             {
                 TabName = !string.IsNullOrEmpty(path) ? Path.GetFileName(path) : "Tab"
             };
@@ -592,7 +578,7 @@ namespace DevPrompt.UI
         /// </summary>
         public void OnProcessTitleChanged(IProcess process, string title)
         {
-            ITabVM tab = this.FindProcess(process);
+            ProcessVM tab = this.FindProcess(process);
             if (tab != null)
             {
                 tab.Title = title;
@@ -607,7 +593,7 @@ namespace DevPrompt.UI
         public void CloneProcess(ProcessVM process)
         {
             IProcess processClone = this.ProcessHost?.CloneProcess(process.Process);
-            ITabVM tab = this.FindProcess(processClone);
+            ProcessVM tab = this.FindProcess(processClone);
             if (tab != null)
             {
                 tab.TabName = process.TabName;
@@ -622,9 +608,13 @@ namespace DevPrompt.UI
             {
                 this.newTabIndex = MainWindowVM.NewTabAtEndNoActivate;
 
-                foreach (ConsoleSnapshot console in snapshot.Consoles)
+                foreach (ITabSnapshot tabSnapshot in snapshot.Tabs)
                 {
-                    this.RestoreConsole(console);
+                    ITabVM tab = tabSnapshot.Restore(this);
+                    if (tab != null && !this.Tabs.Contains(tab))
+                    {
+                        this.AddTab(tab, false);
+                    }
                 }
 
                 if (this.Tabs.Count == 0)
@@ -695,10 +685,15 @@ namespace DevPrompt.UI
             }
         }
 
-        private ProcessVM FindProcess(IProcess process)
+        public ProcessVM FindProcess(IProcess process)
         {
             IntPtr processHwnd = process?.GetWindow() ?? IntPtr.Zero;
             return this.tabs.OfType<ProcessVM>().FirstOrDefault(p => p.Hwnd == processHwnd);
+        }
+
+        public ITabVM FindTab(IProcess process)
+        {
+            return this.FindProcess(process);
         }
 
         private void ClearErrorText()
@@ -713,20 +708,10 @@ namespace DevPrompt.UI
                 settings.ExpandedArguments,
                 settings.ExpandedStartingDirectory);
 
-            ITabVM tab = this.FindProcess(process);
+            ProcessVM tab = this.FindProcess(process);
             if (tab != null)
             {
                 tab.TabName = settings.TabName;
-            }
-        }
-
-        private void RestoreConsole(ConsoleSnapshot console)
-        {
-            IProcess process = this.ProcessHost?.RestoreProcess(console.State);
-            ITabVM tab = this.FindProcess(process);
-            if (tab != null)
-            {
-                tab.TabName = console.TabName;
             }
         }
 

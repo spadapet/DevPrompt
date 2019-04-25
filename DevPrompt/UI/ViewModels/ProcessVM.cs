@@ -3,9 +3,10 @@ using DevPrompt.Utility;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows;
 using System.Windows.Input;
 
-namespace DevPrompt.UI
+namespace DevPrompt.UI.ViewModels
 {
     /// <summary>
     /// View model for each process tab (handles context menu items, etc)
@@ -149,14 +150,6 @@ namespace DevPrompt.UI
             {
                 return this.active;
             }
-        }
-
-        public bool InternalActive
-        {
-            get
-            {
-                return this.active;
-            }
 
             set
             {
@@ -170,17 +163,16 @@ namespace DevPrompt.UI
                     {
                         this.Process.Deactivate();
                     }
-
-                    this.OnPropertyChanged(nameof(this.Active));
                 }
             }
         }
 
-        public bool UsesProcessHost
+        public UIElement ViewElement
         {
             get
             {
-                return true;
+                // Doesn't use WPF, uses the process host HWND instead
+                return null;
             }
         }
 

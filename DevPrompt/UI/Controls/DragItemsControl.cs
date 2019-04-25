@@ -6,7 +6,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace DevPrompt.UI
+namespace DevPrompt.UI.Controls
 {
     /// <summary>
     /// ItemsControl that allows drag/drop of items

@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using DevPrompt.UI.ViewModels;
+using System.Windows;
 
 namespace DevPrompt.UI
 {
@@ -8,7 +9,7 @@ namespace DevPrompt.UI
 
         public InstallBranchDialog()
         {
-            this.ViewModel = new InstallBranchDialogVM(this, "d16.0");
+            this.ViewModel = new InstallBranchDialogVM(this, "d16.1");
 
             this.InitializeComponent();
         }

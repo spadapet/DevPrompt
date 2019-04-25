@@ -271,7 +271,7 @@ Json::Dict Json::ParseRootObject(Tokenizer& tokenizer, const wchar_t** errorPos)
 
 Json::Dict Json::Parse(const wchar_t* text, size_t len, size_t* errorPos)
 {
-    Tokenizer tokenizer(text, len);
+    Tokenizer tokenizer(text ? text : L"", len);
 
     const wchar_t* myErrorPos = nullptr;
     Dict dict = Json::ParseRootObject(tokenizer, &myErrorPos);

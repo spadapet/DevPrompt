@@ -1,7 +1,7 @@
 ﻿using DevPrompt.Utility;
 using System.Windows.Input;
 
-namespace DevPrompt.UI
+namespace DevPrompt.UI.ViewModels
 {
     /// <summary>
     /// View model for the dialog to install a VS branch

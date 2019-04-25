@@ -1,4 +1,6 @@
 ﻿using DevPrompt.Settings;
+using DevPrompt.UI.Controls;
+using DevPrompt.UI.ViewModels;
 using DevPrompt.Utility;
 using System;
 using System.Collections.Generic;
@@ -34,6 +36,34 @@ namespace DevPrompt.UI
             get
             {
                 return this.processHostHolder?.Child as ProcessHostWindow;
+            }
+        }
+
+        public UIElement ViewElement
+        {
+            get
+            {
+                return this.viewElementHolder.Child;
+            }
+
+            set
+            {
+                this.viewElementHolder.Child = value;
+
+                if (value == null)
+                {
+                    this.processHostHolder.Visibility = Visibility.Visible;
+                    this.viewElementHolder.Visibility = Visibility.Collapsed;
+
+                    this.ProcessHostWindow?.Show();
+                }
+                else
+                {
+                    this.ProcessHostWindow?.Hide();
+
+                    this.processHostHolder.Visibility = Visibility.Collapsed;
+                    this.viewElementHolder.Visibility = Visibility.Visible;
+                }
             }
         }
 

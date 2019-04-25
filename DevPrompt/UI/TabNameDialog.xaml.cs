@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using DevPrompt.UI.ViewModels;
+using System.Windows;
 
 namespace DevPrompt.UI
 {
@@ -6,9 +7,9 @@ namespace DevPrompt.UI
     {
         public TabNameDialogVM ViewModel { get; }
 
-        public TabNameDialog(ProcessVM process)
+        public TabNameDialog(ITabVM tab)
         {
-            this.ViewModel = new TabNameDialogVM(process.TabName);
+            this.ViewModel = new TabNameDialogVM(tab.TabName);
 
             this.InitializeComponent();
         }

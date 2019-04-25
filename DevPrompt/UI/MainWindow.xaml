@@ -5,7 +5,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:dp="clr-namespace:DevPrompt"
-        xmlns:local="clr-namespace:DevPrompt.UI"
+        xmlns:controls="clr-namespace:DevPrompt.UI.Controls"
+        xmlns:vm="clr-namespace:DevPrompt.UI.ViewModels"
         xmlns:util="clr-namespace:DevPrompt.Utility"
         mc:Ignorable="d"
         Width="980"
@@ -17,7 +18,7 @@
         Closing="OnClosing"
         Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
         DataContext="{Binding ViewModel, RelativeSource={RelativeSource Mode=Self}}"
-        d:DataContext="{d:DesignInstance local:MainWindowVM, IsDesignTimeCreatable=True}"
+        d:DataContext="{d:DesignInstance vm:MainWindowVM, IsDesignTimeCreatable=True}"
         Title="{Binding WindowTitle}">
 
     <Window.Resources>
@@ -39,7 +40,7 @@
             </ControlTemplate.Triggers>
         </ControlTemplate>
 
-        <DataTemplate x:Key="TabButtonContentTemplate" DataType="{x:Type local:ITabVM}">
+        <DataTemplate x:Key="TabButtonContentTemplate" DataType="{x:Type vm:ITabVM}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" MinWidth="48" />
@@ -78,7 +79,7 @@
             </DataTemplate.Triggers>
         </DataTemplate>
 
-        <DataTemplate x:Key="TabItemTemplate" DataType="{x:Type local:ITabVM}">
+        <DataTemplate x:Key="TabItemTemplate" DataType="{x:Type vm:ITabVM}">
             <Button
                 x:Name="RootButton"
                 Selector.IsSelected="{Binding Active, Mode=OneWay}"
@@ -190,7 +191,7 @@
             Content="{Binding ErrorText}"
             Visibility="{Binding HasErrorText, Converter={StaticResource BoolToVisibility}}"/>
 
-        <local:DragItemsControl
+        <controls:DragItemsControl
             x:Name="tabItemsControl"
             Grid.Row="3"
             Focusable="False"
@@ -199,5 +200,6 @@
             ItemTemplate="{StaticResource TabItemTemplate}" />
 
         <Border Grid.Row="4" x:Name="processHostHolder" BorderThickness="0" />
+        <Border Grid.Row="4" x:Name="viewElementHolder" BorderThickness="0" Visibility="Collapsed" />
     </Grid>
 </Window>

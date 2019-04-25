@@ -1,4 +1,5 @@
 ﻿using DevPrompt.Settings;
+using DevPrompt.UI.ViewModels;
 using System.Windows;
 
 namespace DevPrompt.UI

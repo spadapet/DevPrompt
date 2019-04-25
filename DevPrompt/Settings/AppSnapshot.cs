@@ -1,4 +1,4 @@
-﻿using DevPrompt.UI;
+﻿using DevPrompt.UI.ViewModels;
 using DevPrompt.Utility;
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ namespace DevPrompt.Settings
     [DataContract]
     public class AppSnapshot : PropertyNotifier, ICloneable
     {
-        private ObservableCollection<ConsoleSnapshot> consoles;
+        private ObservableCollection<ITabSnapshot> tabs;
         private static readonly object fileLock = new object();
 
         public AppSnapshot()
@@ -30,9 +30,12 @@ namespace DevPrompt.Settings
 
             if (window != null && (force || window.AppSettings.SaveTabsOnExit))
             {
-                foreach (ProcessVM process in window.Tabs)
+                foreach (ITabVM tab in window.Tabs)
                 {
-                    this.consoles.Add(new ConsoleSnapshot(process));
+                    if (tab is ProcessVM process)
+                    {
+                        this.tabs.Add(new ConsoleSnapshot(process));
+                    }
                 }
             }
         }
@@ -55,30 +58,30 @@ namespace DevPrompt.Settings
 
         public void CopyFrom(AppSnapshot copyFrom)
         {
-            this.consoles.Clear();
+            this.tabs.Clear();
 
             if (copyFrom != null)
             {
-                foreach (ConsoleSnapshot console in copyFrom.Consoles)
+                foreach (ITabSnapshot tab in copyFrom.Tabs)
                 {
-                    this.consoles.Add(console.Clone());
+                    this.tabs.Add(tab.Clone());
                 }
             }
         }
 
         [DataMember]
-        public IList<ConsoleSnapshot> Consoles
+        public IList<ITabSnapshot> Tabs
         {
             get
             {
-                return this.consoles;
+                return this.tabs;
             }
         }
 
         [OnDeserializing]
         private void Initialize(StreamingContext context = default(StreamingContext))
         {
-            this.consoles = new ObservableCollection<ConsoleSnapshot>();
+            this.tabs = new ObservableCollection<ITabSnapshot>();
         }
 
         private static DataContractSerializer DataContractSerializer

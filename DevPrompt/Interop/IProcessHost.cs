@@ -10,7 +10,7 @@ namespace DevPrompt.Interop
     /// </summary>
     [Guid("cedddf4b-b229-4a17-8b10-140e53464efd")]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    interface IProcessHost
+    public interface IProcessHost
     {
         void Dispose();
         void Activate();
