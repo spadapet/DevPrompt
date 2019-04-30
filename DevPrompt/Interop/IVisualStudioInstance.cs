@@ -7,7 +7,7 @@ namespace DevPrompt.Interop
 
     [Guid("4c1047a1-e701-4024-aeed-08a38c70584e")]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IVisualStudioInstance
+    internal interface IVisualStudioInstance
     {
         [return: MarshalAs(UnmanagedType.BStr)] string GetInstallationName();
         [return: MarshalAs(UnmanagedType.BStr)] string GetInstanceId();

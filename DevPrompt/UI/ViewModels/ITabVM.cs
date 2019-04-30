@@ -3,6 +3,9 @@ using System.Windows.Input;
 
 namespace DevPrompt.UI.ViewModels
 {
+    /// <summary>
+    /// Any tab's view model must implement this interface
+    /// </summary>
     public interface ITabVM
     {
         void Focus();

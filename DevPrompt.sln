@@ -12,7 +12,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C9A228D0-7B27-475F-9FE0-038F01B930F6}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		cpp.props = cpp.props
 		README.md = README.md
 		shared.props = shared.props
 	EndProjectSection

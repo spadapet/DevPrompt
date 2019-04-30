@@ -2,8 +2,8 @@
 using System.Runtime.InteropServices;
 using System.Windows;
 
-[assembly: AssemblyTitle("DevPrompt")]
-[assembly: AssemblyDescription("Tabbed command prompts for developers")]
+[assembly: AssemblyTitle("DevOps.Plugin")]
+[assembly: AssemblyDescription("DevOps plugin for DevPrompt")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("DevPrompt")]

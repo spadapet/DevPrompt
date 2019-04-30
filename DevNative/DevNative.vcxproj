@@ -3,7 +3,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{36C4CDB6-17CA-4915-8CCD-6860AED09ADF}</ProjectGuid>
   </PropertyGroup>
-  <Import Project="..\cpp.props" />
+  <Import Project="..\Build\cpp.props" />
   <ItemDefinitionGroup>
     <ClCompile>
       <PreprocessorDefinitions>DEVNATIVE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>

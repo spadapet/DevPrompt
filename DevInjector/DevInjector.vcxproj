@@ -4,7 +4,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <ProjectGuid>{614AB4D5-0ADE-4D21-93A6-CBB6ED7D504C}</ProjectGuid>
   </PropertyGroup>
-  <Import Project="..\cpp.props" />
+  <Import Project="..\Build\cpp.props" />
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>

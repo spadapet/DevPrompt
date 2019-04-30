@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using System.Xml;
@@ -82,7 +83,7 @@ namespace DevPrompt.Settings
         {
             get
             {
-                string exeFile = typeof(Program).Assembly.Location;
+                string exeFile = Assembly.GetExecutingAssembly().Location;
                 string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
                 return Path.Combine(appDataPath, Path.GetFileNameWithoutExtension(exeFile));
             }

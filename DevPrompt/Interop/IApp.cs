@@ -10,7 +10,7 @@ namespace DevPrompt.Interop
     /// </summary>
     [Guid("151c2791-131f-43b6-9384-0f5a8c1c9461")]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IApp
+    internal interface IApp
     {
         void Dispose();
         void Activate();

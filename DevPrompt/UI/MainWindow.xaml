@@ -171,10 +171,12 @@
             </MenuItem>
             <MenuItem Header="_Tools" SubmenuOpened="OnToolsMenuOpened">
                 <Separator Tag="[End]" />
+                <Separator Tag="[Plugins]" />
                 <MenuItem Header="_Customize..." Command="{Binding CustomizeToolsCommand}" />
             </MenuItem>
             <MenuItem Header="_Links" SubmenuOpened="OnLinksMenuOpened">
                 <Separator Tag="[End]" />
+                <Separator Tag="[Plugins]" />
                 <MenuItem Header="_Customize..." Command="{Binding CustomizeLinksCommand}" />
             </MenuItem>
             <MenuItem Header="_About" Command="{Binding AboutCommand}" />

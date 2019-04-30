@@ -1,5 +1,4 @@
 ﻿using DevPrompt.UI.ViewModels;
-using System;
 
 namespace DevPrompt.Settings
 {

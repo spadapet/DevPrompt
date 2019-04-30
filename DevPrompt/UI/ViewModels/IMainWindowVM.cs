@@ -1,10 +1,16 @@
-﻿using DevPrompt.Interop;
+﻿using System.Collections.Generic;
 
 namespace DevPrompt.UI.ViewModels
 {
+    /// <summary>
+    /// Public access to the main window
+    /// </summary>
     public interface IMainWindowVM
     {
-        IProcessHost ProcessHost { get; }
-        ITabVM FindTab(IProcess process);
+        IReadOnlyList<ITabVM> Tabs { get; }
+        ITabVM ActiveTab { get; set; }
+        ITabVM RestoreProcess(string state);
+        void AddTab(ITabVM tab, bool activate);
+        void RemoveTab(ITabVM tab);
     }
 }

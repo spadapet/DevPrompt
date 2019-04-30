@@ -1,5 +1,4 @@
-﻿using DevPrompt.Interop;
-using DevPrompt.UI.ViewModels;
+﻿using DevPrompt.UI.ViewModels;
 using DevPrompt.Utility;
 using System;
 using System.Runtime.Serialization;
@@ -65,9 +64,7 @@ namespace DevPrompt.Settings
                 return null;
             }
 
-            IProcess process = window.ProcessHost?.RestoreProcess(this.State);
-            ITabVM tab = window.FindTab(process);
-
+            ITabVM tab = window.RestoreProcess(this.State);
             if (tab is ProcessVM processTab)
             {
                 processTab.TabName = this.TabName;

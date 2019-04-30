@@ -10,7 +10,7 @@ namespace DevPrompt.Interop
     /// </summary>
     [Guid("e3b1d8b5-bce5-4522-ad92-44ce6edda69c")]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IProcess
+    internal interface IProcess
     {
         void Dispose();
         void Detach();

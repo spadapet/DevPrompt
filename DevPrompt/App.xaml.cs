@@ -1,7 +1,11 @@
 ﻿using DevPrompt.Interop;
+using DevPrompt.Plugins;
 using DevPrompt.Settings;
 using DevPrompt.UI;
 using System;
+using System.Collections.Generic;
+using System.Composition.Hosting;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
@@ -13,12 +17,12 @@ namespace DevPrompt
     /// The native code will call into here using the IAppHost interface. We call into
     /// native code using the IApp interface.
     /// </summary>
-    internal partial class App : Application, IAppHost
+    internal partial class App : Application, Plugins.IApp, IAppHost
     {
         public AppSettings Settings { get; }
-        public IApp NativeApp => this.nativeApp;
+        public Interop.IApp NativeApp { get; private set; }
 
-        private IApp nativeApp;
+        private CompositionHost compositionHost;
         private static App designerApp;
 
         public App()
@@ -61,26 +65,67 @@ namespace DevPrompt
             }
         }
 
+        public T GetExport<T>()
+        {
+            if (this.compositionHost != null && this.compositionHost.TryGetExport<T>(out T value))
+            {
+                return value;
+            }
+
+            return default(T);
+        }
+
+        public IEnumerable<T> GetExports<T>()
+        {
+            List<T> exports = (this.compositionHost?.GetExports<T>() ?? Enumerable.Empty<T>()).ToList();
+            exports.Sort((T x, T y) => string.Compare(x.GetType().Name, y.GetType().Name));
+
+            return exports;
+        }
+
         private async void OnStartup(object sender, StartupEventArgs args)
         {
             string errorMessage;
 
-            this.nativeApp = Interop.App.CreateApp(this, out errorMessage);
+            this.NativeApp = Interop.App.CreateApp(this, out errorMessage);
             this.MainWindow = new MainWindow(this.Settings, errorMessage);
             this.MainWindow.Show();
 
             this.Settings.CopyFrom(await AppSettings.Load(AppSettings.DefaultPath));
+            this.InitPlugins();
             this.MainWindow.OnAppInitComplete();
+
+            foreach (IAppListener listener in this.GetExports<IAppListener>())
+            {
+                listener.OnStartup(this);
+            }
         }
 
         private void OnExit(object sender, ExitEventArgs args)
         {
-            if (this.nativeApp != null)
+            foreach (IAppListener listener in this.GetExports<IAppListener>())
             {
-                this.nativeApp.Dispose();
-                Marshal.FinalReleaseComObject(this.nativeApp);
-                this.nativeApp = null;
+                listener.OnExit(this);
             }
+
+            if (this.compositionHost != null)
+            {
+                this.compositionHost.Dispose();
+                this.compositionHost = null;
+            }
+
+            if (this.NativeApp != null)
+            {
+                this.NativeApp.Dispose();
+                Marshal.FinalReleaseComObject(this.NativeApp);
+                this.NativeApp = null;
+            }
+        }
+
+        private void InitPlugins()
+        {
+            ContainerConfiguration config = new ContainerConfiguration().WithAssemblies(PluginUtility.GetPluginAssemblies());
+            this.compositionHost = config.CreateContainer();
         }
 
         void IAppHost.OnProcessOpening(IProcess process, bool activate, string path)

@@ -1,6 +1,5 @@
 ﻿using DevPrompt.Interop;
 using DevPrompt.Settings;
-using DevPrompt.UI.Controls;
 using DevPrompt.Utility;
 using Microsoft.Win32;
 using System;
@@ -128,7 +127,7 @@ namespace DevPrompt.UI.ViewModels
             {
                 return new DelegateCommand(() =>
                 {
-                    foreach (ITabVM tab in this.Tabs.ToArray())
+                    foreach (ITabVM tab in this.tabs.ToArray())
                     {
                         if (tab.DetachCommand != null && tab.DetachCommand.CanExecute(null))
                         {
@@ -385,7 +384,7 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
-        public IList<ITabVM> Tabs
+        public IReadOnlyList<ITabVM> Tabs
         {
             get
             {
@@ -407,6 +406,11 @@ namespace DevPrompt.UI.ViewModels
                 {
                     if (this.activeTab != null)
                     {
+                        if (!this.tabs.Contains(this.activeTab))
+                        {
+                            this.AddTab(this.activeTab, activate: false);
+                        }
+
                         this.activeTab.Active = true;
                     }
 
@@ -611,13 +615,13 @@ namespace DevPrompt.UI.ViewModels
                 foreach (ITabSnapshot tabSnapshot in snapshot.Tabs)
                 {
                     ITabVM tab = tabSnapshot.Restore(this);
-                    if (tab != null && !this.Tabs.Contains(tab))
+                    if (tab != null && !this.tabs.Contains(tab))
                     {
                         this.AddTab(tab, false);
                     }
                 }
 
-                if (this.Tabs.Count == 0)
+                if (this.tabs.Count == 0)
                 {
                     foreach (ConsoleSettings settings in this.AppSettings.Consoles)
                     {
@@ -694,6 +698,12 @@ namespace DevPrompt.UI.ViewModels
         public ITabVM FindTab(IProcess process)
         {
             return this.FindProcess(process);
+        }
+
+        ITabVM IMainWindowVM.RestoreProcess(string state)
+        {
+            IProcess process = this.ProcessHost?.RestoreProcess(state);
+            return this.FindTab(process);
         }
 
         private void ClearErrorText()

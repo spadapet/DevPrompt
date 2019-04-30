@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 namespace DevPrompt.Utility
 {
-    internal class DelegateCommand : PropertyNotifier, ICommand
+    public class DelegateCommand : PropertyNotifier, ICommand
     {
         public event EventHandler CanExecuteChanged;
 

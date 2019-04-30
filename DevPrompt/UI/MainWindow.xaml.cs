@@ -1,4 +1,5 @@
-﻿using DevPrompt.Settings;
+﻿using DevPrompt.Plugins;
+using DevPrompt.Settings;
 using DevPrompt.UI.Controls;
 using DevPrompt.UI.ViewModels;
 using DevPrompt.Utility;
@@ -122,7 +123,9 @@ namespace DevPrompt.UI
 
         private void OnToolsMenuOpened(object sender, RoutedEventArgs args)
         {
-            MainWindow.UpdateMenu((MenuItem)sender, this.AppSettings.Tools, (ToolSettings settings) =>
+            MenuItem menu = (MenuItem)sender;
+
+            MainWindow.UpdateMenu(menu, this.AppSettings.Tools, (ToolSettings settings) =>
             {
                 if (string.IsNullOrEmpty(settings.Command))
                 {
@@ -136,11 +139,15 @@ namespace DevPrompt.UI
                     CommandParameter = settings,
                 };
             });
+
+            this.AddPluginMenuItems(menu, MenuType.Tools);
         }
 
         private void OnLinksMenuOpened(object sender, RoutedEventArgs args)
         {
-            MainWindow.UpdateMenu((MenuItem)sender, this.AppSettings.Links, (LinkSettings settings) =>
+            MenuItem menu = (MenuItem)sender;
+
+            MainWindow.UpdateMenu(menu, this.AppSettings.Links, (LinkSettings settings) =>
             {
                 if (string.IsNullOrEmpty(settings.Address))
                 {
@@ -154,6 +161,8 @@ namespace DevPrompt.UI
                     CommandParameter = settings,
                 };
             });
+
+            this.AddPluginMenuItems(menu, MenuType.Links);
         }
 
         /// <summary>
@@ -192,6 +201,33 @@ namespace DevPrompt.UI
                 else
                 {
                     menu.Items.RemoveAt(i--);
+                }
+            }
+        }
+
+        private void AddPluginMenuItems(MenuItem menu, MenuType menuType)
+        {
+            Separator separator = menu.Items.OfType<Separator>().Where(s => s.Tag is string name && name == "[Plugins]").FirstOrDefault();
+            if (separator != null)
+            {
+                separator.Tag = null;
+                int index = menu.Items.IndexOf(separator);
+
+                foreach (IMenuItemProvider provider in App.Current.GetExports<IMenuItemProvider>())
+                {
+                    foreach (MenuItem item in provider.GetMenuItems(MenuType.Tools, this.ViewModel))
+                    {
+                        if (item != null)
+                        {
+                            menu.Items.Insert(index, item);
+                        }
+                    }
+                }
+
+                if (menu.Items.IndexOf(separator) == index)
+                {
+                    // No plugins added anything
+                    separator.Visibility = Visibility.Collapsed;
                 }
             }
         }

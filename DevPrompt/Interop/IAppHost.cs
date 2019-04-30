@@ -10,7 +10,7 @@ namespace DevPrompt.Interop
     /// </summary>
     [Guid("42d16e5c-8acf-4dcb-882d-b41974190e53")]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IAppHost
+    internal interface IAppHost
     {
         IntPtr GetMainWindow();
         int CanGrab([MarshalAs(UnmanagedType.LPWStr)] string exePath, [MarshalAs(UnmanagedType.VariantBool)] bool automatic);
