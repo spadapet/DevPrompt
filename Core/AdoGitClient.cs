@@ -1,4 +1,4 @@
-﻿namespace Core.Vso
+﻿namespace Core
 {
     using Microsoft.TeamFoundation.Build.WebApi;
     using Microsoft.TeamFoundation.SourceControl.WebApi;
