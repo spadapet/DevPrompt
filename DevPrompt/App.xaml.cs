@@ -4,7 +4,9 @@ using DevPrompt.Settings;
 using DevPrompt.UI;
 using System;
 using System.Collections.Generic;
+using System.Composition.Convention;
 using System.Composition.Hosting;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -85,9 +87,7 @@ namespace DevPrompt
 
         private async void OnStartup(object sender, StartupEventArgs args)
         {
-            string errorMessage;
-
-            this.NativeApp = Interop.App.CreateApp(this, out errorMessage);
+            this.NativeApp = Interop.App.CreateApp(this, out string errorMessage);
             this.MainWindow = new MainWindow(this.Settings, errorMessage);
             this.MainWindow.Show();
 
@@ -124,8 +124,18 @@ namespace DevPrompt
 
         private void InitPlugins()
         {
-            ContainerConfiguration config = new ContainerConfiguration().WithAssemblies(PluginUtility.GetPluginAssemblies());
-            this.compositionHost = config.CreateContainer();
+            try
+            {
+                ConventionBuilder conventions = new ConventionBuilder();
+                conventions.ForTypesDerivedFrom<IAppListener>().Shared();
+
+                ContainerConfiguration config = new ContainerConfiguration().WithAssemblies(PluginUtility.GetPluginAssemblies(), conventions);
+                this.compositionHost = config.CreateContainer();
+            }
+            catch (Exception ex)
+            {
+                Debug.Fail(ex.Message, ex.StackTrace);
+            }
         }
 
         void IAppHost.OnProcessOpening(IProcess process, bool activate, string path)

@@ -1,4 +1,4 @@
-﻿using DevOps.ViewModels;
+﻿using DevOps.UI.ViewModels;
 using DevPrompt.Plugins;
 using DevPrompt.UI.ViewModels;
 using DevPrompt.Utility;
@@ -33,14 +33,14 @@ namespace DevOps
 
         private void OnPullRequestDashboard(IMainWindowVM window)
         {
-            PullRequestDashboardVM tab = window.Tabs.OfType<PullRequestDashboardVM>().FirstOrDefault();
+            PullRequestTabVM tab = window.Tabs.OfType<PullRequestTabVM>().FirstOrDefault();
             if (tab != null)
             {
                 window.ActiveTab = tab;
             }
             else
             {
-                tab = new PullRequestDashboardVM(window);
+                tab = new PullRequestTabVM(window);
                 window.AddTab(tab, activate: true);
             }
         }

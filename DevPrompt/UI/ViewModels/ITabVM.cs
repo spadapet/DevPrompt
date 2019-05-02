@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.ComponentModel;
+using System.Windows;
 using System.Windows.Input;
 
 namespace DevPrompt.UI.ViewModels
@@ -6,7 +7,7 @@ namespace DevPrompt.UI.ViewModels
     /// <summary>
     /// Any tab's view model must implement this interface
     /// </summary>
-    public interface ITabVM
+    public interface ITabVM : INotifyPropertyChanged
     {
         void Focus();
 

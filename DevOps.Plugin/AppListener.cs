@@ -6,16 +6,24 @@ namespace DevOps
     [Export(typeof(IAppListener))]
     public class AppListener : IAppListener
     {
-        public AppListener()
-        {
-        }
+        private Globals globals;
 
-        void IAppListener.OnExit(IApp app)
+        public AppListener()
         {
         }
 
         void IAppListener.OnStartup(IApp app)
         {
+            this.globals = new Globals(app);
+        }
+
+        void IAppListener.OnExit(IApp app)
+        {
+            if (this.globals != null)
+            {
+                this.globals.Dispose();
+                this.globals = null;
+            }
         }
     }
 }

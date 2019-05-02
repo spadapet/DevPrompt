@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DevPromptNetCore": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}

@@ -111,7 +111,7 @@ namespace DevPrompt.UI.ViewModels
                     Exception exception = await this.AppSettings.Save(path);
                     if (exception != null)
                     {
-                        this.ErrorText = exception.Message;
+                        this.SetError(exception);
                     }
                 };
 
@@ -236,7 +236,7 @@ namespace DevPrompt.UI.ViewModels
                         }
                         catch (Exception exception)
                         {
-                            this.ErrorText = exception.Message;
+                            this.SetError(exception);
                         }
 
                         if (settings != null)
@@ -439,22 +439,22 @@ namespace DevPrompt.UI.ViewModels
 
         public void FocusActiveTab()
         {
-            if (this.activeTab != null)
+            if (this.ActiveTab != null)
             {
                 if (this.currentTabCycle != null)
                 {
-                    if (this.currentTabCycle.Value != this.activeTab)
+                    if (this.currentTabCycle.Value != this.ActiveTab)
                     {
-                        this.currentTabCycle = this.tabOrder.Find(this.activeTab);
+                        this.currentTabCycle = this.tabOrder.Find(this.ActiveTab);
                     }
                 }
                 else
                 {
-                    this.tabOrder.Remove(this.activeTab);
-                    this.tabOrder.AddFirst(this.activeTab);
+                    this.tabOrder.Remove(this.ActiveTab);
+                    this.tabOrder.AddFirst(this.ActiveTab);
                 }
 
-                this.activeTab.Focus();
+                this.ActiveTab.Focus();
             }
         }
 
@@ -507,7 +507,6 @@ namespace DevPrompt.UI.ViewModels
 
             int index = (this.newTabIndex < 0) ? this.tabs.Count : Math.Min(this.tabs.Count, this.newTabIndex);
             this.tabs.Insert(index, tab);
-
             this.tabOrder.AddFirst(tab);
             Debug.Assert(this.tabs.Count == this.tabOrder.Count);
 
@@ -515,6 +514,8 @@ namespace DevPrompt.UI.ViewModels
             {
                 this.ActiveTab = tab;
             }
+
+            tab.PropertyChanged += this.OnTabPropertyChanged;
         }
 
         public void RemoveTab(ITabVM tab)
@@ -528,6 +529,27 @@ namespace DevPrompt.UI.ViewModels
             if (removingActive)
             {
                 this.ActiveTab = this.tabOrder.First?.Value;
+            }
+
+            tab.PropertyChanged -= this.OnTabPropertyChanged;
+
+            if (tab is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+        }
+
+        private void OnTabPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if (sender is ITabVM tab)
+            {
+                if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(ITabVM.ViewElement))
+                {
+                    if (this.ActiveTab == tab)
+                    {
+                        this.Window.ViewElement = tab.ViewElement;
+                    }
+                }
             }
         }
 
@@ -638,6 +660,18 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
+        public void SetError(Exception exception, string text = null)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                this.ErrorText = exception?.Message ?? string.Empty;
+            }
+            else
+            {
+                this.ErrorText = text;
+            }
+        }
+
         public string ErrorText
         {
             get
@@ -708,7 +742,7 @@ namespace DevPrompt.UI.ViewModels
 
         private void ClearErrorText()
         {
-            this.ErrorText = null;
+            this.SetError(null);
         }
 
         private void StartConsole(ConsoleSettings settings)
@@ -760,9 +794,9 @@ namespace DevPrompt.UI.ViewModels
                     Process.Start(path, arguments);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                this.ErrorText = $"Error: Failed to start \"{path}\"";
+                this.SetError(ex, $"Error: Failed to start \"{path}\"");
             }
         }
 

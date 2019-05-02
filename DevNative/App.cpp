@@ -306,6 +306,18 @@ void App::UpdateEnvironmentVariables()
 {
     assert(App::IsMainThread());
 
+#ifdef _DEBUG
+    // Make sure that XAML debugging still works
+    const wchar_t* xamlSourceInfoName = L"ENABLE_XAML_DIAGNOSTICS_SOURCE_INFO";
+    wchar_t xamlSourceInfoBuffer[32];
+    DWORD xamlSourceInfoBufferLen = ::GetEnvironmentVariable(xamlSourceInfoName, xamlSourceInfoBuffer, 32);
+
+    if (!xamlSourceInfoBufferLen || xamlSourceInfoBufferLen > 32)
+    {
+        xamlSourceInfoBuffer[0] = L'\0';
+    }
+#endif
+
     void* env;
     if (::CreateEnvironmentBlock(&env, ::GetCurrentProcessToken(), FALSE))
     {
@@ -334,6 +346,13 @@ void App::UpdateEnvironmentVariables()
             ::RegCloseKey(envKey);
         }
     }
+
+#ifdef _DEBUG
+    if (xamlSourceInfoBuffer[0])
+    {
+        ::SetEnvironmentVariable(xamlSourceInfoName, xamlSourceInfoBuffer);
+    }
+#endif
 }
 
 // Called during App::Dispose

@@ -202,6 +202,6 @@
             ItemTemplate="{StaticResource TabItemTemplate}" />
 
         <Border Grid.Row="4" x:Name="processHostHolder" BorderThickness="0" />
-        <Border Grid.Row="4" x:Name="viewElementHolder" BorderThickness="0" Visibility="Collapsed" />
+        <Border Grid.Row="4" x:Name="viewElementHolder" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" Visibility="Collapsed" KeyboardNavigation.TabNavigation="Cycle"  />
     </Grid>
 </Window>

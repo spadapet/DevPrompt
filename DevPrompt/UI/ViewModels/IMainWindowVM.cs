@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace DevPrompt.UI.ViewModels
 {
@@ -12,5 +13,6 @@ namespace DevPrompt.UI.ViewModels
         ITabVM RestoreProcess(string state);
         void AddTab(ITabVM tab, bool activate);
         void RemoveTab(ITabVM tab);
+        void SetError(Exception exception, string text = null);
     }
 }

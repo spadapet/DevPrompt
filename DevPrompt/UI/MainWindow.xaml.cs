@@ -215,7 +215,7 @@ namespace DevPrompt.UI
 
                 foreach (IMenuItemProvider provider in App.Current.GetExports<IMenuItemProvider>())
                 {
-                    foreach (MenuItem item in provider.GetMenuItems(MenuType.Tools, this.ViewModel))
+                    foreach (MenuItem item in provider.GetMenuItems(menuType, this.ViewModel))
                     {
                         if (item != null)
                         {

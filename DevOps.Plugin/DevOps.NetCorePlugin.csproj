@@ -1,32 +1,23 @@
-<Project>
+﻿<Project>
   <Import Project="..\Build\csharp.netcore.props" />
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk.WindowsDesktop" />
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <RootNamespace>DevOps</RootNamespace>
   </PropertyGroup>
 
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk.WindowsDesktop" />
 
   <ItemGroup>
-    <None Remove="UI\PullRequestDashboard.xaml" />
+    <PackageReference Include="Microsoft.TeamFoundationServer.Client" Version="16.150.0-preview" />
+    <PackageReference Include="Microsoft.VisualStudio.Services.Client" Version="16.150.0-preview" />
+    <PackageReference Include="Microsoft.VisualStudio.Services.InteractiveClient" Version="16.150.0-preview" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DevPrompt\DevPromptNetCore.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="UI\PullRequestDashboard.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="UI\PullRequestDashboard.xaml">
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
 
 </Project>

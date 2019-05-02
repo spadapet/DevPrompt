@@ -1,24 +1,27 @@
-﻿using System.Windows;
-using System.Windows.Input;
-using DevOps.UI;
-using DevPrompt.UI.ViewModels;
+﻿using DevPrompt.UI.ViewModels;
 using DevPrompt.Utility;
+using System;
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Threading;
 
-namespace DevOps.ViewModels
+namespace DevOps.UI.ViewModels
 {
-    internal class PullRequestDashboardVM : PropertyNotifier, ITabVM
+    internal sealed class PullRequestTabVM : PropertyNotifier, ITabVM, IDisposable
     {
+        public IMainWindowVM Window { get; }
         private bool active;
-        private PullRequestDashboard viewElement;
-        private IMainWindowVM window;
+        private UIElement viewElement;
 
-        public PullRequestDashboardVM()
+        public PullRequestTabVM(IMainWindowVM window)
         {
+            this.Window = window;
         }
 
-        public PullRequestDashboardVM(IMainWindowVM window)
+        public void Dispose()
         {
-            this.window = window;
+            this.ViewElement = null;
         }
 
         public string TabName
@@ -65,15 +68,34 @@ namespace DevOps.ViewModels
             {
                 if (this.viewElement == null)
                 {
-                    this.viewElement = new PullRequestDashboard(this);
+                    this.viewElement = new LoginPage(this);
                 }
 
                 return this.viewElement;
+            }
+
+            set
+            {
+                if (this.viewElement != value)
+                {
+                    if (this.viewElement is IDisposable disposable)
+                    {
+                        disposable.Dispose();
+                    }
+
+                    this.viewElement = value;
+                    this.OnPropertyChanged(nameof(this.ViewElement));
+                }
             }
         }
 
         public void Focus()
         {
+            if (this.viewElement != null)
+            {
+                Action action = new Action(() => this.viewElement.MoveFocus(new TraversalRequest(FocusNavigationDirection.First)));
+                this.viewElement.Dispatcher.BeginInvoke(action, DispatcherPriority.ApplicationIdle);
+            }
         }
 
         public ICommand ActivateCommand
@@ -82,7 +104,7 @@ namespace DevOps.ViewModels
             {
                 return new DelegateCommand((object arg) =>
                 {
-                    this.window.ActiveTab = this;
+                    this.Window.ActiveTab = this;
                 });
             }
         }
@@ -93,7 +115,7 @@ namespace DevOps.ViewModels
             {
                 return new DelegateCommand((object arg) =>
                 {
-                    this.window.RemoveTab(this);
+                    this.Window.RemoveTab(this);
                 });
             }
         }
@@ -103,5 +125,9 @@ namespace DevOps.ViewModels
         public ICommand DefaultsCommand => null;
         public ICommand PropertiesCommand => null;
         public ICommand SetTabNameCommand => null;
+
+        private void OnModelPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+        }
     }
 }
