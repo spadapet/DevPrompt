@@ -12,19 +12,24 @@
     Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
     DataContext="{Binding ViewModel, RelativeSource={RelativeSource Mode=Self}}"
     d:DataContext="{d:DesignInstance Type=vm:LoginPageVM, IsDesignTimeCreatable=True}">
-    <StackPanel Margin="10" HorizontalAlignment="Left">
-        <TextBlock Text="Azure DevOps login" FontWeight="Bold" FontSize="18"/>
-        <Label Content="Organization name:"/>
-        <TextBox Text="{Binding OrganizationName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="200" HorizontalAlignment="Left" Padding="2"/>
-        <Label Content="Personal access token:"/>
-        <TextBox Text="{Binding PersonalAccessToken, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="400" HorizontalAlignment="Left" Padding="2"/>
 
-        <Button
-            Content="Let's do it"
-            HorizontalAlignment="Left"
-            Margin="0,10,0,0"
-            Padding="10,5"
-            IsDefault="True"
-            Command="{Binding OkCommand}" />
-    </StackPanel>
+    <Grid>
+        <StackPanel Margin="10" HorizontalAlignment="Left">
+            <TextBlock Text="Azure DevOps login" FontWeight="Bold" FontSize="18"/>
+            <Label Content="Organization name:"/>
+            <TextBox Text="{Binding OrganizationName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="200" HorizontalAlignment="Left" Padding="2"/>
+            <TextBlock Opacity="0.5"><Run Text="https://dev.azure.com/" /><Run Text="{Binding OrganizationName, Mode=OneWay}"/></TextBlock>
+            <Label Content="Personal access token:" Margin="0,10,0,0"/>
+            <TextBox Text="{Binding PersonalAccessToken, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="400" HorizontalAlignment="Left" Padding="2"/>
+
+            <Button
+                Content="Let's do it"
+                HorizontalAlignment="Left"
+                Margin="0,10,0,0"
+                Padding="10,5"
+                IsDefault="True"
+                IsEnabled="{Binding Window.NotLoading}"
+                Command="{Binding OkCommand}" />
+        </StackPanel>
+    </Grid>
 </UserControl>

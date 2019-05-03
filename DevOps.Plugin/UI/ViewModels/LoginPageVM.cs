@@ -1,4 +1,5 @@
-﻿using DevPrompt.Utility;
+﻿using DevPrompt.UI.ViewModels;
+using DevPrompt.Utility;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.VisualStudio.Services.WebApi;
 using System;
@@ -28,6 +29,14 @@ namespace DevOps.UI.ViewModels
         {
             this.cancellationTokenSource.Cancel();
             this.cancellationTokenSource.Dispose();
+        }
+
+        public IMainWindowVM Window
+        {
+            get
+            {
+                return this.tab.Window;
+            }
         }
 
         public string OrganizationName
@@ -77,18 +86,20 @@ namespace DevOps.UI.ViewModels
 
         private async Task OnOk()
         {
-            try
+            using (this.Window.BeginLoading())
             {
-                VssConnection connection = await Globals.Instance.GetVssConnection(this.OrganizationName.Trim(), this.PersonalAccessToken.Trim());
-                GitHttpClient client = await connection.GetClientAsync<GitHttpClient>(this.cancellationTokenSource.Token);
+                try
+                {
+                    VssConnection connection = await Globals.Instance.GetVssConnection(this.OrganizationName.Trim(), this.PersonalAccessToken.Trim());
+                    GitHttpClient client = await connection.GetClientAsync<GitHttpClient>(this.cancellationTokenSource.Token);
 
-                this.tab.ViewElement = new PullRequestPage(this.tab, client);
+                    this.tab.ViewElement = new PullRequestPage(this.tab, client);
+                }
+                catch (Exception ex)
+                {
+                    this.tab.Window.SetError(ex);
+                }
             }
-            catch (Exception ex)
-            {
-                this.tab.Window.SetError(ex);
-            }
-
         }
     }
 }

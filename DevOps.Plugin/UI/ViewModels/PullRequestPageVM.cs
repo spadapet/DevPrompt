@@ -12,15 +12,15 @@ namespace DevOps.UI.ViewModels
     internal class PullRequestPageVM : PropertyNotifier, IDisposable
     {
         private readonly CancellationTokenSource cancellationTokenSource;
-        private readonly IMainWindowVM window;
+        private readonly PullRequestTabVM tab;
         private readonly GitHttpClient client;
         private Task<List<GitPullRequest>> activeTask;
         private ObservableCollection<PullRequestVM> pullRequests;
 
-        public PullRequestPageVM(IMainWindowVM window, GitHttpClient client)
+        public PullRequestPageVM(PullRequestTabVM tab, GitHttpClient client)
         {
             this.cancellationTokenSource = new CancellationTokenSource();
-            this.window = window;
+            this.tab = tab;
             this.client = client;
             this.pullRequests = new ObservableCollection<PullRequestVM>();
         }
@@ -40,6 +40,14 @@ namespace DevOps.UI.ViewModels
             }
         }
 
+        public IMainWindowVM Window
+        {
+            get
+            {
+                return this.tab.Window;
+            }
+        }
+
         public async Task OnLoaded()
         {
             if (this.activeTask == null)
@@ -49,20 +57,24 @@ namespace DevOps.UI.ViewModels
                     Status = PullRequestStatus.Active,
                 };
 
-                List<GitPullRequest> prs;
-                try
+                List<GitPullRequest> prs = null;
+
+                using (this.Window.BeginLoading())
                 {
-                    this.activeTask = this.client.GetPullRequestsByProjectAsync("DevDiv", searchCriteria, cancellationToken: this.cancellationTokenSource.Token);
-                    prs = await this.activeTask;
-                }
-                catch (Exception ex)
-                {
-                    this.window.SetError(ex);
-                    prs = null;
-                }
-                finally
-                {
-                    this.activeTask = null;
+                    try
+                    {
+                        this.activeTask = this.client.GetPullRequestsByProjectAsync("DevDiv", searchCriteria, cancellationToken: this.cancellationTokenSource.Token);
+                        prs = await this.activeTask;
+                    }
+                    catch (Exception ex)
+                    {
+                        this.Window.SetError(ex);
+                        prs = null;
+                    }
+                    finally
+                    {
+                        this.activeTask = null;
+                    }
                 }
 
                 if (prs != null)

@@ -14,7 +14,7 @@ namespace DevOps.UI
         public PullRequestPage(PullRequestTabVM tab, GitHttpClient client)
         {
             this.Tab = tab;
-            this.ViewModel = new PullRequestPageVM(tab.Window, client);
+            this.ViewModel = new PullRequestPageVM(tab, client);
 
             this.InitializeComponent();
         }

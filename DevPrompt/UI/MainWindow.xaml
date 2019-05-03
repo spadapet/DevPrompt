@@ -202,6 +202,18 @@
             ItemTemplate="{StaticResource TabItemTemplate}" />
 
         <Border Grid.Row="4" x:Name="processHostHolder" BorderThickness="0" />
-        <Border Grid.Row="4" x:Name="viewElementHolder" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" Visibility="Collapsed" KeyboardNavigation.TabNavigation="Cycle"  />
+        <Border Grid.Row="4" x:Name="viewElementHolder" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" Visibility="Collapsed" KeyboardNavigation.TabNavigation="Cycle" />
+
+        <ProgressBar
+            Grid.Row="4"
+            Height="5"
+            IsIndeterminate="True"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Top"
+            Background="{x:Null}"
+            BorderBrush="{x:Null}"
+            BorderThickness="0"
+            IsHitTestVisible="False"
+            Visibility="{Binding Loading, Converter={StaticResource BoolToVisibility}}"/>
     </Grid>
 </Window>

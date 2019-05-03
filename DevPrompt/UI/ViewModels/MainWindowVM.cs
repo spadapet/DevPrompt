@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -36,6 +37,7 @@ namespace DevPrompt.UI.ViewModels
         private ITabVM activeTab;
         private string errorText;
         private DispatcherOperation savingAppSettings;
+        private long loadingCount;
 
         private const int NewTabAtEnd = -1;
         private const int NewTabAtEndNoActivate = -2;
@@ -721,6 +723,38 @@ namespace DevPrompt.UI.ViewModels
                     this.tabs.Move(index, finalIndex);
                 }
             }
+        }
+
+        public bool Loading
+        {
+            get
+            {
+                return Interlocked.Read(ref this.loadingCount) != 0;
+            }
+        }
+
+        public bool NotLoading
+        {
+            get
+            {
+                return !this.Loading;
+            }
+        }
+
+        public IDisposable BeginLoading(string text)
+        {
+            if (Interlocked.Increment(ref this.loadingCount) == 1)
+            {
+                this.OnPropertyChanged(nameof(this.Loading));
+            }
+
+            return new DelegateDisposable(() =>
+            {
+                if (Interlocked.Decrement(ref this.loadingCount) == 0)
+                {
+                    this.OnPropertyChanged(nameof(this.Loading));
+                }
+            });
         }
 
         public ProcessVM FindProcess(IProcess process)
