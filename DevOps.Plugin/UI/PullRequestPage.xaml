@@ -5,23 +5,33 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:dvm="clr-namespace:DevOps.UI.DesignerViewModels"
     xmlns:vm="clr-namespace:DevOps.UI.ViewModels"
     mc:Ignorable="d" 
     d:DesignHeight="450" d:DesignWidth="800"
     Loaded="OnLoaded"
     Unloaded="OnUnloaded"
     Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
-    DataContext="{Binding ViewModel, RelativeSource={RelativeSource Mode=Self}}">
+    DataContext="{Binding ViewModel, RelativeSource={RelativeSource Mode=Self}}"
+    d:DataContext="{d:DesignInstance Type=dvm:PullRequestPageDesignerVM, IsDesignTimeCreatable=True}">
 
     <UserControl.Resources>
-        <DataTemplate DataType="{x:Type vm:PullRequestVM}">
-            <StackPanel Orientation="Horizontal" Margin="2">
-                <TextBlock><Run Text="{Binding Author, Mode=OneWay}"/>, <Run Text="{Binding Title, Mode=OneWay}" /></TextBlock>
-            </StackPanel>
+        <DataTemplate x:Key="PullRequestDataTemplate" DataType="{x:Type vm:IPullRequestVM}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="32"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Image Width="32" Height="32" Source="{Binding AvatarImageSource, Mode=OneWay}" />
+                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Grid.ColumnSpan="2" Grid.Column="1">
+                    <TextBlock HorizontalAlignment="Left" FontSize="14" FontWeight="SemiBold"><Hyperlink TextDecorations="None" Foreground="Black"><Run Text="{Binding Title, Mode=OneWay}"/></Hyperlink></TextBlock>
+                    <TextBlock FontSize="10" Foreground="Gray"><Run Text="{Binding Author, Mode=OneWay}" /><Run Text=" | "/><Run Text="{Binding TargetRefName, Mode=OneWay}" /></TextBlock>
+                </StackPanel>
+            </Grid>
         </DataTemplate>
     </UserControl.Resources>
 
     <Grid>
-        <ListBox ItemsSource="{Binding PullRequests}" BorderThickness="0" />
+        <ListBox ItemsSource="{Binding PullRequests}" ItemTemplate="{StaticResource PullRequestDataTemplate}" BorderThickness="0" />
     </Grid>
 </UserControl>

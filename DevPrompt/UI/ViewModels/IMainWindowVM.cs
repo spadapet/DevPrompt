@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows.Threading;
 
 namespace DevPrompt.UI.ViewModels
 {
@@ -8,6 +9,8 @@ namespace DevPrompt.UI.ViewModels
     /// </summary>
     public interface IMainWindowVM
     {
+        Dispatcher Dispatcher { get; }
+
         // Tabs
         IReadOnlyList<ITabVM> Tabs { get; }
         ITabVM ActiveTab { get; set; }

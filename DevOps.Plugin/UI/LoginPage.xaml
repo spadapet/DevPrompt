@@ -5,13 +5,13 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="clr-namespace:DevOps.UI.ViewModels"
+    xmlns:dvm="clr-namespace:DevOps.UI.DesignerViewModels"
     mc:Ignorable="d" 
     d:DesignHeight="450"
     d:DesignWidth="800"
     Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
     DataContext="{Binding ViewModel, RelativeSource={RelativeSource Mode=Self}}"
-    d:DataContext="{d:DesignInstance Type=vm:LoginPageVM, IsDesignTimeCreatable=True}">
+    d:DataContext="{d:DesignInstance Type=dvm:LoginPageDesignerVM, IsDesignTimeCreatable=True}" FontFamily="Segoe UI">
 
     <Grid>
         <StackPanel Margin="10" HorizontalAlignment="Left">
@@ -19,6 +19,8 @@
             <Label Content="Organization name:"/>
             <TextBox Text="{Binding OrganizationName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="200" HorizontalAlignment="Left" Padding="2"/>
             <TextBlock Opacity="0.5"><Run Text="https://dev.azure.com/" /><Run Text="{Binding OrganizationName, Mode=OneWay}"/></TextBlock>
+            <Label Content="Project name:"/>
+            <TextBox Text="{Binding ProjectName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="200" HorizontalAlignment="Left" Padding="2"/>
             <Label Content="Personal access token:" Margin="0,10,0,0"/>
             <TextBox Text="{Binding PersonalAccessToken, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="400" HorizontalAlignment="Left" Padding="2"/>
 

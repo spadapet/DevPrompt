@@ -1,5 +1,4 @@
 ﻿using DevOps.UI.ViewModels;
-using Microsoft.TeamFoundation.SourceControl.WebApi;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -8,14 +7,11 @@ namespace DevOps.UI
 {
     internal partial class PullRequestPage : UserControl, IDisposable
     {
-        public PullRequestTabVM Tab { get; }
         public PullRequestPageVM ViewModel { get; }
 
-        public PullRequestPage(PullRequestTabVM tab, GitHttpClient client)
+        public PullRequestPage(PullRequestPageVM viewModel)
         {
-            this.Tab = tab;
-            this.ViewModel = new PullRequestPageVM(tab, client);
-
+            this.ViewModel = viewModel;
             this.InitializeComponent();
         }
 

@@ -19,7 +19,7 @@ namespace DevPrompt
     /// The native code will call into here using the IAppHost interface. We call into
     /// native code using the IApp interface.
     /// </summary>
-    internal partial class App : Application, Plugins.IApp, IAppHost
+    internal partial class App : Application, IAppHost
     {
         public AppSettings Settings { get; }
         public Interop.IApp NativeApp { get; private set; }
@@ -97,7 +97,7 @@ namespace DevPrompt
 
             foreach (IAppListener listener in this.GetExports<IAppListener>())
             {
-                listener.OnStartup(this);
+                listener.OnStartup();
             }
         }
 
@@ -105,7 +105,7 @@ namespace DevPrompt
         {
             foreach (IAppListener listener in this.GetExports<IAppListener>())
             {
-                listener.OnExit(this);
+                listener.OnExit();
             }
 
             if (this.compositionHost != null)
@@ -127,6 +127,7 @@ namespace DevPrompt
             try
             {
                 ConventionBuilder conventions = new ConventionBuilder();
+                conventions.ForTypesDerivedFrom<Plugins.IApp>().Shared();
                 conventions.ForTypesDerivedFrom<IAppListener>().Shared();
 
                 ContainerConfiguration config = new ContainerConfiguration().WithAssemblies(PluginUtility.GetPluginAssemblies(), conventions);

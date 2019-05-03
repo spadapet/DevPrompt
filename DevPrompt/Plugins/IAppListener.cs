@@ -5,7 +5,7 @@
     /// </summary>
     public interface IAppListener
     {
-        void OnStartup(IApp app);
-        void OnExit(IApp app);
+        void OnStartup();
+        void OnExit();
     }
 }

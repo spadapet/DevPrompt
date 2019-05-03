@@ -42,13 +42,6 @@ namespace DevPrompt.UI.ViewModels
         private const int NewTabAtEnd = -1;
         private const int NewTabAtEndNoActivate = -2;
 
-        /// <summary>
-        /// For designer
-        /// </summary>
-        public MainWindowVM()
-        {
-        }
-
         public MainWindowVM(MainWindow window)
         {
             this.Window = window;
@@ -83,6 +76,14 @@ namespace DevPrompt.UI.ViewModels
             if (this.Window.IsVisible)
             {
                 await this.SaveAppSettings();
+            }
+        }
+
+        public Dispatcher Dispatcher
+        {
+            get
+            {
+                return this.Window.Dispatcher;
             }
         }
 

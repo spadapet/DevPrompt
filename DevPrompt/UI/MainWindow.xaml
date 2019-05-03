@@ -6,6 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:dp="clr-namespace:DevPrompt"
         xmlns:controls="clr-namespace:DevPrompt.UI.Controls"
+        xmlns:dvm="clr-namespace:DevPrompt.UI.DesignerViewModels"
         xmlns:vm="clr-namespace:DevPrompt.UI.ViewModels"
         xmlns:util="clr-namespace:DevPrompt.Utility"
         mc:Ignorable="d"
@@ -18,7 +19,7 @@
         Closing="OnClosing"
         Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
         DataContext="{Binding ViewModel, RelativeSource={RelativeSource Mode=Self}}"
-        d:DataContext="{d:DesignInstance vm:MainWindowVM, IsDesignTimeCreatable=True}"
+        d:DataContext="{d:DesignInstance Type=dvm:MainWindowDesignerVM, IsDesignTimeCreatable=True}"
         Title="{Binding WindowTitle}">
 
     <Window.Resources>
