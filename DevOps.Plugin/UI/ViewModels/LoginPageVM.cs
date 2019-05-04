@@ -9,6 +9,8 @@ using Microsoft.VisualStudio.Services.WebApi;
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -99,8 +101,17 @@ namespace DevOps.UI.ViewModels
             {
                 if (this.SetPropertyValue(ref this.personalAccessToken, value))
                 {
+                    this.OnPropertyChanged(nameof(this.AuthenticationBase64));
                     this.okCommand.UpdateCanExecute();
                 }
+            }
+        }
+
+        public string AuthenticationBase64
+        {
+            get
+            {
+                return Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + this.PersonalAccessToken));
             }
         }
 
@@ -138,11 +149,14 @@ namespace DevOps.UI.ViewModels
         {
             VssConnection connection = await Globals.Instance.GetVssConnection(this.OrganizationName.Trim(), this.PersonalAccessToken.Trim(), this.cancellationTokenSource.Token);
             GitHttpClient gitClient = await connection.GetClientAsync<GitHttpClient>(this.cancellationTokenSource.Token);
-            ProfileHttpClient profileClient = await connection.GetClientAsync<ProfileHttpClient>(this.cancellationTokenSource.Token);
             ProjectHttpClient projectClient = await connection.GetClientAsync<ProjectHttpClient>(this.cancellationTokenSource.Token);
             TeamProject project = await projectClient.GetProject(this.ProjectName);
 
-            PullRequestPageVM vm = new PullRequestPageVM(this.tab, gitClient, profileClient, new TeamProject[] { project });
+            HttpClient httpClient = new HttpClient(new HttpClientHandler());
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", this.AuthenticationBase64);
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("image/apng"));
+
+            PullRequestPageVM vm = new PullRequestPageVM(this.tab, gitClient, httpClient, new TeamProject[] { project });
             this.tab.ViewElement = new PullRequestPage(vm);
         }
     }

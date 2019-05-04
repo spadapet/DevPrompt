@@ -3,13 +3,16 @@ using DevPrompt.UI.ViewModels;
 using DevPrompt.Utility;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
-using Microsoft.VisualStudio.Services.Profile.Client;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace DevOps.UI.ViewModels
 {
@@ -18,32 +21,34 @@ namespace DevOps.UI.ViewModels
         public PullRequestTabVM Tab { get; }
         private readonly CancellationTokenSource cancellationTokenSource;
         private readonly GitHttpClient gitClient;
-        private readonly ProfileHttpClient profileClient;
+        private readonly HttpClient httpClient;
         private List<TeamProject> projects;
         private Task activeTask;
         private ObservableCollection<PullRequestVM> pullRequests;
-        private Dictionary<Guid, List<IAvatarSite>> pendingAvatars;
+        private Dictionary<Uri, List<IAvatarSite>> pendingAvatars;
+        private Dictionary<Uri, ImageSource> avatars;
 
         public PullRequestPageVM(
             PullRequestTabVM tab,
             GitHttpClient gitClient,
-            ProfileHttpClient profileClient,
+            HttpClient httpClient,
             IEnumerable<TeamProject> projects)
         {
             this.cancellationTokenSource = new CancellationTokenSource();
             this.Tab = tab;
             this.gitClient = gitClient;
-            this.profileClient = profileClient;
+            this.httpClient = httpClient;
             this.projects = projects.ToList();
             this.pullRequests = new ObservableCollection<PullRequestVM>();
-            this.pendingAvatars = new Dictionary<Guid, List<IAvatarSite>>();
+            this.pendingAvatars = new Dictionary<Uri, List<IAvatarSite>>();
+            this.avatars = new Dictionary<Uri, ImageSource>();
         }
 
         public void Dispose()
         {
             this.cancellationTokenSource.Cancel();
             this.cancellationTokenSource.Dispose();
-            this.gitClient.Dispose();
+            this.httpClient.Dispose();
         }
 
         public IList<PullRequestVM> PullRequests
@@ -131,25 +136,52 @@ namespace DevOps.UI.ViewModels
             }
         }
 
-        void IAvatarProvider.ProvideAvatar(Guid id, IAvatarSite site)
+        async void IAvatarProvider.ProvideAvatar(Uri uri, IAvatarSite site)
         {
-            List<IAvatarSite> pendingSites;
-            if (this.pendingAvatars.TryGetValue(id, out pendingSites))
+            if (this.avatars.TryGetValue(uri, out ImageSource image))
             {
-                if (pendingSites.Contains(site))
-                {
-                    return;
-                }
+                site.AvatarImageSource = image;
+                return;
             }
-            else
+
+            List<IAvatarSite> pendingSites;
+            if (!this.pendingAvatars.TryGetValue(uri, out pendingSites))
             {
                 pendingSites = new List<IAvatarSite>();
-                this.pendingAvatars[id] = pendingSites;
+                this.pendingAvatars[uri] = pendingSites;
             }
 
-            pendingSites.Add(site);
+            if (!pendingSites.Contains(site))
+            {
+                pendingSites.Add(site);
 
-            //this.profileClient.GetAvatarAsync(
+                try
+                {
+                    Stream stream = await this.httpClient.GetStreamAsync(uri);
+                    BitmapImage bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.UriSource = uri;
+                    bitmap.StreamSource = stream;
+                    bitmap.EndInit();
+
+                    image = bitmap;
+                    this.avatars[uri] = image;
+                }
+                catch
+                {
+                    // oh well, the image won't show
+                    this.avatars[uri] = null;
+                }
+                finally
+                {
+                    site.AvatarImageSource = image;
+
+                    if (pendingSites.Remove(site) && pendingSites.Count == 0)
+                    {
+                        this.pendingAvatars.Remove(uri);
+                    }
+                }
+            }
         }
     }
 }

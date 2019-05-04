@@ -61,7 +61,7 @@ namespace DevOps.UI.ViewModels
                     Uri avatarUri = this.AvatarLink;
                     if (avatarUri != null)
                     {
-                        this.avatarProvider.ProvideAvatar(Guid.Empty, this);
+                        this.avatarProvider.ProvideAvatar(avatarUri, this);
                     }
                 }
 
