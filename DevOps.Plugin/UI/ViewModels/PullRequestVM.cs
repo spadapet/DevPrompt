@@ -4,8 +4,10 @@ using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.VisualStudio.Services.WebApi;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace DevOps.UI.ViewModels
@@ -32,6 +34,14 @@ namespace DevOps.UI.ViewModels
             set
             {
                 this.SetPropertyValue(ref this.pr, value, name: null);
+            }
+        }
+
+        public Uri WebLink
+        {
+            get
+            {
+                return new Uri("http://www.peterspada.com");
             }
         }
 
@@ -79,7 +89,7 @@ namespace DevOps.UI.ViewModels
                     Uri avatarUri = this.AvatarLink;
                     if (avatarUri != null)
                     {
-                        avatarUri = new Uri($"http://gravatar.com/avatar/{PullRequestVM.GetMd5Hash("spadapet@hotmail.com")}?s=32");
+                        //avatarUri = new Uri($"http://gravatar.com/avatar/{PullRequestVM.GetMd5Hash("spadapet@hotmail.com")}?s=32");
                         this.avatarProvider.ProvideAvatar(avatarUri, this);
                     }
                 }
@@ -154,6 +164,27 @@ namespace DevOps.UI.ViewModels
             get
             {
                 return this.pr.TargetRefName;
+            }
+        }
+
+        public ICommand WebLinkCommand
+        {
+            get
+            {
+                return new DelegateCommand(p =>
+                {
+                    if (p is Uri uri)
+                    {
+                        try
+                        {
+                            Process.Start(uri.ToString());
+                        }
+                        catch
+                        {
+                            Debug.Fail($"Can't navigate to: {uri}");
+                        }
+                    }
+                });
             }
         }
     }

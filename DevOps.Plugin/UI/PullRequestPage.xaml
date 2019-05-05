@@ -25,7 +25,7 @@
                 </Grid.ColumnDefinitions>
                 <Image Width="32" Height="32" Source="{Binding AvatarImageSource, Mode=OneWay}" />
                 <StackPanel Orientation="Vertical" Margin="10,0,0,0" Grid.Column="1">
-                    <TextBlock HorizontalAlignment="Left" FontSize="14" FontWeight="SemiBold" TextTrimming="WordEllipsis"><Hyperlink TextDecorations="None" Foreground="Black"><Run Text="{Binding Title, Mode=OneWay}"/></Hyperlink></TextBlock>
+                    <TextBlock HorizontalAlignment="Left" FontSize="14" FontWeight="SemiBold" TextTrimming="WordEllipsis"><Hyperlink TextDecorations="None" Foreground="Black" NavigateUri="{Binding WebLink, Mode=OneWay}" Command="{Binding WebLinkCommand}" CommandParameter="{Binding WebLink, Mode=OneWay}"><Run Text="{Binding Title, Mode=OneWay}"/></Hyperlink></TextBlock>
                     <TextBlock FontSize="10" Foreground="Gray" TextTrimming="WordEllipsis"><Run Text="{Binding Author, Mode=OneWay}" /><Run Text=" | "/><Run Text="{Binding TargetRefName, Mode=OneWay}" /></TextBlock>
                 </StackPanel>
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="10,0">

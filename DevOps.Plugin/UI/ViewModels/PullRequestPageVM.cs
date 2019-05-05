@@ -21,7 +21,7 @@ namespace DevOps.UI.ViewModels
         public PullRequestTabVM Tab { get; }
         private readonly CancellationTokenSource cancellationTokenSource;
         private readonly GitHttpClient gitClient;
-        private readonly HttpClient httpClient;
+        private readonly HttpClient avatarHttpClient;
         private List<TeamProject> projects;
         private Task activeTask;
         private ObservableCollection<PullRequestVM> pullRequests;
@@ -31,13 +31,13 @@ namespace DevOps.UI.ViewModels
         public PullRequestPageVM(
             PullRequestTabVM tab,
             GitHttpClient gitClient,
-            HttpClient httpClient,
+            HttpClient avatarHttpClient,
             IEnumerable<TeamProject> projects)
         {
             this.cancellationTokenSource = new CancellationTokenSource();
             this.Tab = tab;
             this.gitClient = gitClient;
-            this.httpClient = httpClient;
+            this.avatarHttpClient = avatarHttpClient;
             this.projects = projects.ToList();
             this.pullRequests = new ObservableCollection<PullRequestVM>();
             this.pendingAvatars = new Dictionary<Uri, List<IAvatarSite>>();
@@ -48,7 +48,7 @@ namespace DevOps.UI.ViewModels
         {
             this.cancellationTokenSource.Cancel();
             this.cancellationTokenSource.Dispose();
-            this.httpClient.Dispose();
+            this.avatarHttpClient.Dispose();
         }
 
         public IList<PullRequestVM> PullRequests
@@ -156,7 +156,10 @@ namespace DevOps.UI.ViewModels
 
                 try
                 {
-                    Stream stream = await this.httpClient.GetStreamAsync(uri);
+                    HttpResponseMessage response = await this.avatarHttpClient.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, this.cancellationTokenSource.Token);
+                    response = response.EnsureSuccessStatusCode();
+
+                    Stream stream = await response.Content.ReadAsStreamAsync();
                     BitmapImage bitmap = new BitmapImage();
                     bitmap.BeginInit();
                     bitmap.UriSource = uri;

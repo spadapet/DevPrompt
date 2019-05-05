@@ -154,7 +154,7 @@ namespace DevOps.UI.ViewModels
 
             HttpClient httpClient = new HttpClient(new HttpClientHandler());
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", this.AuthenticationBase64);
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("image/apng"));
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("image/png"));
 
             PullRequestPageVM vm = new PullRequestPageVM(this.tab, gitClient, httpClient, new TeamProject[] { project });
             this.tab.ViewElement = new PullRequestPage(vm);
