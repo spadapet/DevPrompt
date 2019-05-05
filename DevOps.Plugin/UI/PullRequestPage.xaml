@@ -20,18 +20,35 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="32"/>
-                    <ColumnDefinition/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Image Width="32" Height="32" Source="{Binding AvatarImageSource, Mode=OneWay}" />
-                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Grid.ColumnSpan="2" Grid.Column="1">
-                    <TextBlock HorizontalAlignment="Left" FontSize="14" FontWeight="SemiBold"><Hyperlink TextDecorations="None" Foreground="Black"><Run Text="{Binding Title, Mode=OneWay}"/></Hyperlink></TextBlock>
-                    <TextBlock FontSize="10" Foreground="Gray"><Run Text="{Binding Author, Mode=OneWay}" /><Run Text=" | "/><Run Text="{Binding TargetRefName, Mode=OneWay}" /></TextBlock>
+                <StackPanel Orientation="Vertical" Margin="10,0,0,0" Grid.Column="1">
+                    <TextBlock HorizontalAlignment="Left" FontSize="14" FontWeight="SemiBold" TextTrimming="WordEllipsis"><Hyperlink TextDecorations="None" Foreground="Black"><Run Text="{Binding Title, Mode=OneWay}"/></Hyperlink></TextBlock>
+                    <TextBlock FontSize="10" Foreground="Gray" TextTrimming="WordEllipsis"><Run Text="{Binding Author, Mode=OneWay}" /><Run Text=" | "/><Run Text="{Binding TargetRefName, Mode=OneWay}" /></TextBlock>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="10,0">
+                    <StackPanel.Resources>
+                        <Style TargetType="Button">
+                            <Setter Property="Padding" Value="4,1" />
+                            <Setter Property="Margin" Value="5,0,0,0"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Style>
+                    </StackPanel.Resources>
+                    <Button Content="Complete &#9207;" VerticalAlignment="Center" />
+                    <Button Content="CodeFlow" VerticalAlignment="Center" />
                 </StackPanel>
             </Grid>
         </DataTemplate>
     </UserControl.Resources>
 
     <Grid>
-        <ListBox ItemsSource="{Binding PullRequests}" ItemTemplate="{StaticResource PullRequestDataTemplate}" BorderThickness="0" />
+        <ListBox
+            ItemsSource="{Binding PullRequests}"
+            ItemTemplate="{StaticResource PullRequestDataTemplate}"
+            HorizontalContentAlignment="Stretch"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+            BorderThickness="0" />
     </Grid>
 </UserControl>

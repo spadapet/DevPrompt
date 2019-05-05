@@ -144,8 +144,7 @@ namespace DevOps.UI.ViewModels
                 return;
             }
 
-            List<IAvatarSite> pendingSites;
-            if (!this.pendingAvatars.TryGetValue(uri, out pendingSites))
+            if (!this.pendingAvatars.TryGetValue(uri, out List<IAvatarSite> pendingSites))
             {
                 pendingSites = new List<IAvatarSite>();
                 this.pendingAvatars[uri] = pendingSites;

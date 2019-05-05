@@ -4,6 +4,8 @@ using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.VisualStudio.Services.WebApi;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
 using System.Windows.Media;
 
 namespace DevOps.UI.ViewModels
@@ -52,6 +54,22 @@ namespace DevOps.UI.ViewModels
             }
         }
 
+        private static string GetMd5Hash(string input)
+        {
+            using (MD5 md5 = MD5.Create())
+            {
+                byte[] data = md5.ComputeHash(Encoding.UTF8.GetBytes(input));
+                StringBuilder stringBuilder = new StringBuilder(data.Length);
+
+                for (int i = 0; i < data.Length; i++)
+                {
+                    stringBuilder.Append(data[i].ToString("x2"));
+                }
+
+                return stringBuilder.ToString();
+            }
+        }
+
         public ImageSource AvatarImageSource
         {
             get
@@ -61,6 +79,7 @@ namespace DevOps.UI.ViewModels
                     Uri avatarUri = this.AvatarLink;
                     if (avatarUri != null)
                     {
+                        avatarUri = new Uri($"http://gravatar.com/avatar/{PullRequestVM.GetMd5Hash("spadapet@hotmail.com")}?s=32");
                         this.avatarProvider.ProvideAvatar(avatarUri, this);
                     }
                 }
