@@ -20,7 +20,8 @@ namespace DevPrompt.UI.ViewModels
 
         // State
         void SetError(Exception exception, string text = null);
-        IDisposable BeginLoading(string text = null);
+        IDisposable BeginLoading(Action cancelAction = null, string text = null);
+        void CancelLoading();
         bool Loading { get; }
         bool NotLoading { get; }
     }

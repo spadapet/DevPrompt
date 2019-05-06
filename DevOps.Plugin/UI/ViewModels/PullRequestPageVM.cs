@@ -19,7 +19,7 @@ namespace DevOps.UI.ViewModels
     internal class PullRequestPageVM : PropertyNotifier, IAvatarProvider, IDisposable
     {
         public PullRequestTabVM Tab { get; }
-        private readonly CancellationTokenSource cancellationTokenSource;
+        private CancellationTokenSource cancellationTokenSource;
         private readonly GitHttpClient gitClient;
         private readonly HttpClient avatarHttpClient;
         private List<TeamProject> projects;
@@ -27,6 +27,7 @@ namespace DevOps.UI.ViewModels
         private ObservableCollection<PullRequestVM> pullRequests;
         private Dictionary<Uri, List<IAvatarSite>> pendingAvatars;
         private Dictionary<Uri, ImageSource> avatars;
+        private bool disposed;
 
         public PullRequestPageVM(
             PullRequestTabVM tab,
@@ -46,8 +47,9 @@ namespace DevOps.UI.ViewModels
 
         public void Dispose()
         {
-            this.cancellationTokenSource.Cancel();
-            this.cancellationTokenSource.Dispose();
+            this.disposed = true;
+
+            this.Cancel(disposing: true);
             this.avatarHttpClient.Dispose();
         }
 
@@ -74,6 +76,21 @@ namespace DevOps.UI.ViewModels
 
         public void OnUnloaded()
         {
+            if (!this.disposed)
+            {
+                this.Cancel(disposing: false);
+            }
+        }
+
+        private void Cancel(bool disposing)
+        {
+            this.cancellationTokenSource.Cancel();
+            this.cancellationTokenSource.Dispose();
+
+            if (!this.disposed)
+            {
+                this.cancellationTokenSource = new CancellationTokenSource();
+            }
         }
 
         public async Task Refresh()
@@ -101,6 +118,15 @@ namespace DevOps.UI.ViewModels
 
         private async Task InternalRefresh()
         {
+            // Clear failed avatar downloads
+            foreach (KeyValuePair<Uri, ImageSource> pair in this.avatars.ToArray())
+            {
+                if (pair.Value == null)
+                {
+                    this.avatars.Remove(pair.Key);
+                }
+            }
+
             GitPullRequestSearchCriteria searchCriteria = new GitPullRequestSearchCriteria()
             {
                 Status = PullRequestStatus.Active,

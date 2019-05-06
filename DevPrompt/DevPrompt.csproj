@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\Build\csharp.netfx.props" />
-
   <PropertyGroup>
     <ProjectGuid>{DA5078CE-F4D0-41C2-B575-C7FCF26DA1C6}</ProjectGuid>
     <OutputType>WinExe</OutputType>
@@ -13,27 +12,24 @@
     <ApplicationIcon>appicon.ico</ApplicationIcon>
     <NoWarn>IDE0034</NoWarn>
   </PropertyGroup>
-
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Composition.AttributedModel, Version=1.0.31.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Composition.AttributedModel.1.0.31\lib\portable-net45+win8+wp8+wpa81\System.Composition.AttributedModel.dll</HintPath>
+    <Reference Include="System.Composition.AttributedModel, Version=1.0.34.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Composition.AttributedModel.1.3.0-preview5.19224.8\lib\netstandard2.0\System.Composition.AttributedModel.dll</HintPath>
     </Reference>
-    <Reference Include="System.Composition.Convention, Version=1.0.31.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Composition.Convention.1.0.31\lib\portable-net45+win8+wp8+wpa81\System.Composition.Convention.dll</HintPath>
+    <Reference Include="System.Composition.Convention, Version=1.0.34.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Composition.Convention.1.3.0-preview5.19224.8\lib\netstandard2.0\System.Composition.Convention.dll</HintPath>
     </Reference>
-    <Reference Include="System.Composition.Hosting, Version=1.0.31.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Composition.Hosting.1.0.31\lib\portable-net45+win8+wp8+wpa81\System.Composition.Hosting.dll</HintPath>
+    <Reference Include="System.Composition.Hosting, Version=1.0.34.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Composition.Hosting.1.3.0-preview5.19224.8\lib\netstandard2.0\System.Composition.Hosting.dll</HintPath>
     </Reference>
-    <Reference Include="System.Composition.Runtime, Version=1.0.31.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Composition.Runtime.1.0.31\lib\portable-net45+win8+wp8+wpa81\System.Composition.Runtime.dll</HintPath>
+    <Reference Include="System.Composition.Runtime, Version=1.0.34.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Composition.Runtime.1.3.0-preview5.19224.8\lib\netstandard2.0\System.Composition.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="System.Composition.TypedParts, Version=1.0.31.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Composition.TypedParts.1.0.31\lib\portable-net45+win8+wp8+wpa81\System.Composition.TypedParts.dll</HintPath>
+    <Reference Include="System.Composition.TypedParts, Version=1.0.34.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Composition.TypedParts.1.3.0-preview5.19224.8\lib\netstandard2.0\System.Composition.TypedParts.dll</HintPath>
     </Reference>
     <Reference Include="System.Data" />
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -58,6 +54,9 @@
     <Compile Include="Interop\IVisualStudioInstances.cs" />
     <Compile Include="Plugins\IApp.cs" />
     <Compile Include="Plugins\IAppListener.cs" />
+    <Compile Include="Plugins\IMenuItemProvider.cs" />
+    <Compile Include="Plugins\MenuType.cs" />
+    <Compile Include="Plugins\PluginApp.cs" />
     <Compile Include="Plugins\PluginUtility.cs" />
     <Compile Include="Settings\AppSnapshot.cs" />
     <Compile Include="Settings\GrabConsoleSettings.cs" />
@@ -67,6 +66,8 @@
     <Compile Include="Settings\ToolSettings.cs" />
     <Compile Include="Settings\LinkSettings.cs" />
     <Compile Include="Settings\ConsoleSettings.cs" />
+    <Compile Include="UI\DesignerViewModels\MainWindowDesignerVM.cs" />
+    <Compile Include="UI\DesignerViewModels\TabDesignerVM.cs" />
     <Compile Include="UI\InstallBranchDialog.xaml.cs">
       <DependentUpon>InstallBranchDialog.xaml</DependentUpon>
     </Compile>
@@ -99,6 +100,7 @@
     <Compile Include="UI\ViewModels\SettingsImportDialogVM.cs" />
     <Compile Include="UI\ViewModels\TabNameDialogVM.cs" />
     <Compile Include="Utility\CommandHelpers.cs" />
+    <Compile Include="Utility\DelegateDisposable.cs" />
     <Compile Include="Utility\ObjectToVisibilityConverter.cs" />
     <Compile Include="Utility\PropertyNotifier.cs" />
     <Compile Include="Settings\AppSettings.cs" />
@@ -165,7 +167,5 @@
     <None Include="packages.config" />
     <Resource Include="appicon.ico" />
   </ItemGroup>
-
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-
 </Project>

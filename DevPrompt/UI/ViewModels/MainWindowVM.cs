@@ -38,6 +38,7 @@ namespace DevPrompt.UI.ViewModels
         private string errorText;
         private DispatcherOperation savingAppSettings;
         private long loadingCount;
+        private Stack<Action> loadingCancelActions;
 
         private const int NewTabAtEnd = -1;
         private const int NewTabAtEndNoActivate = -2;
@@ -51,6 +52,7 @@ namespace DevPrompt.UI.ViewModels
             this.tabs.CollectionChanged += this.OnTabsCollectionChanged;
             this.tabOrder = new LinkedList<ITabVM>();
             this.newTabIndex = MainWindowVM.NewTabAtEnd;
+            this.loadingCancelActions = new Stack<Action>();
 
             this.ConsoleCommand = new DelegateCommand((object arg) => this.StartConsole((ConsoleSettings)arg));
             this.GrabConsoleCommand = new DelegateCommand((object arg) => this.GrabConsole((int)arg));
@@ -742,8 +744,10 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
-        public IDisposable BeginLoading(string text)
+        public IDisposable BeginLoading(Action cancelAction, string text)
         {
+            this.loadingCancelActions.Push(cancelAction);
+
             if (Interlocked.Increment(ref this.loadingCount) == 1)
             {
                 this.OnPropertyChanged(nameof(this.Loading));
@@ -751,11 +755,24 @@ namespace DevPrompt.UI.ViewModels
 
             return new DelegateDisposable(() =>
             {
+                this.loadingCancelActions.Pop();
+
                 if (Interlocked.Decrement(ref this.loadingCount) == 0)
                 {
                     this.OnPropertyChanged(nameof(this.Loading));
                 }
             });
+        }
+
+        public void CancelLoading()
+        {
+            Action[] actions = this.loadingCancelActions.ToArray();
+            this.loadingCancelActions.Clear();
+
+            foreach (Action action in actions)
+            {
+                action?.Invoke();
+            }
         }
 
         public ProcessVM FindProcess(IProcess process)

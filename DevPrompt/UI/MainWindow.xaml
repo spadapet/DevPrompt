@@ -191,8 +191,9 @@
             Padding="5"
             Command="{Binding ClearErrorTextCommand}"
             HorizontalContentAlignment="Left"
-            Content="{Binding ErrorText}"
-            Visibility="{Binding HasErrorText, Converter={StaticResource BoolToVisibility}}"/>
+            Visibility="{Binding HasErrorText, Converter={StaticResource BoolToVisibility}}">
+            <TextBlock Text="{Binding ErrorText}" TextWrapping="Wrap" />
+        </Button>
 
         <controls:DragItemsControl
             x:Name="tabItemsControl"
