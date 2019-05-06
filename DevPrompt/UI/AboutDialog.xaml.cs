@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿using DevPrompt.UI.ViewModels;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Documents;
@@ -8,8 +8,11 @@ namespace DevPrompt.UI
 {
     internal partial class AboutDialog : Window
     {
-        public AboutDialog()
+        private IMainWindowVM window;
+
+        public AboutDialog(IMainWindowVM window)
         {
+            this.window = window;
             this.InitializeComponent();
         }
 
@@ -34,14 +37,7 @@ namespace DevPrompt.UI
         {
             if (sender is Hyperlink hyperlink && hyperlink.NavigateUri != null)
             {
-                try
-                {
-                    Process.Start(hyperlink.NavigateUri.ToString());
-                }
-                catch
-                {
-                    Debug.Fail($"Invalid hyperlink: {hyperlink.NavigateUri}");
-                }
+                this.window.StartProcess(hyperlink.NavigateUri.ToString());
             }
         }
     }

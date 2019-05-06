@@ -363,7 +363,7 @@ namespace DevPrompt.UI.ViewModels
             {
                 return new DelegateCommand(() =>
                 {
-                    AboutDialog dialog = new AboutDialog()
+                    AboutDialog dialog = new AboutDialog(this)
                     {
                         Owner = this.Window
                     };
@@ -831,7 +831,7 @@ namespace DevPrompt.UI.ViewModels
             this.StartProcess(instance.ProductPath);
         }
 
-        private void StartProcess(string path, string arguments = null)
+        public void StartProcess(string path, string arguments = null)
         {
             this.ClearErrorText();
 
@@ -839,7 +839,10 @@ namespace DevPrompt.UI.ViewModels
             {
                 if (string.IsNullOrEmpty(arguments))
                 {
-                    Process.Start(path);
+                    Process.Start(new ProcessStartInfo(path)
+                    {
+                        UseShellExecute = true
+                    });
                 }
                 else
                 {

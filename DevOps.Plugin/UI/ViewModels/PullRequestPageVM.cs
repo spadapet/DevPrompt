@@ -152,7 +152,7 @@ namespace DevOps.UI.ViewModels
                 }
                 else
                 {
-                    this.pullRequests.Add(new PullRequestVM(newPullRequests[i], this));
+                    this.pullRequests.Add(new PullRequestVM(newPullRequests[i], this, this.Window));
                 }
             }
 

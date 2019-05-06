@@ -1,10 +1,10 @@
 ﻿using DevOps.Avatars;
+using DevPrompt.UI.ViewModels;
 using DevPrompt.Utility;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.VisualStudio.Services.WebApi;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Input;
@@ -17,11 +17,13 @@ namespace DevOps.UI.ViewModels
         private GitPullRequest pr;
         private IAvatarProvider avatarProvider;
         private ImageSource avatarImageSource;
+        private IMainWindowVM window;
 
-        public PullRequestVM(GitPullRequest pr, IAvatarProvider avatarProvider)
+        public PullRequestVM(GitPullRequest pr, IAvatarProvider avatarProvider, IMainWindowVM window)
         {
             this.pr = pr;
             this.avatarProvider = avatarProvider;
+            this.window = window;
         }
 
         public GitPullRequest GitPullRequest
@@ -175,14 +177,7 @@ namespace DevOps.UI.ViewModels
                 {
                     if (p is Uri uri)
                     {
-                        try
-                        {
-                            Process.Start(uri.ToString());
-                        }
-                        catch
-                        {
-                            Debug.Fail($"Can't navigate to: {uri}");
-                        }
+                        this.window.StartProcess(uri.ToString());
                     }
                 });
             }

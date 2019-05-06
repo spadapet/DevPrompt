@@ -10,6 +10,7 @@ namespace DevPrompt.UI.ViewModels
     public interface IMainWindowVM
     {
         Dispatcher Dispatcher { get; }
+        void StartProcess(string path, string arguments = null);
 
         // Tabs
         IReadOnlyList<ITabVM> Tabs { get; }

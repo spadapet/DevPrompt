@@ -2,12 +2,8 @@
 using DevPrompt.Utility;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
-using Microsoft.VisualStudio.Services.FileContainer.Client;
-using Microsoft.VisualStudio.Services.Identity.Client;
-using Microsoft.VisualStudio.Services.Profile.Client;
 using Microsoft.VisualStudio.Services.WebApi;
 using System;
-using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -42,6 +38,14 @@ namespace DevOps.UI.ViewModels
             this.cancellationTokenSource = new CancellationTokenSource();
             this.okCommand = new DelegateCommand(async () => await this.OnOk(), this.OkCommandEnabled);
             this.tab = tab;
+
+            foreach (string arg in Environment.GetCommandLineArgs())
+            {
+                if (arg.StartsWith("/pat=", StringComparison.Ordinal))
+                {
+                    this.personalAccessToken = arg.Substring(5);
+                }
+            }
         }
 
         public void Dispose()
