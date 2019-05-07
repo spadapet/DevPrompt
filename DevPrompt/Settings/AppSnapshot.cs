@@ -17,6 +17,7 @@ namespace DevPrompt.Settings
     public class AppSnapshot : PropertyNotifier, ICloneable
     {
         private ObservableCollection<ITabSnapshot> tabs;
+        private int activeTabIndex;
         private static readonly object fileLock = new object();
 
         public AppSnapshot()
@@ -32,9 +33,21 @@ namespace DevPrompt.Settings
             {
                 foreach (ITabVM tab in window.Tabs)
                 {
+                    ITabSnapshot tabSnapshot = null;
+
                     if (tab is ProcessVM process)
                     {
-                        this.tabs.Add(new ConsoleSnapshot(process));
+                        tabSnapshot = new ConsoleSnapshot(process);
+                    }
+
+                    if (tabSnapshot != null)
+                    {
+                        if (tab.Active)
+                        {
+                            this.activeTabIndex = this.tabs.Count;
+                        }
+
+                        this.tabs.Add(tabSnapshot);
                     }
                 }
             }
@@ -59,6 +72,7 @@ namespace DevPrompt.Settings
         public void CopyFrom(AppSnapshot copyFrom)
         {
             this.tabs.Clear();
+            this.activeTabIndex = copyFrom.activeTabIndex;
 
             if (copyFrom != null)
             {
@@ -75,6 +89,20 @@ namespace DevPrompt.Settings
             get
             {
                 return this.tabs;
+            }
+        }
+
+        [DataMember]
+        public int ActiveTabIndex
+        {
+            get
+            {
+                return this.activeTabIndex;
+            }
+
+            set
+            {
+                this.SetPropertyValue(ref this.activeTabIndex, value);
             }
         }
 

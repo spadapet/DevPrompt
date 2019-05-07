@@ -641,10 +641,19 @@ namespace DevPrompt.UI.ViewModels
 
                 foreach (ITabSnapshot tabSnapshot in snapshot.Tabs)
                 {
-                    ITabVM tab = tabSnapshot.Restore(this);
-                    if (tab != null && !this.tabs.Contains(tab))
+                    if (tabSnapshot.Restore(this) is ITabVM tab)
                     {
-                        this.AddTab(tab, false);
+                        if (!this.tabs.Contains(tab))
+                        {
+                            this.AddTab(tab, false);
+                        }
+
+                        if (snapshot.ActiveTabIndex >= 0 &&
+                            snapshot.ActiveTabIndex < snapshot.Tabs.Count &&
+                            snapshot.Tabs[snapshot.ActiveTabIndex] == tabSnapshot)
+                        {
+                            this.ActiveTab = tab;
+                        }
                     }
                 }
 
