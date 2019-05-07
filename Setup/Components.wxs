@@ -17,6 +17,13 @@
                 <File Source="$(var.Bin32)DevInject32.dll" />
                 <File Source="$(var.Bin32)DevNative32.dll" />
                 <File Source="$(var.Bin64)DevPrompt.exe" />
+
+                <File Source="$(var.Bin64)System.Composition.AttributedModel.dll" />
+                <File Source="$(var.Bin64)System.Composition.Convention.dll" />
+                <File Source="$(var.Bin64)System.Composition.Hosting.dll" />
+                <File Source="$(var.Bin64)System.Composition.Runtime.dll" />
+                <File Source="$(var.Bin64)System.Composition.TypedParts.dll" />
+
                 <RegistryValue Root="HKCU" Key="$(var.RegistryRootKey)" Type="string" Name="InstallVersion" Value="$(var.ProductVersion)" KeyPath="yes" />
             </Component>
         </DirectoryRef>

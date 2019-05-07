@@ -25,7 +25,7 @@ namespace DevPrompt.Plugins
                 assemblies.AddRange(PluginUtility.GetPluginAssemblies(path));
             }
 
-            return assemblies;
+            return assemblies.Distinct();
         }
 
         private static IEnumerable<Assembly> GetPluginAssemblies(string path)

@@ -32,13 +32,13 @@ namespace DevPrompt.UI.ViewModels
 
         private readonly ObservableCollection<ITabVM> tabs;
         private readonly LinkedList<ITabVM> tabOrder;
+        private readonly Stack<Action> loadingCancelActions;
         private LinkedListNode<ITabVM> currentTabCycle;
         private int newTabIndex;
         private ITabVM activeTab;
         private string errorText;
         private DispatcherOperation savingAppSettings;
         private long loadingCount;
-        private Stack<Action> loadingCancelActions;
 
         private const int NewTabAtEnd = -1;
         private const int NewTabAtEndNoActivate = -2;

@@ -10,6 +10,8 @@
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>appicon.ico</ApplicationIcon>
+    <Prefer32Bit>False</Prefer32Bit>
+    <Prefer32Bit Condition=" '$(Platform)' == 'x86' ">True</Prefer32Bit>
     <NoWarn>IDE0034</NoWarn>
   </PropertyGroup>
   <ItemGroup>

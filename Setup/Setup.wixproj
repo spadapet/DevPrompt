@@ -15,7 +15,9 @@
         <ProjectOutRoot>$(ConfigOutRoot)$(ProjectName)\</ProjectOutRoot>
         <OutputPath>$(ProjectOutRoot)bin\</OutputPath>
         <IntermediateOutputPath>$(ProjectOutRoot)obj\</IntermediateOutputPath>
-        <DefineConstants>Bin32=$(OutRoot)$(Configuration).x86\bin\;Bin64=$(OutRoot)$(Configuration).x64\bin\;DevRoot=$(DevRoot);DevPromptVersion=$(DevPromptVersion)</DefineConstants>
+        <Bin32>$(OutRoot)$(Configuration).x86\bin\</Bin32>
+        <Bin64>$(OutRoot)$(Configuration).x64\bin\</Bin64>
+        <DefineConstants>Bin32=$(Bin32);Bin64=$(Bin64);DevRoot=$(DevRoot);DevPromptVersion=$(DevPromptVersion)</DefineConstants>
         <LinkerAdditionalOptions>-ext WixUIExtension</LinkerAdditionalOptions>
         <SuppressIces>ICE90;ICE91</SuppressIces>
         <DefineSolutionProperties>False</DefineSolutionProperties>
@@ -43,9 +45,19 @@
     </Target>
     <Target Name="AfterBuild" Outputs="$(OutputPath)DevPrompt.$(DevPromptVersion).Symbols.zip">
         <ItemGroup>
-            <SymbolFile Include="$(OutRoot)$(Configuration).x64\bin\*.pdb" />
-            <SymbolFile Include="$(OutRoot)$(Configuration).x86\bin\*32.pdb" />
+            <SymbolFile Include="$(Bin64)Dev*.pdb" />
+            <SymbolFile Include="$(Bin32)Dev*32.pdb" />
+            <CopyFile Include="$(Bin64)Dev*.dll" Exclude="$(Bin64)*.Plugin.dll" />
+            <CopyFile Include="$(Bin64)Dev*.exe" />
+            <CopyFile Include="$(Bin64)System.Composition.*.dll" />
+            <CopyFile Include="$(Bin32)Dev*32.dll" />
+            <CopyFile Include="$(Bin32)Dev*32.exe" />
         </ItemGroup>
+
+        <MakeDir Directories="$(OutputPath)DevPrompt" />
+        <Copy DestinationFolder="$(OutputPath)DevPrompt" SourceFiles="@(CopyFile)" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" />
+        <ZipDirectory DestinationFile="$(OutputPath)DevPrompt.zip" SourceDirectory="$(OutputPath)DevPrompt" Overwrite="true" />
+
         <MakeDir Directories="$(OutputPath)Symbols" />
         <Copy DestinationFolder="$(OutputPath)Symbols" SourceFiles="@(SymbolFile)" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" />
         <ZipDirectory DestinationFile="$(OutputPath)DevPrompt.$(DevPromptVersion).Symbols.zip" SourceDirectory="$(OutputPath)Symbols" Overwrite="true" />

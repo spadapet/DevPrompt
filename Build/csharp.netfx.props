@@ -8,8 +8,6 @@
         <WarningLevel>4</WarningLevel>
         <ErrorReport>prompt</ErrorReport>
         <PlatformTarget>AnyCPU</PlatformTarget>
-        <Prefer32Bit>False</Prefer32Bit>
-        <Prefer32Bit Condition=" '$(Platform)' == 'x86' ">True</Prefer32Bit>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <FileAlignment>512</FileAlignment>
     </PropertyGroup>
