@@ -1,4 +1,5 @@
-﻿using DevPrompt.UI.ViewModels;
+﻿using DevPrompt.Settings;
+using DevPrompt.UI.ViewModels;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -36,11 +37,17 @@ namespace DevPrompt.UI.DesignerViewModels
         public ICommand DefaultsCommand => null;
         public ICommand PropertiesCommand => null;
         public ICommand SetTabNameCommand => null;
+        public ITabSnapshot Snapshot => null;
 
         event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged { add { } remove { } }
 
         public void Focus()
         {
+        }
+
+        public string GetState()
+        {
+            return string.Empty;
         }
     }
 }

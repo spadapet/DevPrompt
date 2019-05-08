@@ -177,7 +177,7 @@ namespace DevOps.UI.ViewModels
                 {
                     if (p is Uri uri)
                     {
-                        this.window.StartProcess(uri.ToString());
+                        this.window.StartExternalProcess(uri.ToString());
                     }
                 });
             }

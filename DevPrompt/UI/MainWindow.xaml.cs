@@ -1,4 +1,5 @@
-﻿using DevPrompt.Plugins;
+﻿using DevPrompt.Interop;
+using DevPrompt.Plugins;
 using DevPrompt.Settings;
 using DevPrompt.UI.Controls;
 using DevPrompt.UI.ViewModels;
@@ -19,6 +20,7 @@ namespace DevPrompt.UI
     {
         public MainWindowVM ViewModel { get; }
         public AppSettings AppSettings { get; }
+        public NativeProcessListener NativeProcessListener { get; }
         private bool systemShuttingDown;
 
         public MainWindow(AppSettings settings, string initialErrorText)
@@ -29,6 +31,7 @@ namespace DevPrompt.UI
                 ErrorText = initialErrorText
             };
 
+            this.NativeProcessListener = new NativeProcessListener(this.ViewModel);
             this.InitializeComponent();
         }
 

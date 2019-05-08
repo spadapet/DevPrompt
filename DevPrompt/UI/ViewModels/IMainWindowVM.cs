@@ -10,12 +10,12 @@ namespace DevPrompt.UI.ViewModels
     public interface IMainWindowVM
     {
         Dispatcher Dispatcher { get; }
-        void StartProcess(string path, string arguments = null);
+        void StartExternalProcess(string path, string arguments = null);
 
         // Tabs
         IReadOnlyList<ITabVM> Tabs { get; }
         ITabVM ActiveTab { get; set; }
-        ITabVM RestoreProcess(string state);
+        ITabVM RestoreConsoleTab(string state);
         void AddTab(ITabVM tab, bool activate);
         void RemoveTab(ITabVM tab);
 

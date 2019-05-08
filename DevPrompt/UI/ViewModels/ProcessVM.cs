@@ -1,4 +1,5 @@
 ﻿using DevPrompt.Interop;
+using DevPrompt.Settings;
 using DevPrompt.Utility;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,27 @@ namespace DevPrompt.UI.ViewModels
         public IProcess Process { get; }
         public IntPtr Hwnd { get; }
 
+        public void Focus()
+        {
+            this.Process.Focus();
+        }
+
+        public ITabSnapshot Snapshot
+        {
+            get
+            {
+                return new ConsoleSnapshot(this);
+            }
+        }
+
+        public string State
+        {
+            get
+            {
+                return this.Process.GetState() ?? string.Empty;
+            }
+        }
+
         public string Env
         {
             get
@@ -62,7 +84,7 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
-        public string GetEnv(string name)
+        private string GetEnv(string name)
         {
             if (this.envDict.TryGetValue(name, out string value))
             {
@@ -72,7 +94,7 @@ namespace DevPrompt.UI.ViewModels
             return string.Empty;
         }
 
-        public string ExpandEnv(string str)
+        private string ExpandEnv(string str)
         {
             if (str.IndexOf('%') != -1)
             {
@@ -111,7 +133,7 @@ namespace DevPrompt.UI.ViewModels
         {
             get
             {
-                return this.tabName;
+                return this.tabName ?? string.Empty;
             }
 
             set
@@ -127,7 +149,7 @@ namespace DevPrompt.UI.ViewModels
         {
             get
             {
-                return this.ExpandEnv(this.tabName);
+                return this.ExpandEnv(this.TabName);
             }
         }
 
@@ -135,7 +157,7 @@ namespace DevPrompt.UI.ViewModels
         {
             get
             {
-                return this.title;
+                return this.title ?? string.Empty;
             }
 
             set
@@ -193,7 +215,12 @@ namespace DevPrompt.UI.ViewModels
             {
                 return new DelegateCommand((object arg) =>
                 {
-                    this.window.CloneProcess(this);
+                    IProcess processClone = this.window.ProcessHost?.CloneProcess(this.Process);
+                    ProcessVM tab = this.window.FindProcess(processClone);
+                    if (tab != null)
+                    {
+                        tab.TabName = this.TabName;
+                    }
                 });
             }
         }
@@ -259,11 +286,6 @@ namespace DevPrompt.UI.ViewModels
                     }
                 });
             }
-        }
-
-        public void Focus()
-        {
-            this.Process?.Focus();
         }
     }
 }

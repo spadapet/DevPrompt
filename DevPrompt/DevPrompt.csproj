@@ -54,6 +54,7 @@
     <Compile Include="Interop\IApp.cs" />
     <Compile Include="Interop\IVisualStudioInstance.cs" />
     <Compile Include="Interop\IVisualStudioInstances.cs" />
+    <Compile Include="Interop\NativeProcessListener.cs" />
     <Compile Include="Plugins\IApp.cs" />
     <Compile Include="Plugins\IAppListener.cs" />
     <Compile Include="Plugins\IMenuItemProvider.cs" />

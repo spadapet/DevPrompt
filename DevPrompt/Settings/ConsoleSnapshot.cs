@@ -23,8 +23,8 @@ namespace DevPrompt.Settings
         {
             this.Initialize();
 
-            this.tabName = process?.TabName ?? string.Empty;
-            this.state = process?.Process?.GetState() ?? string.Empty;
+            this.tabName = process.TabName;
+            this.state = process.State;
         }
 
         public ConsoleSnapshot(ConsoleSnapshot copyFrom)
@@ -64,7 +64,7 @@ namespace DevPrompt.Settings
                 return null;
             }
 
-            ITabVM tab = window.RestoreProcess(this.State);
+            ITabVM tab = window.RestoreConsoleTab(this.State);
             if (tab is ProcessVM processTab)
             {
                 processTab.TabName = this.TabName;

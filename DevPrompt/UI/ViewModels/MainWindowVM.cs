@@ -159,7 +159,7 @@ namespace DevPrompt.UI.ViewModels
             {
                 return new DelegateCommand(() =>
                 {
-                    this.StartProcess(VisualStudioSetup.InstallerPath);
+                    this.StartExternalProcess(VisualStudioSetup.InstallerPath);
                 });
             }
         }
@@ -170,7 +170,7 @@ namespace DevPrompt.UI.ViewModels
             {
                 return new DelegateCommand(() =>
                 {
-                    this.StartProcess(VisualStudioSetup.DogfoodInstallerPath);
+                    this.StartExternalProcess(VisualStudioSetup.DogfoodInstallerPath);
                 });
             }
         }
@@ -188,7 +188,7 @@ namespace DevPrompt.UI.ViewModels
 
                     if (dialog.ShowDialog() == true)
                     {
-                        this.StartProcess(dialog.ViewModel.Hyperlink);
+                        this.StartExternalProcess(dialog.ViewModel.Hyperlink);
                     }
                 });
             }
@@ -546,89 +546,37 @@ namespace DevPrompt.UI.ViewModels
 
         private void OnTabPropertyChanged(object sender, PropertyChangedEventArgs args)
         {
-            if (sender is ITabVM tab)
+            if (sender is ITabVM tab && this.ActiveTab == tab)
             {
                 if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(ITabVM.ViewElement))
                 {
-                    if (this.ActiveTab == tab)
-                    {
-                        this.Window.ViewElement = tab.ViewElement;
-                    }
+                    this.Window.ViewElement = tab.ViewElement;
                 }
-            }
-        }
 
-        /// <summary>
-        /// Notification from the native app
-        /// </summary>
-        public void OnProcessOpening(IProcess process, bool activate, string path)
-        {
-            ProcessVM tab = new ProcessVM(this, process)
-            {
-                TabName = !string.IsNullOrEmpty(path) ? Path.GetFileName(path) : "Tab"
-            };
-
-            foreach (GrabConsoleSettings grab in this.AppSettings.GrabConsoles)
-            {
-                if (grab.CanGrab(path))
-                {
-                    tab.TabName = grab.TabName;
-                    break;
-                }
-            }
-
-            this.AddTab(tab, activate);
-        }
-
-        /// <summary>
-        /// Notification from the native app
-        /// </summary>
-        public void OnProcessClosing(IProcess process)
-        {
-            ITabVM tab = this.FindProcess(process);
-            if (tab != null)
-            {
-                this.RemoveTab(tab);
-            }
-        }
-
-        /// <summary>
-        /// Notification from the native app
-        /// </summary>
-        public void OnProcessEnvChanged(IProcess process, string env)
-        {
-            ProcessVM tab = this.FindProcess(process);
-            if (tab != null)
-            {
-                tab.Env = env;
-            }
-        }
-
-        /// <summary>
-        /// Notification from the native app
-        /// </summary>
-        public void OnProcessTitleChanged(IProcess process, string title)
-        {
-            ProcessVM tab = this.FindProcess(process);
-            if (tab != null)
-            {
-                tab.Title = title;
-
-                if (this.ActiveTab == tab)
+                if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(ITabVM.Title))
                 {
                     this.OnPropertyChanged(nameof(this.WindowTitle));
                 }
             }
         }
 
-        public void CloneProcess(ProcessVM process)
+        private void StartConsole(ConsoleSettings settings)
         {
-            IProcess processClone = this.ProcessHost?.CloneProcess(process.Process);
-            ProcessVM tab = this.FindProcess(processClone);
+            IProcess process = this.ProcessHost?.RunProcess(
+                settings.Executable,
+                settings.ExpandedArguments,
+                settings.ExpandedStartingDirectory);
+
+            ProcessVM tab = this.FindProcess(process);
             if (tab != null)
             {
-                tab.TabName = process.TabName;
+                tab.TabName = settings.TabName;
             }
+        }
+
+        private void GrabConsole(int processId)
+        {
+            App.Current.NativeApp?.GrabProcess(processId);
         }
 
         public async void RunStartupConsoles()
@@ -795,7 +743,7 @@ namespace DevPrompt.UI.ViewModels
             return this.FindProcess(process);
         }
 
-        ITabVM IMainWindowVM.RestoreProcess(string state)
+        ITabVM IMainWindowVM.RestoreConsoleTab(string state)
         {
             IProcess process = this.ProcessHost?.RestoreProcess(state);
             return this.FindTab(process);
@@ -806,41 +754,22 @@ namespace DevPrompt.UI.ViewModels
             this.SetError(null);
         }
 
-        private void StartConsole(ConsoleSettings settings)
-        {
-            IProcess process = this.ProcessHost?.RunProcess(
-                settings.Executable,
-                settings.ExpandedArguments,
-                settings.ExpandedStartingDirectory);
-
-            ProcessVM tab = this.FindProcess(process);
-            if (tab != null)
-            {
-                tab.TabName = settings.TabName;
-            }
-        }
-
-        private void GrabConsole(int processId)
-        {
-            App.Current.NativeApp?.GrabProcess(processId);
-        }
-
         private void StartLink(LinkSettings settings)
         {
-            this.StartProcess(settings.Address);
+            this.StartExternalProcess(settings.Address);
         }
 
         private void StartTool(ToolSettings settings)
         {
-            this.StartProcess(settings.ExpandedCommand, settings.ExpandedArguments);
+            this.StartExternalProcess(settings.ExpandedCommand, settings.ExpandedArguments);
         }
 
         private void StartVisualStudio(VisualStudioSetup.Instance instance)
         {
-            this.StartProcess(instance.ProductPath);
+            this.StartExternalProcess(instance.ProductPath);
         }
 
-        public void StartProcess(string path, string arguments = null)
+        public void StartExternalProcess(string path, string arguments = null)
         {
             this.ClearErrorText();
 

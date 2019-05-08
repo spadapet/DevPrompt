@@ -33,14 +33,7 @@ namespace DevPrompt.Settings
             {
                 foreach (ITabVM tab in window.Tabs)
                 {
-                    ITabSnapshot tabSnapshot = null;
-
-                    if (tab is ProcessVM process)
-                    {
-                        tabSnapshot = new ConsoleSnapshot(process);
-                    }
-
-                    if (tabSnapshot != null)
+                    if (tab.Snapshot is ITabSnapshot tabSnapshot)
                     {
                         if (tab.Active)
                         {

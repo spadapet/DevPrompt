@@ -37,7 +37,7 @@ namespace DevPrompt.UI
         {
             if (sender is Hyperlink hyperlink && hyperlink.NavigateUri != null)
             {
-                this.window.StartProcess(hyperlink.NavigateUri.ToString());
+                this.window.StartExternalProcess(hyperlink.NavigateUri.ToString());
             }
         }
     }

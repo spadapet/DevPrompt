@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using DevPrompt.Settings;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 
@@ -16,6 +17,7 @@ namespace DevPrompt.UI.ViewModels
         string Title { get; }
         bool Active { get; set; }
         UIElement ViewElement { get; }
+        ITabSnapshot Snapshot { get; }
 
         // Tab context menu commands. Any of them can return null if the command doesn't make sense.
 

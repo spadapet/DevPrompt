@@ -1,4 +1,5 @@
-﻿using DevPrompt.UI.ViewModels;
+﻿using DevPrompt.Settings;
+using DevPrompt.UI.ViewModels;
 using DevPrompt.Utility;
 using System;
 using System.ComponentModel;
@@ -125,6 +126,7 @@ namespace DevOps.UI.ViewModels
         public ICommand DefaultsCommand => null;
         public ICommand PropertiesCommand => null;
         public ICommand SetTabNameCommand => null;
+        public ITabSnapshot Snapshot => null;
 
         private void OnModelPropertyChanged(object sender, PropertyChangedEventArgs args)
         {

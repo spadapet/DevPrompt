@@ -2,6 +2,7 @@
 using DevPrompt.Plugins;
 using DevPrompt.Settings;
 using DevPrompt.UI;
+using DevPrompt.UI.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Composition.Convention;
@@ -64,6 +65,14 @@ namespace DevPrompt
             set
             {
                 base.MainWindow = value;
+            }
+        }
+
+        public ITabVM ActiveTab
+        {
+            get
+            {
+                return this.MainWindow?.ViewModel.ActiveTab;
             }
         }
 
@@ -141,42 +150,42 @@ namespace DevPrompt
 
         void IAppHost.OnProcessOpening(IProcess process, bool activate, string path)
         {
-            this.MainWindow?.ViewModel.OnProcessOpening(process, activate, path);
+            this.MainWindow?.NativeProcessListener.OnProcessOpening(process, activate, path);
         }
 
         void IAppHost.OnProcessClosing(IProcess process)
         {
-            this.MainWindow?.ViewModel.OnProcessClosing(process);
+            this.MainWindow?.NativeProcessListener.OnProcessClosing(process);
         }
 
         void IAppHost.OnProcessEnvChanged(IProcess process, string env)
         {
-            this.MainWindow?.ViewModel.OnProcessEnvChanged(process, env);
+            this.MainWindow?.NativeProcessListener.OnProcessEnvChanged(process, env);
         }
 
         void IAppHost.OnProcessTitleChanged(IProcess process, string title)
         {
-            this.MainWindow?.ViewModel.OnProcessTitleChanged(process, title);
+            this.MainWindow?.NativeProcessListener.OnProcessTitleChanged(process, title);
         }
 
         void IAppHost.CloneActiveProcess()
         {
-            this.MainWindow?.ViewModel.ActiveTab?.CloneCommand.Execute(null);
+            this.ActiveTab?.CloneCommand.Execute(null);
         }
 
         void IAppHost.SetTabName()
         {
-            this.MainWindow?.ViewModel.ActiveTab?.SetTabNameCommand.Execute(null);
+            this.ActiveTab?.SetTabNameCommand.Execute(null);
         }
 
         void IAppHost.CloseActiveProcess()
         {
-            this.MainWindow?.ViewModel.ActiveTab?.CloseCommand.Execute(null);
+            this.ActiveTab?.CloseCommand.Execute(null);
         }
 
         void IAppHost.DetachActiveProcess()
         {
-            this.MainWindow?.ViewModel.ActiveTab?.DetachCommand.Execute(null);
+            this.ActiveTab?.DetachCommand.Execute(null);
         }
 
         IntPtr IAppHost.GetMainWindow()
