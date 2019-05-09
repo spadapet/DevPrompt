@@ -14,6 +14,7 @@ namespace DevOps.UI.DesignerViewModels
         public string Title { get; set; } = "Sample Title";
         public string Author { get; set; } = "Author Name";
         public Uri WebLink { get; set; }
+        public Uri CodeFlowLink { get; set; }
         public Uri AvatarLink { get; set; }
         public ImageSource AvatarImageSource { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.Now;

@@ -6,17 +6,19 @@ namespace DevOps.UI.ViewModels
 {
     internal interface IPullRequestVM
     {
-        string Id { get; }
-        string Title { get; }
-        string Author { get; }
-        Uri WebLink { get; }
-        Uri AvatarLink { get; }
-        ImageSource AvatarImageSource { get; }
-        DateTime CreationDate { get; }
         bool IsDraft { get; }
         string Status { get; }
         string SourceRefName { get; }
         string TargetRefName { get; }
+        string Id { get; }
+        string Title { get; }
+        string Author { get; }
+        Uri WebLink { get; }
+        Uri CodeFlowLink { get; }
+        Uri AvatarLink { get; }
+        ImageSource AvatarImageSource { get; }
+        DateTime CreationDate { get; }
+
         ICommand WebLinkCommand { get; }
     }
 }

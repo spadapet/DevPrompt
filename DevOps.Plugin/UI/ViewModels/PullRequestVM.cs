@@ -5,8 +5,6 @@ using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.VisualStudio.Services.WebApi;
 using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Text;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -14,13 +12,15 @@ namespace DevOps.UI.ViewModels
 {
     internal class PullRequestVM : PropertyNotifier, IPullRequestVM, IAvatarSite
     {
+        private Uri baseUri;
         private GitPullRequest pr;
         private IAvatarProvider avatarProvider;
         private ImageSource avatarImageSource;
         private IMainWindowVM window;
 
-        public PullRequestVM(GitPullRequest pr, IAvatarProvider avatarProvider, IMainWindowVM window)
+        public PullRequestVM(Uri baseUri, GitPullRequest pr, IAvatarProvider avatarProvider, IMainWindowVM window)
         {
+            this.baseUri = baseUri;
             this.pr = pr;
             this.avatarProvider = avatarProvider;
             this.window = window;
@@ -43,7 +43,15 @@ namespace DevOps.UI.ViewModels
         {
             get
             {
-                return new Uri("http://www.peterspada.com");
+                return new Uri($@"{this.baseUri}{this.pr.Repository.ProjectReference.Name}/_git/{this.pr.Repository.Name}/pullrequest/{this.pr.PullRequestId}?_a=overview");
+            }
+        }
+
+        public Uri CodeFlowLink
+        {
+            get
+            {
+                return new Uri($@"codeflow://open/?server={Uri.EscapeUriString(this.baseUri.ToString())}&project={this.pr.Repository.ProjectReference.Name}&repo={this.pr.Repository.Name}&pullRequest={this.pr.PullRequestId}&alert=true");
             }
         }
 
@@ -66,32 +74,14 @@ namespace DevOps.UI.ViewModels
             }
         }
 
-        private static string GetMd5Hash(string input)
-        {
-            using (MD5 md5 = MD5.Create())
-            {
-                byte[] data = md5.ComputeHash(Encoding.UTF8.GetBytes(input));
-                StringBuilder stringBuilder = new StringBuilder(data.Length);
-
-                for (int i = 0; i < data.Length; i++)
-                {
-                    stringBuilder.Append(data[i].ToString("x2"));
-                }
-
-                return stringBuilder.ToString();
-            }
-        }
-
         public ImageSource AvatarImageSource
         {
             get
             {
                 if (this.avatarImageSource == null)
                 {
-                    Uri avatarUri = this.AvatarLink;
-                    if (avatarUri != null)
+                    if (this.AvatarLink is Uri avatarUri)
                     {
-                        //avatarUri = new Uri($"http://gravatar.com/avatar/{PullRequestVM.GetMd5Hash("spadapet@hotmail.com")}?s=32");
                         this.avatarProvider.ProvideAvatar(avatarUri, this);
                     }
                 }

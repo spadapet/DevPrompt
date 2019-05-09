@@ -144,6 +144,8 @@ namespace DevOps.UI.ViewModels
 
         private void UpdatePullRequests(IReadOnlyList<GitPullRequest> newPullRequests)
         {
+            Uri baseUri = this.gitClient.BaseAddress;
+
             for (int i = 0; i < newPullRequests.Count; i++)
             {
                 if (this.pullRequests.Count > i)
@@ -152,7 +154,7 @@ namespace DevOps.UI.ViewModels
                 }
                 else
                 {
-                    this.pullRequests.Add(new PullRequestVM(newPullRequests[i], this, this.Window));
+                    this.pullRequests.Add(new PullRequestVM(baseUri, newPullRequests[i], this, this.Window));
                 }
             }
 
@@ -182,7 +184,7 @@ namespace DevOps.UI.ViewModels
 
                 try
                 {
-                    HttpResponseMessage response = await this.avatarHttpClient.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, this.cancellationTokenSource.Token);
+                    HttpResponseMessage response = await this.avatarHttpClient.GetAsync(uri, HttpCompletionOption.ResponseContentRead, this.cancellationTokenSource.Token);
                     response = response.EnsureSuccessStatusCode();
 
                     Stream stream = await response.Content.ReadAsStreamAsync();

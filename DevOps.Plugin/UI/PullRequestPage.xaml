@@ -37,7 +37,7 @@
                         </Style>
                     </StackPanel.Resources>
                     <Button Content="Complete &#9207;" VerticalAlignment="Center" />
-                    <Button Content="CodeFlow" VerticalAlignment="Center" />
+                    <Button Content="CodeFlow" VerticalAlignment="Center" Command="{Binding WebLinkCommand}" CommandParameter="{Binding CodeFlowLink, Mode=OneWay}" />
                 </StackPanel>
             </Grid>
         </DataTemplate>

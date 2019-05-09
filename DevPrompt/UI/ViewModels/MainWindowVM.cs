@@ -8,7 +8,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -738,15 +737,10 @@ namespace DevPrompt.UI.ViewModels
             return this.tabs.OfType<ProcessVM>().FirstOrDefault(p => p.Hwnd == processHwnd);
         }
 
-        public ITabVM FindTab(IProcess process)
-        {
-            return this.FindProcess(process);
-        }
-
         ITabVM IMainWindowVM.RestoreConsoleTab(string state)
         {
             IProcess process = this.ProcessHost?.RestoreProcess(state);
-            return this.FindTab(process);
+            return this.FindProcess(process);
         }
 
         private void ClearErrorText()
