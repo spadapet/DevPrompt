@@ -210,8 +210,7 @@ namespace DevPrompt.UI
 
         private void AddPluginMenuItems(MenuItem menu, MenuType menuType)
         {
-            Separator separator = menu.Items.OfType<Separator>().Where(s => s.Tag is string name && name == "[Plugins]").FirstOrDefault();
-            if (separator != null)
+            if (menu.Items.OfType<Separator>().Where(s => s.Tag is string name && name == "[Plugins]").FirstOrDefault() is Separator separator)
             {
                 separator.Tag = null;
                 int index = menu.Items.IndexOf(separator);

@@ -112,8 +112,7 @@ namespace DevPrompt.UI.ViewModels
                 {
                     this.savingAppSettings = null;
 
-                    Exception exception = await this.AppSettings.Save(path);
-                    if (exception != null)
+                    if (await this.AppSettings.Save(path) is Exception exception)
                     {
                         this.SetError(exception);
                     }
@@ -566,8 +565,7 @@ namespace DevPrompt.UI.ViewModels
                 settings.ExpandedArguments,
                 settings.ExpandedStartingDirectory);
 
-            ProcessVM tab = this.FindProcess(process);
-            if (tab != null)
+            if (this.FindProcess(process) is ProcessVM tab)
             {
                 tab.TabName = settings.TabName;
             }

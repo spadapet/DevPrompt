@@ -11,7 +11,7 @@
     d:DesignWidth="800"
     Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
     DataContext="{Binding ViewModel, RelativeSource={RelativeSource Mode=Self}}"
-    d:DataContext="{d:DesignInstance Type=dvm:LoginPageDesignerVM, IsDesignTimeCreatable=True}" FontFamily="Segoe UI">
+    d:DataContext="{d:DesignInstance Type=dvm:LoginPageDesignerVM, IsDesignTimeCreatable=True}">
 
     <Grid>
         <StackPanel Margin="10" HorizontalAlignment="Left">

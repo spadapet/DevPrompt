@@ -33,8 +33,7 @@ namespace DevOps
 
         private void OnPullRequestDashboard(IMainWindowVM window)
         {
-            PullRequestTabVM tab = window.Tabs.OfType<PullRequestTabVM>().FirstOrDefault();
-            if (tab != null)
+            if (window.Tabs.OfType<PullRequestTabVM>().FirstOrDefault() is PullRequestTabVM tab)
             {
                 window.ActiveTab = tab;
             }

@@ -45,9 +45,8 @@ namespace DevPrompt.UI.Controls
         {
             this.RemoveDropAdorner();
 
-            object dropModel = args.Data.GetData(DragItemsControl.SingleItemDataFormat);
-
-            if (dropModel != null && this.GetDropTarget(args, out int index, out bool firstHalf))
+            if (args.Data.GetData(DragItemsControl.SingleItemDataFormat) is object dropModel &&
+                this.GetDropTarget(args, out int index, out bool firstHalf))
             {
                 bool copy =
                     (args.Effects & DragDropEffects.Copy) == DragDropEffects.Copy &&
@@ -122,8 +121,7 @@ namespace DevPrompt.UI.Controls
                 {
                     this.dropAdorner = new DragItemAdorner(item, left);
 
-                    AdornerLayer layer = AdornerLayer.GetAdornerLayer(item);
-                    if (layer != null)
+                    if (AdornerLayer.GetAdornerLayer(item) is AdornerLayer layer)
                     {
                         layer.Add(this.dropAdorner);
                     }
@@ -135,8 +133,7 @@ namespace DevPrompt.UI.Controls
         {
             if (this.dropAdorner != null)
             {
-                AdornerLayer layer = AdornerLayer.GetAdornerLayer(this.dropAdorner.AdornedElement);
-                if (layer != null)
+                if (AdornerLayer.GetAdornerLayer(this.dropAdorner.AdornedElement) is AdornerLayer layer)
                 {
                     layer.Remove(this.dropAdorner);
                 }
@@ -186,8 +183,7 @@ namespace DevPrompt.UI.Controls
         {
             if (args.MouseDevice.Captured != null)
             {
-                ContentPresenter item = WpfHelpers.FindItemContainer<ContentPresenter>(this, sender, includeSelf: true);
-                if (item != null && !this.dragging)
+                if (WpfHelpers.FindItemContainer<ContentPresenter>(this, sender, includeSelf: true) is ContentPresenter item && !this.dragging)
                 {
                     this.mouseCapturePoint = args.GetPosition(this);
                     this.captureItem = item;

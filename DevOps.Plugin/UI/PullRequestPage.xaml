@@ -8,7 +8,7 @@
     xmlns:dvm="clr-namespace:DevOps.UI.DesignerViewModels"
     xmlns:vm="clr-namespace:DevOps.UI.ViewModels"
     mc:Ignorable="d" 
-    d:DesignHeight="450" d:DesignWidth="800"
+    d:DesignHeight="300" d:DesignWidth="500"
     Loaded="OnLoaded"
     Unloaded="OnUnloaded"
     Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"

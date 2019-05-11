@@ -59,9 +59,7 @@ namespace DevOps.UI.ViewModels
         {
             get
             {
-                IReadOnlyDictionary<string, object> links = this.pr.CreatedBy?.Links?.Links;
-
-                if (links != null &&
+                if (this.pr.CreatedBy?.Links?.Links is IReadOnlyDictionary<string, object> links &&
                     links.TryGetValue("avatar", out object avatarValue) &&
                     avatarValue is ReferenceLink avatarLink &&
                     !string.IsNullOrEmpty(avatarLink.Href) &&

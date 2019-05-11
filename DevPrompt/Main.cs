@@ -55,8 +55,7 @@ namespace DevPrompt
                         info.Verb = "runas";
                         try
                         {
-                            Process process = Process.Start(info);
-                            if (process != null)
+                            if (Process.Start(info) is Process process)
                             {
                                 // Quit and let the new process take over
                                 return true;

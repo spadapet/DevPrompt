@@ -216,8 +216,7 @@ namespace DevPrompt.UI.ViewModels
                 return new DelegateCommand((object arg) =>
                 {
                     IProcess processClone = this.window.ProcessHost?.CloneProcess(this.Process);
-                    ProcessVM tab = this.window.FindProcess(processClone);
-                    if (tab != null)
+                    if (this.window.FindProcess(processClone) is ProcessVM tab)
                     {
                         tab.TabName = this.TabName;
                     }
