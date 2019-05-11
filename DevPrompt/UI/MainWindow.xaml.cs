@@ -21,10 +21,13 @@ namespace DevPrompt.UI
         public MainWindowVM ViewModel { get; }
         public AppSettings AppSettings { get; }
         public NativeProcessListener NativeProcessListener { get; }
+        public App App { get; }
+        public Interop.IApp NativeApp => this.App?.NativeApp;
         private bool systemShuttingDown;
 
-        public MainWindow(AppSettings settings, string initialErrorText)
+        public MainWindow(App app, AppSettings settings, string initialErrorText)
         {
+            this.App = app;
             this.AppSettings = settings;
             this.ViewModel = new MainWindowVM(this)
             {
@@ -86,7 +89,7 @@ namespace DevPrompt.UI
 
         private void OnGrabMenuOpened(object sender, RoutedEventArgs args)
         {
-            List<string> names = new List<string>(CommandHelpers.GetGrabProcesses());
+            List<string> names = new List<string>(CommandHelpers.GetGrabProcesses(this.NativeApp));
 
             MainWindow.UpdateMenu((MenuItem)sender, names, (string name) =>
             {
@@ -215,7 +218,7 @@ namespace DevPrompt.UI
                 separator.Tag = null;
                 int index = menu.Items.IndexOf(separator);
 
-                foreach (IMenuItemProvider provider in App.Current.GetExports<IMenuItemProvider>())
+                foreach (IMenuItemProvider provider in this.App?.GetExports<IMenuItemProvider>())
                 {
                     foreach (MenuItem item in provider.GetMenuItems(menuType, this.ViewModel))
                     {
@@ -236,27 +239,27 @@ namespace DevPrompt.UI
 
         private void OnActivated(object sender, EventArgs args)
         {
-            App.Current.NativeApp?.Activate();
+            this.NativeApp?.Activate();
             this.ProcessHostWindow?.OnActivated();
         }
 
         private void OnDeactivated(object sender, EventArgs args)
         {
-            App.Current.NativeApp?.Deactivate();
+            this.NativeApp?.Deactivate();
             this.ProcessHostWindow?.OnDeactivated();
         }
 
         private IntPtr WindowProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            App.Current.NativeApp?.MainWindowProc(hwnd, msg, wParam, lParam);
+            this.NativeApp?.MainWindowProc(hwnd, msg, wParam, lParam);
             return IntPtr.Zero;
         }
 
         public void OnAppInitComplete()
         {
-            if (App.Current.NativeApp != null)
+            if (this.NativeApp != null)
             {
-                this.processHostHolder.Child = new ProcessHostWindow();
+                this.processHostHolder.Child = new ProcessHostWindow(this.NativeApp);
 
                 Action action = () => this.ViewModel.RunStartupConsoles();
                 this.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, action);

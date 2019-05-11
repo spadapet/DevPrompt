@@ -9,18 +9,20 @@ namespace DevPrompt.Plugins
     [Export(typeof(IApp))]
     internal class PluginApp : IApp
     {
+        public App App { get; set; }
+
         public PluginApp()
         {
         }
 
         T IApp.GetExport<T>()
         {
-            return App.Current.GetExport<T>();
+            return this.App.GetExport<T>();
         }
 
         IEnumerable<T> IApp.GetExports<T>()
         {
-            return App.Current.GetExports<T>();
+            return this.App.GetExports<T>();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using DevPrompt.Settings;
+﻿using DevPrompt.Interop;
+using DevPrompt.Settings;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -125,7 +126,7 @@ namespace DevPrompt.Utility
             });
         }
 
-        public static void UpdateCommands(params DelegateCommand[] commands)
+        public static void UpdateCommands(Dispatcher dispatcher, params DelegateCommand[] commands)
         {
             Action action = () =>
             {
@@ -135,12 +136,12 @@ namespace DevPrompt.Utility
                 }
             };
 
-            App.Current.Dispatcher.BeginInvoke(action, DispatcherPriority.ApplicationIdle);
+            dispatcher.BeginInvoke(action, DispatcherPriority.ApplicationIdle);
         }
 
-        public static IEnumerable<string> GetGrabProcesses()
+        public static IEnumerable<string> GetGrabProcesses(IApp nativeApp)
         {
-            string names = App.Current.NativeApp?.GetGrabProcesses();
+            string names = nativeApp?.GetGrabProcesses();
             return !string.IsNullOrEmpty(names) ? names.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries) : new string[0];
         }
     }

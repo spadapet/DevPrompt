@@ -9,12 +9,14 @@ namespace DevPrompt.UI.Controls
     /// <summary>
     /// Hooks the native process host window into WPF
     /// </summary>
-    public class ProcessHostWindow : HwndHost
+    internal class ProcessHostWindow : HwndHost
     {
         internal IProcessHost ProcessHost { get; private set; }
+        private IApp nativeApp;
 
-        public ProcessHostWindow()
+        public ProcessHostWindow(IApp nativeApp)
         {
+            this.nativeApp = nativeApp;
         }
 
         public void OnActivated()
@@ -46,7 +48,7 @@ namespace DevPrompt.UI.Controls
 
         protected override HandleRef BuildWindowCore(HandleRef hwndParent)
         {
-            this.ProcessHost = App.Current.NativeApp?.CreateProcessHostWindow(hwndParent.Handle);
+            this.ProcessHost = this.nativeApp?.CreateProcessHostWindow(hwndParent.Handle);
 
             if (this.IsFocused)
             {

@@ -26,7 +26,6 @@ namespace DevPrompt
         public Interop.IApp NativeApp { get; private set; }
 
         private CompositionHost compositionHost;
-        private static App designerApp;
 
         public App()
         {
@@ -40,18 +39,8 @@ namespace DevPrompt
         {
             get
             {
-                App app = (App)Application.Current;
-                if (app == null)
-                {
-                    if (App.designerApp == null)
-                    {
-                        App.designerApp = new App();
-                    }
-
-                    app = App.designerApp;
-                }
-
-                return app;
+                throw new NotImplementedException("Try not to use App.Current if possible");
+                // return (App)Application.Current;
             }
         }
 
@@ -97,7 +86,7 @@ namespace DevPrompt
         private async void OnStartup(object sender, StartupEventArgs args)
         {
             this.NativeApp = Interop.App.CreateApp(this, out string errorMessage);
-            this.MainWindow = new MainWindow(this.Settings, errorMessage);
+            this.MainWindow = new MainWindow(this, this.Settings, errorMessage);
             this.MainWindow.Show();
 
             this.Settings.CopyFrom(await AppSettings.Load(AppSettings.DefaultPath));
@@ -145,6 +134,11 @@ namespace DevPrompt
             catch (Exception ex)
             {
                 Debug.Fail(ex.Message, ex.StackTrace);
+            }
+
+            if (this.GetExport<Plugins.IApp>() is Plugins.PluginApp pluginApp)
+            {
+                pluginApp.App = this;
             }
         }
 

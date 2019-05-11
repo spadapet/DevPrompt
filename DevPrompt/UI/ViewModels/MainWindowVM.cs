@@ -573,7 +573,7 @@ namespace DevPrompt.UI.ViewModels
 
         private void GrabConsole(int processId)
         {
-            App.Current.NativeApp?.GrabProcess(processId);
+            this.Window.NativeApp?.GrabProcess(processId);
         }
 
         public async void RunStartupConsoles()

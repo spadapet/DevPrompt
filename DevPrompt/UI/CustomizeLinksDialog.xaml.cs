@@ -45,12 +45,12 @@ namespace DevPrompt.UI
 
         private void OnSelectionChanged(object sender, SelectionChangedEventArgs args)
         {
-            CommandHelpers.UpdateCommands(this.MoveUpCommand, this.MoveDownCommand, this.DeleteCommand);
+            CommandHelpers.UpdateCommands(this.Dispatcher, this.MoveUpCommand, this.MoveDownCommand, this.DeleteCommand);
         }
 
         private void OnSettingsChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
-            CommandHelpers.UpdateCommands(this.MoveUpCommand, this.MoveDownCommand, this.DeleteCommand);
+            CommandHelpers.UpdateCommands(this.Dispatcher, this.MoveUpCommand, this.MoveDownCommand, this.DeleteCommand);
         }
     }
 }
