@@ -59,7 +59,7 @@
     <Compile Include="Plugins\IAppListener.cs" />
     <Compile Include="Plugins\IMenuItemProvider.cs" />
     <Compile Include="Plugins\MenuType.cs" />
-    <Compile Include="Plugins\PluginApp.cs" />
+    <Compile Include="Plugins\ExportProvider.cs" />
     <Compile Include="Plugins\PluginUtility.cs" />
     <Compile Include="Settings\AppSnapshot.cs" />
     <Compile Include="Settings\GrabConsoleSettings.cs" />
