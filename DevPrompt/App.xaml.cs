@@ -89,7 +89,7 @@ namespace DevPrompt
             this.MainWindow = new MainWindow(this, this.Settings, errorMessage);
             this.MainWindow.Show();
 
-            this.Settings.CopyFrom(await AppSettings.Load(AppSettings.DefaultPath));
+            this.Settings.CopyFrom(await AppSettings.Load(this, AppSettings.DefaultPath));
             this.InitPlugins();
             this.MainWindow.OnAppInitComplete();
 

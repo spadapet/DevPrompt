@@ -57,6 +57,7 @@
     <Compile Include="Interop\NativeProcessListener.cs" />
     <Compile Include="Plugins\IApp.cs" />
     <Compile Include="Plugins\IAppListener.cs" />
+    <Compile Include="Plugins\ISettingTypes.cs" />
     <Compile Include="Plugins\IMenuItemProvider.cs" />
     <Compile Include="Plugins\MenuType.cs" />
     <Compile Include="Plugins\ExportProvider.cs" />

@@ -287,7 +287,7 @@ namespace DevPrompt.UI
             if (!this.systemShuttingDown)
             {
                 AppSnapshot snapshot = new AppSnapshot(this.ViewModel);
-                await snapshot.Save();
+                await snapshot.Save(this.App);
             }
         }
 
@@ -300,7 +300,7 @@ namespace DevPrompt.UI
             {
                 this.systemShuttingDown = true;
                 AppSnapshot snapshot = new AppSnapshot(this.ViewModel, force: true);
-                snapshot.Save().Wait();
+                snapshot.Save(this.App).Wait();
             }
         }
 

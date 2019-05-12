@@ -112,7 +112,7 @@ namespace DevPrompt.UI.ViewModels
                 {
                     this.savingAppSettings = null;
 
-                    if (await this.AppSettings.Save(path) is Exception exception)
+                    if (await this.AppSettings.Save(this.Window.App, path) is Exception exception)
                     {
                         this.SetError(exception);
                     }
@@ -235,7 +235,7 @@ namespace DevPrompt.UI.ViewModels
                         AppSettings settings = null;
                         try
                         {
-                            settings = await AppSettings.UnsafeLoad(dialog.FileName);
+                            settings = await AppSettings.UnsafeLoad(this.Window.App, dialog.FileName);
                         }
                         catch (Exception exception)
                         {
@@ -578,7 +578,7 @@ namespace DevPrompt.UI.ViewModels
 
         public async void RunStartupConsoles()
         {
-            AppSnapshot snapshot = await AppSnapshot.Load(AppSnapshot.DefaultPath);
+            AppSnapshot snapshot = await AppSnapshot.Load(this.Window.App, AppSnapshot.DefaultPath);
 
             try
             {

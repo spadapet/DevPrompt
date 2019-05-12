@@ -1,9 +1,11 @@
-﻿using DevPrompt.UI.ViewModels;
+﻿using DevPrompt.Plugins;
+using DevPrompt.UI.ViewModels;
 using DevPrompt.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using System.Xml;
@@ -105,12 +107,22 @@ namespace DevPrompt.Settings
             this.tabs = new ObservableCollection<ITabSnapshot>();
         }
 
-        private static DataContractSerializer DataContractSerializer
+        private static DataContractSerializer GetDataContractSerializer(IApp pluginApp)
         {
-            get
+            List<Type> knownTypes = new List<Type>(AppSnapshot.CollectionTypes);
+
+            foreach (ISettingTypes types in pluginApp?.GetExports<ISettingTypes>() ?? Enumerable.Empty<ISettingTypes>())
             {
-                return new DataContractSerializer(typeof(AppSnapshot), AppSnapshot.CollectionTypes);
+                foreach (Type type in types.SnapshotTypes ?? Enumerable.Empty<Type>())
+                {
+                    if (type != null && !knownTypes.Contains(type))
+                    {
+                        knownTypes.Add(type);
+                    }
+                }
             }
+
+            return new DataContractSerializer(typeof(AppSnapshot), knownTypes);
         }
 
         private static IEnumerable<Type> CollectionTypes
@@ -129,7 +141,7 @@ namespace DevPrompt.Settings
             }
         }
 
-        public static async Task<AppSnapshot> Load(string path)
+        public static async Task<AppSnapshot> Load(IApp pluginApp, string path)
         {
             AppSnapshot snapshot = null;
 
@@ -147,7 +159,7 @@ namespace DevPrompt.Settings
                         using (Stream stream = File.OpenRead(path))
                         using (XmlReader reader = XmlReader.Create(stream, xmlSettings))
                         {
-                            return (AppSnapshot)AppSnapshot.DataContractSerializer.ReadObject(reader);
+                            return (AppSnapshot)AppSnapshot.GetDataContractSerializer(pluginApp).ReadObject(reader);
                         }
                     }
                 });
@@ -159,12 +171,12 @@ namespace DevPrompt.Settings
             return snapshot ?? new AppSnapshot();
         }
 
-        public Task Save()
+        public Task Save(IApp pluginApp)
         {
-            return this.Save(AppSnapshot.DefaultPath);
+            return this.Save(pluginApp, AppSnapshot.DefaultPath);
         }
 
-        public Task Save(string path)
+        public Task Save(IApp pluginApp, string path)
         {
             AppSnapshot clone = this.Clone();
 
@@ -180,7 +192,7 @@ namespace DevPrompt.Settings
                     using (Stream stream = File.Create(path))
                     using (XmlWriter writer = XmlWriter.Create(stream, xmlSettings))
                     {
-                        AppSnapshot.DataContractSerializer.WriteObject(writer, clone);
+                        AppSnapshot.GetDataContractSerializer(pluginApp).WriteObject(writer, clone);
                     }
                 }
             });

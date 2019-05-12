@@ -1,4 +1,5 @@
-﻿using DevPrompt.Utility;
+﻿using DevPrompt.Plugins;
+using DevPrompt.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -263,7 +264,7 @@ namespace DevPrompt.Settings
             });
         }
 
-        public static async Task<AppSettings> UnsafeLoad(string path)
+        public static async Task<AppSettings> UnsafeLoad(IApp pluginApp, string path)
         {
             return await Task.Run(() =>
             {
@@ -277,13 +278,13 @@ namespace DevPrompt.Settings
                     using (Stream stream = File.OpenRead(path))
                     using (XmlReader reader = XmlReader.Create(stream, xmlSettings))
                     {
-                        return (AppSettings)AppSettings.DataContractSerializer.ReadObject(reader);
+                        return (AppSettings)AppSettings.GetDataContractSerializer(pluginApp).ReadObject(reader);
                     }
                 }
             });
         }
 
-        public static async Task<AppSettings> Load(string path)
+        public static async Task<AppSettings> Load(IApp pluginApp, string path)
         {
             AppSettings settings = null;
 
@@ -291,7 +292,7 @@ namespace DevPrompt.Settings
             {
                 if (File.Exists(path))
                 {
-                    settings = await AppSettings.UnsafeLoad(path);
+                    settings = await AppSettings.UnsafeLoad(pluginApp, path);
                     settings.EnsureValid();
                 }
             }
@@ -302,13 +303,13 @@ namespace DevPrompt.Settings
             if (settings == null)
             {
                 settings = await AppSettings.GetDefaultSettings(DefaultSettingsFilter.All);
-                await settings.Save(path);
+                await settings.Save(pluginApp, path);
             }
 
             return settings;
         }
 
-        public Task<Exception> Save(string path = null)
+        public Task<Exception> Save(IApp pluginApp, string path = null)
         {
             AppSettings clone = this.Clone();
 
@@ -333,7 +334,7 @@ namespace DevPrompt.Settings
                             using (Stream stream = File.Create(path))
                             using (XmlWriter writer = XmlWriter.Create(stream, xmlSettings))
                             {
-                                AppSettings.DataContractSerializer.WriteObject(writer, clone);
+                                AppSettings.GetDataContractSerializer(pluginApp).WriteObject(writer, clone);
                             }
                         }
                     }
@@ -453,12 +454,22 @@ namespace DevPrompt.Settings
             this.saveTabsOnExit = true;
         }
 
-        private static DataContractSerializer DataContractSerializer
+        private static DataContractSerializer GetDataContractSerializer(IApp pluginApp)
         {
-            get
+            List<Type> knownTypes = new List<Type>(AppSettings.CollectionTypes);
+
+            foreach (ISettingTypes types in pluginApp?.GetExports<ISettingTypes>() ?? Enumerable.Empty<ISettingTypes>())
             {
-                return new DataContractSerializer(typeof(AppSettings), AppSettings.CollectionTypes);
+                foreach (Type type in types.SettingTypes ?? Enumerable.Empty<Type>())
+                {
+                    if (type != null && !knownTypes.Contains(type))
+                    {
+                        knownTypes.Add(type);
+                    }
+                }
             }
+
+            return new DataContractSerializer(typeof(AppSettings), knownTypes);
         }
 
         private static IEnumerable<Type> CollectionTypes
