@@ -17,9 +17,8 @@ namespace DevPrompt.Interop
         void Deactivate();
         void Show();
         void Hide();
-        IntPtr GetWindow();
-        void DpiChanged(double oldScale, double newScale);
         void Focus();
+        IntPtr GetWindow();
 
         [return: MarshalAs(UnmanagedType.Interface)]
         IProcess RunProcess(
@@ -32,5 +31,8 @@ namespace DevPrompt.Interop
 
         [return: MarshalAs(UnmanagedType.Interface)]
         IProcess CloneProcess([MarshalAs(UnmanagedType.Interface)] IProcess process);
+
+        [return: MarshalAs(UnmanagedType.VariantBool)]
+        bool ContainsProcess([MarshalAs(UnmanagedType.Interface)] IProcess process);
     }
 }

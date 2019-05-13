@@ -1,6 +1,4 @@
-﻿using DevPrompt.Utility;
-using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.Serialization;
 
 namespace DevPrompt.Settings
@@ -10,7 +8,7 @@ namespace DevPrompt.Settings
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{Name}")]
-    public class LinkSettings : PropertyNotifier, ICloneable
+    internal class LinkSettings : Api.PropertyNotifier
     {
         private string name;
         private string address;
@@ -25,11 +23,6 @@ namespace DevPrompt.Settings
         {
             this.name = copyFrom.Name;
             this.address = copyFrom.Address;
-        }
-
-        object ICloneable.Clone()
-        {
-            return this.Clone();
         }
 
         public LinkSettings Clone()

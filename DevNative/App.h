@@ -41,7 +41,6 @@ public:
     void DeactivateProcessHostWindow(HWND hwnd);
     void ShowProcessHostWindow(HWND hwnd);
     void HideProcessHostWindow(HWND hwnd);
-    void ProcessHostWindowDpiChanged(HWND hwnd, double oldScale, double newScale);
 
     // Process functions, each process is identified by its HWND
     HWND RunProcess(HWND processHostWindow, const Json::Dict& info);
@@ -78,6 +77,7 @@ private:
     void RunAllTasks();
     void NotifyWindowDestroying(HWND hwnd);
     void CheckPendingWindows();
+    void ProcessHostWindowDpiChanged(HWND hwnd);
     static BOOL CALLBACK FindProcessToGrab(HWND hwnd, LPARAM lp);
 
     // Keyboard hook is needed because focus is usually in another process (the console process)

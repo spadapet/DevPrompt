@@ -1,5 +1,4 @@
-﻿using DevPrompt.Settings;
-using DevPrompt.UI.ViewModels;
+﻿using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,14 +10,37 @@ namespace DevPrompt.UI.DesignerViewModels
     /// <summary>
     /// Sample data for the XAML designer
     /// </summary>
-    public class TabDesignerVM : ITabVM
+    internal class TabDesignerVM : Api.ITabVM, Api.ITab
     {
-        public string TabName { get; set; } = "Tab Name";
-        public string ExpandedTabName { get; set; } = "Tab Name";
-        public string Title { get; set; } = "Title";
-        public bool Active { get; set; }
+        public event PropertyChangedEventHandler PropertyChanged { add { } remove { } }
 
-        public UIElement ViewElement { get; set; } = new Border()
+        public Guid Id => Guid.Empty;
+        public string Name => "Tab Name";
+        public string Tooltip => "Tooltip";
+        public string Title => "Title";
+        public bool CreatedTab => true;
+        public Api.ITab Tab => this;
+        public Api.ITabSnapshot Snapshot => null;
+        public Api.ActiveState ActiveState { get; set; }
+
+        public ICommand ActivateCommand => new Api.DelegateCommand();
+        public ICommand CloseCommand => new Api.DelegateCommand();
+        public ICommand CloneCommand => new Api.DelegateCommand();
+        public ICommand DetachCommand => new Api.DelegateCommand();
+        public ICommand DefaultsCommand => new Api.DelegateCommand();
+        public ICommand PropertiesCommand => new Api.DelegateCommand();
+        public ICommand SetTabNameCommand => new Api.DelegateCommand();
+
+        public TabDesignerVM(Api.ActiveState activeState = Api.ActiveState.Hidden)
+        {
+            this.ActiveState = activeState;
+        }
+
+        public void Dispose()
+        {
+        }
+
+        public UIElement ViewElement => new Border()
         {
             Background = new SolidColorBrush(Colors.SlateGray),
             Child = new TextBlock()
@@ -30,24 +52,26 @@ namespace DevPrompt.UI.DesignerViewModels
             }
         };
 
-        public ICommand ActivateCommand => null;
-        public ICommand CloneCommand => null;
-        public ICommand CloseCommand => null;
-        public ICommand DetachCommand => null;
-        public ICommand DefaultsCommand => null;
-        public ICommand PropertiesCommand => null;
-        public ICommand SetTabNameCommand => null;
-        public ITabSnapshot Snapshot => null;
-
-        event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged { add { } remove { } }
-
         public void Focus()
         {
         }
 
-        public string GetState()
+        public bool TakeRestoredTab(Api.ITab tab)
         {
-            return string.Empty;
+            return false;
+        }
+
+        public void OnShowing()
+        {
+        }
+
+        public void OnHiding()
+        {
+        }
+
+        public bool OnClosing()
+        {
+            return true;
         }
     }
 }

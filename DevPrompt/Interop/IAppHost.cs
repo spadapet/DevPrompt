@@ -24,7 +24,7 @@ namespace DevPrompt.Interop
         void OnProcessOpening(IProcess process, [MarshalAs(UnmanagedType.VariantBool)] bool activate, [MarshalAs(UnmanagedType.LPWStr)] string path);
         void OnProcessClosing(IProcess process);
         void OnProcessEnvChanged(IProcess process, [MarshalAs(UnmanagedType.LPWStr)] string env);
-        void OnProcessTitleChanged(IProcess process, [MarshalAs(UnmanagedType.LPWStr)] string env);
+        void OnProcessTitleChanged(IProcess process, [MarshalAs(UnmanagedType.LPWStr)] string title);
         void CloneActiveProcess();
         void CloseActiveProcess();
         void DetachActiveProcess();

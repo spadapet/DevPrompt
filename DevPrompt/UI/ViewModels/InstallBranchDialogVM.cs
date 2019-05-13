@@ -1,12 +1,11 @@
-﻿using DevPrompt.Utility;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 
 namespace DevPrompt.UI.ViewModels
 {
     /// <summary>
     /// View model for the dialog to install a VS branch
     /// </summary>
-    internal class InstallBranchDialogVM : PropertyNotifier
+    internal class InstallBranchDialogVM : Api.PropertyNotifier
     {
         private readonly InstallBranchDialog dialog;
         private string name;
@@ -45,7 +44,7 @@ namespace DevPrompt.UI.ViewModels
         {
             get
             {
-                return new DelegateCommand(() =>
+                return new Api.DelegateCommand(() =>
                 {
                     if (this.dialog != null)
                     {

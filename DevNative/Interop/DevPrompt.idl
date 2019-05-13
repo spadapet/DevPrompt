@@ -56,9 +56,8 @@ interface IProcessHost : IUnknown
     HRESULT Deactivate();
     HRESULT Show();
     HRESULT Hide();
-    HRESULT GetWindow([out, retval] HWND* hwnd);
-    HRESULT DpiChanged(double oldScale, double newScale);
     HRESULT Focus();
+    HRESULT GetWindow([out, retval] HWND* hwnd);
 
     HRESULT RunProcess(
         const wchar_t* executable,
@@ -68,6 +67,7 @@ interface IProcessHost : IUnknown
 
     HRESULT RestoreProcess(const wchar_t* state, [out, retval] IProcess** obj);
     HRESULT CloneProcess(IProcess* process, [out, retval] IProcess** obj);
+    HRESULT ContainsProcess(IProcess* process, [out, retval] VARIANT_BOOL* value);
 };
 
 [object, uuid("e3b1d8b5-bce5-4522-ad92-44ce6edda69c")]

@@ -1,10 +1,9 @@
-﻿using DevOps.UI.ViewModels;
-using DevPrompt.Plugins;
-using DevPrompt.UI.ViewModels;
-using DevPrompt.Utility;
+﻿using DevPrompt.Api;
+using Microsoft.TeamFoundation.Build.WebApi;
 using System.Collections.Generic;
 using System.Composition;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Windows.Controls;
 
 namespace DevOps
@@ -16,7 +15,7 @@ namespace DevOps
         {
         }
 
-        IEnumerable<MenuItem> IMenuItemProvider.GetMenuItems(MenuType menu, IMainWindowVM window)
+        IEnumerable<MenuItem> IMenuItemProvider.GetMenuItems(MenuType menu, IWindow window)
         {
             switch (menu)
             {
@@ -24,23 +23,27 @@ namespace DevOps
                     yield return new MenuItem()
                     {
                         Header = "Pull request dashboard",
-                        Command = new DelegateCommand(obj => this.OnPullRequestDashboard((IMainWindowVM)obj)),
+                        Command = new DelegateCommand(obj => this.OnPullRequestDashboard((IWindow)obj)),
                         CommandParameter = window
                     };
                     break;
             }
         }
 
-        private void OnPullRequestDashboard(IMainWindowVM window)
+        private void OnPullRequestDashboard(IWindow window)
         {
-            if (window.Tabs.OfType<PullRequestTabVM>().FirstOrDefault() is PullRequestTabVM tab)
+            if (window.FindWorkspace(Constants.ProcessWorkspaceId) is IWorkspaceVM workspaceVM && workspaceVM.Workspace is ITabWorkspace workspace)
             {
-                window.ActiveTab = tab;
-            }
-            else
-            {
-                tab = new PullRequestTabVM(window);
-                window.AddTab(tab, activate: true);
+                if (workspace.Tabs.FirstOrDefault(t => t.Id == typeof(PullRequestTab).GUID) is ITabVM tabVM)
+                {
+                    window.ActiveWorkspace = workspaceVM;
+                    workspace.ActiveTab = tabVM;
+                }
+                else
+                {
+                    ITab tab = new PullRequestTab(window, workspace);
+                    workspace.AddTab(new TabVM(window, workspace, tab), activate: true);
+                }
             }
         }
     }

@@ -1,5 +1,4 @@
-﻿using DevPrompt.Utility;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization;
@@ -11,7 +10,7 @@ namespace DevPrompt.Settings
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{ExeName}")]
-    public class GrabConsoleSettings : PropertyNotifier, ICloneable
+    internal class GrabConsoleSettings : Api.PropertyNotifier
     {
         private string exeName;
         private string tabName;
@@ -29,11 +28,6 @@ namespace DevPrompt.Settings
             this.exeName = copyFrom.exeName;
             this.tabName = copyFrom.tabName;
             this.tabActivate = copyFrom.tabActivate;
-        }
-
-        object ICloneable.Clone()
-        {
-            return this.Clone();
         }
 
         public GrabConsoleSettings Clone()

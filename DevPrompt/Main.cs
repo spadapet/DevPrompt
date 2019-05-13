@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace DevPrompt
 {
-    public static class Program
+    internal static class Program
     {
         [STAThread]
         public static void Main(string[] args)
@@ -55,7 +55,7 @@ namespace DevPrompt
                         info.Verb = "runas";
                         try
                         {
-                            if (Process.Start(info) is Process process)
+                            if (System.Diagnostics.Process.Start(info) is System.Diagnostics.Process process)
                             {
                                 // Quit and let the new process take over
                                 return true;

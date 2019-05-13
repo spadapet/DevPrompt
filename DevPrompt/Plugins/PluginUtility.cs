@@ -1,14 +1,55 @@
 ﻿using DevPrompt.Settings;
+using System;
 using System.Collections.Generic;
+using System.Composition.Convention;
+using System.Composition.Hosting;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 
 namespace DevPrompt.Plugins
 {
+    /// <summary>
+    /// Loads all plugin DLLs
+    /// </summary>
     internal static class PluginUtility
     {
-        public static IEnumerable<Assembly> GetPluginAssemblies()
+#if NET_FRAMEWORK
+        private const string DllSuffix = ".Plugin.dll";
+#else
+        private const string DllSuffix = ".NetCorePlugin.dll";
+#endif
+
+        public static CompositionHost CreatePluginHost(App app, ICollection<Assembly> appAssemblies)
+        {
+            try
+            {
+                ConventionBuilder conventions = new ConventionBuilder();
+                conventions.ForType<Api.IApp>().Shared();
+                conventions.ForType<Api.IAppListener>().Shared();
+                conventions.ForType<Api.IAppSettings>().Shared();
+                conventions.ForType<Api.IWindow>().Shared();
+                conventions.ForType<Api.IProcessListener>().Shared();
+                conventions.ForType<Interop.IProcessCache>().Shared();
+                conventions.ForType<Interop.IProcessListener>().Shared();
+
+                CompositionHost host = new ContainerConfiguration()
+                    .WithDefaultConventions(conventions)
+                    .WithAssemblies(PluginUtility.GetPluginAssemblies(appAssemblies), conventions)
+                    .WithProvider(new ExportProvider(app))
+                    .CreateContainer();
+
+                return host;
+            }
+            catch (Exception ex)
+            {
+                Debug.Fail(ex.Message, ex.StackTrace);
+                return null;
+            }
+        }
+
+        private static IEnumerable<Assembly> GetPluginAssemblies(ICollection<Assembly> appAssemblies)
         {
             Assembly thisAssembly = Assembly.GetExecutingAssembly();
             List<Assembly> assemblies = new List<Assembly>();
@@ -25,26 +66,27 @@ namespace DevPrompt.Plugins
                 assemblies.AddRange(PluginUtility.GetPluginAssemblies(path));
             }
 
-            return assemblies.Distinct();
+            foreach (Assembly assembly in assemblies.Distinct())
+            {
+                appAssemblies?.Add(assembly);
+                yield return assembly;
+            }
         }
 
         private static IEnumerable<Assembly> GetPluginAssemblies(string path)
         {
             List<Assembly> assemblies = new List<Assembly>();
-            IEnumerable<string> files;
+            IEnumerable<string> files = Enumerable.Empty<string>();
 
-#if NET_FRAMEWORK
-            string filter = "*.Plugin.dll";
-#else
-            string filter = "*.NetCorePlugin.dll";
-#endif
             try
             {
-                files = Directory.EnumerateFiles(path, filter, SearchOption.TopDirectoryOnly).ToArray();
+                if (Directory.Exists(path))
+                {
+                    files = Directory.EnumerateFiles(path, "*" + PluginUtility.DllSuffix, SearchOption.AllDirectories).ToArray();
+                }
             }
             catch
             {
-                files = Enumerable.Empty<string>();
             }
 
             foreach (string file in files)

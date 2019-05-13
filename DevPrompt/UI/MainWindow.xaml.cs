@@ -1,82 +1,52 @@
-﻿using DevPrompt.Interop;
-using DevPrompt.Plugins;
-using DevPrompt.Settings;
-using DevPrompt.UI.Controls;
+﻿using DevPrompt.Settings;
 using DevPrompt.UI.ViewModels;
 using DevPrompt.Utility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Threading;
 
 namespace DevPrompt.UI
 {
-    internal partial class MainWindow : Window, DragItemsControl.IDragHost
+    internal partial class MainWindow : Window
     {
         public MainWindowVM ViewModel { get; }
-        public AppSettings AppSettings { get; }
-        public NativeProcessListener NativeProcessListener { get; }
         public App App { get; }
-        public Interop.IApp NativeApp => this.App?.NativeApp;
         private bool systemShuttingDown;
 
-        public MainWindow(App app, AppSettings settings, string initialErrorText)
+        public MainWindow(App app, string initialErrorText)
         {
             this.App = app;
-            this.AppSettings = settings;
             this.ViewModel = new MainWindowVM(this)
             {
                 ErrorText = initialErrorText
             };
 
-            this.NativeProcessListener = new NativeProcessListener(this.ViewModel);
             this.InitializeComponent();
-        }
-
-        public ProcessHostWindow ProcessHostWindow
-        {
-            get
-            {
-                return this.processHostHolder?.Child as ProcessHostWindow;
-            }
         }
 
         public UIElement ViewElement
         {
-            get
-            {
-                return this.viewElementHolder.Child;
-            }
-
+            get => this.viewElementHolder.Child;
             set
             {
-                this.viewElementHolder.Child = value;
-
-                if (value == null)
+                if (this.viewElementHolder.Child != value)
                 {
-                    this.processHostHolder.Visibility = Visibility.Visible;
-                    this.viewElementHolder.Visibility = Visibility.Collapsed;
-
-                    this.ProcessHostWindow?.Show();
-                }
-                else
-                {
-                    this.ProcessHostWindow?.Hide();
-
-                    this.processHostHolder.Visibility = Visibility.Collapsed;
-                    this.viewElementHolder.Visibility = Visibility.Visible;
+                    this.viewElementHolder.Child = value;
+                    this.viewElementHolder.Visibility = (value != null) ? Visibility.Visible : Visibility.Collapsed;
                 }
             }
         }
 
         private void OnFileMenuOpened(object sender, RoutedEventArgs args)
         {
-            MainWindow.UpdateMenu((MenuItem)sender, this.AppSettings.Consoles, (ConsoleSettings settings) =>
+            MainWindow.UpdateMenu((MenuItem)sender, this.App.Settings.Consoles, (ConsoleSettings settings) =>
             {
                 return new MenuItem()
                 {
@@ -89,25 +59,16 @@ namespace DevPrompt.UI
 
         private void OnGrabMenuOpened(object sender, RoutedEventArgs args)
         {
-            List<string> names = new List<string>(CommandHelpers.GetGrabProcesses(this.NativeApp));
+            Api.IApp app = this.App;
+            List<Api.GrabProcess> grabProcesses = new List<Api.GrabProcess>(app.GrabProcesses);
 
-            MainWindow.UpdateMenu((MenuItem)sender, names, (string name) =>
+            MainWindow.UpdateMenu((MenuItem)sender, grabProcesses, (Api.GrabProcess grabProcess) =>
             {
-                int id = 0;
-                if (name.StartsWith("[", StringComparison.Ordinal))
-                {
-                    int end = name.IndexOf(']', 1);
-                    if (end != -1 && int.TryParse(name.Substring(1, end - 1), out int tempId))
-                    {
-                        id = tempId;
-                    }
-                }
-
                 return new MenuItem()
                 {
-                    Header = name,
+                    Header = grabProcess.Name,
                     Command = this.ViewModel.GrabConsoleCommand,
-                    CommandParameter = id
+                    CommandParameter = grabProcess.Id,
                 };
             });
         }
@@ -131,7 +92,7 @@ namespace DevPrompt.UI
         {
             MenuItem menu = (MenuItem)sender;
 
-            MainWindow.UpdateMenu(menu, this.AppSettings.Tools, (ToolSettings settings) =>
+            MainWindow.UpdateMenu(menu, this.App.Settings.Tools, (ToolSettings settings) =>
             {
                 if (string.IsNullOrEmpty(settings.Command))
                 {
@@ -146,14 +107,14 @@ namespace DevPrompt.UI
                 };
             });
 
-            this.AddPluginMenuItems(menu, MenuType.Tools);
+            this.AddPluginMenuItems(menu, Api.MenuType.Tools);
         }
 
         private void OnLinksMenuOpened(object sender, RoutedEventArgs args)
         {
             MenuItem menu = (MenuItem)sender;
 
-            MainWindow.UpdateMenu(menu, this.AppSettings.Links, (LinkSettings settings) =>
+            MainWindow.UpdateMenu(menu, this.App.Settings.Links, (LinkSettings settings) =>
             {
                 if (string.IsNullOrEmpty(settings.Address))
                 {
@@ -168,14 +129,14 @@ namespace DevPrompt.UI
                 };
             });
 
-            this.AddPluginMenuItems(menu, MenuType.Links);
+            this.AddPluginMenuItems(menu, Api.MenuType.Links);
         }
 
         /// <summary>
         /// Replaces MenuItems up until the first separator with dynamic MenuItems.
         /// The dynamic MenuItems are generated by the createMenuItem Func
         /// </summary>
-        private static void UpdateMenu<T>(MenuItem menu, IList<T> dynamicItems, Func<T, Control> createMenuItem) where T : class
+        private static void UpdateMenu<T>(MenuItem menu, IList<T> dynamicItems, Func<T, Control> createMenuItem)
         {
             for (int i = 0; i < dynamicItems.Count; i++)
             {
@@ -186,7 +147,7 @@ namespace DevPrompt.UI
                     // Reached the end separator
                     menu.Items.Insert(i, createMenuItem(dynamicItems[i]));
                 }
-                else if (!object.Equals(item.Tag, dynamicItems[i]))
+                else if (!(item.Tag is T itemTag) || !EqualityComparer<T>.Default.Equals(itemTag, dynamicItems[i]))
                 {
                     FrameworkElement elem = createMenuItem(dynamicItems[i]);
                     elem.Tag = dynamicItems[i];
@@ -211,21 +172,28 @@ namespace DevPrompt.UI
             }
         }
 
-        private void AddPluginMenuItems(MenuItem menu, MenuType menuType)
+        private void AddPluginMenuItems(MenuItem menu, Api.MenuType menuType)
         {
             if (menu.Items.OfType<Separator>().Where(s => s.Tag is string name && name == "[Plugins]").FirstOrDefault() is Separator separator)
             {
                 separator.Tag = null;
                 int index = menu.Items.IndexOf(separator);
 
-                foreach (IMenuItemProvider provider in this.App?.GetExports<IMenuItemProvider>())
+                foreach (Api.IMenuItemProvider provider in this.App.MenuItemProviders)
                 {
-                    foreach (MenuItem item in provider.GetMenuItems(menuType, this.ViewModel))
+                    try
                     {
-                        if (item != null)
+                        foreach (MenuItem item in provider.GetMenuItems(menuType, this.ViewModel))
                         {
-                            menu.Items.Insert(index, item);
+                            if (item != null)
+                            {
+                                menu.Items.Insert(index, item);
+                            }
                         }
+                    }
+                    catch
+                    {
+                        Debug.Fail($"IMenuItemProvider.GetMenuItems failed in plugin class {provider.GetType().FullName}");
                     }
                 }
 
@@ -239,31 +207,18 @@ namespace DevPrompt.UI
 
         private void OnActivated(object sender, EventArgs args)
         {
-            this.NativeApp?.Activate();
-            this.ProcessHostWindow?.OnActivated();
+            this.App.NativeApp?.Activate();
         }
 
         private void OnDeactivated(object sender, EventArgs args)
         {
-            this.NativeApp?.Deactivate();
-            this.ProcessHostWindow?.OnDeactivated();
+            this.App.NativeApp?.Deactivate();
         }
 
         private IntPtr WindowProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            this.NativeApp?.MainWindowProc(hwnd, msg, wParam, lParam);
+            this.App.NativeApp?.MainWindowProc(hwnd, msg, wParam, lParam);
             return IntPtr.Zero;
-        }
-
-        public void OnAppInitComplete()
-        {
-            if (this.NativeApp != null)
-            {
-                this.processHostHolder.Child = new ProcessHostWindow(this.NativeApp);
-
-                Action action = () => this.ViewModel.RunStartupConsoles();
-                this.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, action);
-            }
         }
 
         private void OnLoaded(object sender, RoutedEventArgs args)
@@ -282,12 +237,19 @@ namespace DevPrompt.UI
             }
         }
 
+        private async Task OnClosing()
+        {
+            this.App.OnWindowClosing(this);
+
+            AppSnapshot snapshot = new AppSnapshot(this.ViewModel);
+            await snapshot.Save(this.App);
+        }
+
         private async void OnClosing(object sender, CancelEventArgs args)
         {
             if (!this.systemShuttingDown)
             {
-                AppSnapshot snapshot = new AppSnapshot(this.ViewModel);
-                await snapshot.Save(this.App);
+                await this.OnClosing();
             }
         }
 
@@ -299,8 +261,7 @@ namespace DevPrompt.UI
             if (!this.systemShuttingDown)
             {
                 this.systemShuttingDown = true;
-                AppSnapshot snapshot = new AppSnapshot(this.ViewModel, force: true);
-                snapshot.Save(this.App).Wait();
+                this.OnClosing().Wait();
             }
         }
 
@@ -310,7 +271,7 @@ namespace DevPrompt.UI
 
             if (args.NewFocus == this)
             {
-                this.ViewModel.FocusActiveTab();
+                this.ViewModel.ActiveWorkspace?.Workspace?.Focus();
             }
         }
 
@@ -325,56 +286,6 @@ namespace DevPrompt.UI
             {
                 CommandHelpers.FocusFirstMenuItem(this.MainMenu);
             }
-        }
-
-        private void OnTabButtonMouseDown(object sender, MouseButtonEventArgs args)
-        {
-            if (args.ChangedButton == MouseButton.Middle &&
-                sender is Button button &&
-                button.DataContext is ITabVM tab)
-            {
-                tab.CloseCommand?.Execute(null);
-            }
-        }
-
-        private void OnTabButtonMouseMoveEvent(object sender, MouseEventArgs args)
-        {
-            if (sender is Button button)
-            {
-                this.tabItemsControl.NotifyMouseMove(button, args);
-            }
-        }
-
-        private void OnTabButtonMouseCaptureEvent(object sender, MouseEventArgs args)
-        {
-            if (sender is Button button)
-            {
-                this.tabItemsControl.NotifyMouseCapture(button, args);
-            }
-        }
-
-        private void OnTabContextMenuOpened(object sender, RoutedEventArgs args)
-        {
-            if (sender is ContextMenu menu)
-            {
-                CommandHelpers.FocusFirstMenuItem(menu);
-            }
-        }
-
-        void DragItemsControl.IDragHost.OnDrop(ItemsControl source, object droppedModel, int droppedIndex, bool copy)
-        {
-            if (source == this.tabItemsControl && droppedModel is ITabVM tab)
-            {
-                this.ViewModel.OnDrop(tab, droppedIndex, copy);
-            }
-        }
-
-        /// <summary>
-        /// Allows cloning of a process
-        /// </summary>
-        bool DragItemsControl.IDragHost.CanDropCopy(object droppedModel)
-        {
-            return droppedModel is ITabVM tab && tab.CloneCommand?.CanExecute(null) == true;
         }
     }
 }

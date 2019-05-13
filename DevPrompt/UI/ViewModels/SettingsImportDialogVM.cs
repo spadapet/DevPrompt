@@ -1,5 +1,4 @@
 ﻿using DevPrompt.Settings;
-using DevPrompt.Utility;
 using System;
 using System.Collections.Generic;
 
@@ -8,7 +7,7 @@ namespace DevPrompt.UI.ViewModels
     /// <summary>
     /// View model for the settings import dialog
     /// </summary>
-    internal class SettingsImportDialogVM : PropertyNotifier
+    internal class SettingsImportDialogVM : Api.PropertyNotifier
     {
         private AppSettings settings;
         private int consolesIndex;

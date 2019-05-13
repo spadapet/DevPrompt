@@ -607,6 +607,7 @@ void App::Activate()
     assert(App::IsMainThread());
 
     this->active = true;
+    this->DisposeKeyboardHook();
     this->AddRefKeyboardHook();
 }
 
@@ -649,17 +650,17 @@ void App::HideProcessHostWindow(HWND hwnd)
     ::ShowWindow(hwnd, SW_HIDE);
 }
 
-void App::ProcessHostWindowDpiChanged(HWND hwnd, double oldScale, double newScale)
+void App::ProcessHostWindowDpiChanged(HWND hwnd)
 {
     std::shared_ptr<App> self = this->shared_from_this();
 
-    this->PostToMainThread([self, hwnd, oldScale, newScale]()
+    this->PostToMainThread([self, hwnd]()
     {
         for (std::shared_ptr<Process>& i : self->processes)
         {
             if (i->GetHostWindow() && ::GetParent(i->GetHostWindow()) == hwnd)
             {
-                i->SendDpiChanged(oldScale, newScale);
+                i->SendDpiChanged();
             }
         }
     });
@@ -887,9 +888,9 @@ void App::OnProcessClosing(Process* process)
         if (pi.get() == process)
         {
             Microsoft::WRL::ComPtr<IProcess> processInterop = new ProcessInterop(this, pi->GetHostWindow());
+            this->processes.erase(i);
             this->host->OnProcessClosing(processInterop.Get());
             this->NotifyWindowDestroying(pi->GetHostWindow());
-            this->processes.erase(i);
             break;
         }
     }
@@ -1115,6 +1116,10 @@ LRESULT App::WindowProc(HWND hwnd, UINT message, WPARAM wp, LPARAM lp)
 
     case WM_PAINT:
         WindowProc::PaintMessage(hwnd, this->GetMessageFont(hwnd), L"Use the 'File' menu to start a command prompt.");
+        break;
+
+    case WM_DPICHANGED_AFTERPARENT:
+        this->ProcessHostWindowDpiChanged(hwnd);
         break;
     }
 

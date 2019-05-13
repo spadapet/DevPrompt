@@ -1,9 +1,10 @@
-﻿using DevPrompt.Interop;
-using DevPrompt.Settings;
+﻿using DevPrompt.Settings;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Threading;
 
 namespace DevPrompt.Utility
@@ -17,7 +18,7 @@ namespace DevPrompt.Utility
         {
             foreach (object item in mainMenu.Items)
             {
-                if (item is MenuItem menuItem && menuItem.Header is string header)
+                if (item is MenuItem menuItem && menuItem.Header is string header && menuItem.IsEnabled && menuItem.Visibility == Visibility.Visible)
                 {
                     int i = header.IndexOf('_');
                     if (i >= 0 && i + 1 < header.Length)
@@ -42,7 +43,7 @@ namespace DevPrompt.Utility
         {
             foreach (object subItem in mainMenu.Items)
             {
-                if (subItem is MenuItem subMenuItem)
+                if (subItem is MenuItem subMenuItem && subMenuItem.IsEnabled && subMenuItem.Visibility == Visibility.Visible)
                 {
                     if (subMenuItem.Focus())
                     {
@@ -52,9 +53,9 @@ namespace DevPrompt.Utility
             }
         }
 
-        public static DelegateCommand CreateMoveUpCommand<T>(Func<DataGrid> dataGridAccessor, ObservableCollection<T> items)
+        public static Api.DelegateCommand CreateMoveUpCommand<T>(Func<DataGrid> dataGridAccessor, ObservableCollection<T> items)
         {
-            return new DelegateCommand(() =>
+            return new Api.DelegateCommand(() =>
             {
                 DataGrid dataGrid = dataGridAccessor();
 
@@ -70,9 +71,9 @@ namespace DevPrompt.Utility
             });
         }
 
-        public static DelegateCommand CreateMoveDownCommand<T>(Func<DataGrid> dataGridAccessor, ObservableCollection<T> items)
+        public static Api.DelegateCommand CreateMoveDownCommand<T>(Func<DataGrid> dataGridAccessor, ObservableCollection<T> items)
         {
-            return new DelegateCommand(() =>
+            return new Api.DelegateCommand(() =>
             {
                 DataGrid dataGrid = dataGridAccessor();
                 if (dataGrid.SelectedIndex >= 0 && dataGrid.SelectedIndex + 1 < items.Count)
@@ -87,9 +88,9 @@ namespace DevPrompt.Utility
             });
         }
 
-        public static DelegateCommand CreateDeleteCommand<T>(Func<DataGrid> dataGridAccessor, ObservableCollection<T> items)
+        public static Api.DelegateCommand CreateDeleteCommand<T>(Func<DataGrid> dataGridAccessor, ObservableCollection<T> items)
         {
-            return new DelegateCommand(() =>
+            return new Api.DelegateCommand(() =>
             {
                 DataGrid dataGrid = dataGridAccessor();
                 int i = dataGrid.SelectedIndex;
@@ -110,9 +111,9 @@ namespace DevPrompt.Utility
             });
         }
 
-        public static DelegateCommand CreateResetCommand<T>(Func<AppSettings, IList<T>> newListAccessor, ObservableCollection<T> items, AppSettings.DefaultSettingsFilter filter)
+        public static Api.DelegateCommand CreateResetCommand<T>(Func<AppSettings, IList<T>> newListAccessor, ObservableCollection<T> items, AppSettings.DefaultSettingsFilter filter)
         {
-            return new DelegateCommand(async () =>
+            return new Api.DelegateCommand(async () =>
             {
                 AppSettings defaultSettings = await AppSettings.GetDefaultSettings(filter);
                 IList<T> newList = newListAccessor(defaultSettings);
@@ -126,11 +127,11 @@ namespace DevPrompt.Utility
             });
         }
 
-        public static void UpdateCommands(Dispatcher dispatcher, params DelegateCommand[] commands)
+        public static void UpdateCommands(Dispatcher dispatcher, params Api.DelegateCommand[] commands)
         {
             Action action = () =>
             {
-                foreach (DelegateCommand command in commands ?? new DelegateCommand[0])
+                foreach (Api.DelegateCommand command in commands ?? new Api.DelegateCommand[0])
                 {
                     command.UpdateCanExecute();
                 }
@@ -139,10 +140,12 @@ namespace DevPrompt.Utility
             dispatcher.BeginInvoke(action, DispatcherPriority.ApplicationIdle);
         }
 
-        public static IEnumerable<string> GetGrabProcesses(IApp nativeApp)
+        public static void SafeExecute(this ICommand command, object parameter = null)
         {
-            string names = nativeApp?.GetGrabProcesses();
-            return !string.IsNullOrEmpty(names) ? names.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries) : new string[0];
+            if (command != null && command.CanExecute(parameter))
+            {
+                command.Execute(parameter);
+            }
         }
     }
 }

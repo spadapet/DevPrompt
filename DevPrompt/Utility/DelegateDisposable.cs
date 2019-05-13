@@ -2,7 +2,10 @@
 
 namespace DevPrompt.Utility
 {
-    public class DelegateDisposable : IDisposable
+    /// <summary>
+    /// Just calls a delegate when Dispose() is called
+    /// </summary>
+    internal class DelegateDisposable : IDisposable
     {
         private Action disposeAction;
 

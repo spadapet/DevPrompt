@@ -10,28 +10,44 @@ namespace DevPrompt.Plugins
     internal class ExportProvider : ExportDescriptorProvider
     {
         private App app;
-        private Dictionary<string, object> emptyMetadata;
 
         public ExportProvider(App app)
         {
             this.app = app;
-            this.emptyMetadata = new Dictionary<string, object>();
         }
 
+        /// <summary>
+        /// The app and main window cannot be created and owned by System.Composition,
+        /// so this method allows them to be exported anyway.
+        /// </summary>
         public override IEnumerable<ExportDescriptorPromise> GetExportDescriptors(CompositionContract contract, DependencyAccessor descriptorAccessor)
         {
-            if (contract.ContractType == typeof(IApp))
+            if (contract.ContractType == typeof(Api.IApp))
             {
-                yield return new ExportDescriptorPromise(contract,
-                    nameof(ExportProvider), true,
-                    () => Enumerable.Empty<CompositionDependency>(),
-                    deps => ExportDescriptor.Create(this.ActivateApp, this.emptyMetadata));
+                yield return ExportProvider.CreateExport(contract, this.ActivateApp, true);
+            }
+            else if (contract.ContractType == typeof(Api.IAppSettings))
+            {
+                yield return ExportProvider.CreateExport(contract, this.ActivateAppSettings, true);
             }
         }
 
         private object ActivateApp(LifetimeContext context, CompositionOperation operation)
         {
             return this.app;
+        }
+
+        private object ActivateAppSettings(LifetimeContext context, CompositionOperation operation)
+        {
+            return this.app.Settings;
+        }
+
+        private static ExportDescriptorPromise CreateExport(CompositionContract contract, CompositeActivator activator, bool shared)
+        {
+            return new ExportDescriptorPromise(contract,
+                nameof(ExportProvider), shared,
+                () => Enumerable.Empty<CompositionDependency>(),
+                deps => ExportDescriptor.Create(activator, new Dictionary<string, object>()));
         }
     }
 }

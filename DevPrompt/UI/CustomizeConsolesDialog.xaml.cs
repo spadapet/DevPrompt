@@ -11,10 +11,10 @@ namespace DevPrompt.UI
     internal partial class CustomizeConsolesDialog : Window
     {
         private readonly ObservableCollection<ConsoleSettings> settings;
-        public DelegateCommand MoveUpCommand { get; }
-        public DelegateCommand MoveDownCommand { get; }
-        public DelegateCommand DeleteCommand { get; }
-        public DelegateCommand ResetCommand { get; }
+        public Api.DelegateCommand MoveUpCommand { get; }
+        public Api.DelegateCommand MoveDownCommand { get; }
+        public Api.DelegateCommand DeleteCommand { get; }
+        public Api.DelegateCommand ResetCommand { get; }
 
         public CustomizeConsolesDialog(IEnumerable<ConsoleSettings> consoles)
         {

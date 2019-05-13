@@ -1,6 +1,5 @@
 ﻿using DevOps.Avatars;
-using DevPrompt.UI.ViewModels;
-using DevPrompt.Utility;
+using DevPrompt.Api;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using System;
@@ -18,7 +17,7 @@ namespace DevOps.UI.ViewModels
 {
     internal class PullRequestPageVM : PropertyNotifier, IAvatarProvider, IDisposable
     {
-        public PullRequestTabVM Tab { get; }
+        public PullRequestTab Tab { get; }
         private CancellationTokenSource cancellationTokenSource;
         private readonly GitHttpClient gitClient;
         private readonly HttpClient avatarHttpClient;
@@ -30,7 +29,7 @@ namespace DevOps.UI.ViewModels
         private bool disposed;
 
         public PullRequestPageVM(
-            PullRequestTabVM tab,
+            PullRequestTab tab,
             GitHttpClient gitClient,
             HttpClient avatarHttpClient,
             IEnumerable<TeamProject> projects)
@@ -61,7 +60,7 @@ namespace DevOps.UI.ViewModels
             }
         }
 
-        public IMainWindowVM Window
+        public IWindow Window
         {
             get
             {

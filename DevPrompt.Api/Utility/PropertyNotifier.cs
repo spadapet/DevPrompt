@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
-namespace DevPrompt.Utility
+namespace DevPrompt.Api
 {
     /// <summary>
     /// Base class for all WPF models/view models that notify listeners of property changes
@@ -31,7 +31,12 @@ namespace DevPrompt.Utility
             }
 
             property = value;
-            this.OnPropertyChanged(name);
+
+            if (name != null)
+            {
+                this.OnPropertyChanged(name);
+            }
+
             return true;
         }
     }

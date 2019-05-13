@@ -23,7 +23,7 @@ public:
     HWND GetHostWindow() const;
     DWORD GetProcessId() const;
     std::wstring GetProcessState();
-    void SendDpiChanged(double oldScale, double newScale);
+    void SendDpiChanged();
     void SendSystemCommand(UINT id);
 
     void Activate();

@@ -1,5 +1,4 @@
-﻿using DevPrompt.Utility;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Runtime.Serialization;
 
@@ -10,7 +9,7 @@ namespace DevPrompt.Settings
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{Name}")]
-    public class ToolSettings : PropertyNotifier, ICloneable
+    internal class ToolSettings : Api.PropertyNotifier
     {
         private string name;
         private string command;
@@ -28,11 +27,6 @@ namespace DevPrompt.Settings
             this.name = copyFrom.Name;
             this.command = copyFrom.Command;
             this.arguments = copyFrom.arguments;
-        }
-
-        object ICloneable.Clone()
-        {
-            return this.Clone();
         }
 
         public ToolSettings Clone()

@@ -2,188 +2,175 @@
 using DevPrompt.Plugins;
 using DevPrompt.Settings;
 using DevPrompt.UI;
-using DevPrompt.UI.ViewModels;
+using DevPrompt.Utility;
 using System;
 using System.Collections.Generic;
-using System.Composition.Convention;
 using System.Composition.Hosting;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Threading;
 
 namespace DevPrompt
 {
     /// <summary>
-    /// Singleton WPF app object (get using App.Current).
+    /// WPF app object.
     /// The native code will call into here using the IAppHost interface. We call into
     /// native code using the IApp interface.
     /// </summary>
-    internal partial class App : Application, IAppHost, Plugins.IApp
+    internal partial class App : Application, IAppHost, Api.IApp
     {
         public AppSettings Settings { get; }
-        public Interop.IApp NativeApp { get; private set; }
+        public NativeApp NativeApp { get; private set; }
+        public IEnumerable<IProcessListener> ProcessListeners => this.processListeners ?? Enumerable.Empty<IProcessListener>();
+        public IEnumerable<Api.IAppListener> AppListeners => this.appListeners ?? Enumerable.Empty<Api.IAppListener>();
+        public IEnumerable<Api.IMenuItemProvider> MenuItemProviders => this.menuItemProviders ?? Enumerable.Empty<Api.IMenuItemProvider>();
+        public IEnumerable<Api.IWorkspaceProvider> WorkspaceProviders => this.workspaceProviders ?? Enumerable.Empty<Api.IWorkspaceProvider>();
+        public IEnumerable<Assembly> PluginAssemblies => this.pluginAssemblies ?? Enumerable.Empty<Assembly>();
 
         private CompositionHost compositionHost;
+        private IProcessCache processCache;
+        private IProcessListener[] processListeners;
+        private Api.IAppListener[] appListeners;
+        private Api.IMenuItemProvider[] menuItemProviders;
+        private Api.IWorkspaceProvider[] workspaceProviders;
+        private List<Assembly> pluginAssemblies;
 
         public App()
         {
             this.Settings = new AppSettings();
-
             this.Startup += this.OnStartup;
             this.Exit += this.OnExit;
         }
 
-        public static new App Current
+        private void Dispose()
         {
-            get
-            {
-                throw new NotImplementedException("Try not to use App.Current if possible");
-                // return (App)Application.Current;
-            }
+            this.compositionHost?.Dispose();
+            this.NativeApp?.Dispose();
         }
 
         public new MainWindow MainWindow
         {
-            get
-            {
-                return base.MainWindow as MainWindow;
-            }
-
-            set
-            {
-                base.MainWindow = value;
-            }
+            get => base.MainWindow as MainWindow;
+            set => base.MainWindow = value;
         }
 
-        public ITabVM ActiveTab
-        {
-            get
-            {
-                return this.MainWindow?.ViewModel.ActiveTab;
-            }
-        }
-
-        public T GetExport<T>()
-        {
-            if (this.compositionHost != null && this.compositionHost.TryGetExport<T>(out T value))
-            {
-                return value;
-            }
-
-            return default(T);
-        }
-
-        public IEnumerable<T> GetExports<T>()
-        {
-            List<T> exports = (this.compositionHost?.GetExports<T>() ?? Enumerable.Empty<T>()).ToList();
-            exports.Sort((T x, T y) => string.Compare(x.GetType().Name, y.GetType().Name));
-
-            return exports;
-        }
+        private Api.ITabWorkspace ActiveTabWorkspace => this.MainWindow?.ViewModel.ActiveWorkspace?.Workspace as Api.ITabWorkspace;
+        private Api.ITabVM ActiveTab => this.ActiveTabWorkspace?.ActiveTab;
 
         private async void OnStartup(object sender, StartupEventArgs args)
         {
-            this.NativeApp = Interop.App.CreateApp(this, out string errorMessage);
-            this.MainWindow = new MainWindow(this, this.Settings, errorMessage);
+            this.NativeApp = NativeMethods.CreateApp(this, out string errorMessage);
+            this.MainWindow = new MainWindow(this, errorMessage);
             this.MainWindow.Show();
 
-            this.Settings.CopyFrom(await AppSettings.Load(this, AppSettings.DefaultPath));
             this.InitPlugins();
-            this.MainWindow.OnAppInitComplete();
+            this.Settings.CopyFrom(await AppSettings.Load(this, AppSettings.DefaultPath));
+            this.MainWindow.ViewModel.InitWorkspaces(await AppSnapshot.Load(this, AppSnapshot.DefaultPath));
 
-            foreach (IAppListener listener in this.GetExports<IAppListener>())
+            foreach (Api.IAppListener listener in this.AppListeners)
             {
-                listener.OnStartup();
+                listener.OnStartup(this);
+            }
+        }
+
+        public void OnWindowClosing(MainWindow window)
+        {
+            foreach (Api.IAppListener listener in this.AppListeners)
+            {
+                listener.OnClosing(this, window.ViewModel);
             }
         }
 
         private void OnExit(object sender, ExitEventArgs args)
         {
-            foreach (IAppListener listener in this.GetExports<IAppListener>())
+            foreach (Api.IAppListener listener in this.AppListeners)
             {
-                listener.OnExit();
+                listener.OnExit(this);
             }
 
-            if (this.compositionHost != null)
-            {
-                this.compositionHost.Dispose();
-                this.compositionHost = null;
-            }
-
-            if (this.NativeApp != null)
-            {
-                this.NativeApp.Dispose();
-                Marshal.FinalReleaseComObject(this.NativeApp);
-                this.NativeApp = null;
-            }
+            this.Dispose();
         }
 
         private void InitPlugins()
         {
-            try
+            this.pluginAssemblies = new List<Assembly>();
+            this.compositionHost = PluginUtility.CreatePluginHost(this, this.pluginAssemblies);
+
+            if (this.compositionHost != null)
             {
-                ConventionBuilder conventions = new ConventionBuilder();
-                conventions.ForTypesDerivedFrom<Plugins.IApp>().Shared();
-                conventions.ForTypesDerivedFrom<IAppListener>().Shared();
-
-                this.compositionHost = new ContainerConfiguration()
-                    .WithAssemblies(PluginUtility.GetPluginAssemblies(), conventions)
-                    .WithProvider(new ExportProvider(this))
-                    .CreateContainer();
+                this.processCache = this.compositionHost.GetExport<Interop.IProcessCache>();
+                this.appListeners = this.compositionHost.GetExports<Api.IAppListener>().ToArray();
+                this.processListeners = this.compositionHost.GetExports<Interop.IProcessListener>().ToArray();
+                this.menuItemProviders = this.compositionHost.GetExports<Api.IMenuItemProvider>().ToArray();
+                this.workspaceProviders = this.compositionHost.GetExports<Api.IWorkspaceProvider>().ToArray();
             }
-            catch (Exception ex)
+            else
             {
-                Debug.Fail(ex.Message, ex.StackTrace);
+                // Plugin support is broken (maybe missing DLLs) but the app should work anyway
+                this.processCache = new Interop.NativeProcessCache();
             }
         }
 
-        void IAppHost.OnProcessOpening(IProcess process, bool activate, string path)
+        void IAppHost.OnProcessOpening(Interop.IProcess process, bool activate, string path)
         {
-            this.MainWindow?.NativeProcessListener.OnProcessOpening(process, activate, path);
+            foreach (Interop.IProcessListener listener in this.ProcessListeners)
+            {
+                listener.OnProcessOpening(process, activate, path);
+            }
         }
 
-        void IAppHost.OnProcessClosing(IProcess process)
+        void IAppHost.OnProcessClosing(Interop.IProcess process)
         {
-            this.MainWindow?.NativeProcessListener.OnProcessClosing(process);
+            foreach (Interop.IProcessListener listener in this.ProcessListeners)
+            {
+                listener.OnProcessClosing(process);
+            }
         }
 
-        void IAppHost.OnProcessEnvChanged(IProcess process, string env)
+        void IAppHost.OnProcessEnvChanged(Interop.IProcess process, string env)
         {
-            this.MainWindow?.NativeProcessListener.OnProcessEnvChanged(process, env);
+            foreach (Interop.IProcessListener listener in this.ProcessListeners)
+            {
+                listener.OnProcessEnvChanged(process, env);
+            }
         }
 
-        void IAppHost.OnProcessTitleChanged(IProcess process, string title)
+        void IAppHost.OnProcessTitleChanged(Interop.IProcess process, string title)
         {
-            this.MainWindow?.NativeProcessListener.OnProcessTitleChanged(process, title);
+            foreach (Interop.IProcessListener listener in this.ProcessListeners)
+            {
+                listener.OnProcessTitleChanged(process, title);
+            }
         }
 
         void IAppHost.CloneActiveProcess()
         {
-            this.ActiveTab?.CloneCommand.Execute(null);
+            this.ActiveTab?.CloneCommand?.SafeExecute();
         }
 
         void IAppHost.SetTabName()
         {
-            this.ActiveTab?.SetTabNameCommand.Execute(null);
+            this.ActiveTab?.SetTabNameCommand?.SafeExecute();
         }
 
         void IAppHost.CloseActiveProcess()
         {
-            this.ActiveTab?.CloseCommand.Execute(null);
+            this.ActiveTab?.CloseCommand?.SafeExecute();
         }
 
         void IAppHost.DetachActiveProcess()
         {
-            this.ActiveTab?.DetachCommand.Execute(null);
+            this.ActiveTab?.DetachCommand?.SafeExecute();
         }
 
         IntPtr IAppHost.GetMainWindow()
         {
-            if (this.MainWindow != null)
+            if (this.MainWindow is Window window)
             {
-                WindowInteropHelper helper = new WindowInteropHelper(this.MainWindow);
+                WindowInteropHelper helper = new WindowInteropHelper(window);
                 return helper.Handle;
             }
 
@@ -229,17 +216,59 @@ namespace DevPrompt
 
         void IAppHost.TabCycleStop()
         {
-            this.MainWindow?.ViewModel.TabCycleStop();
+            this.ActiveTabWorkspace?.TabCycleStop();
         }
 
         void IAppHost.TabCycleNext()
         {
-            this.MainWindow?.ViewModel.TabCycleNext();
+            this.ActiveTabWorkspace?.TabCycleNext();
         }
 
         void IAppHost.TabCyclePrev()
         {
-            this.MainWindow?.ViewModel.TabCyclePrev();
+            this.ActiveTabWorkspace?.TabCyclePrev();
+        }
+
+        Api.IAppSettings Api.IApp.Settings => this.Settings;
+        Dispatcher Api.IApp.Dispatcher => this.Dispatcher;
+        bool Api.IApp.IsElevated => Program.IsElevated;
+        bool Api.IApp.IsMainProcess => Program.IsMainProcess;
+        bool Api.IApp.IsMicrosoftDomain => Program.IsMicrosoftDomain;
+
+        IEnumerable<Api.IWindow> Api.IApp.Windows
+        {
+            get
+            {
+                if (this.MainWindow?.ViewModel is Api.IWindow window)
+                {
+                    yield return window;
+                }
+            }
+        }
+
+        IEnumerable<Api.GrabProcess> Api.IApp.GrabProcesses
+        {
+            get
+            {
+                string names = this.NativeApp?.GrabProcesses ?? string.Empty;
+                return names.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).Select(n => new Api.GrabProcess(n));
+            }
+        }
+
+        void Api.IApp.GrabProcess(int id)
+        {
+            this.NativeApp?.GrabProcess(id);
+        }
+
+        Api.IProcessHost Api.IApp.CreateProcessHost(IntPtr parentHwnd)
+        {
+            if (this.processCache != null)
+            {
+                return this.NativeApp?.CreateProcessHost(this.processCache, parentHwnd);
+            }
+
+            Debug.Fail("CreateProcessHost called before app init is complete");
+            return null;
         }
     }
 }

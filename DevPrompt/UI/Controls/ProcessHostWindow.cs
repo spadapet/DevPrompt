@@ -1,5 +1,4 @@
-﻿using DevPrompt.Interop;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
@@ -11,12 +10,12 @@ namespace DevPrompt.UI.Controls
     /// </summary>
     internal class ProcessHostWindow : HwndHost
     {
-        internal IProcessHost ProcessHost { get; private set; }
-        private IApp nativeApp;
+        public Api.IProcessHost ProcessHost { get; private set; }
+        private Api.IApp app;
 
-        public ProcessHostWindow(IApp nativeApp)
+        public ProcessHostWindow(Api.IApp app)
         {
-            this.nativeApp = nativeApp;
+            this.app = app;
         }
 
         public void OnActivated()
@@ -39,23 +38,16 @@ namespace DevPrompt.UI.Controls
             this.ProcessHost?.Hide();
         }
 
-        protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
-        {
-            base.OnDpiChanged(oldDpi, newDpi);
-
-            this.ProcessHost?.DpiChanged(oldDpi.DpiScaleX, newDpi.DpiScaleX);
-        }
-
         protected override HandleRef BuildWindowCore(HandleRef hwndParent)
         {
-            this.ProcessHost = this.nativeApp?.CreateProcessHostWindow(hwndParent.Handle);
+            this.ProcessHost = this.app.CreateProcessHost(hwndParent.Handle);
 
             if (this.IsFocused)
             {
                 this.ProcessHost?.Focus();
             }
 
-            return new HandleRef(null, this.ProcessHost?.GetWindow() ?? IntPtr.Zero);
+            return new HandleRef(null, this.ProcessHost?.Hwnd ?? IntPtr.Zero);
         }
 
         protected override void DestroyWindowCore(HandleRef hwnd)

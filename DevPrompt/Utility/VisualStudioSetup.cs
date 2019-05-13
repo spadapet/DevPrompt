@@ -65,7 +65,7 @@ namespace DevPrompt.Utility
         {
             return await Task.Run(() =>
             {
-                IVisualStudioInstances instances = Interop.App.CreateVisualStudioInstances();
+                IVisualStudioInstances instances = NativeMethods.CreateVisualStudioInstances();
 
                 int count = (instances != null) ? instances.GetCount() : 0;
                 List<Instance> result = new List<Instance>(count);

@@ -1,23 +1,25 @@
-﻿using DevPrompt.Settings;
-using DevPrompt.UI.ViewModels;
-using DevPrompt.Utility;
+﻿using DevOps.UI;
+using DevPrompt.Api;
 using System;
-using System.ComponentModel;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 
-namespace DevOps.UI.ViewModels
+namespace DevOps
 {
-    internal sealed class PullRequestTabVM : PropertyNotifier, ITabVM, IDisposable
+    [Guid("527dd4ee-5150-4b3b-84d0-c81e548b7830")]
+    internal sealed class PullRequestTab : PropertyNotifier, ITab, IDisposable
     {
-        public IMainWindowVM Window { get; }
-        private bool active;
+        public IWindow Window { get; }
+        public IWorkspace Workspace { get; }
+
         private UIElement viewElement;
 
-        public PullRequestTabVM(IMainWindowVM window)
+        public PullRequestTab(IWindow window, IWorkspace workspace)
         {
             this.Window = window;
+            this.Workspace = workspace;
         }
 
         public void Dispose()
@@ -25,7 +27,15 @@ namespace DevOps.UI.ViewModels
             this.ViewElement = null;
         }
 
-        public string TabName
+        public Guid Id
+        {
+            get
+            {
+                return this.GetType().GUID;
+            }
+        }
+
+        public string Name
         {
             get
             {
@@ -33,12 +43,11 @@ namespace DevOps.UI.ViewModels
             }
         }
 
-
-        public string ExpandedTabName
+        public string Tooltip
         {
             get
             {
-                return this.TabName;
+                return this.Title;
             }
         }
 
@@ -46,20 +55,7 @@ namespace DevOps.UI.ViewModels
         {
             get
             {
-                return this.TabName;
-            }
-        }
-
-        public bool Active
-        {
-            get
-            {
-                return this.active;
-            }
-
-            set
-            {
-                this.SetPropertyValue(ref this.active, value);
+                return this.Name;
             }
         }
 
@@ -90,7 +86,7 @@ namespace DevOps.UI.ViewModels
             }
         }
 
-        public void Focus()
+        void ITab.Focus()
         {
             if (this.viewElement != null)
             {
@@ -99,37 +95,24 @@ namespace DevOps.UI.ViewModels
             }
         }
 
-        public ICommand ActivateCommand
-        {
-            get
-            {
-                return new DelegateCommand((object arg) =>
-                {
-                    this.Window.ActiveTab = this;
-                });
-            }
-        }
-
-        public ICommand CloseCommand
-        {
-            get
-            {
-                return new DelegateCommand((object arg) =>
-                {
-                    this.Window.RemoveTab(this);
-                });
-            }
-        }
-
-        public ICommand CloneCommand => null;
-        public ICommand DetachCommand => null;
-        public ICommand DefaultsCommand => null;
-        public ICommand PropertiesCommand => null;
-        public ICommand SetTabNameCommand => null;
-        public ITabSnapshot Snapshot => null;
-
-        private void OnModelPropertyChanged(object sender, PropertyChangedEventArgs args)
+        void ITab.OnShowing()
         {
         }
+
+        void ITab.OnHiding()
+        {
+        }
+
+        bool ITab.OnClosing()
+        {
+            return true;
+        }
+
+        ICommand ITab.CloneCommand => null;
+        ICommand ITab.DetachCommand => null;
+        ICommand ITab.DefaultsCommand => null;
+        ICommand ITab.PropertiesCommand => null;
+        ICommand ITab.SetTabNameCommand => null;
+        ITabSnapshot ITab.Snapshot => null; // doesn't save state (yet)
     }
 }

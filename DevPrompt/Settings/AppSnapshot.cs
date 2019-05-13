@@ -1,7 +1,4 @@
-﻿using DevPrompt.Plugins;
-using DevPrompt.UI.ViewModels;
-using DevPrompt.Utility;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -16,47 +13,30 @@ namespace DevPrompt.Settings
     /// Saves the state of the app during shutdown so it can be restored on startup
     /// </summary>
     [DataContract]
-    public class AppSnapshot : PropertyNotifier, ICloneable
+    internal class AppSnapshot : Api.PropertyNotifier
     {
-        private ObservableCollection<ITabSnapshot> tabs;
-        private int activeTabIndex;
+        private ObservableCollection<WorkspaceSnapshot> workspaces;
+        private Guid activeWorkspaceId;
         private static readonly object fileLock = new object();
 
         public AppSnapshot()
-            : this((MainWindowVM)null)
-        {
-        }
-
-        internal AppSnapshot(MainWindowVM window, bool force = false)
         {
             this.Initialize();
+        }
 
-            if (window != null && (force || window.AppSettings.SaveTabsOnExit))
+        public AppSnapshot(Api.IWindow window, bool force = false)
+            : this()
+        {
+            if (force || window.App.Settings.SaveTabsOnExit)
             {
-                foreach (ITabVM tab in window.Tabs)
-                {
-                    if (tab.Snapshot is ITabSnapshot tabSnapshot)
-                    {
-                        if (tab.Active)
-                        {
-                            this.activeTabIndex = this.tabs.Count;
-                        }
-
-                        this.tabs.Add(tabSnapshot);
-                    }
-                }
+                this.TakeSnapshot(window);
             }
         }
 
         public AppSnapshot(AppSnapshot copyFrom)
+            : this()
         {
-            this.Initialize();
             this.CopyFrom(copyFrom);
-        }
-
-        object ICloneable.Clone()
-        {
-            return this.Clone();
         }
 
         public AppSnapshot Clone()
@@ -66,70 +46,95 @@ namespace DevPrompt.Settings
 
         public void CopyFrom(AppSnapshot copyFrom)
         {
-            this.tabs.Clear();
-            this.activeTabIndex = copyFrom.activeTabIndex;
+            this.Workspaces.Clear();
+            this.activeWorkspaceId = Guid.Empty;
 
             if (copyFrom != null)
             {
-                foreach (ITabSnapshot tab in copyFrom.Tabs)
+                this.activeWorkspaceId = copyFrom.activeWorkspaceId;
+
+                foreach (WorkspaceSnapshot workspaceSnapshot in copyFrom.Workspaces)
                 {
-                    this.tabs.Add(tab.Clone());
+                    this.Workspaces.Add(workspaceSnapshot.Clone());
                 }
             }
         }
 
+        private void TakeSnapshot(Api.IWindow window)
+        {
+            foreach (Api.IWorkspaceVM workspace in window.Workspaces)
+            {
+                if (workspace.Snapshot is Api.IWorkspaceSnapshot workspaceSnapshot)
+                {
+                    if (window.ActiveWorkspace == workspace)
+                    {
+                        this.ActiveWorkspaceId = workspace.Id;
+                    }
+
+                    this.Workspaces.Add(new WorkspaceSnapshot(workspace.Id, workspaceSnapshot));
+                }
+            }
+        }
+
+        public Api.IWorkspaceSnapshot FindWorkspaceSnapshot(Guid id)
+        {
+            foreach (WorkspaceSnapshot snapshot in this.Workspaces)
+            {
+                if (snapshot.Id == id)
+                {
+                    return snapshot.Snapshot;
+                }
+            }
+
+            return null;
+        }
+
         [DataMember]
-        public IList<ITabSnapshot> Tabs
+        public IList<WorkspaceSnapshot> Workspaces
         {
             get
             {
-                return this.tabs;
+                return this.workspaces;
             }
         }
 
         [DataMember]
-        public int ActiveTabIndex
+        public Guid ActiveWorkspaceId
         {
             get
             {
-                return this.activeTabIndex;
+                return this.activeWorkspaceId;
             }
 
             set
             {
-                this.SetPropertyValue(ref this.activeTabIndex, value);
+                this.SetPropertyValue(ref this.activeWorkspaceId, value);
             }
         }
 
         [OnDeserializing]
         private void Initialize(StreamingContext context = default(StreamingContext))
         {
-            this.tabs = new ObservableCollection<ITabSnapshot>();
+            this.workspaces = new ObservableCollection<WorkspaceSnapshot>();
         }
 
-        private static DataContractSerializer GetDataContractSerializer(IApp pluginApp)
+        private static DataContractSerializer GetDataContractSerializer(App app)
         {
             List<Type> knownTypes = new List<Type>(AppSnapshot.CollectionTypes);
-
-            foreach (ISettingTypes types in pluginApp?.GetExports<ISettingTypes>() ?? Enumerable.Empty<ISettingTypes>())
+            DataContractSerializerSettings serializerSettings = new DataContractSerializerSettings()
             {
-                foreach (Type type in types.SnapshotTypes ?? Enumerable.Empty<Type>())
-                {
-                    if (type != null && !knownTypes.Contains(type))
-                    {
-                        knownTypes.Add(type);
-                    }
-                }
-            }
+                KnownTypes = knownTypes.Distinct(),
+                DataContractResolver = new SettingTypeResolver(app),
+            };
 
-            return new DataContractSerializer(typeof(AppSnapshot), knownTypes);
+            return new DataContractSerializer(typeof(AppSnapshot), serializerSettings);
         }
 
         private static IEnumerable<Type> CollectionTypes
         {
             get
             {
-                yield return typeof(ConsoleSnapshot);
+                yield return typeof(WorkspaceSnapshot);
             }
         }
 
@@ -141,7 +146,7 @@ namespace DevPrompt.Settings
             }
         }
 
-        public static async Task<AppSnapshot> Load(IApp pluginApp, string path)
+        public static async Task<AppSnapshot> Load(App app, string path)
         {
             AppSnapshot snapshot = null;
 
@@ -159,7 +164,7 @@ namespace DevPrompt.Settings
                         using (Stream stream = File.OpenRead(path))
                         using (XmlReader reader = XmlReader.Create(stream, xmlSettings))
                         {
-                            return (AppSnapshot)AppSnapshot.GetDataContractSerializer(pluginApp).ReadObject(reader);
+                            return (AppSnapshot)AppSnapshot.GetDataContractSerializer(app).ReadObject(reader);
                         }
                     }
                 });
@@ -171,12 +176,12 @@ namespace DevPrompt.Settings
             return snapshot ?? new AppSnapshot();
         }
 
-        public Task Save(IApp pluginApp)
+        public Task Save(App app)
         {
-            return this.Save(pluginApp, AppSnapshot.DefaultPath);
+            return this.Save(app, AppSnapshot.DefaultPath);
         }
 
-        public Task Save(IApp pluginApp, string path)
+        public Task Save(App app, string path)
         {
             AppSnapshot clone = this.Clone();
 
@@ -192,7 +197,7 @@ namespace DevPrompt.Settings
                     using (Stream stream = File.Create(path))
                     using (XmlWriter writer = XmlWriter.Create(stream, xmlSettings))
                     {
-                        AppSnapshot.GetDataContractSerializer(pluginApp).WriteObject(writer, clone);
+                        AppSnapshot.GetDataContractSerializer(app).WriteObject(writer, clone);
                     }
                 }
             });

@@ -1,5 +1,4 @@
-﻿using DevPrompt.Utility;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -12,8 +11,14 @@ namespace DevPrompt.Settings
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{MenuName}")]
-    public class ConsoleSettings : PropertyNotifier, ICloneable
+    internal class ConsoleSettings : Api.PropertyNotifier, Api.IConsoleSettings
     {
+        string Api.IConsoleSettings.TabName => this.TabName;
+        string Api.IConsoleSettings.Executable => this.Executable;
+        string Api.IConsoleSettings.Arguments => this.ExpandedArguments;
+        string Api.IConsoleSettings.StartingDirectory => this.ExpandedStartingDirectory;
+        bool Api.IConsoleSettings.RunAtStartup => this.RunAtStartup;
+
         private string menuName;
         private string tabName;
         private string startingDirectory;
@@ -38,11 +43,6 @@ namespace DevPrompt.Settings
             this.arguments = copyFrom.arguments;
             this.consoleType = copyFrom.ConsoleType;
             this.runAtStartup = copyFrom.RunAtStartup;
-        }
-
-        object ICloneable.Clone()
-        {
-            return this.Clone();
         }
 
         public ConsoleSettings Clone()

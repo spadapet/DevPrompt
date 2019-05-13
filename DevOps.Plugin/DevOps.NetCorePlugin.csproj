@@ -8,16 +8,20 @@
     <RootNamespace>DevOps</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Include="..\Build\GlobalAssemblyInfo.cs" Link="Properties\GlobalAssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.TeamFoundationServer.Client" Version="16.151.0-preview" />
+    <PackageReference Include="Microsoft.VisualStudio.Services.Client" Version="16.151.0-preview" />
+    <PackageReference Include="Microsoft.VisualStudio.Services.InteractiveClient" Version="16.151.0-preview" />
+    <PackageReference Include="System.Composition.AttributedModel" Version="1.3.0-preview5.19224.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DevPrompt.Api\DevPrompt.NetCoreApi.csproj" />
+  </ItemGroup>
+
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk.WindowsDesktop" />
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.TeamFoundationServer.Client" Version="16.150.0-preview" />
-    <PackageReference Include="Microsoft.VisualStudio.Services.Client" Version="16.150.0-preview" />
-    <PackageReference Include="Microsoft.VisualStudio.Services.InteractiveClient" Version="16.150.0-preview" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\DevPrompt\DevPromptNetCore.csproj" />
-  </ItemGroup>
-
 </Project>

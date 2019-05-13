@@ -5,6 +5,9 @@ namespace DevPrompt.Interop
 {
     // MUST match DevPrompt.idl
 
+    /// <summary>
+    /// Managed interface for native Visual Studio instances
+    /// </summary>
     [Guid("4c1047a1-e701-4024-aeed-08a38c70584e")]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     internal interface IVisualStudioInstance

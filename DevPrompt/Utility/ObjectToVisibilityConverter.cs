@@ -1,20 +1,18 @@
 ﻿using System;
-using System.Globalization;
 using System.Windows;
-using System.Windows.Data;
 
 namespace DevPrompt.Utility
 {
-    public sealed class ObjectToVisibilityConverter : IValueConverter
+    internal sealed class ObjectToVisibilityConverter : DelegateConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public ObjectToVisibilityConverter()
+            : base(ObjectToVisibilityConverter.Convert)
         {
-            return (value != null) ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public static object Convert(object value, Type targetType, object parameter)
         {
-            throw new InvalidOperationException();
+            return (value != null) ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 }

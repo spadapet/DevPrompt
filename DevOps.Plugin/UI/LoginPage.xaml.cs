@@ -6,10 +6,10 @@ namespace DevOps.UI
 {
     internal partial class LoginPage : UserControl, IDisposable
     {
-        public PullRequestTabVM Tab { get; }
+        public PullRequestTab Tab { get; }
         public LoginPageVM ViewModel { get; }
 
-        public LoginPage(PullRequestTabVM tab)
+        public LoginPage(PullRequestTab tab)
         {
             this.Tab = tab;
             this.ViewModel = new LoginPageVM(tab);

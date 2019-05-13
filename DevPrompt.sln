@@ -13,12 +13,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		README.md = README.md
-		shared.props = shared.props
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DevInjector", "DevInjector\DevInjector.vcxproj", "{614AB4D5-0ADE-4D21-93A6-CBB6ED7D504C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevOps.Plugin", "DevOps.Plugin\DevOps.Plugin.csproj", "{E2C1CCDF-8C22-44F9-AD58-327C65E7189E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevPrompt.Api", "DevPrompt.Api\DevPrompt.Api.csproj", "{69E79ABB-E387-479B-B007-64C25966DED6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{A46204E7-B11C-4CC8-A54E-7CFF75D4C4E9}"
+	ProjectSection(SolutionItems) = preProject
+		Build\cpp.props = Build\cpp.props
+		Build\csharp.netcore.props = Build\csharp.netcore.props
+		Build\csharp.netfx.props = Build\csharp.netfx.props
+		Build\csharp.props = Build\csharp.props
+		Build\GlobalAssemblyInfo.cs = Build\GlobalAssemblyInfo.cs
+		shared.props = shared.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -68,9 +79,20 @@ Global
 		{E2C1CCDF-8C22-44F9-AD58-327C65E7189E}.Release|x64.Build.0 = Release|x64
 		{E2C1CCDF-8C22-44F9-AD58-327C65E7189E}.Release|x86.ActiveCfg = Release|x86
 		{E2C1CCDF-8C22-44F9-AD58-327C65E7189E}.Release|x86.Build.0 = Release|x86
+		{69E79ABB-E387-479B-B007-64C25966DED6}.Debug|x64.ActiveCfg = Debug|x64
+		{69E79ABB-E387-479B-B007-64C25966DED6}.Debug|x64.Build.0 = Debug|x64
+		{69E79ABB-E387-479B-B007-64C25966DED6}.Debug|x86.ActiveCfg = Debug|x86
+		{69E79ABB-E387-479B-B007-64C25966DED6}.Debug|x86.Build.0 = Debug|x86
+		{69E79ABB-E387-479B-B007-64C25966DED6}.Release|x64.ActiveCfg = Release|x64
+		{69E79ABB-E387-479B-B007-64C25966DED6}.Release|x64.Build.0 = Release|x64
+		{69E79ABB-E387-479B-B007-64C25966DED6}.Release|x86.ActiveCfg = Release|x86
+		{69E79ABB-E387-479B-B007-64C25966DED6}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A46204E7-B11C-4CC8-A54E-7CFF75D4C4E9} = {C9A228D0-7B27-475F-9FE0-038F01B930F6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3D3483EE-044D-4B5D-90E3-4401D8948513}

@@ -1,5 +1,4 @@
-﻿using DevPrompt.UI.ViewModels;
-using DevPrompt.Utility;
+﻿using DevPrompt.Settings;
 using System.Collections.Generic;
 using System.Windows.Input;
 
@@ -8,18 +7,15 @@ namespace DevPrompt.UI.DesignerViewModels
     /// <summary>
     /// Sample data for the XAML designer
     /// </summary>
-    internal class MainWindowDesignerVM : PropertyNotifier
+    internal class MainWindowDesignerVM : Api.PropertyNotifier
     {
-        private List<ITabVM> tabs;
+        private List<Api.ITab> tabs;
 
         public MainWindowDesignerVM()
         {
-            this.tabs = new List<ITabVM>()
+            this.tabs = new List<Api.ITab>()
             {
-                new TabDesignerVM()
-                {
-                    Active = true,
-                },
+                new TabDesignerVM(Api.ActiveState.Active),
                 new TabDesignerVM(),
                 new TabDesignerVM(),
                 new TabDesignerVM(),
@@ -45,11 +41,11 @@ namespace DevPrompt.UI.DesignerViewModels
         public ICommand CustomizeLinksCommand => null;
         public ICommand AboutCommand => null;
 
-        public IReadOnlyList<ITabVM> Tabs => this.tabs;
-        public ITabVM ActiveTab => this.tabs[0];
+        public AppSettings AppSettings => null;
+        public IReadOnlyList<Api.ITab> Tabs => this.tabs;
+        public Api.ITab ActiveTab => this.tabs[0];
         public bool HasActiveTab => this.ActiveTab != null;
         public bool Loading => true;
-        public bool NotLoading => !this.Loading;
         public bool HasErrorText => !string.IsNullOrEmpty(this.ErrorText);
         public string WindowTitle => "Window Title";
         public string ErrorText => "Error Text";

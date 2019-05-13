@@ -20,6 +20,18 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DevInjector", "DevInjector\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DevOps.NetCorePlugin", "DevOps.Plugin\DevOps.NetCorePlugin.csproj", "{CE99BBEC-17A5-45E8-8CEF-968867583BCA}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DevPrompt.NetCoreApi", "DevPrompt.Api\DevPrompt.NetCoreApi.csproj", "{B1E88F5D-E7CB-4F40-9025-5B5ECAA26BDA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{DE8BCE73-303F-4741-89BF-A3784705011D}"
+	ProjectSection(SolutionItems) = preProject
+		Build\cpp.props = Build\cpp.props
+		Build\csharp.netcore.props = Build\csharp.netcore.props
+		Build\csharp.netfx.props = Build\csharp.netfx.props
+		Build\csharp.props = Build\csharp.props
+		Build\GlobalAssemblyInfo.cs = Build\GlobalAssemblyInfo.cs
+		shared.props = shared.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -68,9 +80,20 @@ Global
 		{CE99BBEC-17A5-45E8-8CEF-968867583BCA}.Release|x64.Build.0 = Release|x64
 		{CE99BBEC-17A5-45E8-8CEF-968867583BCA}.Release|x86.ActiveCfg = Release|x86
 		{CE99BBEC-17A5-45E8-8CEF-968867583BCA}.Release|x86.Build.0 = Release|x86
+		{B1E88F5D-E7CB-4F40-9025-5B5ECAA26BDA}.Debug|x64.ActiveCfg = Debug|x64
+		{B1E88F5D-E7CB-4F40-9025-5B5ECAA26BDA}.Debug|x64.Build.0 = Debug|x64
+		{B1E88F5D-E7CB-4F40-9025-5B5ECAA26BDA}.Debug|x86.ActiveCfg = Debug|x86
+		{B1E88F5D-E7CB-4F40-9025-5B5ECAA26BDA}.Debug|x86.Build.0 = Debug|x86
+		{B1E88F5D-E7CB-4F40-9025-5B5ECAA26BDA}.Release|x64.ActiveCfg = Release|x64
+		{B1E88F5D-E7CB-4F40-9025-5B5ECAA26BDA}.Release|x64.Build.0 = Release|x64
+		{B1E88F5D-E7CB-4F40-9025-5B5ECAA26BDA}.Release|x86.ActiveCfg = Release|x86
+		{B1E88F5D-E7CB-4F40-9025-5B5ECAA26BDA}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DE8BCE73-303F-4741-89BF-A3784705011D} = {C9A228D0-7B27-475F-9FE0-038F01B930F6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3D3483EE-044D-4B5D-90E3-4401D8948513}

@@ -1,5 +1,4 @@
-﻿using DevPrompt.UI.ViewModels;
-using DevPrompt.Utility;
+﻿using DevPrompt.Api;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.VisualStudio.Services.WebApi;
@@ -20,7 +19,7 @@ namespace DevOps.UI.ViewModels
         private string personalAccessToken;
         private readonly DelegateCommand okCommand;
         private readonly CancellationTokenSource cancellationTokenSource;
-        private readonly PullRequestTabVM tab;
+        private readonly PullRequestTab tab;
 
         /// <summary>
         /// Sample data for the XAML designer
@@ -31,7 +30,7 @@ namespace DevOps.UI.ViewModels
             this.cancellationTokenSource = new CancellationTokenSource();
         }
 
-        public LoginPageVM(PullRequestTabVM tab)
+        public LoginPageVM(PullRequestTab tab)
         {
             this.organizationName = "devdiv";
             this.projectName = "devdiv";
@@ -54,7 +53,7 @@ namespace DevOps.UI.ViewModels
             this.cancellationTokenSource.Dispose();
         }
 
-        public IMainWindowVM Window
+        public IWindow Window
         {
             get
             {

@@ -3,7 +3,10 @@ using System.Runtime.InteropServices;
 
 namespace DevPrompt.Interop
 {
-    internal static class App
+    /// <summary>
+    /// Calls into global exported methods from native DevNative DLL
+    /// </summary>
+    internal static class NativeMethods
     {
         [DllImport("DevNative64", CallingConvention = CallingConvention.Cdecl, EntryPoint = "CreateApp")]
         private static extern void CreateApp64(IAppHost host, [MarshalAs(UnmanagedType.Bool)] bool elevated, out IApp app);
@@ -34,33 +37,33 @@ namespace DevPrompt.Interop
             return result != null;
         }
 
-        public static IApp CreateApp(IAppHost host, out string errorMessage)
+        public static NativeApp CreateApp(IAppHost host, out string errorMessage)
         {
-            return App.CallDevNative(
+            return NativeMethods.CallDevNative(
                 () =>
                 {
-                    App.CreateApp64(host, Program.IsElevated, out IApp app64);
+                    NativeMethods.CreateApp64(host, Program.IsElevated, out IApp app64);
                     return app64;
                 },
                 () =>
                 {
-                    App.CreateApp32(host, Program.IsElevated, out IApp app32);
+                    NativeMethods.CreateApp32(host, Program.IsElevated, out IApp app32);
                     return app32;
                 },
-                out IApp app, out errorMessage) ? app : null;
+                out IApp app, out errorMessage) ? new NativeApp(app) : null;
         }
 
         public static IVisualStudioInstances CreateVisualStudioInstances()
         {
-            return App.CallDevNative(
+            return NativeMethods.CallDevNative(
                 () =>
                 {
-                    App.CreateVisualStudioInstances64(out IVisualStudioInstances instances64);
+                    NativeMethods.CreateVisualStudioInstances64(out IVisualStudioInstances instances64);
                     return instances64;
                 },
                 () =>
                 {
-                    App.CreateVisualStudioInstances32(out IVisualStudioInstances instances32);
+                    NativeMethods.CreateVisualStudioInstances32(out IVisualStudioInstances instances32);
                     return instances32;
                 },
                 out IVisualStudioInstances instances, out string errorMessage) ? instances : null;

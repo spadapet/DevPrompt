@@ -5,10 +5,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:dp="clr-namespace:DevPrompt"
-        xmlns:controls="clr-namespace:DevPrompt.UI.Controls"
         xmlns:dvm="clr-namespace:DevPrompt.UI.DesignerViewModels"
-        xmlns:vm="clr-namespace:DevPrompt.UI.ViewModels"
-        xmlns:util="clr-namespace:DevPrompt.Utility"
         mc:Ignorable="d"
         Width="980"
         Height="800"
@@ -24,103 +21,6 @@
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
-        <util:ObjectToVisibilityConverter x:Key="ObjectToVisibility" />
-
-        <ItemsPanelTemplate x:Key="TabItemsPanelTemplate">
-            <TabPanel Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
-        </ItemsPanelTemplate>
-
-        <ControlTemplate x:Key="TabCommandButtonTemplate" TargetType="{x:Type Button}">
-            <Border x:Name="BorderBack" Background="{TemplateBinding Background}">
-                <ContentPresenter Focusable="False" HorizontalAlignment="Center" VerticalAlignment="Center" />
-            </Border>
-            <ControlTemplate.Triggers>
-                <Trigger Property="IsMouseOver" Value="False">
-                    <Setter TargetName="BorderBack" Property="Background" Value="Transparent" />
-                </Trigger>
-            </ControlTemplate.Triggers>
-        </ControlTemplate>
-
-        <DataTemplate x:Key="TabButtonContentTemplate" DataType="{x:Type vm:ITabVM}">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" MinWidth="48" />
-                    <ColumnDefinition Width="16" />
-                </Grid.ColumnDefinitions>
-                <TextBlock
-                    Grid.Column="0"
-                    Margin="4"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Text="{Binding ExpandedTabName, Mode=OneWay}" />
-                <Button
-                    x:Name="CloseButton"
-                    Grid.Column="1"
-                    Width="16"
-                    Focusable="False"
-                    Background="#3FFF0000"
-                    Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"
-                    Command="{Binding CloseCommand}"
-                    Visibility="{Binding CloseCommand, Converter={StaticResource ObjectToVisibility}}"
-                    Template="{StaticResource TabCommandButtonTemplate}">
-                    <Path Data="M 0,0 L 8,8 M 0,8 L 8,0" StrokeThickness="1" Stroke="{Binding Foreground, Mode=OneWay, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" />
-                </Button>
-            </Grid>
-            <DataTemplate.Triggers>
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding Active, Mode=OneWay}" Value="False" />
-                        <Condition Binding="{Binding IsMouseOver, Mode=OneWay, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Value="False" />
-                    </MultiDataTrigger.Conditions>
-                    <Setter TargetName="CloseButton" Property="Visibility" Value="Collapsed" />
-                </MultiDataTrigger>
-                <DataTrigger Binding="{Binding Active, Mode=OneWay}" Value="False">
-                    <Setter TargetName="CloseButton" Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" />
-                </DataTrigger>
-            </DataTemplate.Triggers>
-        </DataTemplate>
-
-        <DataTemplate x:Key="TabItemTemplate" DataType="{x:Type vm:ITabVM}">
-            <Button
-                x:Name="RootButton"
-                Selector.IsSelected="{Binding Active, Mode=OneWay}"
-                Command="{Binding ActivateCommand}"
-                MouseDown="OnTabButtonMouseDown"
-                PreviewMouseMove="OnTabButtonMouseMoveEvent"
-                GotMouseCapture="OnTabButtonMouseCaptureEvent"
-                LostMouseCapture="OnTabButtonMouseCaptureEvent"
-                Padding="0"
-                BorderThickness="1,1,1,0"
-                Focusable="False"
-                Foreground="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}"
-                Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
-                BorderBrush="Transparent"
-                Content="{Binding}"
-                ToolTip="{Binding Title}"
-                HorizontalContentAlignment="Stretch"
-                ContentTemplate="{StaticResource TabButtonContentTemplate}">
-                <Button.ContextMenu>
-                    <ContextMenu Opened="OnTabContextMenuOpened">
-                        <!-- NOTE: Keep in sync with Tab menu -->
-                        <MenuItem Header="_Set tab name..." InputGestureText="Ctrl+Shift+T" Command="{Binding SetTabNameCommand}" Visibility="{Binding SetTabNameCommand, Converter={StaticResource ObjectToVisibility}}" />
-                        <Separator />
-                        <MenuItem Header="_Clone" InputGestureText="Ctrl+T" Command="{Binding CloneCommand}" Visibility="{Binding CloneCommand, Converter={StaticResource ObjectToVisibility}}" />
-                        <MenuItem Header="Console _Defaults" Command="{Binding DefaultsCommand}" Visibility="{Binding DefaultsCommand, Converter={StaticResource ObjectToVisibility}}" />
-                        <MenuItem Header="Console _Properties" Command="{Binding PropertiesCommand}" Visibility="{Binding PropertiesCommand, Converter={StaticResource ObjectToVisibility}}" />
-                        <Separator />
-                        <MenuItem Header="D_etach" InputGestureText="Ctrl+Shift+F4" Command="{Binding DetachCommand}" Visibility="{Binding DetachCommand, Converter={StaticResource ObjectToVisibility}}" />
-                        <MenuItem Header="C_lose" InputGestureText="Ctrl+F4" Command="{Binding CloseCommand}" Visibility="{Binding CloseCommand, Converter={StaticResource ObjectToVisibility}}" />
-                    </ContextMenu>
-                </Button.ContextMenu>
-            </Button>
-            <DataTemplate.Triggers>
-                <DataTrigger Binding="{Binding Active, Mode=OneWay}" Value="True">
-                    <Setter TargetName="RootButton" Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
-                    <Setter TargetName="RootButton" Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
-                    <Setter TargetName="RootButton" Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" />
-                </DataTrigger>
-            </DataTemplate.Triggers>
-        </DataTemplate>
     </Window.Resources>
 
     <Grid>
@@ -128,10 +28,9 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        
+
         <Menu x:Name="MainMenu" Grid.Row="0">
             <MenuItem Header="_File" SubmenuOpened="OnFileMenuOpened">
                 <Separator Tag="[End]" />
@@ -144,17 +43,6 @@
                 <MenuItem Header="Save _tabs on exit" IsCheckable="True" IsChecked="{Binding AppSettings.SaveTabsOnExit, Mode=TwoWay}" ToolTip="When tabs are saved, they will be restored the next time you start the app." />
                 <MenuItem Header="Exit (_Detach tabs)" Command="{Binding DetachAndExitCommand}" />
                 <MenuItem Header="E_xit" InputGestureText="Alt+F4" Command="{Binding ExitCommand}" />
-            </MenuItem>
-            <MenuItem Header="Ta_b" Visibility="{Binding HasActiveTab, Converter={StaticResource BoolToVisibility}}">
-                <!-- NOTE: Keep in sync with tab's ContextMenu -->
-                <MenuItem Header="_Set tab name..." InputGestureText="Ctrl+Shift+T" Command="{Binding ActiveTab.SetTabNameCommand}" Visibility="{Binding ActiveTab.SetTabNameCommand, Converter={StaticResource ObjectToVisibility}}" />
-                <Separator />
-                <MenuItem Header="_Clone" InputGestureText="Ctrl+T" Command="{Binding ActiveTab.CloneCommand}" Visibility="{Binding ActiveTab.CloneCommand, Converter={StaticResource ObjectToVisibility}}" />
-                <MenuItem Header="Console _Defaults" Command="{Binding ActiveTab.DefaultsCommand}" Visibility="{Binding ActiveTab.DefaultsCommand, Converter={StaticResource ObjectToVisibility}}" />
-                <MenuItem Header="Console _Properties" Command="{Binding ActiveTab.PropertiesCommand}" Visibility="{Binding ActiveTab.PropertiesCommand, Converter={StaticResource ObjectToVisibility}}" />
-                <Separator />
-                <MenuItem Header="D_etach" InputGestureText="Ctrl+Shift+F4" Command="{Binding ActiveTab.DetachCommand}" Visibility="{Binding ActiveTab.DetachCommand, Converter={StaticResource ObjectToVisibility}}" />
-                <MenuItem Header="C_lose" InputGestureText="Ctrl+F4" Command="{Binding ActiveTab.CloseCommand}" Visibility="{Binding ActiveTab.CloseCommand, Converter={StaticResource ObjectToVisibility}}" />
             </MenuItem>
             <MenuItem Header="_Grab" SubmenuOpened="OnGrabMenuOpened">
                 <Separator Tag="[End]" />
@@ -195,19 +83,10 @@
             <TextBlock Text="{Binding ErrorText}" TextWrapping="Wrap" />
         </Button>
 
-        <controls:DragItemsControl
-            x:Name="tabItemsControl"
-            Grid.Row="3"
-            Focusable="False"
-            ItemsSource="{Binding Tabs}"
-            ItemsPanel="{StaticResource TabItemsPanelTemplate}"
-            ItemTemplate="{StaticResource TabItemTemplate}" />
-
-        <Border Grid.Row="4" x:Name="processHostHolder" BorderThickness="0" />
-        <Border Grid.Row="4" x:Name="viewElementHolder" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" Visibility="Collapsed" KeyboardNavigation.TabNavigation="Cycle" />
+        <Border Grid.Row="3" x:Name="viewElementHolder" Visibility="Collapsed" KeyboardNavigation.TabNavigation="Cycle" />
 
         <ProgressBar
-            Grid.Row="4"
+            Grid.Row="0"
             Height="5"
             IsIndeterminate="True"
             HorizontalAlignment="Stretch"

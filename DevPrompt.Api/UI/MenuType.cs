@@ -1,8 +1,9 @@
-﻿namespace DevPrompt.Plugins
+﻿namespace DevPrompt.Api
 {
     public enum MenuType
     {
         Tools,
         Links,
+        Plugins,
     }
 }

@@ -20,9 +20,8 @@ public:
     virtual HRESULT __stdcall Deactivate() override;
     virtual HRESULT __stdcall Show() override;
     virtual HRESULT __stdcall Hide() override;
-    virtual HRESULT __stdcall GetWindow(HWND* hwnd) override;
-    virtual HRESULT __stdcall DpiChanged(double oldScale, double newScale) override;
     virtual HRESULT __stdcall Focus() override;
+    virtual HRESULT __stdcall GetWindow(HWND* hwnd) override;
 
     virtual HRESULT __stdcall RunProcess(
         const wchar_t* executable,
@@ -32,6 +31,7 @@ public:
 
     virtual HRESULT __stdcall RestoreProcess(const wchar_t* state, IProcess** obj) override;
     virtual HRESULT __stdcall CloneProcess(IProcess* process, IProcess** obj) override;
+    virtual HRESULT __stdcall ContainsProcess(IProcess* process, VARIANT_BOOL* value) override;
 
     // IAppListener
     void OnWindowDestroying(HWND hwnd) override;

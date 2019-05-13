@@ -1,4 +1,4 @@
-﻿using DevPrompt.Plugins;
+﻿using DevPrompt.Api;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using System;
@@ -18,6 +18,7 @@ namespace DevOps
         private readonly ConcurrentDictionary<string, VssConnection> vssConnections;
         private bool disposed;
 
+        [ImportingConstructor]
         public Globals(IApp app)
         {
             Globals.Instance = this;
@@ -58,11 +59,15 @@ namespace DevOps
             return connection;
         }
 
-        void IAppListener.OnStartup()
+        void IAppListener.OnStartup(IApp app)
         {
         }
 
-        void IAppListener.OnExit()
+        void IAppListener.OnClosing(IApp app, IWindow window)
+        {
+        }
+
+        void IAppListener.OnExit(IApp app)
         {
         }
     }

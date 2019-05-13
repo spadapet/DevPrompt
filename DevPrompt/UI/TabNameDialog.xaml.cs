@@ -7,9 +7,9 @@ namespace DevPrompt.UI
     {
         public TabNameDialogVM ViewModel { get; }
 
-        public TabNameDialog(ITabVM tab)
+        public TabNameDialog(string tabName)
         {
-            this.ViewModel = new TabNameDialogVM(tab.TabName);
+            this.ViewModel = new TabNameDialogVM(tabName);
 
             this.InitializeComponent();
         }

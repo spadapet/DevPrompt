@@ -1,32 +1,34 @@
-﻿using DevPrompt.Settings;
+﻿using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 
-namespace DevPrompt.UI.ViewModels
+namespace DevPrompt.Api
 {
     /// <summary>
-    /// Any tab's view model must implement this interface
+    /// View model to wrap ITab model
     /// </summary>
-    public interface ITabVM : INotifyPropertyChanged
+    public interface ITabVM : INotifyPropertyChanged, IDisposable
     {
-        void Focus();
-
-        string TabName { get; }
-        string ExpandedTabName { get; } // expands environment variables from TabName
+        Guid Id { get; }
+        string Name { get; }
+        string Tooltip { get; }
         string Title { get; }
-        bool Active { get; set; }
         UIElement ViewElement { get; }
         ITabSnapshot Snapshot { get; }
-
-        // Tab context menu commands. Any of them can return null if the command doesn't make sense.
+        ActiveState ActiveState { get; set; }
+        bool CreatedTab { get; }
+        ITab Tab { get; }
 
         ICommand ActivateCommand { get; }
-        ICommand CloneCommand { get; }
         ICommand CloseCommand { get; }
+        ICommand CloneCommand { get; }
         ICommand DetachCommand { get; }
         ICommand DefaultsCommand { get; }
         ICommand PropertiesCommand { get; }
         ICommand SetTabNameCommand { get; }
+
+        void Focus();
+        bool TakeRestoredTab(ITab tab);
     }
 }

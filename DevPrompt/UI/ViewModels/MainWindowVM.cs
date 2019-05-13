@@ -1,5 +1,4 @@
-﻿using DevPrompt.Interop;
-using DevPrompt.Settings;
+﻿using DevPrompt.Settings;
 using DevPrompt.Utility;
 using Microsoft.Win32;
 using System;
@@ -9,8 +8,10 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
 
@@ -19,52 +20,76 @@ namespace DevPrompt.UI.ViewModels
     /// <summary>
     /// View model for the main window (handles all menu items, etc)
     /// </summary>
-    internal class MainWindowVM : PropertyNotifier, IMainWindowVM
+    internal class MainWindowVM : Api.PropertyNotifier, Api.IWindow
     {
         public MainWindow Window { get; }
+        public AppSettings AppSettings => this.Window.App.Settings;
+        public Api.IApp App => this.Window.App;
+        Window Api.IWindow.Window => this.Window;
+
         public ICommand ConsoleCommand { get; }
         public ICommand GrabConsoleCommand { get; }
         public ICommand LinkCommand { get; }
         public ICommand ToolCommand { get; }
         public ICommand VisualStudioCommand { get; }
-        public ICommand ClearErrorTextCommand { get; }
 
-        private readonly ObservableCollection<ITabVM> tabs;
-        private readonly LinkedList<ITabVM> tabOrder;
+        private ObservableCollection<Api.IWorkspaceVM> workspaces;
+        private Dictionary<Api.IWorkspaceVM, MenuItem[]> workspaceMenuItems;
+        private IMultiValueConverter workspaceMenuItemVisibilityConverter;
+        private Api.IWorkspaceVM activeWorkspace;
         private readonly Stack<Action> loadingCancelActions;
-        private LinkedListNode<ITabVM> currentTabCycle;
-        private int newTabIndex;
-        private ITabVM activeTab;
-        private string errorText;
         private DispatcherOperation savingAppSettings;
-        private long loadingCount;
-
-        private const int NewTabAtEnd = -1;
-        private const int NewTabAtEndNoActivate = -2;
+        private string errorText;
 
         public MainWindowVM(MainWindow window)
         {
             this.Window = window;
+            this.Window.Closed += this.OnWindowClosed;
             this.Window.Activated += this.OnWindowActivated;
             this.Window.Deactivated += this.OnWindowDeactivated;
-            this.tabs = new ObservableCollection<ITabVM>();
-            this.tabs.CollectionChanged += this.OnTabsCollectionChanged;
-            this.tabOrder = new LinkedList<ITabVM>();
-            this.newTabIndex = MainWindowVM.NewTabAtEnd;
-            this.loadingCancelActions = new Stack<Action>();
-
-            this.ConsoleCommand = new DelegateCommand((object arg) => this.StartConsole((ConsoleSettings)arg));
-            this.GrabConsoleCommand = new DelegateCommand((object arg) => this.GrabConsole((int)arg));
-            this.LinkCommand = new DelegateCommand((object arg) => this.StartLink((LinkSettings)arg));
-            this.ToolCommand = new DelegateCommand((object arg) => this.StartTool((ToolSettings)arg));
-            this.VisualStudioCommand = new DelegateCommand((object arg) => this.StartVisualStudio((VisualStudioSetup.Instance)arg));
-            this.ClearErrorTextCommand = new DelegateCommand((object arg) => this.ClearErrorText());
-
             this.AppSettings.PropertyChanged += this.OnAppSettingsPropertyChanged;
             this.AppSettings.ObservableConsoles.CollectionChanged += this.OnAppSettingsCollectionChanged;
             this.AppSettings.ObservableGrabConsoles.CollectionChanged += this.OnAppSettingsCollectionChanged;
             this.AppSettings.ObservableLinks.CollectionChanged += this.OnAppSettingsCollectionChanged;
             this.AppSettings.ObservableTools.CollectionChanged += this.OnAppSettingsCollectionChanged;
+
+            this.ConsoleCommand = new Api.DelegateCommand((object arg) => this.StartConsole((ConsoleSettings)arg));
+            this.GrabConsoleCommand = new Api.DelegateCommand((object arg) => this.App.GrabProcess((int)arg));
+            this.LinkCommand = new Api.DelegateCommand((object arg) => this.StartLink((LinkSettings)arg));
+            this.ToolCommand = new Api.DelegateCommand((object arg) => this.StartTool((ToolSettings)arg));
+            this.VisualStudioCommand = new Api.DelegateCommand((object arg) => this.StartVisualStudio((VisualStudioSetup.Instance)arg));
+
+            this.workspaces = new ObservableCollection<Api.IWorkspaceVM>();
+            this.workspaceMenuItems = new Dictionary<Api.IWorkspaceVM, MenuItem[]>();
+            this.workspaceMenuItemVisibilityConverter = new DelegateMultiConverter(this.ConvertWorkspaceMenuItemVisibility);
+            this.loadingCancelActions = new Stack<Action>();
+        }
+
+        private void Dispose()
+        {
+            this.Window.Closed -= this.OnWindowClosed;
+            this.Window.Activated -= this.OnWindowActivated;
+            this.Window.Deactivated -= this.OnWindowDeactivated;
+            this.AppSettings.PropertyChanged -= this.OnAppSettingsPropertyChanged;
+            this.AppSettings.ObservableConsoles.CollectionChanged -= this.OnAppSettingsCollectionChanged;
+            this.AppSettings.ObservableGrabConsoles.CollectionChanged -= this.OnAppSettingsCollectionChanged;
+            this.AppSettings.ObservableLinks.CollectionChanged -= this.OnAppSettingsCollectionChanged;
+            this.AppSettings.ObservableTools.CollectionChanged -= this.OnAppSettingsCollectionChanged;
+        }
+
+        private void OnWindowClosed(object sender, EventArgs args)
+        {
+            this.Dispose();
+        }
+
+        private void OnWindowActivated(object sender, EventArgs args)
+        {
+            this.ActiveWorkspace?.Workspace.OnWindowActivated();
+        }
+
+        private void OnWindowDeactivated(object sender, EventArgs args)
+        {
+            this.ActiveWorkspace?.Workspace.OnWindowDeactivated();
         }
 
         private void OnAppSettingsCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
@@ -77,30 +102,6 @@ namespace DevPrompt.UI.ViewModels
             if (this.Window.IsVisible)
             {
                 await this.SaveAppSettings();
-            }
-        }
-
-        public Dispatcher Dispatcher
-        {
-            get
-            {
-                return this.Window.Dispatcher;
-            }
-        }
-
-        public IProcessHost ProcessHost
-        {
-            get
-            {
-                return this.Window.ProcessHostWindow?.ProcessHost;
-            }
-        }
-
-        public AppSettings AppSettings
-        {
-            get
-            {
-                return this.Window.AppSettings;
             }
         }
 
@@ -124,259 +125,189 @@ namespace DevPrompt.UI.ViewModels
             await this.savingAppSettings;
         }
 
-        public ICommand DetachAndExitCommand
+        public ICommand ClearErrorTextCommand => new Api.DelegateCommand(this.ClearErrorText);
+
+        public ICommand DetachAndExitCommand => new Api.DelegateCommand(() =>
         {
-            get
+            foreach (Api.ITabWorkspace workspace in this.Workspaces.Select(w => w.Workspace).OfType<Api.ITabWorkspace>())
             {
-                return new DelegateCommand(() =>
+                foreach (Api.ITab tab in workspace.Tabs)
                 {
-                    foreach (ITabVM tab in this.tabs.ToArray())
-                    {
-                        if (tab.DetachCommand != null && tab.DetachCommand.CanExecute(null))
-                        {
-                            tab.DetachCommand.Execute(null);
-                        }
-                    }
-
-                    this.Window.Close();
-                });
+                    tab.DetachCommand?.SafeExecute();
+                }
             }
-        }
 
-        public ICommand ExitCommand
+            this.Window.Close();
+        });
+
+        public ICommand ExitCommand => new Api.DelegateCommand(() => this.Window.Close());
+
+        public ICommand VisualStudioInstallerCommand => new Api.DelegateCommand(() =>
         {
-            get
+            this.RunExternalProcess(VisualStudioSetup.InstallerPath);
+        });
+
+        public ICommand VisualStudioDogfoodCommand => new Api.DelegateCommand(() =>
+        {
+            this.RunExternalProcess(VisualStudioSetup.DogfoodInstallerPath);
+        });
+
+        public ICommand InstallVisualStudioBranchCommand => new Api.DelegateCommand(() =>
+        {
+            InstallBranchDialog dialog = new InstallBranchDialog()
             {
-                return new DelegateCommand(() => this.Window.Close());
+                Owner = this.Window
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                this.RunExternalProcess(dialog.ViewModel.Hyperlink);
             }
-        }
+        });
 
-        public ICommand VisualStudioInstallerCommand
+        public ICommand CustomizeConsolesCommand => new Api.DelegateCommand(() =>
         {
-            get
+            CustomizeConsolesDialog dialog = new CustomizeConsolesDialog(this.AppSettings.Consoles)
             {
-                return new DelegateCommand(() =>
+                Owner = this.Window
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                this.AppSettings.Consoles.Clear();
+
+                foreach (ConsoleSettings settings in dialog.Settings)
                 {
-                    this.StartExternalProcess(VisualStudioSetup.InstallerPath);
-                });
+                    this.AppSettings.Consoles.Add(settings.Clone());
+                }
             }
-        }
+        });
 
-        public ICommand VisualStudioDogfoodCommand
+        public ICommand SettingsImportCommand => new Api.DelegateCommand(async () =>
         {
-            get
+            OpenFileDialog dialog = new OpenFileDialog
             {
-                return new DelegateCommand(() =>
-                {
-                    this.StartExternalProcess(VisualStudioSetup.DogfoodInstallerPath);
-                });
-            }
-        }
+                Title = "Import Settings",
+                Filter = "XML Files|*.xml",
+                DefaultExt = "xml",
+                CheckFileExists = true
+            };
 
-        public ICommand InstallVisualStudioBranchCommand
-        {
-            get
+            if (dialog.ShowDialog(this.Window) == true)
             {
-                return new DelegateCommand(() =>
+                AppSettings settings = null;
+                try
                 {
-                    InstallBranchDialog dialog = new InstallBranchDialog()
+                    settings = await AppSettings.UnsafeLoad(this.Window.App, dialog.FileName);
+                }
+                catch (Exception exception)
+                {
+                    this.SetError(exception);
+                }
+
+                if (settings != null)
+                {
+                    SettingsImportDialog dialog2 = new SettingsImportDialog(settings)
                     {
                         Owner = this.Window
                     };
 
-                    if (dialog.ShowDialog() == true)
+                    if (dialog2.ShowDialog() == true)
                     {
-                        this.StartExternalProcess(dialog.ViewModel.Hyperlink);
+                        dialog2.ViewModel.Import(this.AppSettings);
                     }
-                });
+                }
             }
-        }
+        });
 
-        public ICommand CustomizeConsolesCommand
+        public ICommand SettingsExportCommand => new Api.DelegateCommand(async () =>
         {
-            get
+            OpenFileDialog dialog = new OpenFileDialog
             {
-                return new DelegateCommand(() =>
-                {
-                    CustomizeConsolesDialog dialog = new CustomizeConsolesDialog(this.AppSettings.Consoles)
-                    {
-                        Owner = this.Window
-                    };
+                Title = "Export Settings",
+                Filter = "XML Files|*.xml",
+                DefaultExt = "xml",
+                CheckPathExists = true,
+                CheckFileExists = false,
+                ValidateNames = true
+            };
 
-                    if (dialog.ShowDialog() == true)
-                    {
-                        this.AppSettings.Consoles.Clear();
-
-                        foreach (ConsoleSettings settings in dialog.Settings)
-                        {
-                            this.AppSettings.Consoles.Add(settings.Clone());
-                        }
-                    }
-                });
+            if (dialog.ShowDialog(this.Window) == true)
+            {
+                await this.SaveAppSettings(dialog.FileName);
             }
-        }
+        });
 
-        public ICommand SettingsImportCommand
+        public ICommand CustomizeConsoleGrabCommand => new Api.DelegateCommand(() =>
         {
-            get
+            CustomizeGrabConsolesDialog dialog = new CustomizeGrabConsolesDialog(this.AppSettings.GrabConsoles)
             {
-                return new DelegateCommand(async () =>
+                Owner = this.Window
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                this.AppSettings.GrabConsoles.Clear();
+
+                foreach (GrabConsoleSettings settings in dialog.Settings)
                 {
-                    OpenFileDialog dialog = new OpenFileDialog
-                    {
-                        Title = "Import Settings",
-                        Filter = "XML Files|*.xml",
-                        DefaultExt = "xml",
-                        CheckFileExists = true
-                    };
-
-                    if (dialog.ShowDialog(this.Window) == true)
-                    {
-                        AppSettings settings = null;
-                        try
-                        {
-                            settings = await AppSettings.UnsafeLoad(this.Window.App, dialog.FileName);
-                        }
-                        catch (Exception exception)
-                        {
-                            this.SetError(exception);
-                        }
-
-                        if (settings != null)
-                        {
-                            SettingsImportDialog dialog2 = new SettingsImportDialog(settings)
-                            {
-                                Owner = this.Window
-                            };
-
-                            if (dialog2.ShowDialog() == true)
-                            {
-                                dialog2.ViewModel.Import(this.AppSettings);
-                            }
-                        }
-                    }
-                });
+                    this.AppSettings.GrabConsoles.Add(settings.Clone());
+                }
             }
-        }
+        });
 
-        public ICommand SettingsExportCommand
+        public ICommand CustomizeToolsCommand => new Api.DelegateCommand(() =>
         {
-            get
+            CustomizeToolsDialog dialog = new CustomizeToolsDialog(this.AppSettings.Tools)
             {
-                return new DelegateCommand(async () =>
+                Owner = this.Window
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                this.AppSettings.Tools.Clear();
+
+                foreach (ToolSettings settings in dialog.Settings)
                 {
-                    OpenFileDialog dialog = new OpenFileDialog
-                    {
-                        Title = "Export Settings",
-                        Filter = "XML Files|*.xml",
-                        DefaultExt = "xml",
-                        CheckPathExists = true,
-                        CheckFileExists = false,
-                        ValidateNames = true
-                    };
-
-                    if (dialog.ShowDialog(this.Window) == true)
-                    {
-                        await this.SaveAppSettings(dialog.FileName);
-                    }
-                });
+                    this.AppSettings.Tools.Add(settings.Clone());
+                }
             }
-        }
+        });
 
-        public ICommand CustomizeConsoleGrabCommand
+        public ICommand CustomizeLinksCommand => new Api.DelegateCommand(() =>
         {
-            get
+            CustomizeLinksDialog dialog = new CustomizeLinksDialog(this.AppSettings.Links)
             {
-                return new DelegateCommand(() =>
+                Owner = this.Window
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                this.AppSettings.Links.Clear();
+
+                foreach (LinkSettings settings in dialog.Settings)
                 {
-                    CustomizeGrabConsolesDialog dialog = new CustomizeGrabConsolesDialog(this.AppSettings.GrabConsoles)
-                    {
-                        Owner = this.Window
-                    };
-
-                    if (dialog.ShowDialog() == true)
-                    {
-                        this.AppSettings.GrabConsoles.Clear();
-
-                        foreach (GrabConsoleSettings settings in dialog.Settings)
-                        {
-                            this.AppSettings.GrabConsoles.Add(settings.Clone());
-                        }
-                    }
-                });
+                    this.AppSettings.Links.Add(settings.Clone());
+                }
             }
-        }
+        });
 
-        public ICommand CustomizeToolsCommand
+        public ICommand AboutCommand => new Api.DelegateCommand(() =>
         {
-            get
+            AboutDialog dialog = new AboutDialog(this)
             {
-                return new DelegateCommand(() =>
-                {
-                    CustomizeToolsDialog dialog = new CustomizeToolsDialog(this.AppSettings.Tools)
-                    {
-                        Owner = this.Window
-                    };
+                Owner = this.Window
+            };
 
-                    if (dialog.ShowDialog() == true)
-                    {
-                        this.AppSettings.Tools.Clear();
-
-                        foreach (ToolSettings settings in dialog.Settings)
-                        {
-                            this.AppSettings.Tools.Add(settings.Clone());
-                        }
-                    }
-                });
-            }
-        }
-
-        public ICommand CustomizeLinksCommand
-        {
-            get
-            {
-                return new DelegateCommand(() =>
-                {
-                    CustomizeLinksDialog dialog = new CustomizeLinksDialog(this.AppSettings.Links)
-                    {
-                        Owner = this.Window
-                    };
-
-                    if (dialog.ShowDialog() == true)
-                    {
-                        this.AppSettings.Links.Clear();
-
-                        foreach (LinkSettings settings in dialog.Settings)
-                        {
-                            this.AppSettings.Links.Add(settings.Clone());
-                        }
-                    }
-                });
-            }
-        }
-
-        public ICommand AboutCommand
-        {
-            get
-            {
-                return new DelegateCommand(() =>
-                {
-                    AboutDialog dialog = new AboutDialog(this)
-                    {
-                        Owner = this.Window
-                    };
-
-                    dialog.ShowDialog();
-                });
-            }
-        }
+            dialog.ShowDialog();
+        });
 
         public string WindowTitle
         {
             get
             {
                 string intro = Program.IsElevated ? "[Dev Admin]" : "[Dev]";
-                string title = this.ActiveTab?.Title;
+                string title = this.ActiveWorkspace?.Title?.Trim();
 
                 if (!string.IsNullOrEmpty(title))
                 {
@@ -387,235 +318,191 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
-        public IReadOnlyList<ITabVM> Tabs
+        public IEnumerable<Api.IWorkspaceVM> Workspaces => this.workspaces;
+        public bool HasActiveWorkspace => this.ActiveWorkspace != null;
+
+        public Api.IWorkspaceVM FindWorkspace(Guid id)
         {
-            get
-            {
-                return this.tabs;
-            }
+            return this.Workspaces.FirstOrDefault(w => w.Id == id);
         }
 
-        public ITabVM ActiveTab
+        public Api.IWorkspaceVM ActiveWorkspace
         {
-            get
-            {
-                return this.activeTab;
-            }
+            get => this.activeWorkspace;
 
             set
             {
-                ITabVM oldTab = this.activeTab;
-                if (this.SetPropertyValue(ref this.activeTab, value))
+                Api.IWorkspaceVM oldWorkspace = this.ActiveWorkspace;
+                if (this.SetPropertyValue(ref this.activeWorkspace, value))
                 {
-                    if (this.activeTab != null)
+                    if (this.activeWorkspace != null)
                     {
-                        if (!this.tabs.Contains(this.activeTab))
+                        if (!this.workspaces.Contains(this.activeWorkspace))
                         {
-                            this.AddTab(this.activeTab, activate: false);
+                            this.AddWorkspace(this.activeWorkspace, activate: false);
                         }
 
-                        this.activeTab.Active = true;
+                        this.activeWorkspace.ActiveState = Api.ActiveState.Active;
                     }
 
-                    if (oldTab != null)
+                    if (oldWorkspace != null)
                     {
-                        oldTab.Active = false;
+                        oldWorkspace.ActiveState = Api.ActiveState.Hidden;
                     }
 
-                    this.Window.ViewElement = this.activeTab?.ViewElement;
+                    this.Window.ViewElement = this.ActiveWorkspace?.ViewElement;
 
-                    this.OnPropertyChanged(nameof(this.HasActiveTab));
+                    this.OnPropertyChanged(nameof(this.HasActiveWorkspace));
                     this.OnPropertyChanged(nameof(this.WindowTitle));
                 }
 
-                this.FocusActiveTab();
+                this.ActiveWorkspace?.Workspace.Focus();
             }
         }
 
-        public bool HasActiveTab
+        public void AddWorkspace(Api.IWorkspaceVM workspace, bool activate)
         {
-            get
+            if (!this.workspaces.Contains(workspace))
             {
-                return this.ActiveTab != null;
+                int index = this.workspaces.Count;
+                this.workspaces.Insert(index, workspace);
+                this.AddMainMenuItems(workspace);
+
+                workspace.PropertyChanged += this.OnWorkspacePropertyChanged;
+            }
+
+            if (activate)
+            {
+                this.ActiveWorkspace = workspace;
             }
         }
 
-        public void FocusActiveTab()
+        public void RemoveWorkspace(Api.IWorkspaceVM workspace)
         {
-            if (this.ActiveTab != null)
+            bool removingActive = (this.ActiveWorkspace == workspace);
+
+            if (this.workspaces.Remove(workspace))
             {
-                if (this.currentTabCycle != null)
+                if (removingActive)
                 {
-                    if (this.currentTabCycle.Value != this.ActiveTab)
+                    this.ActiveWorkspace = this.workspaces.FirstOrDefault();
+                }
+
+                this.RemoveMainMenuItems(workspace);
+                workspace.PropertyChanged -= this.OnWorkspacePropertyChanged;
+                workspace.Dispose();
+            }
+        }
+
+        private object ConvertWorkspaceMenuItemVisibility(object[] values, Type targetType, object parameter)
+        {
+            Api.IWorkspaceVM workspace = (Api.IWorkspaceVM)parameter;
+
+            foreach (object value in values)
+            {
+                if (value is Visibility visibility)
+                {
+                    if (visibility != Visibility.Visible)
                     {
-                        this.currentTabCycle = this.tabOrder.Find(this.ActiveTab);
+                        return Visibility.Collapsed;
                     }
                 }
-                else
+                else if (value == null || value is Api.IWorkspaceVM)
                 {
-                    this.tabOrder.Remove(this.ActiveTab);
-                    this.tabOrder.AddFirst(this.ActiveTab);
+                    if (workspace != value)
+                    {
+                        return Visibility.Collapsed;
+                    }
+                }
+            }
+
+            return Visibility.Visible;
+        }
+
+        private void AddMainMenuItems(Api.IWorkspaceVM workspace)
+        {
+            if (!this.workspaceMenuItems.ContainsKey(workspace) && workspace.CreatedWorkspace)
+            {
+                MenuItem[] items = workspace.MenuItems.ToArray();
+                this.workspaceMenuItems[workspace] = items;
+
+                int index = 1;
+                foreach (MenuItem item in items)
+                {
+                    // Create a {Binding} so that the menu item is only visible when the workspace is active.
+                    // But try and keep any existing {Binding} that's already set on the menu item.
+
+                    MultiBinding binding = new MultiBinding();
+                    binding.Mode = BindingMode.OneWay;
+                    binding.Converter = this.workspaceMenuItemVisibilityConverter;
+                    binding.ConverterParameter = workspace;
+
+                    if (BindingOperations.GetBindingBase(item, UIElement.VisibilityProperty) is BindingBase visibilityBinding)
+                    {
+                        binding.Bindings.Add(visibilityBinding);
+                    }
+
+                    binding.Bindings.Add(new Binding(nameof(this.ActiveWorkspace))
+                    {
+                        Mode = BindingMode.OneWay,
+                        Source = this,
+                    });
+
+                    item.DataContext = workspace.Workspace;
+                    BindingOperations.SetBinding(item, UIElement.VisibilityProperty, binding);
+
+                    this.Window.MainMenu.Items.Insert(index++, item);
+                }
+            }
+        }
+
+        private void RemoveMainMenuItems(Api.IWorkspaceVM workspace)
+        {
+            if (this.workspaceMenuItems.TryGetValue(workspace, out MenuItem[] items))
+            {
+                this.workspaceMenuItems.Remove(workspace);
+
+                foreach (MenuItem item in items)
+                {
+                    this.Window.MainMenu.Items.Remove(item);
                 }
 
-                this.ActiveTab.Focus();
             }
         }
 
-        public void TabCycleStop()
+        private void OnWorkspacePropertyChanged(object sender, PropertyChangedEventArgs args)
         {
-            if (this.currentTabCycle != null)
+            if (sender is Api.IWorkspaceVM workspace && this.ActiveWorkspace == workspace)
             {
-                this.tabOrder.Remove(this.currentTabCycle);
-                this.tabOrder.AddFirst(this.currentTabCycle);
-                this.currentTabCycle = null;
-            }
-        }
-
-        public void TabCycleNext()
-        {
-            if (this.tabOrder.Count > 1)
-            {
-                if (this.currentTabCycle == null)
+                if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.IWorkspaceVM.ViewElement))
                 {
-                    this.currentTabCycle = this.tabOrder.First;
+                    this.Window.ViewElement = workspace.ViewElement;
                 }
 
-                this.currentTabCycle = this.currentTabCycle.Next ?? this.tabOrder.First;
-                this.ActiveTab = this.currentTabCycle.Value;
-            }
-        }
-
-        public void TabCyclePrev()
-        {
-            if (this.tabOrder.Count > 1)
-            {
-                if (this.currentTabCycle == null)
-                {
-                    this.currentTabCycle = this.tabOrder.First;
-                }
-
-                this.currentTabCycle = this.currentTabCycle.Previous ?? this.tabOrder.Last;
-                this.ActiveTab = this.currentTabCycle.Value;
-            }
-        }
-
-        public void AddTab(ITabVM tab, bool activate)
-        {
-            this.ClearErrorText();
-
-            if (this.newTabIndex == MainWindowVM.NewTabAtEndNoActivate)
-            {
-                activate = false;
-            }
-
-            int index = (this.newTabIndex < 0) ? this.tabs.Count : Math.Min(this.tabs.Count, this.newTabIndex);
-            this.tabs.Insert(index, tab);
-            this.tabOrder.AddFirst(tab);
-            Debug.Assert(this.tabs.Count == this.tabOrder.Count);
-
-            if (activate || this.ActiveTab == null)
-            {
-                this.ActiveTab = tab;
-            }
-
-            tab.PropertyChanged += this.OnTabPropertyChanged;
-        }
-
-        public void RemoveTab(ITabVM tab)
-        {
-            bool removingActive = (this.ActiveTab == tab);
-
-            this.tabs.Remove(tab);
-            this.tabOrder.Remove(tab);
-            Debug.Assert(this.tabs.Count == this.tabOrder.Count);
-
-            if (removingActive)
-            {
-                this.ActiveTab = this.tabOrder.First?.Value;
-            }
-
-            tab.PropertyChanged -= this.OnTabPropertyChanged;
-
-            if (tab is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
-        }
-
-        private void OnTabPropertyChanged(object sender, PropertyChangedEventArgs args)
-        {
-            if (sender is ITabVM tab && this.ActiveTab == tab)
-            {
-                if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(ITabVM.ViewElement))
-                {
-                    this.Window.ViewElement = tab.ViewElement;
-                }
-
-                if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(ITabVM.Title))
+                if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.IWorkspaceVM.Title))
                 {
                     this.OnPropertyChanged(nameof(this.WindowTitle));
                 }
-            }
-        }
 
-        private void StartConsole(ConsoleSettings settings)
-        {
-            IProcess process = this.ProcessHost?.RunProcess(
-                settings.Executable,
-                settings.ExpandedArguments,
-                settings.ExpandedStartingDirectory);
-
-            if (this.FindProcess(process) is ProcessVM tab)
-            {
-                tab.TabName = settings.TabName;
-            }
-        }
-
-        private void GrabConsole(int processId)
-        {
-            this.Window.NativeApp?.GrabProcess(processId);
-        }
-
-        public async void RunStartupConsoles()
-        {
-            AppSnapshot snapshot = await AppSnapshot.Load(this.Window.App, AppSnapshot.DefaultPath);
-
-            try
-            {
-                this.newTabIndex = MainWindowVM.NewTabAtEndNoActivate;
-
-                foreach (ITabSnapshot tabSnapshot in snapshot.Tabs)
+                if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.IWorkspaceVM.MenuItems))
                 {
-                    if (tabSnapshot.Restore(this) is ITabVM tab)
-                    {
-                        if (!this.tabs.Contains(tab))
-                        {
-                            this.AddTab(tab, false);
-                        }
-
-                        if (snapshot.ActiveTabIndex >= 0 &&
-                            snapshot.ActiveTabIndex < snapshot.Tabs.Count &&
-                            snapshot.Tabs[snapshot.ActiveTabIndex] == tabSnapshot)
-                        {
-                            this.ActiveTab = tab;
-                        }
-                    }
-                }
-
-                if (this.tabs.Count == 0)
-                {
-                    foreach (ConsoleSettings settings in this.AppSettings.Consoles)
-                    {
-                        if (settings.RunAtStartup)
-                        {
-                            this.StartConsole(settings);
-                        }
-                    }
+                    this.RemoveMainMenuItems(workspace);
+                    this.AddMainMenuItems(workspace);
                 }
             }
-            finally
+        }
+
+        public void InitWorkspaces(AppSnapshot snapshot)
+        {
+            foreach (Api.IWorkspaceProvider provider in this.Window.App.WorkspaceProviders)
             {
-                this.newTabIndex = MainWindowVM.NewTabAtEnd;
+                Api.IWorkspaceVM workspace = new Api.WorkspaceVM(this, provider, snapshot.FindWorkspaceSnapshot(provider.WorkspaceId));
+                this.AddWorkspace(workspace, false);
+
+                if (this.ActiveWorkspace == null || workspace.Id == snapshot.ActiveWorkspaceId)
+                {
+                    this.ActiveWorkspace = workspace;
+                }
             }
         }
 
@@ -655,46 +542,11 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
-        public void OnDrop(ITabVM tab, int droppedIndex, bool copy)
-        {
-            int index = this.tabs.IndexOf(tab);
-            if (index >= 0)
-            {
-                if (copy && tab.CloneCommand?.CanExecute(null) == true)
-                {
-                    int oldTabIndex = this.newTabIndex;
-                    this.newTabIndex = droppedIndex;
-
-                    try
-                    {
-                        tab.CloneCommand.Execute(null);
-                    }
-                    finally
-                    {
-                        this.newTabIndex = oldTabIndex;
-                    }
-                }
-                else if (index != droppedIndex)
-                {
-                    int finalIndex = (droppedIndex > index) ? droppedIndex - 1 : droppedIndex;
-                    this.tabs.Move(index, finalIndex);
-                }
-            }
-        }
-
         public bool Loading
         {
             get
             {
-                return Interlocked.Read(ref this.loadingCount) != 0;
-            }
-        }
-
-        public bool NotLoading
-        {
-            get
-            {
-                return !this.Loading;
+                return this.loadingCancelActions.Count > 0;
             }
         }
 
@@ -702,7 +554,7 @@ namespace DevPrompt.UI.ViewModels
         {
             this.loadingCancelActions.Push(cancelAction);
 
-            if (Interlocked.Increment(ref this.loadingCount) == 1)
+            if (this.loadingCancelActions.Count == 1)
             {
                 this.OnPropertyChanged(nameof(this.Loading));
             }
@@ -711,7 +563,7 @@ namespace DevPrompt.UI.ViewModels
             {
                 this.loadingCancelActions.Pop();
 
-                if (Interlocked.Decrement(ref this.loadingCount) == 0)
+                if (this.loadingCancelActions.Count == 0)
                 {
                     this.OnPropertyChanged(nameof(this.Loading));
                 }
@@ -729,39 +581,36 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
-        public ProcessVM FindProcess(IProcess process)
-        {
-            IntPtr processHwnd = process?.GetWindow() ?? IntPtr.Zero;
-            return this.tabs.OfType<ProcessVM>().FirstOrDefault(p => p.Hwnd == processHwnd);
-        }
-
-        ITabVM IMainWindowVM.RestoreConsoleTab(string state)
-        {
-            IProcess process = this.ProcessHost?.RestoreProcess(state);
-            return this.FindProcess(process);
-        }
-
         private void ClearErrorText()
         {
             this.SetError(null);
         }
 
+        private void StartConsole(ConsoleSettings settings)
+        {
+            if (this.FindWorkspace(Api.Constants.ProcessWorkspaceId) is Api.IWorkspaceVM workspaceVM && workspaceVM.Workspace is Api.IProcessWorkspace workspace)
+            {
+                this.ActiveWorkspace = workspaceVM;
+                workspace.RunProcess(settings);
+            }
+        }
+
         private void StartLink(LinkSettings settings)
         {
-            this.StartExternalProcess(settings.Address);
+            this.RunExternalProcess(settings.Address);
         }
 
         private void StartTool(ToolSettings settings)
         {
-            this.StartExternalProcess(settings.ExpandedCommand, settings.ExpandedArguments);
+            this.RunExternalProcess(settings.ExpandedCommand, settings.ExpandedArguments);
         }
 
         private void StartVisualStudio(VisualStudioSetup.Instance instance)
         {
-            this.StartExternalProcess(instance.ProductPath);
+            this.RunExternalProcess(instance.ProductPath);
         }
 
-        public void StartExternalProcess(string path, string arguments = null)
+        public void RunExternalProcess(string path, string arguments = null)
         {
             this.ClearErrorText();
 
@@ -769,35 +618,20 @@ namespace DevPrompt.UI.ViewModels
             {
                 if (string.IsNullOrEmpty(arguments))
                 {
-                    Process.Start(new ProcessStartInfo(path)
+                    System.Diagnostics.Process.Start(new ProcessStartInfo(path)
                     {
                         UseShellExecute = true
                     });
                 }
                 else
                 {
-                    Process.Start(path, arguments);
+                    System.Diagnostics.Process.Start(path, arguments);
                 }
             }
             catch (Exception ex)
             {
                 this.SetError(ex, $"Error: Failed to start \"{path}\"");
             }
-        }
-
-        private void OnWindowDeactivated(object sender, EventArgs args)
-        {
-            this.TabCycleStop();
-        }
-
-        private void OnWindowActivated(object sender, EventArgs args)
-        {
-            this.TabCycleStop();
-        }
-
-        private void OnTabsCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
-        {
-            this.TabCycleStop();
         }
     }
 }

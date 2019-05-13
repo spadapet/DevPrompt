@@ -1,5 +1,4 @@
-﻿using DevPrompt.Plugins;
-using DevPrompt.Utility;
+﻿using DevPrompt.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,12 +15,13 @@ namespace DevPrompt.Settings
     /// Saves/loads application settings
     /// </summary>
     [DataContract]
-    public class AppSettings : PropertyNotifier, ICloneable
+    internal class AppSettings : Api.PropertyNotifier, Api.IAppSettings
     {
         private ObservableCollection<ConsoleSettings> consoles;
         private ObservableCollection<GrabConsoleSettings> grabConsoles;
         private ObservableCollection<LinkSettings> links;
         private ObservableCollection<ToolSettings> tools;
+        private Dictionary<string, object> customProperties;
         private bool consoleGrabEnabled;
         private bool saveTabsOnExit;
         private static readonly object fileLock = new object();
@@ -35,11 +35,6 @@ namespace DevPrompt.Settings
         {
             this.Initialize();
             this.CopyFrom(copyFrom);
-        }
-
-        object ICloneable.Clone()
-        {
-            return this.Clone();
         }
 
         public AppSettings Clone()
@@ -56,6 +51,7 @@ namespace DevPrompt.Settings
             this.grabConsoles.Clear();
             this.links.Clear();
             this.tools.Clear();
+            this.customProperties.Clear();
 
             foreach (ConsoleSettings console in copyFrom.Consoles)
             {
@@ -75,6 +71,13 @@ namespace DevPrompt.Settings
             foreach (ToolSettings tool in copyFrom.Tools)
             {
                 this.tools.Add(tool.Clone());
+            }
+
+            foreach (KeyValuePair<string, object> pair in copyFrom.CustomProperties)
+            {
+                this.customProperties[pair.Key] = (pair.Value is ICloneable cloneable)
+                    ? cloneable.Clone()
+                    : pair.Value;
             }
 
             this.EnsureValid();
@@ -264,7 +267,7 @@ namespace DevPrompt.Settings
             });
         }
 
-        public static async Task<AppSettings> UnsafeLoad(IApp pluginApp, string path)
+        public static async Task<AppSettings> UnsafeLoad(App app, string path)
         {
             return await Task.Run(() =>
             {
@@ -278,13 +281,13 @@ namespace DevPrompt.Settings
                     using (Stream stream = File.OpenRead(path))
                     using (XmlReader reader = XmlReader.Create(stream, xmlSettings))
                     {
-                        return (AppSettings)AppSettings.GetDataContractSerializer(pluginApp).ReadObject(reader);
+                        return (AppSettings)AppSettings.GetDataContractSerializer(app).ReadObject(reader);
                     }
                 }
             });
         }
 
-        public static async Task<AppSettings> Load(IApp pluginApp, string path)
+        public static async Task<AppSettings> Load(App app, string path)
         {
             AppSettings settings = null;
 
@@ -292,7 +295,7 @@ namespace DevPrompt.Settings
             {
                 if (File.Exists(path))
                 {
-                    settings = await AppSettings.UnsafeLoad(pluginApp, path);
+                    settings = await AppSettings.UnsafeLoad(app, path);
                     settings.EnsureValid();
                 }
             }
@@ -303,13 +306,13 @@ namespace DevPrompt.Settings
             if (settings == null)
             {
                 settings = await AppSettings.GetDefaultSettings(DefaultSettingsFilter.All);
-                await settings.Save(pluginApp, path);
+                await settings.Save(app, path);
             }
 
             return settings;
         }
 
-        public Task<Exception> Save(IApp pluginApp, string path = null)
+        public Task<Exception> Save(App app, string path = null)
         {
             AppSettings clone = this.Clone();
 
@@ -334,7 +337,7 @@ namespace DevPrompt.Settings
                             using (Stream stream = File.Create(path))
                             using (XmlWriter writer = XmlWriter.Create(stream, xmlSettings))
                             {
-                                AppSettings.GetDataContractSerializer(pluginApp).WriteObject(writer, clone);
+                                AppSettings.GetDataContractSerializer(app).WriteObject(writer, clone);
                             }
                         }
                     }
@@ -348,73 +351,24 @@ namespace DevPrompt.Settings
             });
         }
 
-        public ObservableCollection<ConsoleSettings> ObservableConsoles
-        {
-            get
-            {
-                return this.consoles;
-            }
-        }
+        IEnumerable<Api.IConsoleSettings> Api.IAppSettings.ConsoleSettings => this.Consoles;
 
-        public ObservableCollection<GrabConsoleSettings> ObservableGrabConsoles
-        {
-            get
-            {
-                return this.grabConsoles;
-            }
-        }
-
-        public ObservableCollection<LinkSettings> ObservableLinks
-        {
-            get
-            {
-                return this.links;
-            }
-        }
-
-        public ObservableCollection<ToolSettings> ObservableTools
-        {
-            get
-            {
-                return this.tools;
-            }
-        }
+        public ObservableCollection<ConsoleSettings> ObservableConsoles => this.consoles;
+        public ObservableCollection<GrabConsoleSettings> ObservableGrabConsoles => this.grabConsoles;
+        public ObservableCollection<LinkSettings> ObservableLinks => this.links;
+        public ObservableCollection<ToolSettings> ObservableTools => this.tools;
 
         [DataMember]
-        public IList<ConsoleSettings> Consoles
-        {
-            get
-            {
-                return this.consoles;
-            }
-        }
+        public IList<ConsoleSettings> Consoles => this.consoles;
 
         [DataMember]
-        public IList<GrabConsoleSettings> GrabConsoles
-        {
-            get
-            {
-                return this.grabConsoles;
-            }
-        }
+        public IList<GrabConsoleSettings> GrabConsoles => this.grabConsoles;
 
         [DataMember]
-        public IList<LinkSettings> Links
-        {
-            get
-            {
-                return this.links;
-            }
-        }
+        public IList<LinkSettings> Links => this.links;
 
         [DataMember]
-        public IList<ToolSettings> Tools
-        {
-            get
-            {
-                return this.tools;
-            }
-        }
+        public IList<ToolSettings> Tools => this.tools;
 
         [DataMember]
         public bool ConsoleGrabEnabled
@@ -444,6 +398,62 @@ namespace DevPrompt.Settings
             }
         }
 
+        [DataMember]
+        public ICollection<KeyValuePair<string, object>> CustomProperties
+        {
+            get
+            {
+                return this.customProperties;
+            }
+        }
+
+        public bool TryGetProperty<T>(string name, out T value)
+        {
+            if (!string.IsNullOrEmpty(name) && this.customProperties.TryGetValue(name, out object objectValue) && objectValue is T)
+            {
+                value = (T)objectValue;
+                return true;
+            }
+            else
+            {
+                value = default(T);
+                return false;
+            }
+        }
+
+        public void SetProperty<T>(string name, T value)
+        {
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                this.customProperties[name] = value;
+                this.OnPropertyChanged($"Custom.{name}");
+            }
+        }
+
+        public bool RemoveProperty(string name)
+        {
+            if (!string.IsNullOrWhiteSpace(name) && this.customProperties.Remove(name))
+            {
+                this.OnPropertyChanged($"Custom.{name}");
+                return true;
+            }
+
+            return false;
+        }
+
+        string Api.IAppSettings.GetDefaultTabName(string path)
+        {
+            foreach (GrabConsoleSettings grab in this.GrabConsoles)
+            {
+                if (grab.CanGrab(path))
+                {
+                    return grab.TabName;
+                }
+            }
+
+            return !string.IsNullOrEmpty(path) ? Path.GetFileName(path) : "Tab";
+        }
+
         [OnDeserializing]
         private void Initialize(StreamingContext context = default(StreamingContext))
         {
@@ -451,25 +461,20 @@ namespace DevPrompt.Settings
             this.grabConsoles = new ObservableCollection<GrabConsoleSettings>();
             this.links = new ObservableCollection<LinkSettings>();
             this.tools = new ObservableCollection<ToolSettings>();
+            this.customProperties = new Dictionary<string, object>();
             this.saveTabsOnExit = true;
         }
 
-        private static DataContractSerializer GetDataContractSerializer(IApp pluginApp)
+        private static DataContractSerializer GetDataContractSerializer(App app)
         {
             List<Type> knownTypes = new List<Type>(AppSettings.CollectionTypes);
-
-            foreach (ISettingTypes types in pluginApp?.GetExports<ISettingTypes>() ?? Enumerable.Empty<ISettingTypes>())
+            DataContractSerializerSettings serializerSettings = new DataContractSerializerSettings()
             {
-                foreach (Type type in types.SettingTypes ?? Enumerable.Empty<Type>())
-                {
-                    if (type != null && !knownTypes.Contains(type))
-                    {
-                        knownTypes.Add(type);
-                    }
-                }
-            }
+                KnownTypes = knownTypes.Distinct(),
+                DataContractResolver = new SettingTypeResolver(app),
+            };
 
-            return new DataContractSerializer(typeof(AppSettings), knownTypes);
+            return new DataContractSerializer(typeof(AppSettings), serializerSettings);
         }
 
         private static IEnumerable<Type> CollectionTypes

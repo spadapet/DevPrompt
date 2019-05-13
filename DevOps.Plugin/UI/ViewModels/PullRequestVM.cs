@@ -1,6 +1,5 @@
 ﻿using DevOps.Avatars;
-using DevPrompt.UI.ViewModels;
-using DevPrompt.Utility;
+using DevPrompt.Api;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.VisualStudio.Services.WebApi;
 using System;
@@ -16,9 +15,9 @@ namespace DevOps.UI.ViewModels
         private GitPullRequest pr;
         private IAvatarProvider avatarProvider;
         private ImageSource avatarImageSource;
-        private IMainWindowVM window;
+        private IWindow window;
 
-        public PullRequestVM(Uri baseUri, GitPullRequest pr, IAvatarProvider avatarProvider, IMainWindowVM window)
+        public PullRequestVM(Uri baseUri, GitPullRequest pr, IAvatarProvider avatarProvider, IWindow window)
         {
             this.baseUri = baseUri;
             this.pr = pr;
@@ -165,7 +164,7 @@ namespace DevOps.UI.ViewModels
                 {
                     if (p is Uri uri)
                     {
-                        this.window.StartExternalProcess(uri.ToString());
+                        this.window.RunExternalProcess(uri.ToString());
                     }
                 });
             }

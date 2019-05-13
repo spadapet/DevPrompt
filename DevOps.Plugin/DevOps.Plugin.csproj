@@ -126,12 +126,9 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DevPrompt\DevPrompt.csproj">
-      <Project>{da5078ce-f4d0-41c2-b575-c7fcf26da1c6}</Project>
-      <Name>DevPrompt</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
+    <Compile Include="..\Build\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Avatars\IAvatarProvider.cs" />
     <Compile Include="Avatars\IAvatarSite.cs" />
     <Compile Include="Globals.cs" />
@@ -149,8 +146,9 @@
     <Compile Include="UI\ViewModels\IPullRequestVM.cs" />
     <Compile Include="UI\ViewModels\LoginPageVM.cs" />
     <Compile Include="UI\ViewModels\PullRequestPageVM.cs" />
-    <Compile Include="UI\ViewModels\PullRequestTabVM.cs" />
+    <Compile Include="PullRequestTab.cs" />
     <Compile Include="UI\ViewModels\PullRequestVM.cs" />
+    <Compile Include="Utility\NegateBoolConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="UI\LoginPage.xaml">
@@ -165,6 +163,12 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DevPrompt.Api\DevPrompt.Api.csproj">
+      <Project>{69e79abb-e387-479b-b007-64c25966ded6}</Project>
+      <Name>DevPrompt.Api</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

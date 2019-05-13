@@ -1,59 +1,55 @@
-﻿using DevPrompt.Settings;
-using DevPrompt.UI.ViewModels;
-using System.IO;
+﻿using System.Collections.Generic;
+using System.Composition;
+using System.Linq;
 
 namespace DevPrompt.Interop
 {
-    internal class NativeProcessListener
+    /// <summary>
+    /// Keeps the cached NativeProcess up to date with changes to the native IProcess
+    /// </summary>
+    [Export(typeof(IProcessListener))]
+    internal class NativeProcessListener : IProcessListener
     {
-        private MainWindowVM window;
+        private IProcessCache processCache;
+        private Api.IProcessListener[] processListeners;
 
-        public NativeProcessListener(MainWindowVM window)
+        [ImportingConstructor]
+        public NativeProcessListener(
+            IProcessCache processCache,
+            [ImportMany] IEnumerable<Api.IProcessListener> processListeners)
         {
-            this.window = window;
+            this.processCache = processCache;
+            this.processListeners = processListeners?.ToArray() ?? new Api.IProcessListener[0];
         }
 
         public void OnProcessOpening(IProcess process, bool activate, string path)
         {
-            ProcessVM tab = new ProcessVM(this.window, process)
+            NativeProcess wrapper = this.processCache.GetNativeProcess(process);
+            foreach (Api.IProcessListener listener in this.processListeners)
             {
-                TabName = !string.IsNullOrEmpty(path) ? Path.GetFileName(path) : "Tab"
-            };
-
-            foreach (GrabConsoleSettings grab in this.window.AppSettings.GrabConsoles)
-            {
-                if (grab.CanGrab(path))
-                {
-                    tab.TabName = grab.TabName;
-                    break;
-                }
+                listener.OnProcessOpening(wrapper, activate, path);
             }
-
-            this.window.AddTab(tab, activate);
         }
 
         public void OnProcessClosing(IProcess process)
         {
-            if (this.window.FindProcess(process) is ProcessVM tab)
+            NativeProcess wrapper = this.processCache.GetNativeProcess(process);
+            foreach (Api.IProcessListener listener in this.processListeners)
             {
-                this.window.RemoveTab(tab);
+                listener.OnProcessClosing(wrapper);
             }
+
+            this.processCache.RemoveNativeProcess(process);
         }
 
         public void OnProcessEnvChanged(IProcess process, string env)
         {
-            if (this.window.FindProcess(process) is ProcessVM tab)
-            {
-                tab.Env = env;
-            }
+            this.processCache.GetNativeProcess(process).Environment = env;
         }
 
         public void OnProcessTitleChanged(IProcess process, string title)
         {
-            if (this.window.FindProcess(process) is ProcessVM tab)
-            {
-                tab.Title = title;
-            }
+            this.processCache.GetNativeProcess(process).Title = title;
         }
     }
 }

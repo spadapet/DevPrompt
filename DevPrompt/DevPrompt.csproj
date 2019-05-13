@@ -48,29 +48,42 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Interop\App.cs" />
+    <Compile Include="..\Build\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Interop\NativeMethods.cs" />
     <Compile Include="Interop\IProcessHost.cs" />
     <Compile Include="Interop\IProcess.cs" />
     <Compile Include="Interop\IApp.cs" />
     <Compile Include="Interop\IVisualStudioInstance.cs" />
     <Compile Include="Interop\IVisualStudioInstances.cs" />
+    <Compile Include="Interop\NativeApp.cs" />
+    <Compile Include="Interop\IProcessCache.cs" />
+    <Compile Include="Interop\NativeProcessHost.cs" />
+    <Compile Include="Interop\NativeProcess.cs" />
+    <Compile Include="Interop\IProcessListener.cs" />
+    <Compile Include="Interop\NativeProcessCache.cs" />
     <Compile Include="Interop\NativeProcessListener.cs" />
-    <Compile Include="Plugins\IApp.cs" />
-    <Compile Include="Plugins\IAppListener.cs" />
-    <Compile Include="Plugins\ISettingTypes.cs" />
-    <Compile Include="Plugins\IMenuItemProvider.cs" />
-    <Compile Include="Plugins\MenuType.cs" />
     <Compile Include="Plugins\ExportProvider.cs" />
     <Compile Include="Plugins\PluginUtility.cs" />
+    <Compile Include="ProcessWorkspace\ProcessWorkspaceSnapshot.cs" />
+    <Compile Include="ProcessWorkspace\ProcessWorkspaceControl.xaml.cs">
+      <DependentUpon>ProcessWorkspaceControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ProcessWorkspace\ProcessWorkspaceProvider.cs" />
+    <Compile Include="ProcessWorkspace\ProcessWorkspace.cs" />
+    <Compile Include="ProcessWorkspace\ProcessListener.cs" />
+    <Compile Include="Settings\WorkspaceSnapshot.cs" />
     <Compile Include="Settings\AppSnapshot.cs" />
     <Compile Include="Settings\GrabConsoleSettings.cs" />
     <Compile Include="Settings\ConsoleType.cs" />
-    <Compile Include="Settings\ConsoleSnapshot.cs" />
-    <Compile Include="Settings\ITabSnapshot.cs" />
+    <Compile Include="ProcessWorkspace\ProcessSnapshot.cs" />
     <Compile Include="Settings\ToolSettings.cs" />
     <Compile Include="Settings\LinkSettings.cs" />
     <Compile Include="Settings\ConsoleSettings.cs" />
+    <Compile Include="Settings\SettingTypeResolver.cs" />
     <Compile Include="UI\DesignerViewModels\MainWindowDesignerVM.cs" />
+    <Compile Include="UI\DesignerViewModels\WorkspaceDesignerVM.cs" />
     <Compile Include="UI\DesignerViewModels\TabDesignerVM.cs" />
     <Compile Include="UI\InstallBranchDialog.xaml.cs">
       <DependentUpon>InstallBranchDialog.xaml</DependentUpon>
@@ -79,8 +92,6 @@
       <DependentUpon>AboutDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Controls\DragItemsControl.cs" />
-    <Compile Include="UI\ViewModels\IMainWindowVM.cs" />
-    <Compile Include="UI\ViewModels\ITabVM.cs" />
     <Compile Include="UI\SettingsImportDialog.xaml.cs">
       <DependentUpon>SettingsImportDialog.xaml</DependentUpon>
     </Compile>
@@ -99,17 +110,24 @@
     <Compile Include="UI\CustomizeConsolesDialog.xaml.cs">
       <DependentUpon>CustomizeConsolesDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\ViewModels\ProcessVM.cs" />
+    <Compile Include="ProcessWorkspace\ProcessTab.cs" />
     <Compile Include="UI\ViewModels\InstallBranchDialogVM.cs" />
     <Compile Include="UI\ViewModels\SettingsImportDialogVM.cs" />
     <Compile Include="UI\ViewModels\TabNameDialogVM.cs" />
+    <Compile Include="Utility\DelegateConverter.cs" />
+    <Compile Include="Utility\DelegateMultiConverter.cs" />
+    <Compile Include="Utility\VisibleToBoolConverter.cs" />
     <Compile Include="Utility\CommandHelpers.cs" />
     <Compile Include="Utility\DelegateDisposable.cs" />
+    <Compile Include="Utility\ActiveToBoolConverter.cs" />
     <Compile Include="Utility\ObjectToVisibilityConverter.cs" />
-    <Compile Include="Utility\PropertyNotifier.cs" />
     <Compile Include="Settings\AppSettings.cs" />
     <Compile Include="Utility\VisualStudioSetup.cs" />
     <Compile Include="Utility\WpfHelpers.cs" />
+    <Page Include="ProcessWorkspace\ProcessWorkspaceControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\InstallBranchDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -151,7 +169,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="UI\Controls\ProcessHostWindow.cs" />
-    <Compile Include="Utility\DelegateCommand.cs" />
     <Compile Include="Interop\IAppHost.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="UI\MainWindow.xaml.cs">
@@ -170,6 +187,12 @@
     <None Include="app.manifest" />
     <None Include="packages.config" />
     <Resource Include="appicon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DevPrompt.Api\DevPrompt.Api.csproj">
+      <Project>{69e79abb-e387-479b-b007-64c25966ded6}</Project>
+      <Name>DevPrompt.Api</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

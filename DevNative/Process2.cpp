@@ -149,7 +149,7 @@ std::wstring Process::GetProcessState()
     return std::wstring();
 }
 
-void Process::SendDpiChanged(double oldScale, double newScale)
+void Process::SendDpiChanged()
 {
     assert(App::IsMainThread());
 

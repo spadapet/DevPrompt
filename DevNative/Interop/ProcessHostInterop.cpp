@@ -122,34 +122,6 @@ HRESULT ProcessHostInterop::Hide()
     return E_UNEXPECTED;
 }
 
-HRESULT ProcessHostInterop::GetWindow(HWND* hwnd)
-{
-    if (!hwnd)
-    {
-        return E_INVALIDARG;
-    }
-
-    if (this->hwnd)
-    {
-        *hwnd = this->hwnd;
-        return S_OK;
-    }
-
-    return E_UNEXPECTED;
-}
-
-HRESULT ProcessHostInterop::DpiChanged(double oldScale, double newScale)
-{
-    std::shared_ptr<App> app = this->app.lock();
-    if (app && this->hwnd)
-    {
-        app->ProcessHostWindowDpiChanged(this->hwnd, oldScale, newScale);
-        return S_OK;
-    }
-
-    return E_UNEXPECTED;
-}
-
 HRESULT ProcessHostInterop::Focus()
 {
     std::shared_ptr<App> app = this->app.lock();
@@ -160,6 +132,22 @@ HRESULT ProcessHostInterop::Focus()
             ::SetFocus(this->hwnd);
         }
 
+        return S_OK;
+    }
+
+    return E_UNEXPECTED;
+}
+
+HRESULT ProcessHostInterop::GetWindow(HWND* hwnd)
+{
+    if (!hwnd)
+    {
+        return E_INVALIDARG;
+    }
+
+    if (this->hwnd)
+    {
+        *hwnd = this->hwnd;
         return S_OK;
     }
 
@@ -238,6 +226,24 @@ HRESULT ProcessHostInterop::CloneProcess(IProcess* process, IProcess** obj)
         }
 
         return E_FAIL;
+    }
+
+    return E_UNEXPECTED;
+}
+
+HRESULT ProcessHostInterop::ContainsProcess(IProcess* process, VARIANT_BOOL* value)
+{
+    if (!process || !value)
+    {
+        return E_INVALIDARG;
+    }
+
+    HWND processHwnd = nullptr;
+    std::shared_ptr<App> app = this->app.lock();
+    if (app && this->hwnd && SUCCEEDED(process->GetWindow(&processHwnd)) && processHwnd)
+    {
+        *value = ::IsChild(this->hwnd, processHwnd) ? VARIANT_TRUE : VARIANT_FALSE;
+        return S_OK;
     }
 
     return E_UNEXPECTED;
