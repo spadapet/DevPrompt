@@ -80,12 +80,6 @@ private:
     void ProcessHostWindowDpiChanged(HWND hwnd);
     static BOOL CALLBACK FindProcessToGrab(HWND hwnd, LPARAM lp);
 
-    // Keyboard hook is needed because focus is usually in another process (the console process)
-    void AddRefKeyboardHook();
-    void ReleaseKeyboardHook();
-    void DisposeKeyboardHook();
-    bool HandleKeyboardInput(const RAWINPUT& ri);
-
     struct Task
     {
         Task(App& app, std::function<void()>&& func);
@@ -100,7 +94,6 @@ private:
     HINSTANCE instance;
     HANDLE destructEvent;
     DWORD mainThread;
-    HWND mainWindow;
     HWND messageWindow;
     UINT shellMessage;
     bool active;
@@ -121,10 +114,4 @@ private:
     int processCount;
     CRITICAL_SECTION processCountCS;
     CONDITION_VARIABLE processCountZeroCV;
-
-    // Keyboard
-    int keyboardHookCount;
-    std::vector<BYTE> rawInput;
-    std::array<bool, 0xFF> keysPressed;
-    bool pressingAlt;
 };

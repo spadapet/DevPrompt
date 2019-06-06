@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "Inject.h"
+#include "Utility.h"
 
 int __stdcall wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prevInstance, _In_ LPWSTR commandLine, _In_ int windowShow)
 {

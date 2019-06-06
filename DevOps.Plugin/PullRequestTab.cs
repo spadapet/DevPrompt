@@ -91,7 +91,7 @@ namespace DevOps
             if (this.viewElement != null)
             {
                 Action action = new Action(() => this.viewElement.MoveFocus(new TraversalRequest(FocusNavigationDirection.First)));
-                this.viewElement.Dispatcher.BeginInvoke(action, DispatcherPriority.ApplicationIdle);
+                this.viewElement.Dispatcher.BeginInvoke(action, DispatcherPriority.Normal);
             }
         }
 

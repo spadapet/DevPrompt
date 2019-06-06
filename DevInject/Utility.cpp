@@ -1,16 +1,43 @@
 ﻿#include "stdafx.h"
-#include "Inject.h"
 #include "Main.h"
+#include "Utility.h"
+
+static UINT WM_CUSTOM_DETACH = ::RegisterWindowMessage(L"DevInject::");
+
+UINT DevInject::GetDetachMessage()
+{
+    return ::WM_CUSTOM_DETACH;
+}
+
+std::wstring DevInject::GetModuleFileName(HMODULE handle)
+{
+    wchar_t staticBuffer[MAX_PATH];
+    std::vector<BYTE> dynamicBuffer;
+
+    wchar_t* curBuffer = staticBuffer;
+    DWORD curBufferSize = _countof(staticBuffer);
+
+    while (true)
+    {
+        DWORD size = ::GetModuleFileName(handle, curBuffer, curBufferSize);
+        if (size >= curBufferSize)
+        {
+            dynamicBuffer.resize(curBufferSize + MAX_PATH);
+            curBufferSize = static_cast<DWORD>(dynamicBuffer.size());
+        }
+        else
+        {
+            return std::wstring(curBuffer, size);
+        }
+    }
+}
 
 static const bool IsMyProcess64 = (PLATFORM_BITS == 64);
 
 static bool InjectDllSameBitness(HANDLE process, HANDLE stopEvent)
 {
     HMODULE remoteModule = nullptr;
-    wchar_t dllBuffer[MAX_PATH];
-    ::GetModuleFileName(DevInject::GetModule(), dllBuffer, _countof(dllBuffer));
-
-    std::wstring dllPath = dllBuffer;
+    std::wstring dllPath = DevInject::GetModuleFileName(DevInject::GetModule());
     size_t dllPathSize = (dllPath.size() + 1) * sizeof(wchar_t);
 
     wchar_t* dllPathRemote = reinterpret_cast<wchar_t*>(::VirtualAllocEx(process, nullptr, dllPathSize, MEM_COMMIT, PAGE_READWRITE));
@@ -51,10 +78,7 @@ static bool InjectDllOppositeBitness(_In_ HANDLE process, HANDLE stopEvent)
     // Handle must be transferable to a 32bit process
     assert((reinterpret_cast<size_t>(process) & 0xFFFFFFFF) == reinterpret_cast<size_t>(process));
 
-    wchar_t dllBuffer[MAX_PATH];
-    ::GetModuleFileName(DevInject::GetModule(), dllBuffer, _countof(dllBuffer));
-
-    std::wstring exePath = dllBuffer;
+    std::wstring exePath = DevInject::GetModuleFileName(DevInject::GetModule());
     size_t slash = exePath.rfind('\\');
     if (slash == std::wstring::npos)
     {
@@ -124,4 +148,37 @@ bool DevInject::InjectDll(HANDLE process, HANDLE stopEvent, bool allowDifferentB
     }
 
     return false;
+}
+
+void DevInject::CheckConsoleWindowSize(bool visibleOnly)
+{
+    HWND hwnd = ::GetConsoleWindow();
+    if (hwnd && (!visibleOnly || ::IsWindowVisible(hwnd)))
+    {
+        HWND parent = ::GetParent(hwnd);
+        if (parent)
+        {
+            RECT rect, rect2;
+            if (::GetWindowRect(parent, &rect) && ::GetWindowRect(hwnd, &rect2) && ::memcmp(&rect, &rect2, sizeof(rect)))
+            {
+                ::SetWindowPos(hwnd, nullptr, 0, 0, rect.right - rect.left, rect.bottom - rect.top,
+                    SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS);
+            }
+        }
+    }
+}
+
+static DWORD __stdcall DetachThread(void*)
+{
+    ::FreeLibraryAndExitThread(DevInject::Dispose(), 0);
+    return 0;
+}
+
+void DevInject::BeginDetach()
+{
+    HANDLE thread = ::CreateThread(nullptr, 0, ::DetachThread, nullptr, 0, nullptr);
+    if (thread)
+    {
+        ::CloseHandle(thread);
+    }
 }

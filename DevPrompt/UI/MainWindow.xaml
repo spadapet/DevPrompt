@@ -14,14 +14,29 @@
         Loaded="OnLoaded"
         Unloaded="OnUnloaded"
         Closing="OnClosing"
+        Closed="OnClosed"
+        Title="{Binding WindowTitle}"
+        KeyboardNavigation.ControlTabNavigation="None"
+        KeyDown="OnKeyEvent"
+        KeyUp="OnKeyEvent"
         Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
         DataContext="{Binding ViewModel, RelativeSource={RelativeSource Mode=Self}}"
-        d:DataContext="{d:DesignInstance Type=dvm:MainWindowDesignerVM, IsDesignTimeCreatable=True}"
-        Title="{Binding WindowTitle}">
+        d:DataContext="{d:DesignInstance Type=dvm:MainWindowDesignerVM, IsDesignTimeCreatable=True}">
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
     </Window.Resources>
+
+    <Window.InputBindings>
+        <KeyBinding x:Name="closeActiveTabInputBinding" Key="F4" Modifiers="Ctrl" />
+        <KeyBinding x:Name="detachActiveTabInputBinding" Key="F4" Modifiers="Ctrl+Shift" />
+        <KeyBinding x:Name="cloneActiveTabInputBinding" Key="T" Modifiers="Ctrl" />
+        <KeyBinding x:Name="nameActiveTabInputBinding" Key="T" Modifiers="Ctrl+Shift" />
+        <KeyBinding x:Name="cloneActiveTabInputBinding2" Key="K" Modifiers="Ctrl" />
+        <KeyBinding x:Name="nameActiveTabInputBinding2" Key="K" Modifiers="Ctrl+Shift" />
+        <KeyBinding x:Name="tabCycleNextInputBinding" Key="Tab" Modifiers="Ctrl" />
+        <KeyBinding x:Name="tabCyclePrevInputBinding" Key="Tab" Modifiers="Ctrl+Shift" />
+    </Window.InputBindings>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -31,7 +46,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Menu x:Name="MainMenu" Grid.Row="0">
+        <Menu x:Name="mainMenu" Grid.Row="0">
             <MenuItem Header="_File" SubmenuOpened="OnFileMenuOpened">
                 <Separator Tag="[End]" />
                 <MenuItem Header="_Customize..." Command="{Binding CustomizeConsolesCommand}" />
@@ -40,22 +55,24 @@
                     <MenuItem Header="_Export..." Command="{Binding SettingsExportCommand}" />
                 </MenuItem>
                 <Separator />
+                <Separator Tag="[Plugins]" />
                 <MenuItem Header="Save _tabs on exit" IsCheckable="True" IsChecked="{Binding AppSettings.SaveTabsOnExit, Mode=TwoWay}" ToolTip="When tabs are saved, they will be restored the next time you start the app." />
                 <MenuItem Header="Exit (_Detach tabs)" Command="{Binding DetachAndExitCommand}" />
                 <MenuItem Header="E_xit" InputGestureText="Alt+F4" Command="{Binding ExitCommand}" />
             </MenuItem>
             <MenuItem Header="_Grab" SubmenuOpened="OnGrabMenuOpened">
                 <Separator Tag="[End]" />
+                <Separator Tag="[Plugins]" />
                 <MenuItem Header="_Auto Grab" IsCheckable="True" IsChecked="{Binding AppSettings.ConsoleGrabEnabled, Mode=TwoWay}" />
                 <MenuItem Header="_Customize..." Command="{Binding CustomizeConsoleGrabCommand}" />
             </MenuItem>
             <MenuItem Header="_VS" SubmenuOpened="OnVsMenuOpened">
                 <MenuItem Header="Updating..." IsEnabled="False" />
                 <Separator Tag="[End]" />
+                <Separator Tag="[Plugins]" />
                 <MenuItem Header="_Install From Web" Command="{Binding VisualStudioDogfoodCommand}" Visibility="{Binding Source={x:Static dp:Program.IsNotMicrosoftDomain}, Converter={StaticResource BoolToVisibility}}" />
                 <MenuItem Header="_Install Dogfood" Command="{Binding VisualStudioDogfoodCommand}" Visibility="{Binding Source={x:Static dp:Program.IsMicrosoftDomain}, Converter={StaticResource BoolToVisibility}}" />
                 <MenuItem Header="Install _Branch" Command="{Binding InstallVisualStudioBranchCommand}" Visibility="{Binding Source={x:Static dp:Program.IsMicrosoftDomain}, Converter={StaticResource BoolToVisibility}}" />
-                <Separator Tag="[End]" />
                 <MenuItem Header="_Run VS Installer" Command="{Binding VisualStudioInstallerCommand}" />
             </MenuItem>
             <MenuItem Header="_Tools" SubmenuOpened="OnToolsMenuOpened">
@@ -68,7 +85,11 @@
                 <Separator Tag="[Plugins]" />
                 <MenuItem Header="_Customize..." Command="{Binding CustomizeLinksCommand}" />
             </MenuItem>
-            <MenuItem Header="_About" Command="{Binding AboutCommand}" />
+            <Separator Tag="[Plugins]" Visibility="Collapsed" />
+            <MenuItem Header="_Help" SubmenuOpened="OnHelpMenuOpened">
+                <Separator Tag="[Plugins]" />
+                <MenuItem Header="_About" Command="{Binding AboutCommand}" />
+            </MenuItem>
         </Menu>
 
         <Button

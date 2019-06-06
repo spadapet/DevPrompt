@@ -37,14 +37,17 @@ private:
     void SetChildWindow(HWND hwnd);
     HWND GetChildWindow() const;
     void PostDispose();
+    void InjectConhost(HWND conhostHwnd);
 
     void BackgroundAttach(HANDLE process, HANDLE mainThread = nullptr, const Json::Dict* info = nullptr);
     void BackgroundStart(const Json::Dict& info);
     void BackgroundClone(const std::shared_ptr<Process>& process);
     void BackgroundSendCommands(HANDLE process);
+    void BackgroundInjectConhost(HWND conhostHwnd);
     void InitNewProcess(const Json::Dict& info);
 
     Json::Dict HandleMessage(HANDLE process, const Json::Dict& input);
+    Json::Dict HandleConhostMessage(HANDLE process, HWND conhostHwnd, const Json::Dict& input);
     void HandleResponse(const std::wstring& name, const Json::Dict& output);
     void HandleNewState(const Json::Dict& state);
 
@@ -58,6 +61,7 @@ private:
 
     std::shared_ptr<App> app;
     std::thread backgroundThread;
+    std::thread injectConhostThread;
     HANDLE disposeEvent;
     HWND hostWnd;
     DWORD processId;

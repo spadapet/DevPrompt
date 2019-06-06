@@ -32,6 +32,7 @@ namespace DevPrompt.ProcessWorkspace
         private Api.ITabVM activeTab;
         private int newTabIndex;
         private ProcessWorkspaceControl viewElement;
+        private ProcessWorkspaceSnapshot initialSnapshot;
 
         private const int NewTabAtEnd = -1;
         private const int NewTabAtEndNoActivate = -2;
@@ -43,9 +44,7 @@ namespace DevPrompt.ProcessWorkspace
             this.tabs.CollectionChanged += this.OnTabsCollectionChanged;
             this.tabOrder = new LinkedList<Api.ITabVM>();
             this.newTabIndex = ProcessWorkspace.NewTabAtEnd;
-
-            Action action = () => this.InitTabs(snapshot);
-            this.Window.Window.Dispatcher.BeginInvoke(action, DispatcherPriority.ApplicationIdle);
+            this.initialSnapshot = snapshot;
         }
 
         private void InitTabs(ProcessWorkspaceSnapshot snapshot)
@@ -106,10 +105,21 @@ namespace DevPrompt.ProcessWorkspace
                 if (this.viewElement == null)
                 {
                     this.viewElement = new ProcessWorkspaceControl(this);
+                    this.viewElement.Loaded += this.OnViewElementLoaded;
                 }
 
                 return this.viewElement;
             }
+        }
+
+        private void OnViewElementLoaded(object sender, RoutedEventArgs args)
+        {
+            this.viewElement.Loaded -= this.OnViewElementLoaded;
+
+            ProcessWorkspaceSnapshot snapshot = this.initialSnapshot;
+            this.initialSnapshot = null;
+
+            this.InitTabs(snapshot);
         }
 
         public Api.ITabVM ActiveTab

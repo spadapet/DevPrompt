@@ -2,15 +2,16 @@
 using DevPrompt.Plugins;
 using DevPrompt.Settings;
 using DevPrompt.UI;
-using DevPrompt.Utility;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Composition;
 using System.Composition.Hosting;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Interop;
 using System.Windows.Threading;
 
 namespace DevPrompt
@@ -24,10 +25,12 @@ namespace DevPrompt
     {
         public AppSettings Settings { get; }
         public NativeApp NativeApp { get; private set; }
+        public bool ArePluginsInitialized => this.processCache != null;
         public IEnumerable<IProcessListener> ProcessListeners => this.processListeners ?? Enumerable.Empty<IProcessListener>();
         public IEnumerable<Api.IAppListener> AppListeners => this.appListeners ?? Enumerable.Empty<Api.IAppListener>();
         public IEnumerable<Api.IMenuItemProvider> MenuItemProviders => this.menuItemProviders ?? Enumerable.Empty<Api.IMenuItemProvider>();
         public IEnumerable<Api.IWorkspaceProvider> WorkspaceProviders => this.workspaceProviders ?? Enumerable.Empty<Api.IWorkspaceProvider>();
+        public IEnumerable<Api.IPluginInfo> PluginInfos => this.pluginInfos ?? Enumerable.Empty<Api.IPluginInfo>();
         public IEnumerable<Assembly> PluginAssemblies => this.pluginAssemblies ?? Enumerable.Empty<Assembly>();
 
         private CompositionHost compositionHost;
@@ -36,18 +39,41 @@ namespace DevPrompt
         private Api.IAppListener[] appListeners;
         private Api.IMenuItemProvider[] menuItemProviders;
         private Api.IWorkspaceProvider[] workspaceProviders;
+        private Api.IPluginInfo[] pluginInfos;
         private List<Assembly> pluginAssemblies;
+        private bool saveSettingsPending;
+        private List<Task> criticalTasks;
+        private State state;
+        private bool initializedSettings;
+
+        private enum State
+        {
+            Run,
+            Restart,
+            ShutDown,
+        }
 
         public App()
         {
+            this.criticalTasks = new List<Task>();
+
+            this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             this.Settings = new AppSettings();
             this.Startup += this.OnStartup;
             this.Exit += this.OnExit;
+
+            SystemEvents.SessionEnded += this.OnSessionEnded;
         }
 
         private void Dispose()
         {
-            this.compositionHost?.Dispose();
+            this.Settings.PropertyChanged -= this.OnSettingsPropertyChanged;
+            this.Settings.ObservableConsoles.CollectionChanged -= this.OnSettingsPropertyChanged;
+            this.Settings.ObservableGrabConsoles.CollectionChanged -= this.OnSettingsPropertyChanged;
+            this.Settings.ObservableLinks.CollectionChanged -= this.OnSettingsPropertyChanged;
+            this.Settings.ObservableTools.CollectionChanged -= this.OnSettingsPropertyChanged;
+
+            this.ClearPlugins();
             this.NativeApp?.Dispose();
         }
 
@@ -57,23 +83,35 @@ namespace DevPrompt
             set => base.MainWindow = value;
         }
 
-        private Api.ITabWorkspace ActiveTabWorkspace => this.MainWindow?.ViewModel.ActiveWorkspace?.Workspace as Api.ITabWorkspace;
-        private Api.ITabVM ActiveTab => this.ActiveTabWorkspace?.ActiveTab;
-
         private async void OnStartup(object sender, StartupEventArgs args)
         {
-            this.NativeApp = NativeMethods.CreateApp(this, out string errorMessage);
+            string errorMessage = string.Empty;
+            this.NativeApp = this.NativeApp ?? NativeMethods.CreateApp(this, out errorMessage);
             this.MainWindow = new MainWindow(this, errorMessage);
             this.MainWindow.Show();
 
-            this.InitPlugins();
-            this.Settings.CopyFrom(await AppSettings.Load(this, AppSettings.DefaultPath));
-            this.MainWindow.ViewModel.InitWorkspaces(await AppSnapshot.Load(this, AppSnapshot.DefaultPath));
+            await this.InitPlugins();
+            await this.InitSettings();
+            AppSnapshot snapshot = await AppSnapshot.Load(this, AppSnapshot.DefaultPath);
 
             foreach (Api.IAppListener listener in this.AppListeners)
             {
                 listener.OnStartup(this);
             }
+
+            this.MainWindow?.InitWorkspaces(snapshot);
+        }
+
+        private void OnExit(object sender, ExitEventArgs args)
+        {
+            Debug.Assert(this.MainWindow == null && this.criticalTasks.Count == 0);
+
+            foreach (Api.IAppListener listener in this.AppListeners)
+            {
+                listener.OnExit(this);
+            }
+
+            this.Dispose();
         }
 
         public void OnWindowClosing(MainWindow window)
@@ -84,34 +122,173 @@ namespace DevPrompt
             }
         }
 
-        private void OnExit(object sender, ExitEventArgs args)
+        public void OnWindowClosed(MainWindow window)
         {
-            foreach (Api.IAppListener listener in this.AppListeners)
-            {
-                listener.OnExit(this);
-            }
-
-            this.Dispose();
+            this.CheckShutdown(windowClosed: true);
         }
 
-        private void InitPlugins()
+        private async Task InitPlugins()
         {
             this.pluginAssemblies = new List<Assembly>();
-            this.compositionHost = PluginUtility.CreatePluginHost(this, this.pluginAssemblies);
+            this.compositionHost = await PluginUtility.CreatePluginHost(this, this.pluginAssemblies);
 
             if (this.compositionHost != null)
             {
                 this.processCache = this.compositionHost.GetExport<Interop.IProcessCache>();
-                this.appListeners = this.compositionHost.GetExports<Api.IAppListener>().ToArray();
-                this.processListeners = this.compositionHost.GetExports<Interop.IProcessListener>().ToArray();
-                this.menuItemProviders = this.compositionHost.GetExports<Api.IMenuItemProvider>().ToArray();
-                this.workspaceProviders = this.compositionHost.GetExports<Api.IWorkspaceProvider>().ToArray();
+                this.appListeners = this.GetOrderedExports<Api.IAppListener>().ToArray();
+                this.processListeners = this.GetOrderedExports<Interop.IProcessListener>().ToArray();
+                this.menuItemProviders = this.GetOrderedExports<Api.IMenuItemProvider>().ToArray();
+                this.workspaceProviders = this.GetOrderedExports<Api.IWorkspaceProvider>().ToArray();
+                this.pluginInfos = this.GetOrderedExports<Api.IPluginInfo>().ToArray();
             }
             else
             {
                 // Plugin support is broken (maybe missing DLLs) but the app should work anyway
                 this.processCache = new Interop.NativeProcessCache();
             }
+        }
+
+        private void ClearPlugins()
+        {
+            this.compositionHost?.Dispose();
+            this.compositionHost = null;
+            this.pluginAssemblies = null;
+
+            this.processCache = null;
+            this.appListeners = null;
+            this.processListeners = null;
+            this.menuItemProviders = null;
+            this.workspaceProviders = null;
+            this.pluginInfos = null;
+        }
+
+        private async Task InitSettings()
+        {
+            if (!this.initializedSettings)
+            {
+                this.initializedSettings = true;
+
+                AppSettings settings = await AppSettings.Load(this, AppSettings.DefaultPath);
+                this.Settings.CopyFrom(settings);
+
+                this.Settings.PropertyChanged += this.OnSettingsPropertyChanged;
+                this.Settings.ObservableConsoles.CollectionChanged += this.OnSettingsPropertyChanged;
+                this.Settings.ObservableGrabConsoles.CollectionChanged += this.OnSettingsPropertyChanged;
+                this.Settings.ObservableLinks.CollectionChanged += this.OnSettingsPropertyChanged;
+                this.Settings.ObservableTools.CollectionChanged += this.OnSettingsPropertyChanged;
+            }
+        }
+
+        private void OnSettingsPropertyChanged(object sender, EventArgs args)
+        {
+            this.SaveSettings();
+        }
+
+        public void SaveSettings(string path = null)
+        {
+            if (!this.saveSettingsPending)
+            {
+                this.saveSettingsPending = true;
+
+                Action action = () =>
+                {
+                    this.saveSettingsPending = false;
+                    this.Settings.Save(this, path);
+                };
+
+                this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, action);
+            }
+        }
+
+        private IEnumerable<T> GetOrderedExports<T>()
+        {
+            return this.compositionHost.GetExports<ExportFactory<T, Api.OrderAttribute>>()
+                .OrderBy(i => i.Metadata.Order)
+                .Select(i => i.CreateExport().Value);
+        }
+
+        public void AddCriticalTask(Task task)
+        {
+            bool added = false;
+
+            lock (this.criticalTasks)
+            {
+                if (this.state != State.ShutDown && task != null && !this.criticalTasks.Contains(task))
+                {
+                    this.criticalTasks.Add(task);
+                    added = true;
+                }
+            }
+
+            if (added)
+            {
+                task.ContinueWith(this.RemoveCriticalTask);
+            }
+        }
+
+        private void RemoveCriticalTask(Task task)
+        {
+            bool done = false;
+
+            lock (this.criticalTasks)
+            {
+                this.criticalTasks.Remove(task);
+                done = (this.criticalTasks.Count == 0);
+            }
+
+            if (done)
+            {
+                this.CheckShutdown(windowClosed: false);
+            }
+        }
+
+        private void CheckShutdown(bool windowClosed)
+        {
+            Action action = () =>
+            {
+                if (this.state != State.ShutDown && (windowClosed || this.MainWindow == null))
+                {
+                    int taskCount = 0;
+                    lock (this.criticalTasks)
+                    {
+                        taskCount = this.criticalTasks.Count;
+                        if (taskCount == 0 && this.state == State.Run)
+                        {
+                            this.state = State.ShutDown;
+                        }
+                    }
+
+                    if (taskCount == 0)
+                    {
+                        if (this.state == State.ShutDown)
+                        {
+                            this.Shutdown();
+                        }
+                        else if (this.state == State.Restart)
+                        {
+                            this.Restart();
+                        }
+                    }
+                }
+            };
+
+            this.Dispatcher.BeginInvoke(action, DispatcherPriority.Normal);
+        }
+
+        private void Restart()
+        {
+            this.state = State.Run;
+            this.ClearPlugins();
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            this.OnStartup(this, null);
+        }
+
+        private void OnSessionEnded(object sender, SessionEndedEventArgs args)
+        {
+            this.MainWindow?.OnSessionEnded();
         }
 
         void IAppHost.OnProcessOpening(Interop.IProcess process, bool activate, string path)
@@ -146,37 +323,6 @@ namespace DevPrompt
             }
         }
 
-        void IAppHost.CloneActiveProcess()
-        {
-            this.ActiveTab?.CloneCommand?.SafeExecute();
-        }
-
-        void IAppHost.SetTabName()
-        {
-            this.ActiveTab?.SetTabNameCommand?.SafeExecute();
-        }
-
-        void IAppHost.CloseActiveProcess()
-        {
-            this.ActiveTab?.CloseCommand?.SafeExecute();
-        }
-
-        void IAppHost.DetachActiveProcess()
-        {
-            this.ActiveTab?.DetachCommand?.SafeExecute();
-        }
-
-        IntPtr IAppHost.GetMainWindow()
-        {
-            if (this.MainWindow is Window window)
-            {
-                WindowInteropHelper helper = new WindowInteropHelper(window);
-                return helper.Handle;
-            }
-
-            return IntPtr.Zero;
-        }
-
         int IAppHost.CanGrab(string exePath, bool automatic)
         {
             if (automatic && !Program.IsMainProcess)
@@ -197,36 +343,6 @@ namespace DevPrompt
             }
 
             return 0;
-        }
-
-        void IAppHost.OnSystemShutdown()
-        {
-            this.MainWindow?.OnSystemShutdown();
-        }
-
-        void IAppHost.OnAltLetter(int vk)
-        {
-            this.MainWindow?.OnAltLetter(vk);
-        }
-
-        void IAppHost.OnAlt()
-        {
-            this.MainWindow?.OnAlt();
-        }
-
-        void IAppHost.TabCycleStop()
-        {
-            this.ActiveTabWorkspace?.TabCycleStop();
-        }
-
-        void IAppHost.TabCycleNext()
-        {
-            this.ActiveTabWorkspace?.TabCycleNext();
-        }
-
-        void IAppHost.TabCyclePrev()
-        {
-            this.ActiveTabWorkspace?.TabCyclePrev();
         }
 
         Api.IAppSettings Api.IApp.Settings => this.Settings;
@@ -255,7 +371,8 @@ namespace DevPrompt
             }
         }
 
-        void Api.IApp.GrabProcess(int id)
+        // Api.IApp
+        public void GrabProcess(int id)
         {
             this.NativeApp?.GrabProcess(id);
         }

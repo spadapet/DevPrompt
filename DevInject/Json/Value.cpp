@@ -183,6 +183,22 @@ std::wstring Json::Value::TryGetString() const
     return this->IsString() ? this->GetString() : std::wstring();
 }
 
+HWND Json::Value::TryGetHwndFromString() const
+{
+    HWND hwnd = nullptr;
+    std::wstring hwndString = this->TryGetString();
+    const wchar_t* start = hwndString.c_str();
+    wchar_t* end = nullptr;
+    unsigned long long hwndSize = std::wcstoull(start, &end, 10);
+
+    if (hwndSize && end == start + hwndString.size())
+    {
+        hwnd = reinterpret_cast<HWND>(hwndSize);
+    }
+
+    return hwnd;
+}
+
 const std::vector<Json::Value> &Json::Value::GetVector() const
 {
     assert(this->IsVector());

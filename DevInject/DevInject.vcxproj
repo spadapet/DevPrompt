@@ -11,8 +11,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Api.h" />
-    <ClInclude Include="MessageHandler.h" />
-    <ClInclude Include="Inject.h" />
+    <ClInclude Include="Context\AppContext.h" />
+    <ClInclude Include="Context\AppMessageHandler.h" />
+    <ClInclude Include="Context\BaseContext.h" />
+    <ClInclude Include="Context\ConhostContext.h" />
+    <ClInclude Include="Context\OwnerContext.h" />
+    <ClInclude Include="Utility.h" />
     <ClInclude Include="Json\Dict.h" />
     <ClInclude Include="Json\Message.h" />
     <ClInclude Include="Json\Persist.h" />
@@ -24,8 +28,12 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="MessageHandler.cpp" />
-    <ClCompile Include="Inject.cpp" />
+    <ClCompile Include="Context\AppContext.cpp" />
+    <ClCompile Include="Context\AppMessageHandler.cpp" />
+    <ClCompile Include="Context\BaseContext.cpp" />
+    <ClCompile Include="Context\ConhostContext.cpp" />
+    <ClCompile Include="Context\OwnerContext.cpp" />
+    <ClCompile Include="Utility.cpp" />
     <ClCompile Include="Json\Dict.cpp" />
     <ClCompile Include="Json\Message.cpp" />
     <ClCompile Include="Json\Persist.cpp" />

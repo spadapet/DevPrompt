@@ -2,8 +2,12 @@
 {
     public enum MenuType
     {
+        MenuBar,
+        File,
+        Grab,
+        VS,
         Tools,
         Links,
-        Plugins,
+        Help
     }
 }

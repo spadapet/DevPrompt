@@ -12,28 +12,13 @@ interface IVisualStudioInstances;
 [object, uuid("42d16e5c-8acf-4dcb-882d-b41974190e53")]
 interface IAppHost : IUnknown
 {
-    HRESULT GetMainWindow([out, retval] HWND* hwnd);
     HRESULT CanGrab(const wchar_t* exePath, VARIANT_BOOL automatic, [out, retval] int* value);
-    HRESULT OnSystemShutdown();
-
-    // Keyboard handling (since WPF will not see most key presses since focus will mostly be in a hosted process)
-    HRESULT OnAltLetter(int vk);
-    HRESULT OnAlt();
 
     // Processes
     HRESULT OnProcessOpening(IProcess* process, VARIANT_BOOL activate, const wchar_t* path);
     HRESULT OnProcessClosing(IProcess* process);
     HRESULT OnProcessEnvChanged(IProcess* process, const wchar_t* env);
     HRESULT OnProcessTitleChanged(IProcess* process, const wchar_t* title);
-    HRESULT CloneActiveProcess();
-    HRESULT CloseActiveProcess();
-    HRESULT DetachActiveProcess();
-    HRESULT SetTabName();
-
-    // Ctrl-Tab and Ctrl-Shift-Tab
-    HRESULT TabCycleStop();
-    HRESULT TabCycleNext();
-    HRESULT TabCyclePrev();
 };
 
 [object, uuid("151c2791-131f-43b6-9384-0f5a8c1c9461")]

@@ -1,9 +1,7 @@
 ﻿using DevPrompt.Api;
-using Microsoft.TeamFoundation.Build.WebApi;
 using System.Collections.Generic;
 using System.Composition;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Windows.Controls;
 
 namespace DevOps

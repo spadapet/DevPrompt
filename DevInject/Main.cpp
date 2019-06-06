@@ -1,24 +1,21 @@
 ﻿#include "stdafx.h"
-#include "Json/Persist.h"
+#include "Context/AppContext.h"
+#include "Context/ConhostContext.h"
+#include "Context/OwnerContext.h"
 #include "Main.h"
-#include "MessageHandler.h"
-#include "Pipe.h"
+#include "Utility.h"
 
 static HMODULE module = nullptr;
-static HANDLE disposeEvent = nullptr;
-static HANDLE ownerProcess = nullptr;
-static HANDLE pipeServerThread = nullptr;
-static HANDLE watchdogThread = nullptr;
-static HANDLE findMainWindowThread = nullptr;
-static std::mutex ownerPipeMutex;
-static Pipe ownerPipe;
+static BaseContext* context = nullptr;
+
+static void Initialize(HMODULE module);
 
 BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID)
 {
     switch (reason)
     {
     case DLL_PROCESS_ATTACH:
-        DevInject::Initialize(module);
+        ::Initialize(module);
         break;
 
     case DLL_PROCESS_DETACH:
@@ -33,253 +30,68 @@ BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID)
     return TRUE;
 }
 
-static void SendToOwner(const Json::Dict& message)
+enum class ProcessType
 {
-    std::scoped_lock<std::mutex> lock(::ownerPipeMutex);
-    if (::ownerPipe)
-    {
-        ::ownerPipe.Send(message);
-    }
-}
+    Unknown,
+    OwnerApp,
+    InjectedApp,
+    InjectedConHost,
+};
 
-// A thread that listens for commands coming from the owner process, and responds to them
-static DWORD __stdcall PipeServerThread(void*)
+static ProcessType DetectProcessType()
 {
-    Pipe pipe = Pipe::Create(::ownerProcess, ::disposeEvent);
+    std::wstring file = DevInject::GetModuleFileName(nullptr);
+    size_t slash = file.rfind('\\');
 
-    ::SendToOwner(Json::CreateMessage(PIPE_COMMAND_PIPE_CREATED));
-
-    if (pipe.WaitForClient())
+    if (slash != std::wstring::npos)
     {
-        pipe.RunServer(DevInject::CreateMessageHandler());
-    }
+        file = file.substr(slash + 1);
 
-    return 0;
-}
-
-static void NotifyOwnerOfChanges(std::wstring& oldTitle, std::wstring& oldEnvironment)
-{
-    if (!::ownerPipe)
-    {
-        std::scoped_lock<std::mutex> lock(::ownerPipeMutex);
-        if (!::ownerPipe)
+        if (!_wcsicmp(file.c_str(), L"conhost.exe"))
         {
-            return;
+            return ProcessType::InjectedConHost;
+        }
+
+        if (_wcsicmp(file.c_str(), L"DevPrompt.exe") && _wcsicmp(file.c_str(), L"DevPromptNetCore.exe"))
+        {
+            return ProcessType::InjectedApp;
         }
     }
 
-    HWND hwnd = ::GetConsoleWindow();
-    if (hwnd)
-    {
-        wchar_t title[1024];
-        if (!::GetWindowText(hwnd, title, _countof(title)))
-        {
-            title[0] = '\0';
-        }
-
-        if (oldTitle != title)
-        {
-            oldTitle = title;
-
-            Json::Dict message = Json::CreateMessage(PIPE_COMMAND_STATE_CHANGED);
-            message.Set(PIPE_PROPERTY_TITLE, Json::Value(std::wstring(oldTitle)));
-            ::SendToOwner(message);
-        }
-    }
-
-    wchar_t* env = ::GetEnvironmentStrings();
-    if (env)
-    {
-        size_t len = 0;
-        for (const wchar_t* cur = env; cur[0] || (cur > env && cur[-1]); cur++, len++)
-        {
-            // find the second null in a row
-        }
-
-        if (len != oldEnvironment.size() || ::memcmp(env, oldEnvironment.c_str(), len))
-        {
-            oldEnvironment.assign(env, len);
-
-            Json::Dict message = Json::CreateMessage(PIPE_COMMAND_STATE_CHANGED);
-            message.Set(PIPE_PROPERTY_ENVIRONMENT, Json::Value(Json::ParseNameValuePairs(env, '\0')));
-            ::SendToOwner(message);
-        }
-
-        ::FreeEnvironmentStrings(env);
-    }
+    return ProcessType::OwnerApp;
 }
 
-void DevInject::CheckConsoleWindowSize(bool visibleOnly)
-{
-    HWND hwnd = ::GetConsoleWindow();
-    if (hwnd && (!visibleOnly || ::IsWindowVisible(hwnd)))
-    {
-        HWND parent = ::GetParent(hwnd);
-        if (parent)
-        {
-            RECT rect, rect2;
-            if (::GetWindowRect(parent, &rect) && ::GetWindowRect(hwnd, &rect2) && ::memcmp(&rect, &rect2, sizeof(rect)))
-            {
-                ::SetWindowPos(hwnd, nullptr, 0, 0, rect.right - rect.left, rect.bottom - rect.top,
-                    SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS);
-            }
-        }
-    }
-}
-
-// A thread that detects if the owner process has died, and if it does then kills this process too.
-// Normally the owner process will politely close all console processes first, but it might crash.
-static DWORD __stdcall WatchdogThread(void*)
-{
-    std::array<HANDLE, 2> handles = { ::ownerProcess, ::disposeEvent };
-    std::wstring oldTitle;
-    std::wstring oldEnvironment;
-
-    while (true)
-    {
-        switch (::WaitForMultipleObjects(static_cast<DWORD>(handles.size()), handles.data(), FALSE, 2048))
-        {
-        case WAIT_OBJECT_0:
-            ::TerminateProcess(::GetCurrentProcess(), 0);
-            break;
-
-        case WAIT_TIMEOUT:
-            ::NotifyOwnerOfChanges(oldTitle, oldEnvironment);
-            DevInject::CheckConsoleWindowSize(true);
-            break;
-
-        default:
-            return 0;
-        }
-    }
-}
-
-// A thread that only runs until it can find that a main console window has been created
-static DWORD __stdcall FindMainWindowThread(void*)
-{
-    HWND hwnd = ::GetConsoleWindow();
-
-    std::array<HANDLE, 2> handles = { ::disposeEvent, ::ownerProcess };
-    while (!hwnd && ::WaitForMultipleObjects(static_cast<DWORD>(handles.size()), handles.data(), FALSE, 50) == WAIT_TIMEOUT)
-    {
-        hwnd = ::GetConsoleWindow();
-    }
-
-    if (hwnd)
-    {
-        Json::Dict message = Json::CreateMessage(PIPE_COMMAND_WINDOW_CREATED);
-        message.Set(PIPE_PROPERTY_HWND, Json::Value(std::to_wstring(reinterpret_cast<size_t>(hwnd))));
-        ::SendToOwner(message);
-    }
-
-    return 0;
-}
-
-static BOOL CALLBACK FindOwnerProcessWindow(HWND hwnd, LPARAM lp)
-{
-    DWORD* processId = reinterpret_cast<DWORD*>(lp);
-    if (!*processId)
-    {
-        DWORD hwndProcessId;
-        if (::GetWindowThreadProcessId(hwnd, &hwndProcessId))
-        {
-            HANDLE hwndProcess = ::OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, hwndProcessId);
-            if (hwndProcess)
-            {
-                wchar_t path[MAX_PATH];
-                if (::GetProcessImageFileName(hwndProcess, path, _countof(path)))
-                {
-                    const wchar_t* ownerSuffix = L"\\DevPrompt.exe";
-                    const size_t suffixLen = std::wcslen(ownerSuffix);
-
-                    const wchar_t* ownerSuffix2 = L"\\DevPromptNetCore.exe";
-                    const size_t suffixLen2 = std::wcslen(ownerSuffix2);
-
-                    size_t len = std::wcslen(path);
-                    if ((len >= suffixLen && !_wcsicmp(ownerSuffix, path + (len - suffixLen))) ||
-                        (len >= suffixLen2 && !_wcsicmp(ownerSuffix2, path + (len - suffixLen2))))
-                    {
-                        ::ownerPipe = Pipe::Connect(hwndProcess, ::disposeEvent);
-                        if (::ownerPipe)
-                        {
-                            *processId = hwndProcessId;
-                        }
-                    }
-                }
-
-                ::CloseHandle(hwndProcess);
-            }
-        }
-    }
-
-    return TRUE;
-}
-
-static HANDLE OpenOwnerProcess()
-{
-    assert(::disposeEvent && !::ownerProcess && !::ownerPipe);
-
-    DWORD processId = 0;
-    ::EnumDesktopWindows(nullptr, ::FindOwnerProcessWindow, reinterpret_cast<LPARAM>(&processId));
-
-    return (processId && processId != ::GetCurrentProcessId())
-        ? ::OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, FALSE, processId)
-        : nullptr;
-}
-
-// Called when the DLL is mapped into any process
-void DevInject::Initialize(HMODULE module)
+void Initialize(HMODULE module)
 {
     ::module = module;
-    ::disposeEvent = ::CreateEvent(nullptr, TRUE, FALSE, nullptr);
-    ::ownerProcess = ::OpenOwnerProcess();
 
-    // No owner process unless this DLL was injected
-    if (::ownerProcess)
+    switch (::DetectProcessType())
     {
-        assert(::ownerPipe);
+    case ProcessType::InjectedApp:
+        ::context = new AppContext();
+        break;
 
-        // Don't use std::thread since it will wait for the thread to start running
-        // for some reason, and that will hang since that thread can't get the loader lock.
-        ::pipeServerThread = ::CreateThread(nullptr, 0, ::PipeServerThread, nullptr, 0, nullptr);
-        ::watchdogThread = ::CreateThread(nullptr, 0, ::WatchdogThread, nullptr, 0, nullptr);
-        ::findMainWindowThread = ::CreateThread(nullptr, 0, ::FindMainWindowThread, nullptr, 0, nullptr);
-    }
-    else if (::disposeEvent)
-    {
-        assert(!::ownerPipe);
+    case ProcessType::InjectedConHost:
+        ::context = new ConhostContext();
+        break;
 
-        ::CloseHandle(::disposeEvent);
-        ::disposeEvent = nullptr;
+    default:
+        ::context = new OwnerContext();
+        break;
     }
+
+    ::context->Initialize();
 }
 
-// Called from a command handler
 HMODULE DevInject::Dispose()
 {
-    if (::ownerProcess)
+    BaseContext* context = ::context;
+    ::context = nullptr;
+
+    if (context)
     {
-        ::SetEvent(::disposeEvent);
-
-        ::WaitForSingleObject(::pipeServerThread, INFINITE);
-        ::WaitForSingleObject(::watchdogThread, INFINITE);
-        ::WaitForSingleObject(::findMainWindowThread, INFINITE);
-
-        ::ownerPipeMutex.lock();
-        ::ownerPipe.Dispose();
-        ::ownerPipeMutex.unlock();
-
-        ::CloseHandle(::pipeServerThread);
-        ::CloseHandle(::watchdogThread);
-        ::CloseHandle(::findMainWindowThread);
-        ::CloseHandle(::disposeEvent);
-        ::CloseHandle(::ownerProcess);
-
-        ::pipeServerThread = nullptr;
-        ::watchdogThread = nullptr;
-        ::findMainWindowThread = nullptr;
-        ::disposeEvent = nullptr;
-        ::ownerProcess = nullptr;
+        context->Dispose();
+        delete context;
     }
 
     return ::module;

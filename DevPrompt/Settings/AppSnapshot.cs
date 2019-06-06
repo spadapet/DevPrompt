@@ -185,7 +185,7 @@ namespace DevPrompt.Settings
         {
             AppSnapshot clone = this.Clone();
 
-            return Task.Run(() =>
+            Task task = Task.Run(() =>
             {
                 XmlWriterSettings xmlSettings = new XmlWriterSettings()
                 {
@@ -201,6 +201,9 @@ namespace DevPrompt.Settings
                     }
                 }
             });
+
+            app.AddCriticalTask(task);
+            return task;
         }
     }
 }

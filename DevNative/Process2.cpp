@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
 #include "App.h"
-#include "Inject.h"
 #include "Json/Persist.h"
 #include "Process2.h"
+#include "Utility.h"
 
 Process::Process(App& app)
     : app(app.shared_from_this())
@@ -27,6 +27,18 @@ Process::~Process()
         else
         {
             this->backgroundThread.detach();
+        }
+    }
+
+    if (this->injectConhostThread.joinable())
+    {
+        if (this->injectConhostThread.get_id() != std::this_thread::get_id())
+        {
+            this->injectConhostThread.join();
+        }
+        else
+        {
+            this->injectConhostThread.detach();
         }
     }
 
@@ -66,7 +78,7 @@ void Process::Detach()
 {
     assert(App::IsMainThread());
 
-    if (GetProcessId())
+    if (this->GetProcessId())
     {
         this->SetChildWindow(nullptr);
         ::InterlockedExchange(&this->processId, 0);
@@ -160,15 +172,16 @@ void Process::SendSystemCommand(UINT id)
 {
     assert(App::IsMainThread());
 
-    if (this->GetChildWindow())
+    HWND hwnd = this->GetChildWindow();
+    if (hwnd)
     {
         if (id == SC_CLOSE)
         {
-            ::SendMessage(this->GetChildWindow(), WM_SYSCOMMAND, id, 0);
+            ::SendMessage(hwnd, WM_SYSCOMMAND, id, 0);
         }
         else
         {
-            ::PostMessage(this->GetChildWindow(), WM_SYSCOMMAND, id, 0);
+            ::PostMessage(hwnd, WM_SYSCOMMAND, id, 0);
         }
     }
 }
@@ -216,7 +229,9 @@ void Process::SetChildWindow(HWND hwnd)
 
     if (this->hostWnd)
     {
-        if (hwnd && !this->GetChildWindow())
+        HWND childHwnd = this->GetChildWindow();
+
+        if (hwnd && !childHwnd)
         {
             UINT oldDpi = ::GetDpiForWindow(hwnd);
             LONG style = ::GetWindowLong(hwnd, GWL_STYLE);
@@ -247,25 +262,26 @@ void Process::SetChildWindow(HWND hwnd)
             // Now's the chance to ask the process for a bunch of info
             this->SendMessageAsync(PIPE_COMMAND_GET_STATE);
             this->SendMessageAsync(PIPE_COMMAND_CHECK_WINDOW_SIZE);
+            this->InjectConhost(hwnd);
         }
-        else if (!hwnd && this->GetChildWindow())
+        else if (!hwnd && childHwnd)
         {
-            hwnd = this->GetChildWindow();
-            this->app->NoAutoGrabWindow(hwnd);
+            this->app->NoAutoGrabWindow(childHwnd);
 
             RECT rect;
             ::GetWindowRect(this->hostWnd, &rect);
-            ::ShowWindow(hwnd, SW_HIDE);
+            ::ShowWindow(childHwnd, SW_HIDE);
 
             LONG style = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_VSCROLL;
-            LONG exstyle = ::GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_APPWINDOW; // | WS_EX_LAYERED;
+            LONG exstyle = ::GetWindowLong(childHwnd, GWL_EXSTYLE) | WS_EX_APPWINDOW; // | WS_EX_LAYERED;
 
-            ::SetParent(hwnd, nullptr);
-            ::SetWindowLong(hwnd, GWL_STYLE, style);
-            ::SetWindowLong(hwnd, GWL_EXSTYLE, exstyle);
+            ::SetParent(childHwnd, nullptr);
+            ::SetWindowLong(childHwnd, GWL_STYLE, style);
+            ::SetWindowLong(childHwnd, GWL_EXSTYLE, exstyle);
 
-            ::SetWindowPos(hwnd, HWND_TOP, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, SWP_FRAMECHANGED | SWP_SHOWWINDOW | SWP_NOACTIVATE);
-            ::SetForegroundWindow(hwnd);
+            ::SetWindowPos(childHwnd, HWND_TOP, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, SWP_FRAMECHANGED | SWP_SHOWWINDOW | SWP_NOACTIVATE);
+            ::SetForegroundWindow(childHwnd);
+            ::PostMessage(childHwnd, DevInject::GetDetachMessage(), 0, 0);
         }
     }
 }
@@ -287,18 +303,19 @@ LRESULT Process::WindowProc(HWND hwnd, UINT message, WPARAM wp, LPARAM lp)
     case WM_DESTROY:
         this->app->OnProcessClosing(this);
         this->SendMessageAsync(PIPE_COMMAND_CLOSED);
-
-        if (this->GetChildWindow())
-        {
-            this->SendSystemCommand(SC_CLOSE);
-        }
-
+        this->SendSystemCommand(SC_CLOSE);
         this->hostWnd = nullptr;
         break;
 
     case WM_PAINT:
         WindowProc::PaintMessage(hwnd, this->app->GetMessageFont(hwnd), L"Waiting for process to respond...");
         break;
+    }
+
+    if (message >= WM_USER + WM_KEYFIRST && message <= WM_USER + WM_KEYLAST)
+    {
+        // Key message forwarded from conhost.exe, just repost it to give WPF a chance to handle the hotkey
+        ::PostMessage(hwnd, message - WM_USER, wp, lp);
     }
 
     return ::DefWindowProc(hwnd, message, wp, lp);
@@ -321,6 +338,18 @@ void Process::PostDispose()
     });
 }
 
+void Process::InjectConhost(HWND conhostHwnd)
+{
+    assert(App::IsMainThread());
+
+    std::shared_ptr<Process> self = shared_from_this();
+
+    this->injectConhostThread = std::thread([self, conhostHwnd]()
+    {
+        self->BackgroundInjectConhost(conhostHwnd);
+    });
+}
+
 // Creates a pipe server to listen to the other process, and injects a thread
 // into that process to create another pipe server that listens to this process. Whew...
 void Process::BackgroundAttach(HANDLE process, HANDLE mainThread, const Json::Dict* info)
@@ -329,7 +358,7 @@ void Process::BackgroundAttach(HANDLE process, HANDLE mainThread, const Json::Di
     std::shared_ptr<Process> self = shared_from_this();
     ::InterlockedExchange(&this->processId, ::GetProcessId(process));
 
-    Pipe pipe = Pipe::Create(process, self->disposeEvent);
+    Pipe pipe = Pipe::Create(process, this->disposeEvent);
     bool injected = DevInject::InjectDll(process, this->disposeEvent, true);
 
     if (injected)
@@ -502,6 +531,51 @@ void Process::BackgroundSendCommands(HANDLE process)
     }
 }
 
+void Process::BackgroundInjectConhost(HWND conhostHwnd)
+{
+    std::shared_ptr<Process> self = shared_from_this();
+    DWORD conhostProcessId = 0;
+    HANDLE conhostProcess = nullptr;
+
+    HANDLE snap = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (snap && snap != INVALID_HANDLE_VALUE)
+    {
+        ::PROCESSENTRY32 entry;
+        entry.dwSize = sizeof(entry);
+
+        for (BOOL status = ::Process32First(snap, &entry); status; status = ::Process32Next(snap, &entry))
+        {
+            if (entry.th32ParentProcessID == this->GetProcessId())
+            {
+                conhostProcessId = entry.th32ProcessID;
+                conhostProcess = ::OpenProcess(PROCESS_ALL_ACCESS, FALSE, conhostProcessId);
+                break;
+            }
+        }
+
+        ::CloseHandle(snap);
+    }
+
+    assert(conhostProcess);
+    if (conhostProcess)
+    {
+        Pipe pipe = Pipe::Create(conhostProcess, this->disposeEvent);
+        bool injected = DevInject::InjectDll(conhostProcess, this->disposeEvent, true);
+        if (injected)
+        {
+            if (pipe.WaitForClient())
+            {
+                pipe.RunServer([self, conhostProcess, conhostHwnd](const Json::Dict& input)
+                {
+                    return self->HandleConhostMessage(conhostProcess, conhostHwnd, input);
+                });
+            }
+        }
+
+        ::CloseHandle(conhostProcess);
+    }
+}
+
 // Initialize a newly created process after pipes are connected
 void Process::InitNewProcess(const Json::Dict& info)
 {
@@ -634,15 +708,9 @@ Json::Dict Process::HandleMessage(HANDLE process, const Json::Dict& input)
     }
     else if (name == PIPE_COMMAND_WINDOW_CREATED)
     {
-        std::wstring hwndString = input.Get(PIPE_PROPERTY_HWND).TryGetString();
-        const wchar_t* start = hwndString.c_str();
-        wchar_t* end = nullptr;
-        unsigned long long hwndSize = std::wcstoull(start, &end, 10);
-
-        if (hwndSize && end == start + hwndString.size())
+        HWND hwnd = input.Get(PIPE_PROPERTY_HWND).TryGetHwndFromString();
+        if (hwnd)
         {
-            HWND hwnd = reinterpret_cast<HWND>(hwndSize);
-
             this->app->PostToMainThread([self, hwnd]()
             {
                 self->SetChildWindow(hwnd);
@@ -652,6 +720,21 @@ Json::Dict Process::HandleMessage(HANDLE process, const Json::Dict& input)
     else if (name == PIPE_COMMAND_STATE_CHANGED)
     {
         this->HandleNewState(input);
+    }
+
+    return result;
+}
+
+Json::Dict Process::HandleConhostMessage(HANDLE process, HWND conhostHwnd, const Json::Dict& input)
+{
+    assert(!App::IsMainThread());
+
+    Json::Dict result;
+    std::wstring name = input.Get(PIPE_PROPERTY_COMMAND).TryGetString();
+
+    if (name == PIPE_COMMAND_CONHOST_INJECTED)
+    {
+        result.Set(PIPE_PROPERTY_HWND, Json::Value(std::to_wstring(reinterpret_cast<size_t>(conhostHwnd))));
     }
 
     return result;

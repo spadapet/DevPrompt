@@ -1,7 +1,8 @@
 ﻿#include "stdafx.h"
+#include "Context/AppMessageHandler.h"
 #include "Json/Persist.h"
 #include "Main.h"
-#include "MessageHandler.h"
+#include "Utility.h"
 
 static Json::Value HandleGetDirectory()
 {
@@ -25,13 +26,7 @@ static Json::Value HandleGetEnvironment()
 
 static Json::Value HandleGetExecutable()
 {
-    wchar_t value[MAX_PATH];
-    if (::GetModuleFileName(nullptr, value, _countof(value)))
-    {
-        return Json::Value(std::wstring(value));
-    }
-
-    return Json::Value();
+    return Json::Value(DevInject::GetModuleFileName(nullptr));
 }
 
 static Json::Value HandleGetTitle()
@@ -241,20 +236,9 @@ static Json::Dict HandleActivated(const Json::Dict& input)
     return Json::Dict();
 }
 
-static DWORD __stdcall DetachThread(void*)
-{
-    ::FreeLibraryAndExitThread(DevInject::Dispose(), 0);
-    return 0;
-}
-
 static Json::Dict HandleDetach(const Json::Dict& input)
 {
-    HANDLE thread = ::CreateThread(nullptr, 0, ::DetachThread, nullptr, 0, nullptr);
-    if (thread)
-    {
-        ::CloseHandle(thread);
-    }
-
+    DevInject::BeginDetach();
     return Json::Dict();
 }
 

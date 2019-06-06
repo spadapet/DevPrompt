@@ -316,7 +316,7 @@ namespace DevPrompt.Settings
         {
             AppSettings clone = this.Clone();
 
-            return Task.Run(() =>
+            Task<Exception> task = Task.Run(() =>
             {
                 XmlWriterSettings xmlSettings = new XmlWriterSettings()
                 {
@@ -349,6 +349,9 @@ namespace DevPrompt.Settings
 
                 return null;
             });
+
+            app.AddCriticalTask(task);
+            return task;
         }
 
         IEnumerable<Api.IConsoleSettings> Api.IAppSettings.ConsoleSettings => this.Consoles;

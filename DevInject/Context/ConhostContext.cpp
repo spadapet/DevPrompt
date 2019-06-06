@@ -1,0 +1,184 @@
+﻿#include "stdafx.h"
+#include "Context/ConhostContext.h"
+#include "Main.h"
+#include "Pipe.h"
+#include "Utility.h"
+
+static HANDLE disposeEvent = nullptr;
+static HANDLE ownerProcess = nullptr;
+static HANDLE initializeThread = nullptr;
+static HWND consoleHwnd = nullptr;
+static HWND consoleParentHwnd = nullptr;
+static WNDPROC oldWndProc = nullptr;
+static std::mutex wndProcMutex;
+static std::mutex ownerPipeMutex;
+static Pipe ownerPipe;
+
+ConhostContext::ConhostContext()
+{
+}
+
+ConhostContext::~ConhostContext()
+{
+}
+
+static void SendToOwner(const Json::Dict& message, std::function<void(const Json::Dict& dict)> handler = nullptr)
+{
+    std::scoped_lock<std::mutex> lock(::ownerPipeMutex);
+    if (::ownerPipe)
+    {
+        Json::Dict output;
+        if (::ownerPipe.Transact(message, output) && handler != nullptr)
+        {
+            handler(output);
+        }
+    }
+}
+
+static LRESULT __stdcall ConhostWindowProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
+{
+    WNDPROC baseProc = ::oldWndProc;
+    HWND parentHwnd = ::consoleParentHwnd;
+    if (!baseProc)
+    {
+        std::scoped_lock<std::mutex> lock(::wndProcMutex);
+        baseProc = ::oldWndProc;
+        parentHwnd = ::consoleParentHwnd;
+    }
+
+    if (parentHwnd)
+    {
+        // Need to ignore any accelerators that will be processed by MainWindow.xaml
+        enum class MsgHandler { Here, Parent, Both } handler = MsgHandler::Here;
+
+        switch (msg)
+        {
+        case WM_CHAR:
+            // K or T
+            if ((wp == 11 || wp == 20) && ::GetKeyState(VK_CONTROL) < 0)
+            {
+                // Untranslate the message back to WM_KEYDOWN
+                wp = 'A' + wp - 1;
+                msg = (lp & 0x80000000) ? WM_KEYUP : WM_KEYDOWN;
+                handler = MsgHandler::Parent;
+            }
+            break;
+
+        case WM_KEYDOWN:
+        case WM_KEYUP:
+            switch (wp)
+            {
+            case VK_CONTROL:
+                handler = MsgHandler::Both;
+                break;
+
+            case VK_F4:
+            case VK_TAB:
+                handler = MsgHandler::Parent;
+                break;
+            }
+            break;
+
+        case WM_SYSKEYDOWN:
+        case WM_SYSKEYUP:
+        case WM_SYSCHAR:
+            handler = MsgHandler::Parent;
+            break;
+
+        default:
+            if (msg == DevInject::GetDetachMessage())
+            {
+                DevInject::BeginDetach();
+
+                std::scoped_lock<std::mutex> lock(::wndProcMutex);
+                ::consoleParentHwnd = nullptr;
+            }
+            break;
+        }
+
+        if (handler == MsgHandler::Parent || handler == MsgHandler::Both)
+        {
+            ::PostMessage(parentHwnd, WM_USER + msg, wp, lp);
+
+            if (handler == MsgHandler::Parent)
+            {
+                return 0;
+            }
+        }
+    }
+
+    return ::CallWindowProc(baseProc ? baseProc : ::DefWindowProc, hwnd, msg, wp, lp);
+}
+
+static DWORD __stdcall InitializeThread(void*)
+{
+    ::SendToOwner(Json::CreateMessage(PIPE_COMMAND_CONHOST_INJECTED), [](const Json::Dict& dict)
+    {
+        HWND hwnd = dict.Get(PIPE_PROPERTY_HWND).TryGetHwndFromString();
+        HWND hwndParent = hwnd ? ::GetParent(hwnd) : nullptr;
+
+        if (hwndParent)
+        {
+            std::scoped_lock<std::mutex> lock(::wndProcMutex);
+
+            WNDPROC newWndProc = ::ConhostWindowProc;
+            LONG_PTR oldWndProcLong = ::SetWindowLongPtr(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(newWndProc));
+            ::oldWndProc = reinterpret_cast<WNDPROC>(oldWndProcLong);
+            ::consoleHwnd = hwnd;
+            ::consoleParentHwnd = hwndParent;
+        }
+    });
+
+    return 0;
+}
+
+void ConhostContext::Initialize()
+{
+    ::disposeEvent = ::CreateEvent(nullptr, TRUE, FALSE, nullptr);
+    ::ownerProcess = this->OpenOwnerProcess(::disposeEvent, ::ownerPipe);
+
+    if (::ownerProcess)
+    {
+        assert(::ownerPipe);
+
+        ::initializeThread = ::CreateThread(nullptr, 0, ::InitializeThread, nullptr, 0, nullptr);
+    }
+}
+
+void ConhostContext::Dispose()
+{
+    ::SetEvent(::disposeEvent);
+
+    if (::initializeThread)
+    {
+        ::WaitForSingleObject(::initializeThread, INFINITE);
+        ::CloseHandle(::initializeThread);
+        ::initializeThread = nullptr;
+    }
+
+    if (::ownerPipe)
+    {
+        std::scoped_lock<std::mutex> lock(::ownerPipeMutex);
+        ::ownerPipe.Dispose();
+    }
+
+    if (::ownerProcess)
+    {
+        ::CloseHandle(::ownerProcess);
+        ::ownerProcess = nullptr;
+    }
+
+    if (::consoleHwnd)
+    {
+        std::scoped_lock<std::mutex> lock(::wndProcMutex);
+        if (::consoleHwnd)
+        {
+            ::SetWindowLongPtr(::consoleHwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(::oldWndProc));
+            ::consoleHwnd = nullptr;
+            ::consoleParentHwnd = nullptr;
+        }
+    }
+
+    ::CloseHandle(::disposeEvent);
+    ::disposeEvent = nullptr;
+}

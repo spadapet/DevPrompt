@@ -4,16 +4,13 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Threading;
 
 namespace DevPrompt.UI.ViewModels
 {
@@ -23,9 +20,10 @@ namespace DevPrompt.UI.ViewModels
     internal class MainWindowVM : Api.PropertyNotifier, Api.IWindow
     {
         public MainWindow Window { get; }
-        public AppSettings AppSettings => this.Window.App.Settings;
-        public Api.IApp App => this.Window.App;
+        public App App => this.Window.App;
+        public AppSettings AppSettings => this.App.Settings;
         Window Api.IWindow.Window => this.Window;
+        Api.IApp Api.IWindow.App => this.App;
 
         public ICommand ConsoleCommand { get; }
         public ICommand GrabConsoleCommand { get; }
@@ -38,7 +36,6 @@ namespace DevPrompt.UI.ViewModels
         private IMultiValueConverter workspaceMenuItemVisibilityConverter;
         private Api.IWorkspaceVM activeWorkspace;
         private readonly Stack<Action> loadingCancelActions;
-        private DispatcherOperation savingAppSettings;
         private string errorText;
 
         public MainWindowVM(MainWindow window)
@@ -47,11 +44,6 @@ namespace DevPrompt.UI.ViewModels
             this.Window.Closed += this.OnWindowClosed;
             this.Window.Activated += this.OnWindowActivated;
             this.Window.Deactivated += this.OnWindowDeactivated;
-            this.AppSettings.PropertyChanged += this.OnAppSettingsPropertyChanged;
-            this.AppSettings.ObservableConsoles.CollectionChanged += this.OnAppSettingsCollectionChanged;
-            this.AppSettings.ObservableGrabConsoles.CollectionChanged += this.OnAppSettingsCollectionChanged;
-            this.AppSettings.ObservableLinks.CollectionChanged += this.OnAppSettingsCollectionChanged;
-            this.AppSettings.ObservableTools.CollectionChanged += this.OnAppSettingsCollectionChanged;
 
             this.ConsoleCommand = new Api.DelegateCommand((object arg) => this.StartConsole((ConsoleSettings)arg));
             this.GrabConsoleCommand = new Api.DelegateCommand((object arg) => this.App.GrabProcess((int)arg));
@@ -70,11 +62,6 @@ namespace DevPrompt.UI.ViewModels
             this.Window.Closed -= this.OnWindowClosed;
             this.Window.Activated -= this.OnWindowActivated;
             this.Window.Deactivated -= this.OnWindowDeactivated;
-            this.AppSettings.PropertyChanged -= this.OnAppSettingsPropertyChanged;
-            this.AppSettings.ObservableConsoles.CollectionChanged -= this.OnAppSettingsCollectionChanged;
-            this.AppSettings.ObservableGrabConsoles.CollectionChanged -= this.OnAppSettingsCollectionChanged;
-            this.AppSettings.ObservableLinks.CollectionChanged -= this.OnAppSettingsCollectionChanged;
-            this.AppSettings.ObservableTools.CollectionChanged -= this.OnAppSettingsCollectionChanged;
         }
 
         private void OnWindowClosed(object sender, EventArgs args)
@@ -90,39 +77,6 @@ namespace DevPrompt.UI.ViewModels
         private void OnWindowDeactivated(object sender, EventArgs args)
         {
             this.ActiveWorkspace?.Workspace.OnWindowDeactivated();
-        }
-
-        private void OnAppSettingsCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
-        {
-            this.OnAppSettingsPropertyChanged(sender, null);
-        }
-
-        private async void OnAppSettingsPropertyChanged(object sender, PropertyChangedEventArgs args)
-        {
-            if (this.Window.IsVisible)
-            {
-                await this.SaveAppSettings();
-            }
-        }
-
-        private async Task SaveAppSettings(string path = null)
-        {
-            if (this.savingAppSettings == null)
-            {
-                Action action = async () =>
-                {
-                    this.savingAppSettings = null;
-
-                    if (await this.AppSettings.Save(this.Window.App, path) is Exception exception)
-                    {
-                        this.SetError(exception);
-                    }
-                };
-
-                this.savingAppSettings = this.Window.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, action);
-            }
-
-            await this.savingAppSettings;
         }
 
         public ICommand ClearErrorTextCommand => new Api.DelegateCommand(this.ClearErrorText);
@@ -220,7 +174,7 @@ namespace DevPrompt.UI.ViewModels
             }
         });
 
-        public ICommand SettingsExportCommand => new Api.DelegateCommand(async () =>
+        public ICommand SettingsExportCommand => new Api.DelegateCommand(() =>
         {
             OpenFileDialog dialog = new OpenFileDialog
             {
@@ -234,7 +188,7 @@ namespace DevPrompt.UI.ViewModels
 
             if (dialog.ShowDialog(this.Window) == true)
             {
-                await this.SaveAppSettings(dialog.FileName);
+                this.App.SaveSettings(dialog.FileName);
             }
         });
 
@@ -302,6 +256,36 @@ namespace DevPrompt.UI.ViewModels
             dialog.ShowDialog();
         });
 
+        public ICommand SetActiveTabNameCommand => new Api.DelegateCommand(() =>
+        {
+            this.ActiveTabWorkspace?.ActiveTab?.SetTabNameCommand?.SafeExecute();
+        });
+
+        public ICommand CloseActiveTabCommand => new Api.DelegateCommand(() =>
+        {
+            this.ActiveTabWorkspace?.ActiveTab?.CloseCommand?.SafeExecute();
+        });
+
+        public ICommand DetachActiveTabCommand => new Api.DelegateCommand(() =>
+        {
+            this.ActiveTabWorkspace?.ActiveTab?.DetachCommand?.SafeExecute();
+        });
+
+        public ICommand CloneActiveTabCommand => new Api.DelegateCommand(() =>
+        {
+            this.ActiveTabWorkspace?.ActiveTab?.CloneCommand?.SafeExecute();
+        });
+
+        public ICommand TabCycleNextCommand => new Api.DelegateCommand(() =>
+        {
+            this.ActiveTabWorkspace?.TabCycleNext();
+        });
+
+        public ICommand TabCyclePrevCommand => new Api.DelegateCommand(() =>
+        {
+            this.ActiveTabWorkspace?.TabCyclePrev();
+        });
+
         public string WindowTitle
         {
             get
@@ -320,6 +304,7 @@ namespace DevPrompt.UI.ViewModels
 
         public IEnumerable<Api.IWorkspaceVM> Workspaces => this.workspaces;
         public bool HasActiveWorkspace => this.ActiveWorkspace != null;
+        public Api.ITabWorkspace ActiveTabWorkspace => this.ActiveWorkspace?.Workspace as Api.ITabWorkspace;
 
         public Api.IWorkspaceVM FindWorkspace(Guid id)
         {
@@ -451,7 +436,7 @@ namespace DevPrompt.UI.ViewModels
                     item.DataContext = workspace.Workspace;
                     BindingOperations.SetBinding(item, UIElement.VisibilityProperty, binding);
 
-                    this.Window.MainMenu.Items.Insert(index++, item);
+                    this.Window.mainMenu.Items.Insert(index++, item);
                 }
             }
         }
@@ -464,7 +449,7 @@ namespace DevPrompt.UI.ViewModels
 
                 foreach (MenuItem item in items)
                 {
-                    this.Window.MainMenu.Items.Remove(item);
+                    this.Window.mainMenu.Items.Remove(item);
                 }
 
             }

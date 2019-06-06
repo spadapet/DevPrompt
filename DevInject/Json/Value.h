@@ -41,6 +41,7 @@ namespace Json
         DEV_INJECT_API double GetDouble() const;
         DEV_INJECT_API const std::wstring& GetString() const;
         DEV_INJECT_API std::wstring TryGetString() const;
+        DEV_INJECT_API HWND TryGetHwndFromString() const;
         DEV_INJECT_API const std::vector<Json::Value> &GetVector() const;
         DEV_INJECT_API const Dict& GetDict() const;
 

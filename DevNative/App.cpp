@@ -9,26 +9,12 @@ static App* app = nullptr;
 static const UINT_PTR WINDOWS_CHANGED_TIMER = 1;
 static const UINT WINDOWS_CHANGED_TIMEOUT = 100;
 static const UINT WM_USER_RUN_TASKS = WM_USER + 1;
-static const UINT WM_USER_CLOSE_ACTIVE_PROCESS = WM_USER + 2;
-static const UINT WM_USER_NEXT_TAB = WM_USER + 3;
-static const UINT WM_USER_PREV_TAB = WM_USER + 4;
-static const UINT WM_USER_STOP_TAB = WM_USER + 5;
-static const UINT WM_USER_ALT_LETTER = WM_USER + 6;
-static const UINT WM_USER_ALT_RELEASED = WM_USER + 7;
-static const UINT WM_USER_ALT_PRESSED = WM_USER + 8;
-static const UINT WM_USER_CLONE_ACTIVE_PROCESS = WM_USER + 9;
-static const UINT WM_USER_SET_TAB_NAME = WM_USER + 10;
-static const UINT WM_USER_DETACH_ACTIVE_PROCESS = WM_USER + 11;
 
 App::App(IAppHost* host, bool elevated, HINSTANCE instance, HANDLE destructEvent)
     : host(host)
     , elevated(elevated)
     , instance(instance)
-    , mainWindow(nullptr)
     , destructEvent(destructEvent)
-    , keyboardHookCount(0)
-    , keysPressed{}
-    , pressingAlt(false)
     , mainThread(::GetCurrentThreadId())
     , messageWindow(nullptr)
     , shellMessage(::RegisterWindowMessage(L"SHELLHOOK"))
@@ -85,15 +71,13 @@ void App::Initialize()
 
 void App::Dispose()
 {
-    assert(App::IsMainThread());
+    assert(App::IsMainThread() || this->host == nullptr);
 
-    this->DisposeKeyboardHook();
     this->DisposeMessageWindow();
     this->RunAllTasks();
     this->DisposeAllProcessesAndWait();
 
     this->host.Reset();
-    this->mainWindow = nullptr;
 }
 
 App* App::Get()
@@ -419,154 +403,14 @@ void App::RunAllTasks()
     }
 }
 
-// Need to spy on all key input since the command window will eat them
-// (an alternative would be to somehow subclass the console window in conhost.exe)
-void App::AddRefKeyboardHook()
-{
-    assert(App::IsMainThread());
-
-    if (++this->keyboardHookCount == 1)
-    {
-        ::RAWINPUTDEVICE rid{};
-        rid.dwFlags = RIDEV_EXINPUTSINK;
-        rid.usUsagePage = 1;
-        rid.usUsage = 6;
-        rid.hwndTarget = this->messageWindow;
-        ::RegisterRawInputDevices(&rid, 1, sizeof(rid));
-    }
-}
-
-void App::ReleaseKeyboardHook()
-{
-    assert(App::IsMainThread());
-
-    if (this->keyboardHookCount == 1)
-    {
-        this->DisposeKeyboardHook();
-    }
-    else if (this->keyboardHookCount > 0)
-    {
-        this->keyboardHookCount--;
-    }
-}
-
-void App::DisposeKeyboardHook()
-{
-    assert(App::IsMainThread());
-
-    if (this->keyboardHookCount > 0)
-    {
-        this->keyboardHookCount = 0;
-
-        ::RAWINPUTDEVICE rid{};
-        rid.dwFlags = RIDEV_REMOVE;
-        rid.usUsagePage = 1;
-        rid.usUsage = 6;
-        ::RegisterRawInputDevices(&rid, 1, sizeof(rid));
-    }
-}
-
 static bool IsKeyPressed(int vk)
 {
     return ::GetAsyncKeyState(vk) < 0;
 }
 
-// This method is used to spy on all key presses before the console window gets a chance to see them
-bool App::HandleKeyboardInput(const RAWINPUT& ri)
-{
-    wchar_t vkey = ri.data.keyboard.VKey;
-    if (vkey < this->keysPressed.size())
-    {
-        bool pressed = !(ri.data.keyboard.Flags & 1);
-        bool wasPressed = this->keysPressed[vkey];
-        bool pressedNow = pressed && !wasPressed;
-
-        this->keysPressed[vkey] = pressed;
-
-        switch (ri.data.keyboard.VKey)
-        {
-        case VK_F4:
-            if (pressed && ::IsKeyPressed(VK_CONTROL))
-            {
-                if (::IsKeyPressed(VK_SHIFT))
-                {
-                    ::PostMessage(this->messageWindow, WM_USER_DETACH_ACTIVE_PROCESS, 0, 0);
-                }
-                else
-                {
-                    ::PostMessage(this->messageWindow, WM_USER_CLOSE_ACTIVE_PROCESS, 0, 0);
-                }
-            }
-            break;
-
-        case VK_TAB:
-            if (pressed && ::IsKeyPressed(VK_CONTROL) && ::IsKeyPressed(VK_SHIFT))
-            {
-                ::PostMessage(this->messageWindow, WM_USER_PREV_TAB, 0, 0);
-            }
-            else if (pressed && ::IsKeyPressed(VK_CONTROL))
-            {
-                ::PostMessage(this->messageWindow, WM_USER_NEXT_TAB, 0, 0);
-            }
-            break;
-
-        case VK_CONTROL:
-            if (!pressed)
-            {
-                ::PostMessage(this->messageWindow, WM_USER_STOP_TAB, 0, 0);
-            }
-            break;
-
-        default:
-            if (pressed && ((vkey >= 'A' && vkey <= 'Z') || (vkey >= '0' && vkey <= '9')) && ::IsKeyPressed(VK_MENU))
-            {
-                ::PostMessage(this->messageWindow, WM_USER_ALT_LETTER, vkey, 0);
-            }
-            break;
-        }
-
-        // ALT key handling
-        switch (ri.data.keyboard.VKey)
-        {
-        case VK_MENU:
-            if (pressedNow)
-            {
-                this->pressingAlt = true;
-                ::PostMessage(this->messageWindow, WM_USER_ALT_PRESSED, vkey, 0);
-            }
-            else if (!pressed && this->pressingAlt)
-            {
-                this->pressingAlt = false;
-                ::PostMessage(this->messageWindow, WM_USER_ALT_RELEASED, vkey, 0);
-            }
-            break;
-
-        case 'T':
-        case 'K':
-            if (pressed && ::IsKeyPressed(VK_CONTROL))
-            {
-                ::PostMessage(this->messageWindow, ::IsKeyPressed(VK_SHIFT) ? WM_USER_SET_TAB_NAME : WM_USER_CLONE_ACTIVE_PROCESS, 0, 0);
-                return true;
-            }
-            break;
-
-        default:
-            this->pressingAlt = false;
-            break;
-        }
-    }
-
-    return false;
-}
-
 HWND App::CreateProcessHostWindow(HWND parentWnd)
 {
     assert(App::IsMainThread() && parentWnd);
-
-    if (!this->mainWindow)
-    {
-        this->host->GetMainWindow(&this->mainWindow);
-    }
 
     WNDCLASSEX windowClass{};
     windowClass.cbSize = sizeof(windowClass);
@@ -607,8 +451,6 @@ void App::Activate()
     assert(App::IsMainThread());
 
     this->active = true;
-    this->DisposeKeyboardHook();
-    this->AddRefKeyboardHook();
 }
 
 void App::Deactivate()
@@ -616,7 +458,6 @@ void App::Deactivate()
     assert(App::IsMainThread());
 
     this->active = false;
-    this->ReleaseKeyboardHook();
 }
 
 bool App::IsActive() const
@@ -984,13 +825,6 @@ void App::MainWindowProc(HWND hwnd, int msg, WPARAM wp, LPARAM lp)
     case WM_SETTINGCHANGE:
         this->UpdateEnvironmentVariables();
         break;
-
-    case WM_ENDSESSION:
-        if (wp && (lp & ENDSESSION_CLOSEAPP) != 0)
-        {
-            this->host->OnSystemShutdown();
-        }
-        break;
     }
 }
 
@@ -1031,49 +865,6 @@ LRESULT App::WindowProc(HWND hwnd, UINT message, WPARAM wp, LPARAM lp)
             this->RunAllTasks();
             return 0;
 
-        case WM_USER_CLOSE_ACTIVE_PROCESS:
-            this->host->CloseActiveProcess();
-            break;
-
-        case WM_USER_DETACH_ACTIVE_PROCESS:
-            this->host->DetachActiveProcess();
-            break;
-
-        case WM_USER_CLONE_ACTIVE_PROCESS:
-            this->host->CloneActiveProcess();
-            break;
-
-        case WM_USER_SET_TAB_NAME:
-            this->host->SetTabName();
-            break;
-
-        case WM_USER_NEXT_TAB:
-            this->host->TabCycleNext();
-            break;
-
-        case WM_USER_PREV_TAB:
-            this->host->TabCyclePrev();
-            break;
-
-        case WM_USER_STOP_TAB:
-            this->host->TabCycleStop();
-            break;
-
-        case WM_USER_ALT_LETTER:
-            this->host->OnAltLetter(static_cast<int>(wp));
-            break;
-
-        case WM_USER_ALT_RELEASED:
-            this->host->OnAlt();
-            break;
-
-        case WM_USER_ALT_PRESSED:
-            if (this->mainWindow)
-            {
-                ::PostMessage(this->mainWindow, WM_UPDATEUISTATE, UIS_CLEAR | (UISF_HIDEACCEL << 16), 0);
-            }
-            break;
-
         case WM_TIMER:
             // Make sure all processes have a known process ID before continuing
             if (wp == ::WINDOWS_CHANGED_TIMER && this->FindProcess((DWORD)0) == nullptr)
@@ -1083,24 +874,6 @@ LRESULT App::WindowProc(HWND hwnd, UINT message, WPARAM wp, LPARAM lp)
                 return 0;
             }
             break;
-
-        case WM_INPUT:
-        {
-            HRAWINPUT hri = reinterpret_cast<HRAWINPUT>(lp);
-            UINT size = 0;
-            if (::GetRawInputData(hri, RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER)) == 0)
-            {
-                rawInput.resize(size);
-                if (::GetRawInputData(hri, RID_INPUT, rawInput.data(), &size, sizeof(RAWINPUTHEADER)) == size)
-                {
-                    RAWINPUT* ri = reinterpret_cast<RAWINPUT*>(rawInput.data());
-                    if (HandleKeyboardInput(*ri))
-                    {
-                        return 1;
-                    }
-                }
-            }
-        } break;
         }
     }
     // It's a process host window

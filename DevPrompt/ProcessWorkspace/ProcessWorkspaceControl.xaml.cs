@@ -1,8 +1,14 @@
 ﻿using DevPrompt.UI.Controls;
 using DevPrompt.Utility;
+using System;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Interop;
+using System.Windows.Threading;
 
 namespace DevPrompt.ProcessWorkspace
 {
@@ -81,10 +87,23 @@ namespace DevPrompt.ProcessWorkspace
 
         private void OnTabContextMenuOpened(object sender, RoutedEventArgs args)
         {
+#if false
             if (sender is ContextMenu menu)
             {
-                CommandHelpers.FocusFirstMenuItem(menu);
+                Action action = () =>
+                {
+                    foreach (HwndSource source in PresentationSource.CurrentSources.OfType<HwndSource>())
+                    {
+                        if (source.RootVisual is FrameworkElement rootElement && rootElement.Parent is Popup popup && popup.IsOpen && popup.Child is ContextMenu childMenu)
+                        {
+                            //SetFocus(source.Handle);
+                        }
+                    }
+                };
+
+                this.Dispatcher.BeginInvoke(action, DispatcherPriority.Normal);
             }
+#endif
         }
 
         void DragItemsControl.IDragHost.OnDrop(ItemsControl source, object droppedModel, int droppedIndex, bool copy)

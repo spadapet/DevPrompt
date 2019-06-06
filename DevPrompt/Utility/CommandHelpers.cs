@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -13,45 +12,6 @@ namespace DevPrompt.Utility
     {
         public const string SeparatorName = "Separator";
         private const string NewItemPlaceholder = "{NewItemPlaceholder}";
-
-        public static void ShowMenuFromAltLetter(ItemsControl mainMenu, int vk)
-        {
-            foreach (object item in mainMenu.Items)
-            {
-                if (item is MenuItem menuItem && menuItem.Header is string header && menuItem.IsEnabled && menuItem.Visibility == Visibility.Visible)
-                {
-                    int i = header.IndexOf('_');
-                    if (i >= 0 && i + 1 < header.Length)
-                    {
-                        char letter = char.ToUpperInvariant(header[i + 1]);
-                        if (vk == letter)
-                        {
-                            menuItem.Focus();
-                            menuItem.IsSubmenuOpen = true;
-
-                            Action action = () => CommandHelpers.FocusFirstMenuItem(menuItem);
-                            mainMenu.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, action);
-
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        public static void FocusFirstMenuItem(ItemsControl mainMenu)
-        {
-            foreach (object subItem in mainMenu.Items)
-            {
-                if (subItem is MenuItem subMenuItem && subMenuItem.IsEnabled && subMenuItem.Visibility == Visibility.Visible)
-                {
-                    if (subMenuItem.Focus())
-                    {
-                        break;
-                    }
-                }
-            }
-        }
 
         public static Api.DelegateCommand CreateMoveUpCommand<T>(Func<DataGrid> dataGridAccessor, ObservableCollection<T> items)
         {
@@ -137,7 +97,7 @@ namespace DevPrompt.Utility
                 }
             };
 
-            dispatcher.BeginInvoke(action, DispatcherPriority.ApplicationIdle);
+            dispatcher.BeginInvoke(action, DispatcherPriority.Normal);
         }
 
         public static void SafeExecute(this ICommand command, object parameter = null)

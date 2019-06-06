@@ -6,6 +6,7 @@
 #define PIPE_COMMAND_CHECK_WINDOW_DPI L"CheckWindowDpi"
 #define PIPE_COMMAND_CHECK_WINDOW_SIZE L"CheckWindowSize"
 #define PIPE_COMMAND_CLOSED L"Closed"
+#define PIPE_COMMAND_CONHOST_INJECTED L"ConhostInjected"
 #define PIPE_COMMAND_DEACTIVATED L"Deactivated"
 #define PIPE_COMMAND_DETACH L"Detach"
 #define PIPE_COMMAND_GET_STATE L"GetState"

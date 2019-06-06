@@ -4,7 +4,6 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Api.h" />
     <ClInclude Include="Pipe.h" />
-    <ClInclude Include="Inject.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Json\Dict.h">
@@ -22,13 +21,27 @@
     <ClInclude Include="Json\Message.h">
       <Filter>Json</Filter>
     </ClInclude>
-    <ClInclude Include="MessageHandler.h" />
+    <ClInclude Include="Context\AppMessageHandler.h">
+      <Filter>Context</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility.h" />
+    <ClInclude Include="Context\AppContext.h">
+      <Filter>Context</Filter>
+    </ClInclude>
+    <ClInclude Include="Context\BaseContext.h">
+      <Filter>Context</Filter>
+    </ClInclude>
+    <ClInclude Include="Context\ConhostContext.h">
+      <Filter>Context</Filter>
+    </ClInclude>
+    <ClInclude Include="Context\OwnerContext.h">
+      <Filter>Context</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Pipe.cpp" />
-    <ClCompile Include="Inject.cpp" />
     <ClCompile Include="Json\Dict.cpp">
       <Filter>Json</Filter>
     </ClCompile>
@@ -44,7 +57,22 @@
     <ClCompile Include="Json\Message.cpp">
       <Filter>Json</Filter>
     </ClCompile>
-    <ClCompile Include="MessageHandler.cpp" />
+    <ClCompile Include="Context\AppContext.cpp">
+      <Filter>Context</Filter>
+    </ClCompile>
+    <ClCompile Include="Context\AppMessageHandler.cpp">
+      <Filter>Context</Filter>
+    </ClCompile>
+    <ClCompile Include="Context\BaseContext.cpp">
+      <Filter>Context</Filter>
+    </ClCompile>
+    <ClCompile Include="Context\ConhostContext.cpp">
+      <Filter>Context</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility.cpp" />
+    <ClCompile Include="Context\OwnerContext.cpp">
+      <Filter>Context</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
@@ -55,6 +83,9 @@
   <ItemGroup>
     <Filter Include="Json">
       <UniqueIdentifier>{5e3fa1ed-b275-4313-9a9f-d58993d7d6c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Context">
+      <UniqueIdentifier>{8476564e-4d48-4e4d-84a7-9da2a262e417}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
