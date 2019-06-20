@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using System.Windows;
 using System.Windows.Interop;
 
 namespace DevPrompt.UI.Controls
@@ -16,6 +15,7 @@ namespace DevPrompt.UI.Controls
         public ProcessHostWindow(Api.IApp app)
         {
             this.app = app;
+            this.Focusable = false;
         }
 
         public void OnActivated()
@@ -41,12 +41,6 @@ namespace DevPrompt.UI.Controls
         protected override HandleRef BuildWindowCore(HandleRef hwndParent)
         {
             this.ProcessHost = this.app.CreateProcessHost(hwndParent.Handle);
-
-            if (this.IsFocused)
-            {
-                this.ProcessHost?.Focus();
-            }
-
             return new HandleRef(null, this.ProcessHost?.Hwnd ?? IntPtr.Zero);
         }
 
@@ -54,12 +48,6 @@ namespace DevPrompt.UI.Controls
         {
             this.ProcessHost?.Dispose();
             this.ProcessHost = null;
-        }
-
-        protected override void OnGotFocus(RoutedEventArgs args)
-        {
-            this.ProcessHost?.Focus();
-            base.OnGotFocus(args);
         }
     }
 }

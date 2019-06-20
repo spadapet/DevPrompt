@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "App.h"
+#include "DevPrompt_h.h"
 #include "Json/Persist.h"
 #include "Process2.h"
 #include "Utility.h"
@@ -302,20 +303,14 @@ LRESULT Process::WindowProc(HWND hwnd, UINT message, WPARAM wp, LPARAM lp)
 
     case WM_DESTROY:
         this->app->OnProcessClosing(this);
-        this->SendMessageAsync(PIPE_COMMAND_CLOSED);
         this->SendSystemCommand(SC_CLOSE);
+        this->SendMessageAsync(PIPE_COMMAND_CLOSED);
         this->hostWnd = nullptr;
         break;
 
     case WM_PAINT:
         WindowProc::PaintMessage(hwnd, this->app->GetMessageFont(hwnd), L"Waiting for process to respond...");
         break;
-    }
-
-    if (message >= WM_USER + WM_KEYFIRST && message <= WM_USER + WM_KEYLAST)
-    {
-        // Key message forwarded from conhost.exe, just repost it to give WPF a chance to handle the hotkey
-        ::PostMessage(hwnd, message - WM_USER, wp, lp);
     }
 
     return ::DefWindowProc(hwnd, message, wp, lp);

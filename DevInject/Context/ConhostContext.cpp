@@ -35,6 +35,21 @@ static void SendToOwner(const Json::Dict& message, std::function<void(const Json
     }
 }
 
+static void DetachWindowProc()
+{
+    if (::consoleHwnd)
+    {
+        std::scoped_lock<std::mutex> lock(::wndProcMutex);
+        if (::consoleHwnd)
+        {
+            ::SetWindowLongPtr(::consoleHwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(::oldWndProc));
+            ::oldWndProc = nullptr;
+            ::consoleHwnd = nullptr;
+            ::consoleParentHwnd = nullptr;
+        }
+    }
+}
+
 static LRESULT __stdcall ConhostWindowProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 {
     WNDPROC baseProc = ::oldWndProc;
@@ -49,18 +64,23 @@ static LRESULT __stdcall ConhostWindowProc(HWND hwnd, UINT msg, WPARAM wp, LPARA
     if (parentHwnd)
     {
         // Need to ignore any accelerators that will be processed by MainWindow.xaml
-        enum class MsgHandler { Here, Parent, Both } handler = MsgHandler::Here;
+        // Keep in sync with: MainWindow.InputBindings
+        enum class MsgHandler { Here, ParentKeyboard, Both } handler = MsgHandler::Here;
+        UINT parentMsg = msg;
+        WPARAM parentWP = wp;
+        LPARAM parentLP = lp;
 
         switch (msg)
         {
         case WM_CHAR:
-            // K or T
-            if ((wp == 11 || wp == 20) && ::GetKeyState(VK_CONTROL) < 0)
+            switch (wp)
             {
-                // Untranslate the message back to WM_KEYDOWN
-                wp = 'A' + wp - 1;
-                msg = (lp & 0x80000000) ? WM_KEYUP : WM_KEYDOWN;
-                handler = MsgHandler::Parent;
+            case 11: // Ctrl-K
+            case 20: // Ctrl-T
+                handler = MsgHandler::ParentKeyboard;
+                parentMsg = (lp & 0x80000000) ? WM_KEYUP : WM_KEYDOWN;
+                parentWP = 'A' + wp - 1;
+                break;
             }
             break;
 
@@ -68,13 +88,16 @@ static LRESULT __stdcall ConhostWindowProc(HWND hwnd, UINT msg, WPARAM wp, LPARA
         case WM_KEYUP:
             switch (wp)
             {
-            case VK_CONTROL:
-                handler = MsgHandler::Both;
-                break;
-
             case VK_F4:
             case VK_TAB:
-                handler = MsgHandler::Parent;
+                if (::GetKeyState(VK_CONTROL) < 0)
+                {
+                    handler = MsgHandler::ParentKeyboard;
+                }
+                break;
+
+            case VK_CONTROL:
+                handler = MsgHandler::Both;
                 break;
             }
             break;
@@ -82,25 +105,32 @@ static LRESULT __stdcall ConhostWindowProc(HWND hwnd, UINT msg, WPARAM wp, LPARA
         case WM_SYSKEYDOWN:
         case WM_SYSKEYUP:
         case WM_SYSCHAR:
-            handler = MsgHandler::Parent;
+            handler = MsgHandler::ParentKeyboard;
+            break;
+
+        case WM_SYSCOMMAND:
+            // Windows doesn't let SC_CLOSE work when a popup window is showing for some reason, so force exit anyway
+            if (wp == SC_CLOSE)
+            {
+                ::DetachWindowProc();
+                ::ExitProcess(0);
+            }
             break;
 
         default:
             if (msg == DevInject::GetDetachMessage())
             {
+                ::DetachWindowProc();
                 DevInject::BeginDetach();
-
-                std::scoped_lock<std::mutex> lock(::wndProcMutex);
-                ::consoleParentHwnd = nullptr;
             }
             break;
         }
 
-        if (handler == MsgHandler::Parent || handler == MsgHandler::Both)
+        if (handler == MsgHandler::ParentKeyboard || handler == MsgHandler::Both)
         {
-            ::PostMessage(parentHwnd, WM_USER + msg, wp, lp);
+            ::PostMessage(parentHwnd, parentMsg, parentWP, parentLP);
 
-            if (handler == MsgHandler::Parent)
+            if (handler == MsgHandler::ParentKeyboard)
             {
                 return 0;
             }
@@ -108,6 +138,22 @@ static LRESULT __stdcall ConhostWindowProc(HWND hwnd, UINT msg, WPARAM wp, LPARA
     }
 
     return ::CallWindowProc(baseProc ? baseProc : ::DefWindowProc, hwnd, msg, wp, lp);
+}
+
+static void AttachWindowProc(HWND hwnd, HWND hwndParent)
+{
+    assert(!::consoleHwnd);
+
+    std::scoped_lock<std::mutex> lock(::wndProcMutex);
+
+    if (!::consoleHwnd)
+    {
+        WNDPROC newWndProc = ::ConhostWindowProc;
+        LONG_PTR oldWndProcLong = ::SetWindowLongPtr(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(newWndProc));
+        ::oldWndProc = reinterpret_cast<WNDPROC>(oldWndProcLong);
+        ::consoleHwnd = hwnd;
+        ::consoleParentHwnd = hwndParent;
+    }
 }
 
 static DWORD __stdcall InitializeThread(void*)
@@ -119,13 +165,7 @@ static DWORD __stdcall InitializeThread(void*)
 
         if (hwndParent)
         {
-            std::scoped_lock<std::mutex> lock(::wndProcMutex);
-
-            WNDPROC newWndProc = ::ConhostWindowProc;
-            LONG_PTR oldWndProcLong = ::SetWindowLongPtr(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(newWndProc));
-            ::oldWndProc = reinterpret_cast<WNDPROC>(oldWndProcLong);
-            ::consoleHwnd = hwnd;
-            ::consoleParentHwnd = hwndParent;
+            ::AttachWindowProc(hwnd, hwndParent);
         }
     });
 
@@ -168,17 +208,7 @@ void ConhostContext::Dispose()
         ::ownerProcess = nullptr;
     }
 
-    if (::consoleHwnd)
-    {
-        std::scoped_lock<std::mutex> lock(::wndProcMutex);
-        if (::consoleHwnd)
-        {
-            ::SetWindowLongPtr(::consoleHwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(::oldWndProc));
-            ::consoleHwnd = nullptr;
-            ::consoleParentHwnd = nullptr;
-        }
-    }
-
+    ::DetachWindowProc();
     ::CloseHandle(::disposeEvent);
     ::disposeEvent = nullptr;
 }

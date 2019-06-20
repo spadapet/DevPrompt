@@ -1,9 +1,9 @@
 ﻿#include "stdafx.h"
 #include "App.h"
+#include "DevPrompt_h.h"
 #include "Interop/ProcessInterop.h"
 #include "Json/Persist.h"
 #include "Process2.h"
-#include "DevPrompt_h.h"
 
 static App* app = nullptr;
 static const UINT_PTR WINDOWS_CHANGED_TIMER = 1;
@@ -93,6 +93,12 @@ bool App::IsMainThread()
 HINSTANCE App::GetInstance() const
 {
     return this->instance;
+}
+
+IAppHost* App::GetHost() const
+{
+    assert(App::IsMainThread() && this->host);
+    return this->host.Get();
 }
 
 App::Task::Task(App& app, std::function<void()>&& func)

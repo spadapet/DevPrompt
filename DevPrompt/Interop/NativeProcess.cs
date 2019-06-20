@@ -26,29 +26,29 @@ namespace DevPrompt.Interop
 
         public void Dispose()
         {
-            this.Process.Dispose();
+            NativeMethods.SafeComCall(this.Process.Dispose);
         }
 
         public void Detach()
         {
-            this.Process.Detach();
+            NativeMethods.SafeComCall(this.Process.Detach);
         }
 
         public void Activate()
         {
-            this.Process.Activate();
+            NativeMethods.SafeComCall(this.Process.Activate);
         }
 
         public void Deactivate()
         {
-            this.Process.Deactivate();
+            NativeMethods.SafeComCall(this.Process.Deactivate);
         }
 
         public string State
         {
             get
             {
-                return this.Process.GetState() ?? string.Empty;
+                return NativeMethods.SafeComCall(this.Process.GetState, string.Empty) ?? string.Empty;
             }
         }
 
@@ -139,7 +139,7 @@ namespace DevPrompt.Interop
 
         public void Focus()
         {
-            this.Process.Focus();
+            NativeMethods.SafeComCall(this.Process.Focus);
         }
 
         public void RunCommand(Api.ProcessCommand command)
@@ -147,11 +147,11 @@ namespace DevPrompt.Interop
             switch (command)
             {
                 case Api.ProcessCommand.DefaultsDialog:
-                    this.Process.SystemCommandDefaults();
+                    NativeMethods.SafeComCall(this.Process.SystemCommandDefaults);
                     break;
 
                 case Api.ProcessCommand.PropertiesDialog:
-                    this.Process.SystemCommandProperties();
+                    NativeMethods.SafeComCall(this.Process.SystemCommandProperties);
                     break;
             }
         }

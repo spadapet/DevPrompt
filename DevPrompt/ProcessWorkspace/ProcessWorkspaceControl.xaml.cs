@@ -85,25 +85,12 @@ namespace DevPrompt.ProcessWorkspace
             }
         }
 
-        private void OnTabContextMenuOpened(object sender, RoutedEventArgs args)
+        private void OnTabButtonUnloaded(object sender, RoutedEventArgs args)
         {
-#if false
-            if (sender is ContextMenu menu)
+            if (this.ContextMenu is ContextMenu menu)
             {
-                Action action = () =>
-                {
-                    foreach (HwndSource source in PresentationSource.CurrentSources.OfType<HwndSource>())
-                    {
-                        if (source.RootVisual is FrameworkElement rootElement && rootElement.Parent is Popup popup && popup.IsOpen && popup.Child is ContextMenu childMenu)
-                        {
-                            //SetFocus(source.Handle);
-                        }
-                    }
-                };
-
-                this.Dispatcher.BeginInvoke(action, DispatcherPriority.Normal);
+                menu.IsOpen = false;
             }
-#endif
         }
 
         void DragItemsControl.IDragHost.OnDrop(ItemsControl source, object droppedModel, int droppedIndex, bool copy)

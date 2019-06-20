@@ -39,6 +39,9 @@ namespace DevPrompt.UI
             this.nameActiveTabInputBinding2.Command = this.nameActiveTabInputBinding.Command;
             this.tabCycleNextInputBinding.Command = this.ViewModel.TabCycleNextCommand;
             this.tabCyclePrevInputBinding.Command = this.ViewModel.TabCyclePrevCommand;
+
+            InputManager.Current.EnterMenuMode += this.OnEnterMenuMode;
+            InputManager.Current.LeaveMenuMode += this.OnLeaveMenuMode;
         }
 
         public void InitWorkspaces(AppSnapshot snapshot)
@@ -309,15 +312,15 @@ namespace DevPrompt.UI
 
         private void OnKeyEvent(object sender, KeyEventArgs args)
         {
-            if (args.IsUp)
+            switch (args.Key)
             {
-                switch (args.Key)
-                {
-                    case Key.LeftCtrl:
-                    case Key.RightCtrl:
+                case Key.LeftCtrl:
+                case Key.RightCtrl:
+                    if (args.IsUp)
+                    {
                         this.ViewModel.ActiveTabWorkspace?.TabCycleStop();
-                        break;
-                }
+                    }
+                    break;
             }
         }
 
@@ -325,10 +328,20 @@ namespace DevPrompt.UI
         {
             base.OnGotKeyboardFocus(args);
 
-            if (args.NewFocus == this)
+            if (args.NewFocus == this && !InputManager.Current.IsInMenuMode)
             {
-                this.ViewModel.ActiveWorkspace?.Workspace?.Focus();
+                this.ViewModel.FocusActiveWorkspace();
             }
+        }
+
+        private void OnEnterMenuMode(object sender, EventArgs args)
+        {
+            this.Focus();
+        }
+
+        private void OnLeaveMenuMode(object sender, EventArgs args)
+        {
+            this.ViewModel.FocusActiveWorkspace();
         }
     }
 }

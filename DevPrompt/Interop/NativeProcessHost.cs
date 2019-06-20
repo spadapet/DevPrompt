@@ -18,45 +18,45 @@ namespace DevPrompt.Interop
 
         public void Dispose()
         {
-            this.Host.Dispose();
+            NativeMethods.SafeComCall(this.Host.Dispose);
         }
 
         public void Activate()
         {
-            this.Host.Activate();
+            NativeMethods.SafeComCall(this.Host.Activate);
         }
 
         public void Deactivate()
         {
-            this.Host.Deactivate();
+            NativeMethods.SafeComCall(this.Host.Deactivate);
         }
 
         public void Show()
         {
-            this.Host.Show();
+            NativeMethods.SafeComCall(this.Host.Show);
         }
 
         public void Hide()
         {
-            this.Host.Hide();
+            NativeMethods.SafeComCall(this.Host.Hide);
         }
 
         public IntPtr Hwnd
         {
             get
             {
-                return this.Host.GetWindow();
+                return NativeMethods.SafeComCall(this.Host.GetWindow);
             }
         }
 
         public void Focus()
         {
-            this.Host.Focus();
+            NativeMethods.SafeComCall(this.Host.Focus);
         }
 
         public NativeProcess RunProcess(string executable, string arguments, string startingDirectory)
         {
-            if (this.Host.RunProcess(executable, arguments, startingDirectory) is IProcess process)
+            if (NativeMethods.SafeComCall(() => this.Host.RunProcess(executable, arguments, startingDirectory)) is IProcess process)
             {
                 return this.processCache.GetNativeProcess(process);
             }
@@ -66,7 +66,7 @@ namespace DevPrompt.Interop
 
         public NativeProcess RestoreProcess(string state)
         {
-            if (this.Host.RestoreProcess(state) is IProcess process)
+            if (NativeMethods.SafeComCall(() => this.Host.RestoreProcess(state)) is IProcess process)
             {
                 return this.processCache.GetNativeProcess(process);
             }
@@ -76,7 +76,7 @@ namespace DevPrompt.Interop
 
         public NativeProcess CloneProcess(NativeProcess process)
         {
-            if (this.Host.CloneProcess(process.Process) is IProcess clone)
+            if (NativeMethods.SafeComCall(() => this.Host.CloneProcess(process.Process)) is IProcess clone)
             {
                 return this.processCache.GetNativeProcess(clone);
             }
@@ -86,7 +86,7 @@ namespace DevPrompt.Interop
 
         public bool ContainsProcess(NativeProcess process)
         {
-            return this.Host.ContainsProcess(process.Process);
+            return NativeMethods.SafeComCall(() => this.Host.ContainsProcess(process.Process));
         }
 
         public override int GetHashCode()

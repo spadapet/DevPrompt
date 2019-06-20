@@ -341,8 +341,13 @@ namespace DevPrompt.UI.ViewModels
                     this.OnPropertyChanged(nameof(this.WindowTitle));
                 }
 
-                this.ActiveWorkspace?.Workspace.Focus();
+                this.FocusActiveWorkspace();
             }
+        }
+
+        public void FocusActiveWorkspace()
+        {
+            this.ActiveWorkspace?.Workspace?.Focus();
         }
 
         public void AddWorkspace(Api.IWorkspaceVM workspace, bool activate)

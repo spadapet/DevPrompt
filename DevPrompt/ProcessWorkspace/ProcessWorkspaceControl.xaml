@@ -81,6 +81,7 @@
                 PreviewMouseMove="OnTabButtonMouseMoveEvent"
                 GotMouseCapture="OnTabButtonMouseCaptureEvent"
                 LostMouseCapture="OnTabButtonMouseCaptureEvent"
+                Unloaded="OnTabButtonUnloaded"
                 Padding="0"
                 BorderThickness="1,1,1,0"
                 Focusable="False"
@@ -92,7 +93,7 @@
                 HorizontalContentAlignment="Stretch"
                 ContentTemplate="{StaticResource TabButtonContentTemplate}">
                 <Button.ContextMenu>
-                    <ContextMenu Opened="OnTabContextMenuOpened">
+                    <ContextMenu>
                         <!-- NOTE: Keep in sync with Tab menu -->
                         <MenuItem Header="_Set tab name..." InputGestureText="Ctrl+Shift+T" Command="{Binding SetTabNameCommand}" Visibility="{Binding SetTabNameCommand, Converter={StaticResource ObjectToVisibility}}" />
                         <Separator />

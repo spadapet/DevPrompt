@@ -17,36 +17,36 @@ namespace DevPrompt.Interop
 
         public void Dispose()
         {
-            this.App.Dispose();
+            NativeMethods.SafeComCall(this.App.Dispose);
             Marshal.FinalReleaseComObject(this.App);
         }
 
         public void Activate()
         {
-            this.App.Activate();
+            NativeMethods.SafeComCall(this.App.Activate);
         }
 
         public void Deactivate()
         {
-            this.App.Deactivate();
+            NativeMethods.SafeComCall(this.App.Deactivate);
         }
 
         public string GrabProcesses
         {
             get
             {
-                return this.App.GetGrabProcesses();
+                return NativeMethods.SafeComCall(this.App.GetGrabProcesses, string.Empty);
             }
         }
 
         public void GrabProcess(int id)
         {
-            this.App.GrabProcess(id);
+            NativeMethods.SafeComCall(() => this.App.GrabProcess(id));
         }
 
         public NativeProcessHost CreateProcessHost(IProcessCache processCache, IntPtr parentHwnd)
         {
-            if (this.App.CreateProcessHostWindow(parentHwnd) is IProcessHost host)
+            if (NativeMethods.SafeComCall(() => this.App.CreateProcessHostWindow(parentHwnd)) is IProcessHost host)
             {
                 return new NativeProcessHost(processCache, host);
             }
@@ -56,7 +56,7 @@ namespace DevPrompt.Interop
 
         public void MainWindowProc(IntPtr hwnd, int msg, IntPtr wp, IntPtr lp)
         {
-            this.App.MainWindowProc(hwnd, msg, wp, lp);
+            NativeMethods.SafeComCall(() => this.App.MainWindowProc(hwnd, msg, wp, lp));
         }
     }
 }

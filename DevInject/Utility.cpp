@@ -2,7 +2,7 @@
 #include "Main.h"
 #include "Utility.h"
 
-static UINT WM_CUSTOM_DETACH = ::RegisterWindowMessage(L"DevInject::");
+static UINT WM_CUSTOM_DETACH = ::RegisterWindowMessage(L"DevInject::WM_CUSTOM_DETACH");
 
 UINT DevInject::GetDetachMessage()
 {
@@ -22,7 +22,7 @@ std::wstring DevInject::GetModuleFileName(HMODULE handle)
         DWORD size = ::GetModuleFileName(handle, curBuffer, curBufferSize);
         if (size >= curBufferSize)
         {
-            dynamicBuffer.resize(curBufferSize + MAX_PATH);
+            dynamicBuffer.resize(static_cast<size_t>(curBufferSize) + MAX_PATH);
             curBufferSize = static_cast<DWORD>(dynamicBuffer.size());
         }
         else

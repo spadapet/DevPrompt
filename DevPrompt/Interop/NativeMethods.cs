@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace DevPrompt.Interop
@@ -67,6 +68,31 @@ namespace DevPrompt.Interop
                     return instances32;
                 },
                 out IVisualStudioInstances instances, out string errorMessage) ? instances : null;
+        }
+
+        public static void SafeComCall(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (COMException)
+            {
+                Debug.Fail("COM call failed");
+            }
+        }
+
+        public static T SafeComCall<T>(Func<T> func, T returnOnFailure = default)
+        {
+            try
+            {
+                return func();
+            }
+            catch (COMException)
+            {
+                Debug.Fail("COM call failed");
+                return returnOnFailure;
+            }
         }
     }
 }

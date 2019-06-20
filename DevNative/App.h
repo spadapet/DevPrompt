@@ -27,6 +27,7 @@ public:
     static bool IsMainThread();
 
     HINSTANCE GetInstance() const;
+    IAppHost* GetHost() const;
     void PostToMainThread(std::function<void()>&& func);
     void PostBackgroundTask(std::function<void()>&& func);
     void AddListener(IAppListener* obj);
