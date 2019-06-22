@@ -11,15 +11,17 @@ namespace DevPrompt.UI
     internal partial class CustomizeConsolesDialog : Window
     {
         private readonly ObservableCollection<ConsoleSettings> settings;
+
         public Api.DelegateCommand MoveUpCommand { get; }
         public Api.DelegateCommand MoveDownCommand { get; }
         public Api.DelegateCommand DeleteCommand { get; }
         public Api.DelegateCommand ResetCommand { get; }
 
-        public CustomizeConsolesDialog(IEnumerable<ConsoleSettings> consoles)
+        public CustomizeConsolesDialog(IEnumerable<ConsoleSettings> consoles, bool saveTabs)
         {
             this.settings = new ObservableCollection<ConsoleSettings>(consoles.Select(i => i.Clone()));
             this.settings.CollectionChanged += this.OnConsoleSettingsChanged;
+            this.SaveTabs = saveTabs;
 
             this.MoveUpCommand = CommandHelpers.CreateMoveUpCommand(() => this.dataGrid, this.settings);
             this.MoveDownCommand = CommandHelpers.CreateMoveDownCommand(() => this.dataGrid, this.settings);
@@ -30,16 +32,12 @@ namespace DevPrompt.UI
             this.InitializeComponent();
         }
 
-        public IList<ConsoleSettings> Settings
-        {
-            get
-            {
-                return this.settings;
-            }
-        }
+        public IList<ConsoleSettings> Settings => this.settings;
+        public bool SaveTabs { get; private set; }
 
         private void OnClickOk(object sender, RoutedEventArgs args)
         {
+            this.SaveTabs = this.saveTabsCheckbox.IsChecked.HasValue && this.saveTabsCheckbox.IsChecked.Value;
             this.DialogResult = true;
         }
 

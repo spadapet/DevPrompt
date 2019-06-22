@@ -57,8 +57,6 @@
                 </MenuItem>
                 <Separator />
                 <Separator Tag="[Plugins]" />
-                <MenuItem Header="Save _tabs on exit" IsCheckable="True" IsChecked="{Binding AppSettings.SaveTabsOnExit, Mode=TwoWay}" ToolTip="When tabs are saved, they will be restored the next time you start the app." />
-                <MenuItem Header="Exit (_Detach tabs)" Command="{Binding DetachAndExitCommand}" />
                 <MenuItem Header="E_xit" InputGestureText="Alt+F4" Command="{Binding ExitCommand}" />
             </MenuItem>
             <MenuItem Header="_Grab" SubmenuOpened="OnGrabMenuOpened">

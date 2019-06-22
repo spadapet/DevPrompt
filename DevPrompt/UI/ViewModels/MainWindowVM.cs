@@ -81,19 +81,6 @@ namespace DevPrompt.UI.ViewModels
 
         public ICommand ClearErrorTextCommand => new Api.DelegateCommand(this.ClearErrorText);
 
-        public ICommand DetachAndExitCommand => new Api.DelegateCommand(() =>
-        {
-            foreach (Api.ITabWorkspace workspace in this.Workspaces.Select(w => w.Workspace).OfType<Api.ITabWorkspace>())
-            {
-                foreach (Api.ITab tab in workspace.Tabs)
-                {
-                    tab.DetachCommand?.SafeExecute();
-                }
-            }
-
-            this.Window.Close();
-        });
-
         public ICommand ExitCommand => new Api.DelegateCommand(() => this.Window.Close());
 
         public ICommand VisualStudioInstallerCommand => new Api.DelegateCommand(() =>
@@ -121,13 +108,14 @@ namespace DevPrompt.UI.ViewModels
 
         public ICommand CustomizeConsolesCommand => new Api.DelegateCommand(() =>
         {
-            CustomizeConsolesDialog dialog = new CustomizeConsolesDialog(this.AppSettings.Consoles)
+            CustomizeConsolesDialog dialog = new CustomizeConsolesDialog(this.AppSettings.Consoles, this.AppSettings.SaveTabsOnExit)
             {
                 Owner = this.Window
             };
 
             if (dialog.ShowDialog() == true)
             {
+                this.AppSettings.SaveTabsOnExit = dialog.SaveTabs;
                 this.AppSettings.Consoles.Clear();
 
                 foreach (ConsoleSettings settings in dialog.Settings)

@@ -7,7 +7,11 @@
         xmlns:settings="clr-namespace:DevPrompt.Settings"
         xmlns:core="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="Customize Command Prompts" Width="800" Height="320"
+        Title="Customize Command Prompts"
+        Width="700"
+        Height="320"
+        MinWidth="350"
+        MinHeight="200"
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanResizeWithGrip"
         ShowInTaskbar="False"
@@ -44,6 +48,9 @@
             <Button Padding="5,0" Margin="5,0,0,0" Content="Down" Command="{Binding MoveDownCommand}" />
             <Button Padding="5,0" Margin="5,0,0,0" Content="Delete" Command="{Binding DeleteCommand}" />
             <Button Padding="5,0" Margin="5,0,0,0" Content="Reset" Command="{Binding ResetCommand}" />
+        </StackPanel>
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0">
+            <CheckBox Name="saveTabsCheckbox" Content="Restore tabs at startup" IsChecked="{Binding SaveTabs, Mode=OneTime}" />
         </StackPanel>
         <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,5,15,15" HorizontalAlignment="Right">
             <Button Content="OK" IsDefault="true" MinWidth="70" Click="OnClickOk" />

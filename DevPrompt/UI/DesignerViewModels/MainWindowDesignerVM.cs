@@ -29,7 +29,6 @@ namespace DevPrompt.UI.DesignerViewModels
         public ICommand VisualStudioCommand => null;
         public ICommand ClearErrorTextCommand => null;
         public ICommand ExitCommand => null;
-        public ICommand DetachAndExitCommand => null;
         public ICommand VisualStudioInstallerCommand => null;
         public ICommand VisualStudioDogfoodCommand => null;
         public ICommand InstallVisualStudioBranchCommand => null;
