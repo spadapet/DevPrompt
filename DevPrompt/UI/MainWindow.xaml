@@ -37,6 +37,15 @@
         <KeyBinding x:Name="nameActiveTabInputBinding2" Key="K" Modifiers="Ctrl+Shift" />
         <KeyBinding x:Name="tabCycleNextInputBinding" Key="Tab" Modifiers="Ctrl" />
         <KeyBinding x:Name="tabCyclePrevInputBinding" Key="Tab" Modifiers="Ctrl+Shift" />
+        <KeyBinding x:Name="keyCtrl1" Key="D1" Modifiers="Ctrl" />
+        <KeyBinding x:Name="keyCtrl2" Key="D2" Modifiers="Ctrl" />
+        <KeyBinding x:Name="keyCtrl3" Key="D3" Modifiers="Ctrl" />
+        <KeyBinding x:Name="keyCtrl4" Key="D4" Modifiers="Ctrl" />
+        <KeyBinding x:Name="keyCtrl5" Key="D5" Modifiers="Ctrl" />
+        <KeyBinding x:Name="keyCtrl6" Key="D6" Modifiers="Ctrl" />
+        <KeyBinding x:Name="keyCtrl7" Key="D7" Modifiers="Ctrl" />
+        <KeyBinding x:Name="keyCtrl8" Key="D8" Modifiers="Ctrl" />
+        <KeyBinding x:Name="keyCtrl9" Key="D9" Modifiers="Ctrl" />
     </Window.InputBindings>
 
     <Grid>

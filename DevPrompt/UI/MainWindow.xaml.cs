@@ -40,6 +40,26 @@ namespace DevPrompt.UI
             this.tabCycleNextInputBinding.Command = this.ViewModel.TabCycleNextCommand;
             this.tabCyclePrevInputBinding.Command = this.ViewModel.TabCyclePrevCommand;
 
+            this.keyCtrl1.Command = this.ViewModel.QuickStartConsoleCommand;
+            this.keyCtrl2.Command = this.ViewModel.QuickStartConsoleCommand;
+            this.keyCtrl3.Command = this.ViewModel.QuickStartConsoleCommand;
+            this.keyCtrl4.Command = this.ViewModel.QuickStartConsoleCommand;
+            this.keyCtrl5.Command = this.ViewModel.QuickStartConsoleCommand;
+            this.keyCtrl6.Command = this.ViewModel.QuickStartConsoleCommand;
+            this.keyCtrl7.Command = this.ViewModel.QuickStartConsoleCommand;
+            this.keyCtrl8.Command = this.ViewModel.QuickStartConsoleCommand;
+            this.keyCtrl9.Command = this.ViewModel.QuickStartConsoleCommand;
+
+            this.keyCtrl1.CommandParameter = 0;
+            this.keyCtrl2.CommandParameter = 1;
+            this.keyCtrl3.CommandParameter = 2;
+            this.keyCtrl4.CommandParameter = 3;
+            this.keyCtrl5.CommandParameter = 4;
+            this.keyCtrl6.CommandParameter = 5;
+            this.keyCtrl7.CommandParameter = 6;
+            this.keyCtrl8.CommandParameter = 7;
+            this.keyCtrl9.CommandParameter = 8;
+
             InputManager.Current.EnterMenuMode += this.OnEnterMenuMode;
             InputManager.Current.LeaveMenuMode += this.OnLeaveMenuMode;
         }
@@ -78,6 +98,26 @@ namespace DevPrompt.UI
             });
 
             this.AddPluginMenuItems(menu, Api.MenuType.File);
+
+            char hotKey = '1';
+            foreach (object obj in menu.Items)
+            {
+                if (obj is MenuItem item)
+                {
+                    if (hotKey <= '9')
+                    {
+                        item.InputGestureText = $"Ctrl-{hotKey++}";
+                    }
+                    else
+                    {
+                        item.InputGestureText = string.Empty;
+                    }
+                }
+                else if (obj is Separator)
+                {
+                    break;
+                }
+            }
         }
 
         private void OnGrabMenuOpened(object sender, RoutedEventArgs args)

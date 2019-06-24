@@ -30,6 +30,7 @@ namespace DevPrompt.UI.ViewModels
         public ICommand LinkCommand { get; }
         public ICommand ToolCommand { get; }
         public ICommand VisualStudioCommand { get; }
+        public ICommand QuickStartConsoleCommand { get; }
 
         private ObservableCollection<Api.IWorkspaceVM> workspaces;
         private Dictionary<Api.IWorkspaceVM, MenuItem[]> workspaceMenuItems;
@@ -50,6 +51,7 @@ namespace DevPrompt.UI.ViewModels
             this.LinkCommand = new Api.DelegateCommand((object arg) => this.StartLink((LinkSettings)arg));
             this.ToolCommand = new Api.DelegateCommand((object arg) => this.StartTool((ToolSettings)arg));
             this.VisualStudioCommand = new Api.DelegateCommand((object arg) => this.StartVisualStudio((VisualStudioSetup.Instance)arg));
+            this.QuickStartConsoleCommand = new Api.DelegateCommand((object arg) => this.QuickStartConsole((int)arg));
 
             this.workspaces = new ObservableCollection<Api.IWorkspaceVM>();
             this.workspaceMenuItems = new Dictionary<Api.IWorkspaceVM, MenuItem[]>();
@@ -570,6 +572,14 @@ namespace DevPrompt.UI.ViewModels
             {
                 this.ActiveWorkspace = workspaceVM;
                 workspace.RunProcess(settings);
+            }
+        }
+
+        private void QuickStartConsole(int arg)
+        {
+            if (this.AppSettings.Consoles.ElementAtOrDefault(arg) is ConsoleSettings settings)
+            {
+                this.StartConsole(settings);
             }
         }
 

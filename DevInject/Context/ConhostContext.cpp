@@ -88,6 +88,15 @@ static LRESULT __stdcall ConhostWindowProc(HWND hwnd, UINT msg, WPARAM wp, LPARA
         case WM_KEYUP:
             switch (wp)
             {
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
             case VK_F4:
             case VK_TAB:
                 if (::GetKeyState(VK_CONTROL) < 0)
