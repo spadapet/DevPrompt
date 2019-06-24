@@ -718,7 +718,7 @@ Json::Dict Process::HandleMessage(HANDLE process, const Json::Dict& input)
             this->app->PostToMainThread([self, hwnd]()
             {
                 self->SetChildWindow(hwnd);
-            });
+            }, true);
         }
     }
     else if (name == PIPE_COMMAND_STATE_CHANGED)
@@ -764,7 +764,7 @@ void Process::HandleNewState(const Json::Dict& state)
         this->app->PostToMainThread([self, title]()
         {
             self->app->OnProcessTitleChanged(self.get(), title.GetString());
-        });
+        }, true);
     }
 
     Json::Value environment = state.Get(PIPE_PROPERTY_ENVIRONMENT);
@@ -773,6 +773,6 @@ void Process::HandleNewState(const Json::Dict& state)
         this->app->PostToMainThread([self, environment]()
         {
             self->app->OnProcessEnvChanged(self.get(), environment.GetDict());
-        });
+        }, true);
     }
 }

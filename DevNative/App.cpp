@@ -123,7 +123,7 @@ void App::PostBackgroundTask(std::function<void()>&& func)
     }
 }
 
-void App::PostToMainThread(std::function<void()>&& func)
+void App::PostToMainThread(std::function<void()>&& func, bool skipIfNoMainThread)
 {
     bool runNow = false;
     bool postMessage = false;
@@ -137,8 +137,8 @@ void App::PostToMainThread(std::function<void()>&& func)
     }
     else
     {
-        // Can't post to main thread, just run the task now on any thread
-        runNow = true;
+        // Can't post to main thread
+        runNow = !skipIfNoMainThread;
     }
 
     this->taskMutex.unlock();
@@ -510,7 +510,7 @@ void App::ProcessHostWindowDpiChanged(HWND hwnd)
                 i->SendDpiChanged();
             }
         }
-    });
+    }, true);
 }
 
 HWND App::RunProcess(HWND processHostWindow, const Json::Dict& info)

@@ -28,7 +28,7 @@ public:
 
     HINSTANCE GetInstance() const;
     IAppHost* GetHost() const;
-    void PostToMainThread(std::function<void()>&& func);
+    void PostToMainThread(std::function<void()>&& func, bool skipIfNoMainThread = false);
     void PostBackgroundTask(std::function<void()>&& func);
     void AddListener(IAppListener* obj);
     void RemoveListener(IAppListener* obj);
