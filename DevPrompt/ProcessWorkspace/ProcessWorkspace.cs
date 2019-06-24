@@ -261,6 +261,10 @@ namespace DevPrompt.ProcessWorkspace
                 if (removingActive)
                 {
                     this.ActiveTab = this.tabOrder.First?.Value;
+                    if (this.ActiveTab == null)
+                    {
+                        this.Window.Window.Focus();
+                    }
                 }
 
                 tab.PropertyChanged -= this.OnTabPropertyChanged;

@@ -900,6 +900,15 @@ LRESULT App::WindowProc(HWND hwnd, UINT message, WPARAM wp, LPARAM lp)
     case WM_DPICHANGED_AFTERPARENT:
         this->ProcessHostWindowDpiChanged(hwnd);
         break;
+
+    case WM_CHAR:
+    case WM_KEYDOWN:
+    case WM_KEYUP:
+    case WM_SYSCHAR:
+    case WM_SYSKEYDOWN:
+    case WM_SYSKEYUP:
+        ::PostMessage(::GetAncestor(hwnd, GA_ROOT), message, wp, lp);
+        break;
     }
 
     return ::DefWindowProc(hwnd, message, wp, lp);

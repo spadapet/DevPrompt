@@ -311,6 +311,15 @@ LRESULT Process::WindowProc(HWND hwnd, UINT message, WPARAM wp, LPARAM lp)
     case WM_PAINT:
         WindowProc::PaintMessage(hwnd, this->app->GetMessageFont(hwnd), L"Waiting for process to respond...");
         break;
+
+    case WM_CHAR:
+    case WM_KEYDOWN:
+    case WM_KEYUP:
+    case WM_SYSCHAR:
+    case WM_SYSKEYDOWN:
+    case WM_SYSKEYUP:
+        ::PostMessage(::GetAncestor(hwnd, GA_ROOT), message, wp, lp);
+        break;
     }
 
     return ::DefWindowProc(hwnd, message, wp, lp);
