@@ -117,15 +117,6 @@ static LRESULT __stdcall ConhostWindowProc(HWND hwnd, UINT msg, WPARAM wp, LPARA
             handler = MsgHandler::ParentKeyboard;
             break;
 
-        case WM_SYSCOMMAND:
-            // Windows doesn't let SC_CLOSE work when a popup window is showing for some reason, so force exit anyway
-            if (wp == SC_CLOSE)
-            {
-                ::DetachWindowProc();
-                ::ExitProcess(0);
-            }
-            break;
-
         default:
             if (msg == DevInject::GetDetachMessage())
             {
