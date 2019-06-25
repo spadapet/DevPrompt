@@ -10,6 +10,11 @@ using System.Threading.Tasks;
 
 namespace DevOps
 {
+    /// <summary>
+    /// The intention of this Globals class is to cache VSS connections
+    /// globally so that each view doesn't have to authenticate.
+    /// The implementation is not here yet, but that's the intent.
+    /// </summary>
     [Export(typeof(IAppListener))]
     internal class Globals : IAppListener, IDisposable
     {
@@ -60,6 +65,10 @@ namespace DevOps
         }
 
         void IAppListener.OnStartup(IApp app)
+        {
+        }
+
+        void IAppListener.OnOpened(IApp app, IWindow window)
         {
         }
 

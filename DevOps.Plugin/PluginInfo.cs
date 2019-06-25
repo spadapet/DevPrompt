@@ -19,10 +19,6 @@ namespace DevOps
         public Uri MoreInfoLink => null;
         public ImageSource Icon => null;
 
-        public PluginInfo()
-        {
-        }
-
         private static T FirstAssemblyAttribute<T>() where T : Attribute
         {
             return Assembly.GetExecutingAssembly().GetCustomAttributes<T>().FirstOrDefault();

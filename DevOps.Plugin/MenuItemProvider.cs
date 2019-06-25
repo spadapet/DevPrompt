@@ -6,13 +6,12 @@ using System.Windows.Controls;
 
 namespace DevOps
 {
+    /// <summary>
+    /// Adds custom menu items to the main window
+    /// </summary>
     [Export(typeof(IMenuItemProvider))]
     public class MenuItemProvider : IMenuItemProvider
     {
-        public MenuItemProvider()
-        {
-        }
-
         IEnumerable<MenuItem> IMenuItemProvider.GetMenuItems(MenuType menu, IWindow window)
         {
             switch (menu)
@@ -30,11 +29,14 @@ namespace DevOps
 
         private void OnPullRequestDashboard(IWindow window)
         {
+            // Adds a new tab or activates and existing tab in the default process workspace
             if (window.FindWorkspace(Constants.ProcessWorkspaceId) is IWorkspaceVM workspaceVM && workspaceVM.Workspace is ITabWorkspace workspace)
             {
+                window.ActiveWorkspace = workspaceVM;
+
                 if (workspace.Tabs.FirstOrDefault(t => t.Id == typeof(PullRequestTab).GUID) is ITabVM tabVM)
                 {
-                    window.ActiveWorkspace = workspaceVM;
+                    // The tab was already open, make sure it's shown
                     workspace.ActiveTab = tabVM;
                 }
                 else

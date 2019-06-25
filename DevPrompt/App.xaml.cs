@@ -103,6 +103,14 @@ namespace DevPrompt
             }
 
             this.MainWindow?.InitWorkspaces(snapshot);
+
+            foreach (Api.IAppListener listener in this.AppListeners)
+            {
+                if (this.MainWindow?.ViewModel is Api.IWindow window)
+                {
+                    listener.OnOpened(this, window);
+                }
+            }
         }
 
         private void OnExit(object sender, ExitEventArgs args)
