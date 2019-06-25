@@ -362,6 +362,10 @@ void Process::BackgroundAttach(HANDLE process, HANDLE mainThread, const Json::Di
     std::shared_ptr<Process> self = shared_from_this();
     ::InterlockedExchange(&this->processId, ::GetProcessId(process));
 
+    std::wstringstream threadName;
+    threadName << L"[" << this->GetProcessId() << L"] AppPipeServer";
+    DevInject::SetDebuggerThreadName(threadName.str());
+
     Pipe pipe = Pipe::Create(process, this->disposeEvent);
     bool injected = DevInject::InjectDll(process, this->disposeEvent, true);
 
@@ -381,6 +385,10 @@ void Process::BackgroundAttach(HANDLE process, HANDLE mainThread, const Json::Di
         {
             std::thread sendCommandsThread([self, process]()
             {
+                std::wstringstream threadName;
+                threadName << L"[" << self->GetProcessId() << L"] SendCommands";
+                DevInject::SetDebuggerThreadName(threadName.str());
+
                 self->BackgroundSendCommands(process);
             });
 
@@ -549,7 +557,7 @@ void Process::BackgroundInjectConhost(HWND conhostHwnd)
 
         for (BOOL status = ::Process32First(snap, &entry); status; status = ::Process32Next(snap, &entry))
         {
-            if (entry.th32ParentProcessID == this->GetProcessId())
+            if (entry.th32ParentProcessID == this->GetProcessId() && !::_wcsicmp(entry.szExeFile, L"conhost.exe"))
             {
                 conhostProcessId = entry.th32ProcessID;
                 conhostProcess = ::OpenProcess(PROCESS_ALL_ACCESS, FALSE, conhostProcessId);
@@ -563,6 +571,10 @@ void Process::BackgroundInjectConhost(HWND conhostHwnd)
     assert(conhostProcess);
     if (conhostProcess)
     {
+        std::wstringstream threadName;
+        threadName << L"[" << conhostProcessId << L"] ConhostPipeServer";
+        DevInject::SetDebuggerThreadName(threadName.str());
+
         Pipe pipe = Pipe::Create(conhostProcess, this->disposeEvent);
         bool injected = DevInject::InjectDll(conhostProcess, this->disposeEvent, true);
         if (injected)

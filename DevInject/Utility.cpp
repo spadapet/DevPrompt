@@ -68,7 +68,6 @@ static bool InjectDllSameBitness(HANDLE process, HANDLE stopEvent)
         assert(freed);
     }
 
-    assert(remoteModule);
     return remoteModule != nullptr;
 }
 
@@ -181,4 +180,37 @@ void DevInject::BeginDetach()
     {
         ::CloseHandle(thread);
     }
+}
+
+void DevInject::SetDebuggerThreadName(const std::wstring& name, DWORD threadId)
+{
+#ifdef _DEBUG
+    if (IsDebuggerPresent())
+    {
+        char nameAcp[512] = "";
+        ::WideCharToMultiByte(CP_ACP, 0, name.c_str(), -1, nameAcp, _countof(nameAcp), nullptr, nullptr);
+
+        typedef struct tagTHREADNAME_INFO
+        {
+            ULONG_PTR dwType; // must be 0x1000
+            const char* szName; // pointer to name (in user addr space)
+            ULONG_PTR dwThreadID; // thread ID (-1=caller thread)
+            ULONG_PTR dwFlags; // reserved for future use, must be zero
+        } THREADNAME_INFO;
+
+        THREADNAME_INFO info;
+        info.dwType = 0x1000;
+        info.szName = nameAcp;
+        info.dwThreadID = threadId ? threadId : ::GetCurrentThreadId();
+        info.dwFlags = 0;
+
+        __try
+        {
+            RaiseException(0x406D1388, 0, sizeof(info) / sizeof(ULONG_PTR), reinterpret_cast<ULONG_PTR*>(&info));
+        }
+        __except (EXCEPTION_CONTINUE_EXECUTION)
+        {
+        }
+    }
+#endif
 }

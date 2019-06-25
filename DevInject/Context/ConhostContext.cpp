@@ -156,7 +156,7 @@ static void AttachWindowProc(HWND hwnd, HWND hwndParent)
     }
 }
 
-static DWORD __stdcall InitializeThread(void*)
+static unsigned int __stdcall InitializeThread(void*)
 {
     ::SendToOwner(Json::CreateMessage(PIPE_COMMAND_CONHOST_INJECTED), [](const Json::Dict& dict)
     {
@@ -181,7 +181,7 @@ void ConhostContext::Initialize()
     {
         assert(::ownerPipe);
 
-        ::initializeThread = ::CreateThread(nullptr, 0, ::InitializeThread, nullptr, 0, nullptr);
+        ::initializeThread = reinterpret_cast<HANDLE>(::_beginthreadex(nullptr, 0, ::InitializeThread, nullptr, 0, nullptr));
     }
 }
 

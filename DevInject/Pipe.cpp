@@ -190,6 +190,10 @@ bool Pipe::ReadMessage(Json::Dict& input) const
                 readBufferSize += bytesRead;
                 moreData = true;
             }
+            else
+            {
+                assert(::GetLastError() == ERROR_BROKEN_PIPE);
+            }
         }
         else if (::GetLastError() == ERROR_IO_PENDING)
         {
@@ -205,6 +209,10 @@ bool Pipe::ReadMessage(Json::Dict& input) const
                 {
                     readBufferSize += bytesRead;
                     moreData = true;
+                }
+                else
+                {
+                    assert(::GetLastError() == ERROR_BROKEN_PIPE);
                 }
             }
         }
@@ -286,13 +294,21 @@ bool Pipe::Transact(const Json::Dict& input, Json::Dict& output) const
         inputCopy.Set(PIPE_PROPERTY_ID, Json::Value(id));
     }
 
-    if (this->WriteMessage(inputCopy) && this->ReadMessage(output))
+    if (this->WriteMessage(inputCopy))
     {
-        assert(inputCopy.Get(PIPE_PROPERTY_ID) == output.Get(PIPE_PROPERTY_ID));
-        assert(inputCopy.Get(PIPE_PROPERTY_COMMAND) == output.Get(PIPE_PROPERTY_COMMAND));
-        return true;
+        if (this->ReadMessage(output))
+        {
+            assert(inputCopy.Get(PIPE_PROPERTY_ID) == output.Get(PIPE_PROPERTY_ID));
+            assert(inputCopy.Get(PIPE_PROPERTY_COMMAND) == output.Get(PIPE_PROPERTY_COMMAND));
+            return true;
+        }
+
+        // Maybe the other process died, but mostly likely this is a pipe bug
+        assert(L"Failed getting pipe reply");
+        return false;
     }
 
+    // Failure is OK when the other process dies
     return false;
 }
 

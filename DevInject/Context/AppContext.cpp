@@ -23,7 +23,7 @@ static void SendToOwner(const Json::Dict& message)
 }
 
 // A thread that listens for commands coming from the owner process, and responds to them
-static DWORD __stdcall PipeServerThread(void*)
+static unsigned int __stdcall PipeServerThread(void*)
 {
     Pipe pipe = Pipe::Create(::ownerProcess, ::disposeEvent);
 
@@ -91,7 +91,7 @@ static void NotifyOwnerOfChanges(std::wstring& oldTitle, std::wstring& oldEnviro
 
 // A thread that detects if the owner process has died, and if it does then kills this process too.
 // Normally the owner process will politely close all console processes first, but it might crash.
-static DWORD __stdcall WatchdogThread(void*)
+static unsigned int __stdcall WatchdogThread(void*)
 {
     std::array<HANDLE, 2> handles = { ::ownerProcess, ::disposeEvent };
     std::wstring oldTitle;
@@ -117,7 +117,7 @@ static DWORD __stdcall WatchdogThread(void*)
 }
 
 // A thread that only runs until it can find that a main console window has been created
-static DWORD __stdcall FindMainWindowThread(void*)
+static unsigned int __stdcall FindMainWindowThread(void*)
 {
     HWND hwnd = ::GetConsoleWindow();
 
@@ -156,9 +156,9 @@ void AppContext::Initialize()
 
         // Don't use std::thread since it will wait for the thread to start running
         // for some reason, and that will hang since that thread can't get the loader lock.
-        ::watchdogThread = ::CreateThread(nullptr, 0, ::WatchdogThread, nullptr, 0, nullptr);
-        ::pipeServerThread = ::CreateThread(nullptr, 0, ::PipeServerThread, nullptr, 0, nullptr);
-        ::findMainWindowThread = ::CreateThread(nullptr, 0, ::FindMainWindowThread, nullptr, 0, nullptr);
+        ::watchdogThread = reinterpret_cast<HANDLE>(::_beginthreadex(nullptr, 0, ::WatchdogThread, nullptr, 0, nullptr));
+        ::pipeServerThread = reinterpret_cast<HANDLE>(::_beginthreadex(nullptr, 0, ::PipeServerThread, nullptr, 0, nullptr));
+        ::findMainWindowThread = reinterpret_cast<HANDLE>(::_beginthreadex(nullptr, 0, ::FindMainWindowThread, nullptr, 0, nullptr));
     }
 }
 
