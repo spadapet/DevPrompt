@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
@@ -214,6 +215,17 @@ namespace DevPrompt.Api
             if (this.tab == null || this.tab.OnClosing())
             {
                 this.workspace.RemoveTab(this);
+            }
+        });
+
+        public ICommand CloseAllButThisCommand => new DelegateCommand(() =>
+        {
+            foreach (ITabVM tab in this.workspace.Tabs.ToArray())
+            {
+                if (tab != this && tab.CloseCommand != null && tab.CloseCommand.CanExecute(null))
+                {
+                    tab.CloseCommand.Execute(null);
+                }
             }
         });
 

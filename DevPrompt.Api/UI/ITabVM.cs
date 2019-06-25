@@ -22,6 +22,7 @@ namespace DevPrompt.Api
 
         ICommand ActivateCommand { get; }
         ICommand CloseCommand { get; }
+        ICommand CloseAllButThisCommand { get; }
         ICommand CloneCommand { get; }
         ICommand DetachCommand { get; }
         ICommand DefaultsCommand { get; }

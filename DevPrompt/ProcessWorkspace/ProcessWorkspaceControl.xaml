@@ -103,6 +103,7 @@
                         <Separator />
                         <MenuItem Header="D_etach" InputGestureText="Ctrl+Shift+F4" Command="{Binding DetachCommand}" Visibility="{Binding DetachCommand, Converter={StaticResource ObjectToVisibility}}" />
                         <MenuItem Header="C_lose" InputGestureText="Ctrl+F4" Command="{Binding CloseCommand}" Visibility="{Binding CloseCommand, Converter={StaticResource ObjectToVisibility}}" />
+                        <MenuItem Header="Close All But This" Command="{Binding CloseAllButThisCommand}" Visibility="{Binding CloseAllButThisCommand, Converter={StaticResource ObjectToVisibility}}" />
                     </ContextMenu>
                 </Button.ContextMenu>
             </Button>
@@ -125,6 +126,7 @@
             <Separator />
             <MenuItem Header="D_etach" InputGestureText="Ctrl+Shift+F4" Command="{Binding ActiveTab.DetachCommand}" Visibility="{Binding ActiveTab.DetachCommand, Converter={StaticResource ObjectToVisibility}}" />
             <MenuItem Header="C_lose" InputGestureText="Ctrl+F4" Command="{Binding ActiveTab.CloseCommand}" Visibility="{Binding ActiveTab.CloseCommand, Converter={StaticResource ObjectToVisibility}}" />
+            <MenuItem Header="Close All But This" Command="{Binding ActiveTab.CloseAllButThisCommand}" Visibility="{Binding ActiveTab.CloseAllButThisCommand, Converter={StaticResource ObjectToVisibility}}" />
         </MenuItem>
     </UserControl.Resources>
 

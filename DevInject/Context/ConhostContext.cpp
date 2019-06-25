@@ -122,6 +122,7 @@ static LRESULT __stdcall ConhostWindowProc(HWND hwnd, UINT msg, WPARAM wp, LPARA
             {
                 ::DetachWindowProc();
                 DevInject::BeginDetach();
+                ::SetForegroundWindow(hwnd);
             }
             break;
         }

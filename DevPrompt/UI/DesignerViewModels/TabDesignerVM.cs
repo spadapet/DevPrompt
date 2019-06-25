@@ -25,6 +25,7 @@ namespace DevPrompt.UI.DesignerViewModels
 
         public ICommand ActivateCommand => new Api.DelegateCommand();
         public ICommand CloseCommand => new Api.DelegateCommand();
+        public ICommand CloseAllButThisCommand => new Api.DelegateCommand();
         public ICommand CloneCommand => new Api.DelegateCommand();
         public ICommand DetachCommand => new Api.DelegateCommand();
         public ICommand DefaultsCommand => new Api.DelegateCommand();
