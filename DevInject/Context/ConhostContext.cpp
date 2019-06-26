@@ -37,16 +37,14 @@ static void SendToOwner(const Json::Dict& message, std::function<void(const Json
 
 static void DetachWindowProc()
 {
+    std::scoped_lock<std::mutex> lock(::wndProcMutex);
+
     if (::consoleHwnd)
     {
-        std::scoped_lock<std::mutex> lock(::wndProcMutex);
-        if (::consoleHwnd)
-        {
-            ::SetWindowLongPtr(::consoleHwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(::oldWndProc));
-            ::oldWndProc = nullptr;
-            ::consoleHwnd = nullptr;
-            ::consoleParentHwnd = nullptr;
-        }
+        ::SetWindowLongPtr(::consoleHwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(::oldWndProc));
+        ::oldWndProc = nullptr;
+        ::consoleHwnd = nullptr;
+        ::consoleParentHwnd = nullptr;
     }
 }
 
@@ -121,8 +119,9 @@ static LRESULT __stdcall ConhostWindowProc(HWND hwnd, UINT msg, WPARAM wp, LPARA
             if (msg == DevInject::GetDetachMessage())
             {
                 ::DetachWindowProc();
-                DevInject::BeginDetach();
                 ::SetForegroundWindow(hwnd);
+                DevInject::BeginDetach(hwnd);
+                return 0;
             }
             break;
         }

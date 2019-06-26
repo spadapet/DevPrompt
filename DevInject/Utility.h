@@ -10,5 +10,5 @@ namespace DevInject
     DEV_INJECT_API UINT GetDetachMessage();
 
     void CheckConsoleWindowSize(bool visibleOnly);
-    void BeginDetach();
+    void BeginDetach(HWND waitForWindowToRespond = nullptr);
 }

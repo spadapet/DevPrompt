@@ -167,15 +167,21 @@ void DevInject::CheckConsoleWindowSize(bool visibleOnly)
     }
 }
 
-static DWORD __stdcall DetachThread(void*)
+static unsigned int __stdcall DetachThread(void* waitForWindowToRespond)
 {
+    HWND hwnd = reinterpret_cast<HWND>(waitForWindowToRespond);
+    if (hwnd)
+    {
+        ::SendMessage(hwnd, WM_NULL, 0, 0);
+    }
+
     ::FreeLibraryAndExitThread(DevInject::Dispose(), 0);
     return 0;
 }
 
-void DevInject::BeginDetach()
+void DevInject::BeginDetach(HWND waitForWindowToRespond)
 {
-    HANDLE thread = ::CreateThread(nullptr, 0, ::DetachThread, nullptr, 0, nullptr);
+    HANDLE thread = reinterpret_cast<HANDLE>(::_beginthreadex(nullptr, 0, ::DetachThread, reinterpret_cast<void*>(waitForWindowToRespond), 0, nullptr));
     if (thread)
     {
         ::CloseHandle(thread);
