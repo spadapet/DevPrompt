@@ -167,7 +167,7 @@ void DevInject::CheckConsoleWindowSize(bool visibleOnly)
     }
 }
 
-static unsigned int __stdcall DetachThread(void* waitForWindowToRespond)
+static DWORD __stdcall DetachThread(void* waitForWindowToRespond)
 {
     HWND hwnd = reinterpret_cast<HWND>(waitForWindowToRespond);
     if (hwnd)
@@ -181,7 +181,8 @@ static unsigned int __stdcall DetachThread(void* waitForWindowToRespond)
 
 void DevInject::BeginDetach(HWND waitForWindowToRespond)
 {
-    HANDLE thread = reinterpret_cast<HANDLE>(::_beginthreadex(nullptr, 0, ::DetachThread, reinterpret_cast<void*>(waitForWindowToRespond), 0, nullptr));
+    // Don't use _beginthreadex since that will increment the DLL load count
+    HANDLE thread = ::CreateThread(nullptr, 0, ::DetachThread, reinterpret_cast<void*>(waitForWindowToRespond), 0, nullptr);
     if (thread)
     {
         ::CloseHandle(thread);
