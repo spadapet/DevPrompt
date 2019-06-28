@@ -1,0 +1,18 @@
+﻿<?xml version="1.0"?>
+<package >
+    <metadata>
+        <id>DevPrompt.Api</id>
+        <version>1.2.5.2</version>
+        <authors>Peter Spada</authors>
+        <owners>Peter Spada</owners>
+        <projectUrl>https://github.com/spadapet/DevPrompt</projectUrl>
+        <iconUrl>https://raw.githubusercontent.com/spadapet/DevPrompt/master/DevPrompt/appicon.ico</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Plugin API for DevPrompt</description>
+        <copyright>Copyright 2019</copyright>
+        <tags>DevPrompt</tags>
+    </metadata>
+    <files>
+        <file src="..\out\Release.x64\bin\DevPrompt.Api.dll" target="lib\net40" />
+    </files>
+</package>
