@@ -63,4 +63,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="AfterBuild" Outputs="$(OutputPath)DevPrompt.Api.nupkg" Condition=" 'Configuration' == 'Release' ">
+    <Exec Command="nuget.exe pack &quot;DevPrompt.Api.nuspec&quot; -OutputDirectory &quot;$(OutputPath).&quot; -BasePath &quot;$(OutputPath).&quot; -Version $(DevPromptVersion) -Properties &quot;OutputPath=$(OutputPath);Configuration=$(Configuration);Platform=$(Platform);Version=$(DevPromptVersion)&quot;" />
+  </Target>
 </Project>
