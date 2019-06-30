@@ -31,6 +31,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{A46204E7
 		shared.props = shared.props
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget", "Nuget", "{AFEE30EE-2F59-472C-AC34-F766C8C04380}"
+	ProjectSection(SolutionItems) = preProject
+		DevPrompt.Api\DevPrompt.Api.nuspec = DevPrompt.Api\DevPrompt.Api.nuspec
+		NuGet.Config = NuGet.Config
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -93,6 +99,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A46204E7-B11C-4CC8-A54E-7CFF75D4C4E9} = {C9A228D0-7B27-475F-9FE0-038F01B930F6}
+		{AFEE30EE-2F59-472C-AC34-F766C8C04380} = {C9A228D0-7B27-475F-9FE0-038F01B930F6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3D3483EE-044D-4B5D-90E3-4401D8948513}
