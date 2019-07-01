@@ -32,9 +32,7 @@ namespace DevPrompt.UI.DesignerViewModels
         public ICommand VisualStudioInstallerCommand => null;
         public ICommand VisualStudioDogfoodCommand => null;
         public ICommand InstallVisualStudioBranchCommand => null;
-        public ICommand CustomizeConsolesCommand => null;
-        public ICommand SettingsImportCommand => null;
-        public ICommand SettingsExportCommand => null;
+        public ICommand SettingsCommand => null;
         public ICommand CustomizeConsoleGrabCommand => null;
         public ICommand CustomizeToolsCommand => null;
         public ICommand CustomizeLinksCommand => null;

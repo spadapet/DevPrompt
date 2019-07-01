@@ -1,0 +1,53 @@
+﻿<UserControl
+    x:Class="DevPrompt.UI.ConsolesSettingsControl"
+    x:ClassModifier="internal"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:settings="clr-namespace:DevPrompt.Settings"
+    xmlns:core="clr-namespace:System;assembly=mscorlib"
+    mc:Ignorable="d"
+    MinWidth="350" MinHeight="200" d:DesignWidth="500" d:DesignHeight="250"
+    DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="SettingsStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <ObjectDataProvider x:Key="ConsoleTypeEnum" MethodName="GetValues" ObjectType="{x:Type core:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type Type="settings:ConsoleType"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock TextWrapping="Wrap" Padding="5,10" Text="Use percent signs to reference environment variables. 'Run at startup' only applies when there are no saved tabs at startup."/>
+        <DataGrid Grid.Row="1" x:Name="dataGrid" ItemsSource="{Binding ViewModel.Settings.Consoles}" SelectionChanged="OnSelectionChanged" BorderThickness="0,1">
+            <DataGrid.Columns>
+                <DataGridComboBoxColumn Header="Executable" Width="3*" SelectedItemBinding="{Binding ConsoleType}" ItemsSource="{Binding Source={StaticResource ConsoleTypeEnum}}" />
+                <DataGridTextColumn Header="Menu Name" Width="3*" Binding="{Binding MenuName}"/>
+                <DataGridTextColumn Header="Tab Name" Width="2*" Binding="{Binding TabName}"/>
+                <DataGridTextColumn Header="Starting Directory" Width="4*" Binding="{Binding StartingDirectory}"/>
+                <DataGridTextColumn Header="Arguments" Width="6*" Binding="{Binding Arguments}"/>
+                <DataGridCheckBoxColumn Header="Run at startup" Width="2.5*" Binding="{Binding RunAtStartup}" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10">
+            <Button Padding="5,0" Margin="5,0,0,0" Content="Up" Command="{Binding MoveUpCommand}" />
+            <Button Padding="5,0" Margin="5,0,0,0" Content="Down" Command="{Binding MoveDownCommand}" />
+            <Button Padding="5,0" Margin="5,0,0,0" Content="Delete" Command="{Binding DeleteCommand}" />
+            <Button Padding="5,0" Margin="5,0,0,0" Content="Reset" Command="{Binding ResetCommand}" />
+        </StackPanel>
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,5">
+            <CheckBox Name="saveTabsCheckbox" Content="Restore tabs at startup" IsChecked="{Binding ViewModel.Settings.SaveTabsOnExit, Mode=TwoWay}" />
+        </StackPanel>
+    </Grid>
+</UserControl>

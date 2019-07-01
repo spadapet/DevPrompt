@@ -108,132 +108,37 @@ namespace DevPrompt.UI.ViewModels
             }
         });
 
-        public ICommand CustomizeConsolesCommand => new Api.DelegateCommand(() =>
+        private void ShowSettingsDialog(SettingsTabType tab)
         {
-            CustomizeConsolesDialog dialog = new CustomizeConsolesDialog(this.AppSettings.Consoles, this.AppSettings.SaveTabsOnExit)
+            SettingsDialog dialog = new SettingsDialog(this.Window, this.AppSettings, tab)
             {
                 Owner = this.Window
             };
 
             if (dialog.ShowDialog() == true)
             {
-                this.AppSettings.SaveTabsOnExit = dialog.SaveTabs;
-                this.AppSettings.Consoles.Clear();
-
-                foreach (ConsoleSettings settings in dialog.Settings)
-                {
-                    this.AppSettings.Consoles.Add(settings.Clone());
-                }
+                this.AppSettings.CopyFrom(dialog.ViewModel.Settings);
             }
-        });
+        }
 
-        public ICommand SettingsImportCommand => new Api.DelegateCommand(async () =>
+        public ICommand SettingsCommand => new Api.DelegateCommand(() =>
         {
-            OpenFileDialog dialog = new OpenFileDialog
-            {
-                Title = "Import Settings",
-                Filter = "XML Files|*.xml",
-                DefaultExt = "xml",
-                CheckFileExists = true
-            };
-
-            if (dialog.ShowDialog(this.Window) == true)
-            {
-                AppSettings settings = null;
-                try
-                {
-                    settings = await AppSettings.UnsafeLoad(this.Window.App, dialog.FileName);
-                }
-                catch (Exception exception)
-                {
-                    this.SetError(exception);
-                }
-
-                if (settings != null)
-                {
-                    SettingsImportDialog dialog2 = new SettingsImportDialog(settings)
-                    {
-                        Owner = this.Window
-                    };
-
-                    if (dialog2.ShowDialog() == true)
-                    {
-                        dialog2.ViewModel.Import(this.AppSettings);
-                    }
-                }
-            }
-        });
-
-        public ICommand SettingsExportCommand => new Api.DelegateCommand(() =>
-        {
-            OpenFileDialog dialog = new OpenFileDialog
-            {
-                Title = "Export Settings",
-                Filter = "XML Files|*.xml",
-                DefaultExt = "xml",
-                CheckPathExists = true,
-                CheckFileExists = false,
-                ValidateNames = true
-            };
-
-            if (dialog.ShowDialog(this.Window) == true)
-            {
-                this.App.SaveSettings(dialog.FileName);
-            }
+            this.ShowSettingsDialog(SettingsTabType.Default);
         });
 
         public ICommand CustomizeConsoleGrabCommand => new Api.DelegateCommand(() =>
         {
-            CustomizeGrabConsolesDialog dialog = new CustomizeGrabConsolesDialog(this.AppSettings.GrabConsoles)
-            {
-                Owner = this.Window
-            };
-
-            if (dialog.ShowDialog() == true)
-            {
-                this.AppSettings.GrabConsoles.Clear();
-
-                foreach (GrabConsoleSettings settings in dialog.Settings)
-                {
-                    this.AppSettings.GrabConsoles.Add(settings.Clone());
-                }
-            }
+            this.ShowSettingsDialog(SettingsTabType.Grab);
         });
 
         public ICommand CustomizeToolsCommand => new Api.DelegateCommand(() =>
         {
-            CustomizeToolsDialog dialog = new CustomizeToolsDialog(this.AppSettings.Tools)
-            {
-                Owner = this.Window
-            };
-
-            if (dialog.ShowDialog() == true)
-            {
-                this.AppSettings.Tools.Clear();
-
-                foreach (ToolSettings settings in dialog.Settings)
-                {
-                    this.AppSettings.Tools.Add(settings.Clone());
-                }
-            }
+            this.ShowSettingsDialog(SettingsTabType.Tools);
         });
 
         public ICommand CustomizeLinksCommand => new Api.DelegateCommand(() =>
         {
-            CustomizeLinksDialog dialog = new CustomizeLinksDialog(this.AppSettings.Links)
-            {
-                Owner = this.Window
-            };
-
-            if (dialog.ShowDialog() == true)
-            {
-                this.AppSettings.Links.Clear();
-
-                foreach (LinkSettings settings in dialog.Settings)
-                {
-                    this.AppSettings.Links.Add(settings.Clone());
-                }
-            }
+            this.ShowSettingsDialog(SettingsTabType.Links);
         });
 
         public ICommand AboutCommand => new Api.DelegateCommand(() =>

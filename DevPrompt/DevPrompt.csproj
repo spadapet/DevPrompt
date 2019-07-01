@@ -92,26 +92,31 @@
       <DependentUpon>AboutDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Controls\DragItemsControl.cs" />
+    <Compile Include="UI\SettingsDialog.xaml.cs">
+      <DependentUpon>SettingsDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\SettingsImportDialog.xaml.cs">
       <DependentUpon>SettingsImportDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\TabNameDialog.xaml.cs">
       <DependentUpon>TabNameDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\CustomizeGrabConsolesDialog.xaml.cs">
-      <DependentUpon>CustomizeGrabConsolesDialog.xaml</DependentUpon>
+    <Compile Include="UI\GrabSettingsControl.xaml.cs">
+      <DependentUpon>GrabSettingsControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\CustomizeLinksDialog.xaml.cs">
-      <DependentUpon>CustomizeLinksDialog.xaml</DependentUpon>
+    <Compile Include="UI\LinksSettingsControl.xaml.cs">
+      <DependentUpon>LinksSettingsControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\CustomizeToolsDialog.xaml.cs">
-      <DependentUpon>CustomizeToolsDialog.xaml</DependentUpon>
+    <Compile Include="UI\ToolsSettingsControl.xaml.cs">
+      <DependentUpon>ToolsSettingsControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\CustomizeConsolesDialog.xaml.cs">
-      <DependentUpon>CustomizeConsolesDialog.xaml</DependentUpon>
+    <Compile Include="UI\ConsolesSettingsControl.xaml.cs">
+      <DependentUpon>ConsolesSettingsControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ProcessWorkspace\ProcessTab.cs" />
     <Compile Include="UI\ViewModels\InstallBranchDialogVM.cs" />
+    <Compile Include="UI\ViewModels\SettingsTabVM.cs" />
+    <Compile Include="UI\ViewModels\SettingsDialogVM.cs" />
     <Compile Include="UI\ViewModels\SettingsImportDialogVM.cs" />
     <Compile Include="UI\ViewModels\TabNameDialogVM.cs" />
     <Compile Include="Utility\DelegateConverter.cs" />
@@ -136,27 +141,35 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UI\SettingsDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI\SettingsImportDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SettingsStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\TabNameDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\CustomizeGrabConsolesDialog.xaml">
+    <Page Include="UI\GrabSettingsControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\CustomizeLinksDialog.xaml">
+    <Page Include="UI\LinksSettingsControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\CustomizeToolsDialog.xaml">
+    <Page Include="UI\ToolsSettingsControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\CustomizeConsolesDialog.xaml">
+    <Page Include="UI\ConsolesSettingsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

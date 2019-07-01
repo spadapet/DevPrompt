@@ -59,11 +59,7 @@
         <Menu x:Name="mainMenu" Grid.Row="0">
             <MenuItem Header="_File" SubmenuOpened="OnFileMenuOpened">
                 <Separator Tag="[End]" />
-                <MenuItem Header="_Customize..." Command="{Binding CustomizeConsolesCommand}" />
-                <MenuItem Header="_Settings">
-                    <MenuItem Header="_Import..." Command="{Binding SettingsImportCommand}" />
-                    <MenuItem Header="_Export..." Command="{Binding SettingsExportCommand}" />
-                </MenuItem>
+                <MenuItem Header="_Settings..." Command="{Binding SettingsCommand}" />
                 <Separator />
                 <Separator Tag="[Plugins]" />
                 <MenuItem Header="E_xit" InputGestureText="Alt+F4" Command="{Binding ExitCommand}" />
