@@ -12,6 +12,12 @@
         <FileAlignment>512</FileAlignment>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(DevPromptPfxFile)' != '' And Exists('$(DevPromptPfxFile)')">
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>$(DevPromptPfxFile)</AssemblyOriginatorKeyFile>
+        <DelaySign Condition=" '$(Configuration)' != 'Release' ">true</DelaySign>
+    </PropertyGroup>
+
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
         <DebugSymbols>true</DebugSymbols>
         <DebugType>full</DebugType>
