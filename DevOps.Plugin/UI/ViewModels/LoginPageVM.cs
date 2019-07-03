@@ -155,7 +155,7 @@ namespace DevOps.UI.ViewModels
             ProjectHttpClient projectClient = await connection.GetClientAsync<ProjectHttpClient>(this.cancellationTokenSource.Token);
             TeamProject project = await projectClient.GetProject(this.ProjectName);
 
-            HttpClient httpClient = new HttpClient(new HttpClientHandler());
+            HttpClient httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", this.AuthenticationBase64);
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("image/png"));
 

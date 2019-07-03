@@ -8,6 +8,11 @@ The installation does not run with administrator rights.
 Windows will warn you not to install it since the MSI file is unsigned.
 It’s perfectly safe though, just click the More Info link and install anyway.
 
+## Note for development
+To build and run you MUST either:
+* Run the registry file Build\publickey-verify.reg as admin to skip strong name verification for public key token 19bc3e3d1db2ab26. That public key is used to delay-sign DevPrompt during development.
+* Or set a user environment variable DevPromptNoSign=1. DevPrompt will have no public key, which is fine unless a plugin requires it.
+
 ## Features
 * Hosts cmd.exe and powershell.exe command prompts in multiple tabs
 * Quickly clone a command prompt

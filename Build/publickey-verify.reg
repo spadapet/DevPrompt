@@ -1,0 +1,4 @@
+﻿Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\Software\Microsoft\StrongName\Verification\*,19bc3e3d1db2ab26]
+[HKEY_LOCAL_MACHINE\Software\WOW6432Node\Microsoft\StrongName\Verification\*,19bc3e3d1db2ab26]

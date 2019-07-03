@@ -92,6 +92,8 @@
             <Separator Tag="[Plugins]" Visibility="Collapsed" />
             <MenuItem Header="_Help" SubmenuOpened="OnHelpMenuOpened">
                 <Separator Tag="[Plugins]" />
+                <MenuItem Header="_Report an issue" Command="{Binding ReportAnIssueCommand}" />
+                <MenuItem Header="_Check for updates" Command="{Binding CheckForUpdatesCommand}" />
                 <MenuItem Header="_About" Command="{Binding AboutCommand}" />
             </MenuItem>
         </Menu>

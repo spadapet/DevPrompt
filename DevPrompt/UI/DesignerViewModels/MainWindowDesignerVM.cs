@@ -36,6 +36,9 @@ namespace DevPrompt.UI.DesignerViewModels
         public ICommand CustomizeConsoleGrabCommand => null;
         public ICommand CustomizeToolsCommand => null;
         public ICommand CustomizeLinksCommand => null;
+        // Help menu
+        public ICommand ReportAnIssueCommand => null;
+        public ICommand CheckForUpdatesCommand => null;
         public ICommand AboutCommand => null;
 
         public AppSettings AppSettings => null;

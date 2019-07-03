@@ -12,10 +12,15 @@
         <FileAlignment>512</FileAlignment>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(DevPromptPfxFile)' != '' And Exists('$(DevPromptPfxFile)')">
+    <PropertyGroup Condition=" '$(DevPromptNoSign)' == '' ">
+        <DelaySign>true</DelaySign>
         <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>$(DevRoot)Build\publickey.snk</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(DevPromptNoSign)' == '' And '$(DevPromptPfxFile)' != '' And Exists('$(DevPromptPfxFile)') ">
+        <DelaySign>false</DelaySign>
         <AssemblyOriginatorKeyFile>$(DevPromptPfxFile)</AssemblyOriginatorKeyFile>
-        <DelaySign Condition=" '$(Configuration)' != 'Release' ">true</DelaySign>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">

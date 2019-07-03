@@ -515,6 +515,11 @@ namespace DevPrompt.Settings
                     RunAtStartup = true
                 });
             }
+
+            if (this.ObservablePluginDirectories.Count == 0)
+            {
+                this.ObservablePluginDirectories.Add(new PluginDirectorySettings());
+            }
         }
     }
 }

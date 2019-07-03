@@ -1,0 +1,48 @@
+﻿<Window x:Class="DevPrompt.UI.CheckForUpdatesDialog"
+        x:ClassModifier="internal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="DevPrompt" Width="375" Height="225"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        WindowStyle="SingleBorderWindow"
+        Loaded="OnLoaded"
+        Unloaded="OnUnloaded"
+        Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <StackPanel Margin="10" HorizontalAlignment="Left">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0"><Run Text="Current version: "/></TextBlock>
+                <TextBlock Grid.Row="0" Grid.Column="1"><Bold><Run Text="{Binding AppVersion, Mode=OneTime}" /></Bold></TextBlock>
+                <TextBlock Grid.Row="1" Grid.Column="0"><Run Text="Latest version: "/></TextBlock>
+                <TextBlock Grid.Row="1" Grid.Column="1"><Bold><Run Text="{Binding LatestVersion, Mode=OneWay}" /></Bold></TextBlock>
+            </Grid>
+            <TextBlock Margin="0,20,0,0">Download the latest version from here:</TextBlock>
+            <RichTextBox Margin="-5,0,0,0" IsReadOnly="True" BorderThickness="0" IsDocumentEnabled="True" Background="Transparent">
+                <FlowDocument PagePadding="0">
+                    <Paragraph>
+                        <Hyperlink NavigateUri="https://github.com/spadapet/DevPrompt/blob/master/README.md" RequestNavigate="OnHyperlink">https://github.com/spadapet/DevPrompt</Hyperlink>
+                    </Paragraph>
+                </FlowDocument>
+            </RichTextBox>
+        </StackPanel>
+        <Button Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right" Margin="0,0,10,10" Padding="15,2" IsCancel="True" IsDefault="True">Close</Button>
+    </Grid>
+</Window>

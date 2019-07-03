@@ -15,13 +15,7 @@ namespace DevPrompt.UI
             this.InitializeComponent();
         }
 
-        public string AppVersion
-        {
-            get
-            {
-                return Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            }
-        }
+        public string AppVersion => Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
         public string CopyrightYear
         {
