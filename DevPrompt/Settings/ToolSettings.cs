@@ -37,24 +37,14 @@ namespace DevPrompt.Settings
         [DataMember]
         public string Name
         {
-            get
-            {
-                return this.name;
-            }
-
-            set
-            {
-                this.SetPropertyValue(ref this.name, value ?? string.Empty);
-            }
+            get => this.name;
+            set => this.SetPropertyValue(ref this.name, value ?? string.Empty);
         }
 
         [DataMember]
         public string Command
         {
-            get
-            {
-                return this.command;
-            }
+            get => this.command;
 
             set
             {
@@ -68,10 +58,7 @@ namespace DevPrompt.Settings
         [DataMember]
         public string Arguments
         {
-            get
-            {
-                return this.arguments;
-            }
+            get => this.arguments;
 
             set
             {
@@ -82,20 +69,7 @@ namespace DevPrompt.Settings
             }
         }
 
-        public string ExpandedCommand
-        {
-            get
-            {
-                return Environment.ExpandEnvironmentVariables(this.Command);
-            }
-        }
-
-        public string ExpandedArguments
-        {
-            get
-            {
-                return Environment.ExpandEnvironmentVariables(this.Arguments);
-            }
-        }
+        public string ExpandedCommand => Environment.ExpandEnvironmentVariables(this.Command);
+        public string ExpandedArguments => Environment.ExpandEnvironmentVariables(this.Arguments);
     }
 }

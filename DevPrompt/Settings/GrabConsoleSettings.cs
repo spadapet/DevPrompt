@@ -38,10 +38,7 @@ namespace DevPrompt.Settings
         [DataMember]
         public string ExeName
         {
-            get
-            {
-                return this.exeName;
-            }
+            get => this.exeName;
 
             set
             {
@@ -55,38 +52,18 @@ namespace DevPrompt.Settings
         [DataMember]
         public string TabName
         {
-            get
-            {
-                return this.tabName;
-            }
-
-            set
-            {
-                this.SetPropertyValue(ref this.tabName, value ?? string.Empty);
-            }
+            get => this.tabName;
+            set => this.SetPropertyValue(ref this.tabName, value ?? string.Empty);
         }
 
         [DataMember]
         public bool TabActivate
         {
-            get
-            {
-                return this.tabActivate;
-            }
-
-            set
-            {
-                this.SetPropertyValue(ref this.tabActivate, value);
-            }
+            get => this.tabActivate;
+            set => this.SetPropertyValue(ref this.tabActivate, value);
         }
 
-        public string ExpandedExeName
-        {
-            get
-            {
-                return Environment.ExpandEnvironmentVariables(this.ExeName);
-            }
-        }
+        public string ExpandedExeName => Environment.ExpandEnvironmentVariables(this.ExeName);
 
         public bool CanGrab(string exePath)
         {

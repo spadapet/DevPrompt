@@ -9,15 +9,20 @@ namespace DevPrompt.UI
     internal partial class GrabSettingsControl : UserControl
     {
         public SettingsDialogVM ViewModel { get; }
-        public Api.DelegateCommand MoveUpCommand => CommandHelpers.CreateMoveUpCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableGrabConsoles);
-        public Api.DelegateCommand MoveDownCommand => CommandHelpers.CreateMoveDownCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableGrabConsoles);
-        public Api.DelegateCommand DeleteCommand => CommandHelpers.CreateDeleteCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableGrabConsoles);
-        public Api.DelegateCommand ResetCommand => CommandHelpers.CreateResetCommand((s) => s.GrabConsoles, this.ViewModel.Settings.ObservableGrabConsoles, AppSettings.DefaultSettingsFilter.Grabs);
+        public Api.DelegateCommand MoveUpCommand { get; }
+        public Api.DelegateCommand MoveDownCommand { get; }
+        public Api.DelegateCommand DeleteCommand { get; }
+        public Api.DelegateCommand ResetCommand { get; }
 
         public GrabSettingsControl(SettingsDialogVM viewModel)
         {
             this.ViewModel = viewModel;
             this.ViewModel.Settings.ObservableGrabConsoles.CollectionChanged += this.OnSettingsChanged;
+
+            this.MoveUpCommand = CommandHelpers.CreateMoveUpCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableGrabConsoles);
+            this.MoveDownCommand = CommandHelpers.CreateMoveDownCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableGrabConsoles);
+            this.DeleteCommand = CommandHelpers.CreateDeleteCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableGrabConsoles);
+            this.ResetCommand = CommandHelpers.CreateResetCommand((s) => s.GrabConsoles, this.ViewModel.Settings.ObservableGrabConsoles, AppSettings.DefaultSettingsFilter.Grabs);
 
             this.InitializeComponent();
         }

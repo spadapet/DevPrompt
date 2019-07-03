@@ -73,6 +73,7 @@
     <Compile Include="ProcessWorkspace\ProcessWorkspaceProvider.cs" />
     <Compile Include="ProcessWorkspace\ProcessWorkspace.cs" />
     <Compile Include="ProcessWorkspace\ProcessListener.cs" />
+    <Compile Include="Settings\PluginDirectorySettings.cs" />
     <Compile Include="Settings\WorkspaceSnapshot.cs" />
     <Compile Include="Settings\AppSnapshot.cs" />
     <Compile Include="Settings\GrabConsoleSettings.cs" />
@@ -106,6 +107,9 @@
     </Compile>
     <Compile Include="UI\LinksSettingsControl.xaml.cs">
       <DependentUpon>LinksSettingsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\PluginDirsSettingsControl.xaml.cs">
+      <DependentUpon>PluginDirsSettingsControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\ToolsSettingsControl.xaml.cs">
       <DependentUpon>ToolsSettingsControl.xaml</DependentUpon>
@@ -162,6 +166,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\LinksSettingsControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\PluginDirsSettingsControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

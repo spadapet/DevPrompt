@@ -10,6 +10,7 @@ namespace DevPrompt.UI.ViewModels
         Grab,
         Tools,
         Links,
+        PluginDirs,
 
         Default = Consoles
     }
@@ -29,7 +30,33 @@ namespace DevPrompt.UI.ViewModels
             this.viewModel = viewModel;
         }
 
-        public string Name => Enum.GetName(typeof(SettingsTabType), this.TabType);
+        public string Name
+        {
+            get
+            {
+                switch (this.TabType)
+                {
+                    case SettingsTabType.Consoles:
+                        return "Consoles";
+
+                    case SettingsTabType.Grab:
+                        return "Grab";
+
+                    case SettingsTabType.Links:
+                        return "Links";
+
+                    case SettingsTabType.Tools:
+                        return "Tools";
+
+                    case SettingsTabType.PluginDirs:
+                        return "Plugins";
+
+                    default:
+                        Debug.Fail($"Missing name for tab: {this.TabType}");
+                        return "<?>";
+                }
+            }
+        }
 
         public UIElement ViewElement
         {
@@ -55,8 +82,12 @@ namespace DevPrompt.UI.ViewModels
                             this.viewElement = new ToolsSettingsControl(this.viewModel);
                             break;
 
+                        case SettingsTabType.PluginDirs:
+                            this.viewElement = new PluginDirsSettingsControl(this.viewModel);
+                            break;
+
                         default:
-                            Debug.Fail($"Missing UI for tab: {this.Name}");
+                            Debug.Fail($"Missing UI for tab: {this.TabType}");
                             break;
                     }
                 }

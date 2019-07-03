@@ -20,6 +20,7 @@ namespace DevPrompt.UI
         public App App { get; }
 
         private bool systemShuttingDown;
+        private bool restartOnClose;
 
         public MainWindow(App app, string initialErrorText)
         {
@@ -319,14 +320,14 @@ namespace DevPrompt.UI
 
         private void OnClosed(object sender, EventArgs args)
         {
-            this.App.OnWindowClosed(this);
+            this.App.OnWindowClosed(this, this.restartOnClose);
         }
 
         private Task OnClosing()
         {
             this.App.OnWindowClosing(this);
 
-            AppSnapshot snapshot = new AppSnapshot(this.ViewModel);
+            AppSnapshot snapshot = new AppSnapshot(this.ViewModel, force: this.restartOnClose);
             return snapshot.Save(this.App);
         }
 
@@ -348,6 +349,12 @@ namespace DevPrompt.UI
                 this.systemShuttingDown = true;
                 this.OnClosing().Wait();
             }
+        }
+
+        public void CloseAndRestart()
+        {
+            this.restartOnClose = true;
+            this.Close();
         }
 
         private void OnKeyEvent(object sender, KeyEventArgs args)

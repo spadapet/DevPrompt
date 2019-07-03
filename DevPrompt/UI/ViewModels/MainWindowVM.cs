@@ -1,6 +1,5 @@
 ﻿using DevPrompt.Settings;
 using DevPrompt.Utility;
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -117,7 +116,17 @@ namespace DevPrompt.UI.ViewModels
 
             if (dialog.ShowDialog() == true)
             {
+                bool pluginsChanged = this.AppSettings.PluginsChanged(dialog.ViewModel.Settings);
                 this.AppSettings.CopyFrom(dialog.ViewModel.Settings);
+
+                if (pluginsChanged && MessageBox.Show(
+                    this.Window,
+                    "Plugins have changed, would you like to restart the app now?",
+                    "DevPrompt",
+                    MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    this.Window.CloseAndRestart();
+                }
             }
         }
 

@@ -133,8 +133,13 @@ namespace DevPrompt
             }
         }
 
-        public void OnWindowClosed(MainWindow window)
+        public void OnWindowClosed(MainWindow window, bool restart)
         {
+            if (this.state == State.Run && restart)
+            {
+                this.state = State.Restart;
+            }
+
             this.CheckShutdown(windowClosed: true);
         }
 

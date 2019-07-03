@@ -33,29 +33,15 @@ namespace DevPrompt.Settings
         [DataMember]
         public string Name
         {
-            get
-            {
-                return this.name;
-            }
-
-            set
-            {
-                this.SetPropertyValue(ref this.name, value ?? string.Empty);
-            }
+            get => this.name;
+            set => this.SetPropertyValue(ref this.name, value ?? string.Empty);
         }
 
         [DataMember]
         public string Address
         {
-            get
-            {
-                return this.address;
-            }
-
-            set
-            {
-                this.SetPropertyValue(ref this.address, value ?? string.Empty);
-            }
+            get => this.address;
+            set => this.SetPropertyValue(ref this.address, value ?? string.Empty);
         }
     }
 }

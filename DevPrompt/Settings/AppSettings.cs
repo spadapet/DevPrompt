@@ -1,5 +1,6 @@
 ﻿using DevPrompt.Utility;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -17,10 +18,12 @@ namespace DevPrompt.Settings
     [DataContract]
     internal class AppSettings : Api.PropertyNotifier, Api.IAppSettings
     {
-        private ObservableCollection<ConsoleSettings> consoles;
-        private ObservableCollection<GrabConsoleSettings> grabConsoles;
-        private ObservableCollection<LinkSettings> links;
-        private ObservableCollection<ToolSettings> tools;
+        public ObservableCollection<ConsoleSettings> ObservableConsoles { get; private set; }
+        public ObservableCollection<GrabConsoleSettings> ObservableGrabConsoles { get; private set; }
+        public ObservableCollection<LinkSettings> ObservableLinks { get; private set; }
+        public ObservableCollection<ToolSettings> ObservableTools { get; private set; }
+        public ObservableCollection<PluginDirectorySettings> ObservablePluginDirectories { get; private set; }
+
         private Dictionary<string, object> customProperties;
         private bool consoleGrabEnabled;
         private bool saveTabsOnExit;
@@ -47,30 +50,36 @@ namespace DevPrompt.Settings
             this.ConsoleGrabEnabled = copyFrom.ConsoleGrabEnabled;
             this.SaveTabsOnExit = copyFrom.SaveTabsOnExit;
 
-            this.consoles.Clear();
-            this.grabConsoles.Clear();
-            this.links.Clear();
-            this.tools.Clear();
+            this.ObservableConsoles.Clear();
+            this.ObservableGrabConsoles.Clear();
+            this.ObservableLinks.Clear();
+            this.ObservableTools.Clear();
+            this.ObservablePluginDirectories.Clear();
             this.customProperties.Clear();
 
             foreach (ConsoleSettings console in copyFrom.Consoles)
             {
-                this.consoles.Add(console.Clone());
+                this.ObservableConsoles.Add(console.Clone());
             }
 
             foreach (GrabConsoleSettings console in copyFrom.GrabConsoles)
             {
-                this.grabConsoles.Add(console.Clone());
+                this.ObservableGrabConsoles.Add(console.Clone());
             }
 
             foreach (LinkSettings link in copyFrom.Links)
             {
-                this.links.Add(link.Clone());
+                this.ObservableLinks.Add(link.Clone());
             }
 
             foreach (ToolSettings tool in copyFrom.Tools)
             {
-                this.tools.Add(tool.Clone());
+                this.ObservableTools.Add(tool.Clone());
+            }
+
+            foreach (PluginDirectorySettings pluginDir in copyFrom.ObservablePluginDirectories)
+            {
+                this.ObservablePluginDirectories.Add(pluginDir.Clone());
             }
 
             foreach (KeyValuePair<string, object> pair in copyFrom.CustomProperties)
@@ -93,13 +102,7 @@ namespace DevPrompt.Settings
             }
         }
 
-        public static string DefaultPath
-        {
-            get
-            {
-                return Path.Combine(AppSettings.AppDataPath, "Settings.xml");
-            }
-        }
+        public static string DefaultPath => Path.Combine(AppSettings.AppDataPath, "Settings.xml");
 
         [Flags]
         public enum DefaultSettingsFilter
@@ -110,6 +113,7 @@ namespace DevPrompt.Settings
             Grabs = 0x04,
             Links = 0x08,
             Tools = 0x10,
+            PluginDirs = 0x20,
             All = 0xFF,
         }
 
@@ -143,9 +147,14 @@ namespace DevPrompt.Settings
                 settings.AddDefaultTools();
             }
 
-            if (settings.consoles.Count > 0 && !settings.consoles.Any(c => c.RunAtStartup))
+            if ((filter & DefaultSettingsFilter.PluginDirs) != 0)
             {
-                settings.consoles[0].RunAtStartup = true;
+                settings.AddDefaultPluginDirs();
+            }
+
+            if (settings.ObservableConsoles.Count > 0 && !settings.ObservableConsoles.Any(c => c.RunAtStartup))
+            {
+                settings.ObservableConsoles[0].RunAtStartup = true;
             }
 
             settings.EnsureValid();
@@ -193,7 +202,7 @@ namespace DevPrompt.Settings
                 if (File.Exists(file))
                 {
                     string name = instance.DisplayName.Split(' ')[0];
-                    this.consoles.Add(new ConsoleSettings()
+                    this.ObservableConsoles.Add(new ConsoleSettings()
                     {
                         MenuName = $"VS prompt {name}",
                         TabName = $"VS {name}",
@@ -205,14 +214,14 @@ namespace DevPrompt.Settings
 
         private void AddRawCommandPrompts()
         {
-            this.consoles.Add(new ConsoleSettings()
+            this.ObservableConsoles.Add(new ConsoleSettings()
             {
                 ConsoleType = ConsoleType.Cmd,
                 MenuName = "Raw cmd.exe",
                 TabName = "Cmd",
             });
 
-            this.consoles.Add(new ConsoleSettings()
+            this.ObservableConsoles.Add(new ConsoleSettings()
             {
                 ConsoleType = ConsoleType.PowerShell,
                 MenuName = "Raw powershell.exe",
@@ -265,6 +274,32 @@ namespace DevPrompt.Settings
                 Name = "Notepad",
                 Command = "%windir%\\notepad.exe",
             });
+        }
+
+        private void AddDefaultPluginDirs()
+        {
+            this.PluginDirectories.Add(new PluginDirectorySettings());
+
+            string exeName = Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().Location);
+
+            this.PluginDirectories.Add(new PluginDirectorySettings()
+            {
+                Directory = $@"%LocalAppData%\{exeName}.Plugins",
+                Recurse = true,
+            });
+        }
+
+        public bool PluginsChanged(AppSettings other)
+        {
+            HashSet<PluginDirectorySettings> mySet = this.PluginDirectories.ToHashSet();
+            HashSet<PluginDirectorySettings> otherSet = other.PluginDirectories.ToHashSet();
+
+            if (!mySet.SetEquals(otherSet))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public static async Task<AppSettings> UnsafeLoad(App app, string path)
@@ -354,61 +389,38 @@ namespace DevPrompt.Settings
             return task;
         }
 
+        [DataMember]
+        public IList<ConsoleSettings> Consoles => this.ObservableConsoles;
         IEnumerable<Api.IConsoleSettings> Api.IAppSettings.ConsoleSettings => this.Consoles;
 
-        public ObservableCollection<ConsoleSettings> ObservableConsoles => this.consoles;
-        public ObservableCollection<GrabConsoleSettings> ObservableGrabConsoles => this.grabConsoles;
-        public ObservableCollection<LinkSettings> ObservableLinks => this.links;
-        public ObservableCollection<ToolSettings> ObservableTools => this.tools;
+        [DataMember]
+        public IList<GrabConsoleSettings> GrabConsoles => this.ObservableGrabConsoles;
 
         [DataMember]
-        public IList<ConsoleSettings> Consoles => this.consoles;
+        public IList<LinkSettings> Links => this.ObservableLinks;
 
         [DataMember]
-        public IList<GrabConsoleSettings> GrabConsoles => this.grabConsoles;
+        public IList<ToolSettings> Tools => this.ObservableTools;
 
         [DataMember]
-        public IList<LinkSettings> Links => this.links;
-
-        [DataMember]
-        public IList<ToolSettings> Tools => this.tools;
+        public IList<PluginDirectorySettings> PluginDirectories => this.ObservablePluginDirectories;
 
         [DataMember]
         public bool ConsoleGrabEnabled
         {
-            get
-            {
-                return this.consoleGrabEnabled;
-            }
-
-            set
-            {
-                this.SetPropertyValue(ref this.consoleGrabEnabled, value);
-            }
+            get => this.consoleGrabEnabled;
+            set => this.SetPropertyValue(ref this.consoleGrabEnabled, value);
         }
 
         [DataMember]
         public bool SaveTabsOnExit
         {
-            get
-            {
-                return this.saveTabsOnExit;
-            }
-
-            set
-            {
-                this.SetPropertyValue(ref this.saveTabsOnExit, value);
-            }
+            get => this.saveTabsOnExit;
+            set => this.SetPropertyValue(ref this.saveTabsOnExit, value);
         }
 
         [DataMember]
-        public ICollection<KeyValuePair<string, object>> CustomProperties
-        {
-            get
-            {
-                return this.customProperties;
-            }
-        }
+        public ICollection<KeyValuePair<string, object>> CustomProperties => this.customProperties;
 
         public bool TryGetProperty<T>(string name, out T value)
         {
@@ -460,10 +472,11 @@ namespace DevPrompt.Settings
         [OnDeserializing]
         private void Initialize(StreamingContext context = default(StreamingContext))
         {
-            this.consoles = new ObservableCollection<ConsoleSettings>();
-            this.grabConsoles = new ObservableCollection<GrabConsoleSettings>();
-            this.links = new ObservableCollection<LinkSettings>();
-            this.tools = new ObservableCollection<ToolSettings>();
+            this.ObservableConsoles = new ObservableCollection<ConsoleSettings>();
+            this.ObservableGrabConsoles = new ObservableCollection<GrabConsoleSettings>();
+            this.ObservableLinks = new ObservableCollection<LinkSettings>();
+            this.ObservableTools = new ObservableCollection<ToolSettings>();
+            this.ObservablePluginDirectories = new ObservableCollection<PluginDirectorySettings>();
             this.customProperties = new Dictionary<string, object>();
             this.saveTabsOnExit = true;
         }
@@ -488,15 +501,16 @@ namespace DevPrompt.Settings
                 yield return typeof(GrabConsoleSettings);
                 yield return typeof(LinkSettings);
                 yield return typeof(ToolSettings);
+                yield return typeof(PluginDirectorySettings);
             }
         }
 
         public void EnsureValid()
         {
-            if (this.consoles.Count == 0)
+            if (this.ObservableConsoles.Count == 0)
             {
                 // Have to have at least one console that can be created
-                this.consoles.Add(new ConsoleSettings()
+                this.ObservableConsoles.Add(new ConsoleSettings()
                 {
                     RunAtStartup = true
                 });

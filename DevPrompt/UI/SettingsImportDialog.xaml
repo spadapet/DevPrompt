@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Import Settings"
         Width="350"
-        Height="260"
+        Height="280"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         ShowInTaskbar="False"
@@ -33,6 +33,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.Resources>
                 <Style TargetType="TextBlock">
@@ -47,10 +48,12 @@
             <TextBlock Grid.Row="3" Grid.Column="1">Grab:</TextBlock>
             <TextBlock Grid.Row="4" Grid.Column="1">Links:</TextBlock>
             <TextBlock Grid.Row="5" Grid.Column="1">Tools:</TextBlock>
+            <TextBlock Grid.Row="6" Grid.Column="1">Plugins:</TextBlock>
             <ComboBox Grid.Row="2" Grid.Column="2" ItemsSource="{Binding ImportChoices}" SelectedIndex="{Binding ConsolesIndex}" />
             <ComboBox Grid.Row="3" Grid.Column="2" ItemsSource="{Binding ImportChoices}" SelectedIndex="{Binding GrabIndex}" />
             <ComboBox Grid.Row="4" Grid.Column="2" ItemsSource="{Binding ImportChoices}" SelectedIndex="{Binding LinksIndex}" />
             <ComboBox Grid.Row="5" Grid.Column="2" ItemsSource="{Binding ImportChoices}" SelectedIndex="{Binding ToolsIndex}" />
+            <ComboBox Grid.Row="6" Grid.Column="2" ItemsSource="{Binding ImportChoices}" SelectedIndex="{Binding PluginsIndex}" />
         </Grid>
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,5,15,15" HorizontalAlignment="Right">
             <Button Content="OK" IsDefault="true" MinWidth="70" Click="OnClickOk" />

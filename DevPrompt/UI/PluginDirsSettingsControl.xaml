@@ -1,0 +1,41 @@
+﻿<UserControl
+    x:Class="DevPrompt.UI.PluginDirsSettingsControl"
+    x:ClassModifier="internal"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    MinWidth="350" MinHeight="200" d:DesignWidth="400" d:DesignHeight="200"
+    DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+    <UserControl.Resources>
+        <ResourceDictionary Source="SettingsStyles.xaml" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock TextWrapping="Wrap" Padding="5,10" Text="If you change the plugin directories, they will only be reloaded after restarting the app."/>
+        <DataGrid Grid.Row="1" x:Name="dataGrid" ItemsSource="{Binding ViewModel.Settings.PluginDirectories}" SelectionChanged="OnSelectionChanged" BorderThickness="0,0,0,1">
+            <DataGrid.Columns>
+                <DataGridCheckBoxColumn Header="Enabled" Width="1*" Binding="{Binding Enabled}" />
+                <DataGridTextColumn Header="Directory" Width="3*" Binding="{Binding Directory}">
+                    <DataGridTextColumn.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="ToolTip" Value="{Binding ExpandedDirectory}" />
+                        </Style>
+                    </DataGridTextColumn.CellStyle>
+                </DataGridTextColumn>
+                <DataGridCheckBoxColumn Header="Include subdirectories" Width="2*" Binding="{Binding Recurse}" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10">
+            <Button Padding="5,0" Margin="5,0,0,0" Content="Up" Command="{Binding MoveUpCommand}" />
+            <Button Padding="5,0" Margin="5,0,0,0" Content="Down" Command="{Binding MoveDownCommand}" />
+            <Button Padding="5,0" Margin="5,0,0,0" Content="Delete" Command="{Binding DeleteCommand}" />
+            <Button Padding="5,0" Margin="5,0,0,0" Content="Reset" Command="{Binding ResetCommand}" />
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -41,7 +41,7 @@ namespace DevPrompt.Plugins
 
                     CompositionHost host = new ContainerConfiguration()
                         .WithDefaultConventions(conventions)
-                        .WithAssemblies(PluginUtility.GetPluginAssemblies(localAssemblies), conventions)
+                        .WithAssemblies(PluginUtility.GetPluginAssemblies(app, localAssemblies), conventions)
                         .WithProvider(new ExportProvider(app))
                         .CreateContainer();
 
@@ -65,21 +65,17 @@ namespace DevPrompt.Plugins
             return compositionHost;
         }
 
-        private static IEnumerable<Assembly> GetPluginAssemblies(ICollection<Assembly> appAssemblies)
+        private static IEnumerable<Assembly> GetPluginAssemblies(App app, ICollection<Assembly> appAssemblies)
         {
             Assembly thisAssembly = Assembly.GetExecutingAssembly();
-            List<Assembly> assemblies = new List<Assembly>();
-            assemblies.Add(thisAssembly);
+            List<Assembly> assemblies = new List<Assembly> { thisAssembly };
 
-            string[] paths = new string[]
-                {
-                    Path.GetDirectoryName(thisAssembly.Location),
-                    AppSettings.AppDataPath + ".Plugins"
-                };
-
-            foreach (string path in paths)
+            foreach (PluginDirectorySettings pluginDir in app.Settings.PluginDirectories)
             {
-                assemblies.AddRange(PluginUtility.GetPluginAssemblies(path));
+                if (pluginDir.Enabled)
+                {
+                    assemblies.AddRange(PluginUtility.GetPluginAssemblies(pluginDir.ExpandedDirectory, pluginDir.Recurse));
+                }
             }
 
             foreach (Assembly assembly in assemblies.Distinct())
@@ -89,7 +85,7 @@ namespace DevPrompt.Plugins
             }
         }
 
-        private static IEnumerable<Assembly> GetPluginAssemblies(string path)
+        private static IEnumerable<Assembly> GetPluginAssemblies(string path, bool recursive)
         {
             List<Assembly> assemblies = new List<Assembly>();
             IEnumerable<string> files = Enumerable.Empty<string>();
@@ -98,7 +94,7 @@ namespace DevPrompt.Plugins
             {
                 if (Directory.Exists(path))
                 {
-                    files = Directory.EnumerateFiles(path, "*" + PluginUtility.DllSuffix, SearchOption.AllDirectories).ToArray();
+                    files = Directory.EnumerateFiles(path, "*" + PluginUtility.DllSuffix, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).ToArray();
                 }
             }
             catch

@@ -41,29 +41,15 @@ namespace DevPrompt.Settings
         [DataMember]
         public Guid Id
         {
-            get
-            {
-                return this.id;
-            }
-
-            set
-            {
-                this.SetPropertyValue(ref this.id, value);
-            }
+            get => this.id;
+            set => this.SetPropertyValue(ref this.id, value);
         }
 
         [DataMember]
         public Api.IWorkspaceSnapshot Snapshot
         {
-            get
-            {
-                return this.snapshot;
-            }
-
-            set
-            {
-                this.SetPropertyValue(ref this.snapshot, value);
-            }
+            get => this.snapshot;
+            set => this.SetPropertyValue(ref this.snapshot, value);
         }
 
         [OnDeserializing]

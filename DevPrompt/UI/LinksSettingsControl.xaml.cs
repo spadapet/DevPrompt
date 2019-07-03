@@ -9,15 +9,20 @@ namespace DevPrompt.UI
     internal partial class LinksSettingsControl : UserControl
     {
         public SettingsDialogVM ViewModel { get; }
-        public Api.DelegateCommand MoveUpCommand => CommandHelpers.CreateMoveUpCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableLinks);
-        public Api.DelegateCommand MoveDownCommand => CommandHelpers.CreateMoveDownCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableLinks);
-        public Api.DelegateCommand DeleteCommand => CommandHelpers.CreateDeleteCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableLinks);
-        public Api.DelegateCommand ResetCommand => CommandHelpers.CreateResetCommand((s) => s.Links, this.ViewModel.Settings.ObservableLinks, AppSettings.DefaultSettingsFilter.Links);
+        public Api.DelegateCommand MoveUpCommand { get; }
+        public Api.DelegateCommand MoveDownCommand { get; }
+        public Api.DelegateCommand DeleteCommand { get; }
+        public Api.DelegateCommand ResetCommand { get; }
 
         public LinksSettingsControl(SettingsDialogVM viewModel)
         {
             this.ViewModel = viewModel;
             this.ViewModel.Settings.ObservableLinks.CollectionChanged += this.OnSettingsChanged;
+
+            this.MoveUpCommand = CommandHelpers.CreateMoveUpCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableLinks);
+            this.MoveDownCommand = CommandHelpers.CreateMoveDownCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableLinks);
+            this.DeleteCommand = CommandHelpers.CreateDeleteCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableLinks);
+            this.ResetCommand = CommandHelpers.CreateResetCommand((s) => s.Links, this.ViewModel.Settings.ObservableLinks, AppSettings.DefaultSettingsFilter.Links);
 
             this.InitializeComponent();
         }

@@ -14,6 +14,7 @@ namespace DevPrompt.UI.ViewModels
         private int grabIndex;
         private int linksIndex;
         private int toolsIndex;
+        private int pluginsIndex;
         public IList<string> ImportChoices { get; }
 
         public SettingsImportDialogVM(AppSettings settings)
@@ -27,60 +28,36 @@ namespace DevPrompt.UI.ViewModels
                 };
         }
 
+        private int FilterIndex(int index) => Math.Min(this.ImportChoices.Count - 1, Math.Max(0, index));
+
         public int ConsolesIndex
         {
-            get
-            {
-                return this.consolesIndex;
-            }
-
-            set
-            {
-                int newValue = Math.Min(this.ImportChoices.Count - 1, Math.Max(0, value));
-                this.SetPropertyValue(ref this.consolesIndex, newValue);
-            }
+            get => this.consolesIndex;
+            set => this.SetPropertyValue(ref this.consolesIndex, this.FilterIndex(value));
         }
 
         public int GrabIndex
         {
-            get
-            {
-                return this.grabIndex;
-            }
-
-            set
-            {
-                int newValue = Math.Min(this.ImportChoices.Count - 1, Math.Max(0, value));
-                this.SetPropertyValue(ref this.grabIndex, newValue);
-            }
+            get => this.grabIndex;
+            set => this.SetPropertyValue(ref this.grabIndex, this.FilterIndex(value));
         }
 
         public int LinksIndex
         {
-            get
-            {
-                return this.linksIndex;
-            }
-
-            set
-            {
-                int newValue = Math.Min(this.ImportChoices.Count - 1, Math.Max(0, value));
-                this.SetPropertyValue(ref this.linksIndex, newValue);
-            }
+            get => this.linksIndex;
+            set => this.SetPropertyValue(ref this.linksIndex, this.FilterIndex(value));
         }
 
         public int ToolsIndex
         {
-            get
-            {
-                return this.toolsIndex;
-            }
+            get => this.toolsIndex;
+            set => this.SetPropertyValue(ref this.toolsIndex, this.FilterIndex(value));
+        }
 
-            set
-            {
-                int newValue = Math.Min(this.ImportChoices.Count - 1, Math.Max(0, value));
-                this.SetPropertyValue(ref this.toolsIndex, newValue);
-            }
+        public int PluginsIndex
+        {
+            get => this.pluginsIndex;
+            set => this.SetPropertyValue(ref this.pluginsIndex, this.FilterIndex(value));
         }
 
         public void Import(AppSettings targetSettings)
@@ -94,7 +71,7 @@ namespace DevPrompt.UI.ViewModels
             {
                 foreach (ConsoleSettings setting in this.settings.Consoles)
                 {
-                    targetSettings.Consoles.Add(setting);
+                    targetSettings.Consoles.Add(setting.Clone());
                 }
             }
 
@@ -107,7 +84,7 @@ namespace DevPrompt.UI.ViewModels
             {
                 foreach (GrabConsoleSettings setting in this.settings.GrabConsoles)
                 {
-                    targetSettings.GrabConsoles.Add(setting);
+                    targetSettings.GrabConsoles.Add(setting.Clone());
                 }
             }
 
@@ -120,7 +97,7 @@ namespace DevPrompt.UI.ViewModels
             {
                 foreach (LinkSettings setting in this.settings.Links)
                 {
-                    targetSettings.Links.Add(setting);
+                    targetSettings.Links.Add(setting.Clone());
                 }
             }
 
@@ -133,7 +110,20 @@ namespace DevPrompt.UI.ViewModels
             {
                 foreach (ToolSettings setting in this.settings.Tools)
                 {
-                    targetSettings.Tools.Add(setting);
+                    targetSettings.Tools.Add(setting.Clone());
+                }
+            }
+
+            if (this.PluginsIndex == 0)
+            {
+                targetSettings.PluginDirectories.Clear();
+            }
+
+            if (this.PluginsIndex != 2)
+            {
+                foreach (PluginDirectorySettings setting in this.settings.PluginDirectories)
+                {
+                    targetSettings.PluginDirectories.Add(setting.Clone());
                 }
             }
 

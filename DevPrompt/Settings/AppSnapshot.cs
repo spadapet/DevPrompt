@@ -90,26 +90,13 @@ namespace DevPrompt.Settings
         }
 
         [DataMember]
-        public IList<WorkspaceSnapshot> Workspaces
-        {
-            get
-            {
-                return this.workspaces;
-            }
-        }
+        public IList<WorkspaceSnapshot> Workspaces => this.workspaces;
 
         [DataMember]
         public Guid ActiveWorkspaceId
         {
-            get
-            {
-                return this.activeWorkspaceId;
-            }
-
-            set
-            {
-                this.SetPropertyValue(ref this.activeWorkspaceId, value);
-            }
+            get => this.activeWorkspaceId;
+            set => this.SetPropertyValue(ref this.activeWorkspaceId, value);
         }
 
         [OnDeserializing]
@@ -138,13 +125,7 @@ namespace DevPrompt.Settings
             }
         }
 
-        public static string DefaultPath
-        {
-            get
-            {
-                return Path.Combine(AppSettings.AppDataPath, "Snapshot.xml");
-            }
-        }
+        public static string DefaultPath => Path.Combine(AppSettings.AppDataPath, "Snapshot.xml");
 
         public static async Task<AppSnapshot> Load(App app, string path)
         {

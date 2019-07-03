@@ -6,7 +6,7 @@ using System.Windows.Controls;
 
 namespace DevPrompt.UI
 {
-    internal partial class ToolsSettingsControl : UserControl
+    internal partial class PluginDirsSettingsControl : UserControl
     {
         public SettingsDialogVM ViewModel { get; }
         public Api.DelegateCommand MoveUpCommand { get; }
@@ -14,15 +14,15 @@ namespace DevPrompt.UI
         public Api.DelegateCommand DeleteCommand { get; }
         public Api.DelegateCommand ResetCommand { get; }
 
-        public ToolsSettingsControl(SettingsDialogVM viewModel)
+        public PluginDirsSettingsControl(SettingsDialogVM viewModel)
         {
             this.ViewModel = viewModel;
-            this.ViewModel.Settings.ObservableTools.CollectionChanged += this.OnSettingsChanged;
+            this.ViewModel.Settings.ObservablePluginDirectories.CollectionChanged += this.OnSettingsChanged;
 
-            this.MoveUpCommand = CommandHelpers.CreateMoveUpCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableTools);
-            this.MoveDownCommand = CommandHelpers.CreateMoveDownCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableTools);
-            this.DeleteCommand = CommandHelpers.CreateDeleteCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableTools);
-            this.ResetCommand = CommandHelpers.CreateResetCommand((s) => s.Tools, this.ViewModel.Settings.ObservableTools, AppSettings.DefaultSettingsFilter.Tools);
+            this.MoveUpCommand = CommandHelpers.CreateMoveUpCommand(() => this.dataGrid, this.ViewModel.Settings.ObservablePluginDirectories);
+            this.MoveDownCommand = CommandHelpers.CreateMoveDownCommand(() => this.dataGrid, this.ViewModel.Settings.ObservablePluginDirectories);
+            this.DeleteCommand = CommandHelpers.CreateDeleteCommand(() => this.dataGrid, this.ViewModel.Settings.ObservablePluginDirectories);
+            this.ResetCommand = CommandHelpers.CreateResetCommand((s) => s.PluginDirectories, this.ViewModel.Settings.ObservablePluginDirectories, AppSettings.DefaultSettingsFilter.PluginDirs);
 
             this.InitializeComponent();
         }

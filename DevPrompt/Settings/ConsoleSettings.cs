@@ -53,38 +53,21 @@ namespace DevPrompt.Settings
         [DataMember]
         public string MenuName
         {
-            get
-            {
-                return this.menuName;
-            }
-
-            set
-            {
-                this.SetPropertyValue(ref this.menuName, value ?? string.Empty);
-            }
+            get => this.menuName;
+            set => this.SetPropertyValue(ref this.menuName, value ?? string.Empty);
         }
 
         [DataMember]
         public string TabName
         {
-            get
-            {
-                return this.tabName;
-            }
-
-            set
-            {
-                this.SetPropertyValue(ref this.tabName, value ?? string.Empty);
-            }
+            get => this.tabName;
+            set => this.SetPropertyValue(ref this.tabName, value ?? string.Empty);
         }
 
         [DataMember]
         public string StartingDirectory
         {
-            get
-            {
-                return this.startingDirectory;
-            }
+            get => this.startingDirectory;
 
             set
             {
@@ -98,10 +81,7 @@ namespace DevPrompt.Settings
         [DataMember]
         public string Arguments
         {
-            get
-            {
-                return this.arguments;
-            }
+            get => this.arguments; 
 
             set
             {
@@ -115,10 +95,7 @@ namespace DevPrompt.Settings
         [DataMember]
         public ConsoleType ConsoleType
         {
-            get
-            {
-                return this.consoleType;
-            }
+            get => this.consoleType;
 
             set
             {
@@ -132,23 +109,8 @@ namespace DevPrompt.Settings
         [DataMember]
         public bool RunAtStartup
         {
-            get
-            {
-                return this.runAtStartup;
-            }
-
-            set
-            {
-                this.SetPropertyValue(ref this.runAtStartup, value);
-            }
-        }
-
-        public string Executable
-        {
-            get
-            {
-                return ConsoleSettings.GetExecutable(this.ConsoleType);
-            }
+            get => this.runAtStartup;
+            set => this.SetPropertyValue(ref this.runAtStartup, value);
         }
 
         public static string GetExecutable(ConsoleType type)
@@ -167,20 +129,8 @@ namespace DevPrompt.Settings
             }
         }
 
-        public string ExpandedArguments
-        {
-            get
-            {
-                return Environment.ExpandEnvironmentVariables(this.Arguments);
-            }
-        }
-
-        public string ExpandedStartingDirectory
-        {
-            get
-            {
-                return Environment.ExpandEnvironmentVariables(this.StartingDirectory);
-            }
-        }
+        public string Executable => ConsoleSettings.GetExecutable(this.ConsoleType);
+        public string ExpandedArguments => Environment.ExpandEnvironmentVariables(this.Arguments);
+        public string ExpandedStartingDirectory => Environment.ExpandEnvironmentVariables(this.StartingDirectory);
     }
 }
