@@ -11,8 +11,8 @@
         <OutputType>Package</OutputType>
         <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
         <WixTargetsPath Condition=" !Exists('$(WixTargetsPath)') ">$(MSBuildProgramFiles32)\MSBuild\Microsoft\WiX\v3.x\wix.targets</WixTargetsPath>
-        <ConfigOutRoot>$(OutRoot)$(Configuration).$(XPlatform)\</ConfigOutRoot>
-        <ProjectOutRoot>$(ConfigOutRoot)$(ProjectName)\</ProjectOutRoot>
+        <ConfigOutRoot>$(OutRoot)$(Configuration)\</ConfigOutRoot>
+        <ProjectOutRoot>$(ConfigOutRoot)</ProjectOutRoot>
         <OutputPath>$(ProjectOutRoot)bin\</OutputPath>
         <IntermediateOutputPath>$(ProjectOutRoot)obj\</IntermediateOutputPath>
         <Bin32>$(OutRoot)$(Configuration).x86\bin\</Bin32>
@@ -52,6 +52,7 @@
             <CopyFile Include="$(Bin64)System.Composition.*.dll" />
             <CopyFile Include="$(Bin32)Dev*32.dll" />
             <CopyFile Include="$(Bin32)Dev*32.exe" />
+            <NuGetFile Include="$(Bin64)*.nupkg" />
         </ItemGroup>
 
         <MakeDir Directories="$(OutputPath)DevPrompt" />
@@ -61,5 +62,11 @@
         <MakeDir Directories="$(OutputPath)Symbols" />
         <Copy DestinationFolder="$(OutputPath)Symbols" SourceFiles="@(SymbolFile)" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" />
         <ZipDirectory DestinationFile="$(OutputPath)DevPrompt.$(DevPromptVersion).Symbols.zip" SourceDirectory="$(OutputPath)Symbols" Overwrite="true" />
+
+        <Exec Condition=" '$(DevPromptPfxPassword)' != '' And '$(DevPromptPfxFile)' != '' And Exists('$(DevPromptPfxFile)')"
+              Command="signtool.exe sign /f &quot;$(DevPromptPfxFile)&quot; /p $(DevPromptPfxPassword) /t http://timestamp.digicert.com &quot;$(OutputPath)en-us\DevPrompt.msi&quot;" />
+        <Copy SourceFiles="$(OutputPath)en-us\DevPrompt.msi" DestinationFolder="$(OutputPath)" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" />
+        <Copy SourceFiles="$(OutputPath)DevPrompt.msi" DestinationFiles="$(OutputPath)DevPrompt.$(DevPromptVersion).msi" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" />
+        <Copy SourceFiles="@(NuGetFile)" DestinationFolder="$(OutputPath)" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" />
     </Target>
 </Project>
