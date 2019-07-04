@@ -15,4 +15,15 @@
         <OutputPath>$(BaseOutputPath)</OutputPath>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(DevPromptNoSign)' == '' ">
+        <DelaySign>true</DelaySign>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>$(DevRoot)Build\publickey.snk</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(DevPromptNoSign)' == '' And '$(DevPromptPfxFile)' != '' And Exists('$(DevPromptPfxFile)') ">
+        <DelaySign>false</DelaySign>
+        <AssemblyOriginatorKeyFile>$(DevPromptPfxFile)</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
+
 </Project>
