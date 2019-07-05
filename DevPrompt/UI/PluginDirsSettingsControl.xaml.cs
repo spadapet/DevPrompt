@@ -21,7 +21,7 @@ namespace DevPrompt.UI
 
             this.MoveUpCommand = CommandHelpers.CreateMoveUpCommand(() => this.dataGrid, this.ViewModel.Settings.ObservablePluginDirectories);
             this.MoveDownCommand = CommandHelpers.CreateMoveDownCommand(() => this.dataGrid, this.ViewModel.Settings.ObservablePluginDirectories);
-            this.DeleteCommand = CommandHelpers.CreateDeleteCommand(() => this.dataGrid, this.ViewModel.Settings.ObservablePluginDirectories);
+            this.DeleteCommand = CommandHelpers.CreateDeleteCommand(() => this.dataGrid, this.ViewModel.Settings.ObservablePluginDirectories, o => o.ReadOnly);
             this.ResetCommand = CommandHelpers.CreateResetCommand((s) => s.PluginDirectories, this.ViewModel.Settings.ObservablePluginDirectories, AppSettings.DefaultSettingsFilter.PluginDirs);
 
             this.InitializeComponent();
@@ -35,6 +35,14 @@ namespace DevPrompt.UI
         private void OnSettingsChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
             CommandHelpers.UpdateCommands(this.Dispatcher, this.MoveUpCommand, this.MoveDownCommand, this.DeleteCommand);
+        }
+
+        private void OnBeginningEdit(object sender, DataGridBeginningEditEventArgs args)
+        {
+            if (args.Row.Item is PluginDirectorySettings setting && setting.ReadOnly)
+            {
+                args.Cancel = true;
+            }
         }
     }
 }

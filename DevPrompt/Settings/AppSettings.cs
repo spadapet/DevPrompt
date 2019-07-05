@@ -157,7 +157,7 @@ namespace DevPrompt.Settings
                 settings.ObservableConsoles[0].RunAtStartup = true;
             }
 
-            settings.EnsureValid();
+            settings.EnsureValid(filter);
 
             return settings;
         }
@@ -276,23 +276,46 @@ namespace DevPrompt.Settings
             });
         }
 
+        private static IEnumerable<PluginDirectorySettings> DefaultPluginDirs
+        {
+            get
+            {
+                string exeName = Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().Location);
+
+                yield return new PluginDirectorySettings()
+                {
+                    ReadOnly = true,
+                };
+
+                yield return new PluginDirectorySettings()
+                {
+                    Directory = $@"%LocalAppData%\{exeName}.Plugins",
+                    Recurse = true,
+                    ReadOnly = true,
+                };
+            }
+        }
+
         private void AddDefaultPluginDirs()
         {
-            this.PluginDirectories.Add(new PluginDirectorySettings());
-
-            string exeName = Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().Location);
-
-            this.PluginDirectories.Add(new PluginDirectorySettings()
-            {
-                Directory = $@"%LocalAppData%\{exeName}.Plugins",
-                Recurse = true,
-            });
+            // No need to do anything, EnsureValid will add them
         }
 
         public bool PluginsChanged(AppSettings other)
         {
-            HashSet<PluginDirectorySettings> mySet = this.PluginDirectories.ToHashSet();
-            HashSet<PluginDirectorySettings> otherSet = other.PluginDirectories.ToHashSet();
+            IEqualityComparer<PluginDirectorySettings> comparer = new PluginDirectorySettings.Comparer();
+            HashSet<PluginDirectorySettings> mySet = new HashSet<PluginDirectorySettings>(comparer);
+            HashSet<PluginDirectorySettings> otherSet = new HashSet<PluginDirectorySettings>(comparer);
+
+            foreach (PluginDirectorySettings setting in this.PluginDirectories)
+            {
+                mySet.Add(setting);
+            }
+
+            foreach (PluginDirectorySettings setting in other.PluginDirectories)
+            {
+                otherSet.Add(setting);
+            }
 
             if (!mySet.SetEquals(otherSet))
             {
@@ -505,20 +528,42 @@ namespace DevPrompt.Settings
             }
         }
 
-        public void EnsureValid()
+        public void EnsureValid(DefaultSettingsFilter filter = DefaultSettingsFilter.All)
         {
-            if (this.ObservableConsoles.Count == 0)
+            if ((filter & (DefaultSettingsFilter.DevPrompts | DefaultSettingsFilter.RawPrompts)) != 0)
             {
-                // Have to have at least one console that can be created
-                this.ObservableConsoles.Add(new ConsoleSettings()
+                if (this.ObservableConsoles.Count == 0)
                 {
-                    RunAtStartup = true
-                });
+                    // Have to have at least one console that can be created
+                    this.ObservableConsoles.Add(new ConsoleSettings()
+                    {
+                        RunAtStartup = true
+                    });
+                }
             }
 
-            if (this.ObservablePluginDirectories.Count == 0)
+            if ((filter & DefaultSettingsFilter.PluginDirs) != 0)
             {
-                this.ObservablePluginDirectories.Add(new PluginDirectorySettings());
+                // Make sure the default plugin dirs are there, and no dupes
+
+                PluginDirectorySettings[] pluginDirs = AppSettings.DefaultPluginDirs.ToArray();
+                PluginDirectorySettings.Comparer comparer = new PluginDirectorySettings.Comparer();
+
+                foreach (PluginDirectorySettings dir in pluginDirs)
+                {
+                    for (int i = 0; i < this.PluginDirectories.Count; i++)
+                    {
+                        if (comparer.Equals(dir, this.PluginDirectories[i]))
+                        {
+                            this.PluginDirectories.RemoveAt(i--);
+                        }
+                    }
+                }
+
+                foreach (PluginDirectorySettings dir in pluginDirs.Reverse())
+                {
+                    this.PluginDirectories.Insert(0, dir.Clone());
+                }
             }
         }
     }

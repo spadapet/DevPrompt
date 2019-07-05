@@ -48,7 +48,7 @@ namespace DevPrompt.Utility
             });
         }
 
-        public static Api.DelegateCommand CreateDeleteCommand<T>(Func<DataGrid> dataGridAccessor, ObservableCollection<T> items)
+        public static Api.DelegateCommand CreateDeleteCommand<T>(Func<DataGrid> dataGridAccessor, ObservableCollection<T> items, Func<T, bool> readOnlyFunc = null)
         {
             return new Api.DelegateCommand(() =>
             {
@@ -67,7 +67,12 @@ namespace DevPrompt.Utility
             () =>
             {
                 DataGrid dataGrid = dataGridAccessor();
-                return dataGrid.SelectedItem != null && dataGrid.SelectedItem.ToString() != CommandHelpers.NewItemPlaceholder;
+                if (dataGrid.SelectedItem is T item)
+                {
+                    return readOnlyFunc == null || !readOnlyFunc(item);
+                }
+
+                return false;
             });
         }
 

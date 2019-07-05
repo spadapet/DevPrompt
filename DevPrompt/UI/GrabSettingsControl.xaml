@@ -19,7 +19,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock TextWrapping="Wrap" Padding="5,10" Text="When a process from the following list starts to run, its console window can be &quot;grabbed&quot; and become a tab. You need to be running as admin to grab admin processes."/>
-        <DataGrid Grid.Row="1" x:Name="dataGrid" ItemsSource="{Binding ViewModel.Settings.GrabConsoles}" SelectionChanged="OnSelectionChanged" BorderThickness="0,1">
+        <DataGrid Grid.Row="1" x:Name="dataGrid" ItemsSource="{Binding ViewModel.Settings.GrabConsoles}" SelectionMode="Single" SelectionChanged="OnSelectionChanged" BorderThickness="0,1">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Executable Name" Width="1*" Binding="{Binding ExeName}" />
                 <DataGridTextColumn Header="Tab Name" Width="1*" Binding="{Binding TabName}" />

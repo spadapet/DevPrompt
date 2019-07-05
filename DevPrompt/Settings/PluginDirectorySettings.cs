@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -11,16 +12,16 @@ namespace DevPrompt.Settings
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{Directory}")]
-    internal class PluginDirectorySettings : Api.PropertyNotifier, IEquatable<PluginDirectorySettings>
+    internal class PluginDirectorySettings : Api.PropertyNotifier
     {
         private string directory;
         private bool recurse;
         private bool enabled;
+        private bool readOnly;
 
         public PluginDirectorySettings()
         {
             this.directory = ".";
-            this.recurse = false;
             this.enabled = true;
         }
 
@@ -29,6 +30,7 @@ namespace DevPrompt.Settings
             this.directory = copyFrom.directory;
             this.recurse = copyFrom.recurse;
             this.enabled = copyFrom.enabled;
+            this.readOnly = copyFrom.readOnly;
         }
 
         public PluginDirectorySettings Clone()
@@ -64,6 +66,13 @@ namespace DevPrompt.Settings
             set => this.SetPropertyValue(ref this.enabled, value);
         }
 
+        [DataMember]
+        public bool ReadOnly
+        {
+            get => this.readOnly;
+            set => this.SetPropertyValue(ref this.readOnly, value);
+        }
+
         public string ExpandedDirectory
         {
             get
@@ -84,19 +93,17 @@ namespace DevPrompt.Settings
             }
         }
 
-        public override int GetHashCode()
+        public class Comparer : IEqualityComparer<PluginDirectorySettings>
         {
-            return this.directory.GetHashCode() ^ this.recurse.GetHashCode() ^ (this.enabled.GetHashCode() << 1);
-        }
+            public bool Equals(PluginDirectorySettings x, PluginDirectorySettings y)
+            {
+                return x.ExpandedDirectory == y.ExpandedDirectory && x.Recurse == y.Recurse && x.Enabled == y.Enabled;
+            }
 
-        public override bool Equals(object obj)
-        {
-            return obj is PluginDirectorySettings other && this.Equals(other);
-        }
-
-        public bool Equals(PluginDirectorySettings other)
-        {
-            return this.directory == other.directory && this.recurse == other.recurse && this.enabled == other.enabled;
+            public int GetHashCode(PluginDirectorySettings obj)
+            {
+                return obj.ExpandedDirectory.GetHashCode() ^ obj.Recurse.GetHashCode() ^ (obj.Enabled.GetHashCode() << 1);
+            }
         }
     }
 }

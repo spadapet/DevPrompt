@@ -17,8 +17,8 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock TextWrapping="Wrap" Padding="5,10" Text="If you change the plugin directories, they will only be reloaded after restarting the app."/>
-        <DataGrid Grid.Row="1" x:Name="dataGrid" ItemsSource="{Binding ViewModel.Settings.PluginDirectories}" SelectionChanged="OnSelectionChanged" BorderThickness="0,0,0,1">
+        <TextBlock TextWrapping="Wrap" Padding="5,10" Text="If you change the plugin directories, they will only be reloaded after restarting the app. Default directories cannot be changed."/>
+        <DataGrid Grid.Row="1" x:Name="dataGrid" ItemsSource="{Binding ViewModel.Settings.PluginDirectories}" SelectionMode="Single" SelectionChanged="OnSelectionChanged" BorderThickness="0,0,0,1" BeginningEdit="OnBeginningEdit">
             <DataGrid.Columns>
                 <DataGridCheckBoxColumn Header="Enabled" Width="1*" Binding="{Binding Enabled}" />
                 <DataGridTextColumn Header="Directory" Width="3*" Binding="{Binding Directory}">

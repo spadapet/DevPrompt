@@ -30,7 +30,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock TextWrapping="Wrap" Padding="5,10" Text="Use percent signs to reference environment variables. 'Run at startup' only applies when there are no saved tabs at startup."/>
-        <DataGrid Grid.Row="1" x:Name="dataGrid" ItemsSource="{Binding ViewModel.Settings.Consoles}" SelectionChanged="OnSelectionChanged" BorderThickness="0,1">
+        <DataGrid Grid.Row="1" x:Name="dataGrid" ItemsSource="{Binding ViewModel.Settings.Consoles}" SelectionMode="Single" SelectionChanged="OnSelectionChanged" BorderThickness="0,1">
             <DataGrid.Columns>
                 <DataGridComboBoxColumn Header="Executable" Width="3*" SelectedItemBinding="{Binding ConsoleType}" ItemsSource="{Binding Source={StaticResource ConsoleTypeEnum}}" />
                 <DataGridTextColumn Header="Menu Name" Width="3*" Binding="{Binding MenuName}"/>

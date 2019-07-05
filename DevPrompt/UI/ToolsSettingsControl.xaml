@@ -16,7 +16,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <DataGrid x:Name="dataGrid" ItemsSource="{Binding ViewModel.Settings.Tools}" SelectionChanged="OnSelectionChanged" BorderThickness="0,0,0,1">
+        <DataGrid x:Name="dataGrid" ItemsSource="{Binding ViewModel.Settings.Tools}" SelectionMode="Single" SelectionChanged="OnSelectionChanged" BorderThickness="0,0,0,1">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Name" Width="1*" Binding="{Binding Name}"/>
                 <DataGridTextColumn Header="Command" Width="3*" Binding="{Binding Command}"/>
