@@ -1,14 +1,8 @@
 ﻿using DevPrompt.UI.Controls;
 using DevPrompt.Utility;
-using System;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using System.Windows.Interop;
-using System.Windows.Threading;
 
 namespace DevPrompt.ProcessWorkspace
 {

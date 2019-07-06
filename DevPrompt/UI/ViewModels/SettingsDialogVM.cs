@@ -88,7 +88,7 @@ namespace DevPrompt.UI.ViewModels
                 AppSettings settings = null;
                 try
                 {
-                    settings = await AppSettings.UnsafeLoad(this.window.App, dialog.FileName);
+                    settings = await AppSettings.UnsafeLoad<AppSettings>(this.window.App, dialog.FileName);
                 }
                 catch (Exception exception)
                 {

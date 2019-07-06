@@ -12,9 +12,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
-using System.Windows.Interop;
-using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace DevPrompt
@@ -45,9 +42,9 @@ namespace DevPrompt
         private Api.IPluginInfo[] pluginInfos;
         private List<Assembly> pluginAssemblies;
         private bool saveSettingsPending;
+        private bool loadedSettings;
         private List<Task> criticalTasks;
         private State state;
-        private bool initializedSettings;
 
         private enum State
         {
@@ -93,8 +90,10 @@ namespace DevPrompt
             this.MainWindow = new MainWindow(this, errorMessage);
             this.MainWindow.Show();
 
-            await this.InitPlugins();
             await this.InitSettings();
+            await this.InitPlugins();
+            await this.InitCustomSettings();
+            this.loadedSettings = true;
             AppSnapshot snapshot = await AppSnapshot.Load(this, AppSnapshot.DefaultPath);
 
             foreach (Api.IAppListener listener in this.AppListeners)
@@ -180,10 +179,8 @@ namespace DevPrompt
 
         private async Task InitSettings()
         {
-            if (!this.initializedSettings)
+            if (!this.loadedSettings)
             {
-                this.initializedSettings = true;
-
                 AppSettings settings = await AppSettings.Load(this, AppSettings.DefaultPath);
                 this.Settings.CopyFrom(settings);
 
@@ -192,6 +189,16 @@ namespace DevPrompt
                 this.Settings.ObservableGrabConsoles.CollectionChanged += this.OnSettingsPropertyChanged;
                 this.Settings.ObservableLinks.CollectionChanged += this.OnSettingsPropertyChanged;
                 this.Settings.ObservableTools.CollectionChanged += this.OnSettingsPropertyChanged;
+                this.Settings.ObservablePluginDirectories.CollectionChanged += this.OnSettingsPropertyChanged;
+            }
+        }
+
+        private async Task InitCustomSettings()
+        {
+            if (!this.loadedSettings)
+            {
+                AppCustomSettings customSettings = await AppSettings.LoadCustom(this, AppSettings.DefaultCustomPath);
+                this.Settings.CopyFrom(customSettings);
             }
         }
 
@@ -202,7 +209,7 @@ namespace DevPrompt
 
         public void SaveSettings(string path = null)
         {
-            if (!this.saveSettingsPending)
+            if (this.loadedSettings && !this.saveSettingsPending)
             {
                 this.saveSettingsPending = true;
 

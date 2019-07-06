@@ -81,7 +81,7 @@ namespace DevPrompt.Settings
         [DataMember]
         public string Arguments
         {
-            get => this.arguments; 
+            get => this.arguments;
 
             set
             {

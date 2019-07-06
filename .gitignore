@@ -1,7 +1,5 @@
-/out/
+﻿/out/
 /packages/
-/SetupNetCore/AppPackages/
-/SetupNetCore/BundleArtifacts/
 
 .vs/
 bin/

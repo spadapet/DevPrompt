@@ -1,6 +1,5 @@
 ﻿using DevPrompt.Utility;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -92,6 +91,18 @@ namespace DevPrompt.Settings
             this.EnsureValid();
         }
 
+        public void CopyFrom(AppCustomSettings copyFrom)
+        {
+            foreach (KeyValuePair<string, object> pair in copyFrom.CustomProperties)
+            {
+                this.customProperties[pair.Key] = (pair.Value is ICloneable cloneable)
+                    ? cloneable.Clone()
+                    : pair.Value;
+            }
+
+            this.EnsureValid(DefaultSettingsFilter.Custom);
+        }
+
         public static string AppDataPath
         {
             get
@@ -103,6 +114,7 @@ namespace DevPrompt.Settings
         }
 
         public static string DefaultPath => Path.Combine(AppSettings.AppDataPath, "Settings.xml");
+        public static string DefaultCustomPath => Path.Combine(AppSettings.AppDataPath, "Settings.Custom.xml");
 
         [Flags]
         public enum DefaultSettingsFilter
@@ -114,6 +126,7 @@ namespace DevPrompt.Settings
             Links = 0x08,
             Tools = 0x10,
             PluginDirs = 0x20,
+            Custom = 0x40,
             All = 0xFF,
         }
 
@@ -325,7 +338,7 @@ namespace DevPrompt.Settings
             return false;
         }
 
-        public static async Task<AppSettings> UnsafeLoad(App app, string path)
+        public static async Task<T> UnsafeLoad<T>(App app, string path)
         {
             return await Task.Run(() =>
             {
@@ -339,7 +352,7 @@ namespace DevPrompt.Settings
                     using (Stream stream = File.OpenRead(path))
                     using (XmlReader reader = XmlReader.Create(stream, xmlSettings))
                     {
-                        return (AppSettings)AppSettings.GetDataContractSerializer(app).ReadObject(reader);
+                        return (T)AppSettings.GetDataContractSerializer<T>(app).ReadObject(reader, verifyObjectName: false);
                     }
                 }
             });
@@ -353,7 +366,7 @@ namespace DevPrompt.Settings
             {
                 if (File.Exists(path))
                 {
-                    settings = await AppSettings.UnsafeLoad(app, path);
+                    settings = await AppSettings.UnsafeLoad<AppSettings>(app, path);
                     settings.EnsureValid();
                 }
             }
@@ -368,6 +381,24 @@ namespace DevPrompt.Settings
             }
 
             return settings;
+        }
+
+        public static async Task<AppCustomSettings> LoadCustom(App app, string path)
+        {
+            AppCustomSettings settings = null;
+
+            try
+            {
+                if (File.Exists(path))
+                {
+                    settings = await AppSettings.UnsafeLoad<AppCustomSettings>(app, path);
+                }
+            }
+            catch
+            {
+            }
+
+            return settings ?? new AppCustomSettings();
         }
 
         public Task<Exception> Save(App app, string path = null)
@@ -385,9 +416,12 @@ namespace DevPrompt.Settings
                 {
                     try
                     {
+                        string customPath = null;
+
                         if (string.IsNullOrEmpty(path))
                         {
                             path = AppSettings.DefaultPath;
+                            customPath = AppSettings.DefaultCustomPath;
                         }
 
                         if (Directory.CreateDirectory(Path.GetDirectoryName(path)) != null)
@@ -395,7 +429,17 @@ namespace DevPrompt.Settings
                             using (Stream stream = File.Create(path))
                             using (XmlWriter writer = XmlWriter.Create(stream, xmlSettings))
                             {
-                                AppSettings.GetDataContractSerializer(app).WriteObject(writer, clone);
+                                AppSettings.GetDataContractSerializer<AppSettings>(app).WriteObject(writer, clone);
+                            }
+
+                            if (!string.IsNullOrEmpty(customPath))
+                            {
+                                using (Stream stream = File.Create(customPath))
+                                using (XmlWriter writer = XmlWriter.Create(stream, xmlSettings))
+                                {
+                                    AppCustomSettings customSettings = new AppCustomSettings(clone);
+                                    AppSettings.GetDataContractSerializer<AppCustomSettings>(app).WriteObject(writer, customSettings);
+                                }
                             }
                         }
                     }
@@ -442,7 +486,7 @@ namespace DevPrompt.Settings
             set => this.SetPropertyValue(ref this.saveTabsOnExit, value);
         }
 
-        [DataMember]
+        // [DataMember]
         public ICollection<KeyValuePair<string, object>> CustomProperties => this.customProperties;
 
         public bool TryGetProperty<T>(string name, out T value)
@@ -504,7 +548,7 @@ namespace DevPrompt.Settings
             this.saveTabsOnExit = true;
         }
 
-        private static DataContractSerializer GetDataContractSerializer(App app)
+        private static DataContractSerializer GetDataContractSerializer<T>(App app)
         {
             List<Type> knownTypes = new List<Type>(AppSettings.CollectionTypes);
             DataContractSerializerSettings serializerSettings = new DataContractSerializerSettings()
@@ -513,7 +557,7 @@ namespace DevPrompt.Settings
                 DataContractResolver = new SettingTypeResolver(app),
             };
 
-            return new DataContractSerializer(typeof(AppSettings), serializerSettings);
+            return new DataContractSerializer(typeof(T), serializerSettings);
         }
 
         private static IEnumerable<Type> CollectionTypes
@@ -566,5 +610,35 @@ namespace DevPrompt.Settings
                 }
             }
         }
+    }
+
+    [DataContract]
+    internal class AppCustomSettings
+    {
+        private Dictionary<string, object> customProperties;
+
+        public AppCustomSettings()
+        {
+            this.Initialize();
+        }
+
+        public AppCustomSettings(AppSettings settings)
+        {
+            this.Initialize();
+
+            foreach (KeyValuePair<string, object> pair in settings.CustomProperties)
+            {
+                this.customProperties[pair.Key] = pair.Value;
+            }
+        }
+
+        [OnDeserializing]
+        private void Initialize(StreamingContext context = default(StreamingContext))
+        {
+            this.customProperties = new Dictionary<string, object>();
+        }
+
+        [DataMember]
+        public ICollection<KeyValuePair<string, object>> CustomProperties => this.customProperties;
     }
 }
