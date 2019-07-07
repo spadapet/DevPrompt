@@ -78,6 +78,27 @@ namespace DevPrompt.Plugins
                 }
             }
 
+            // User can force specific plugins from the command line
+            string[] args = Environment.GetCommandLineArgs();
+            for (int i = 1; i + 1 < args.Length; i++)
+            {
+                if (args[i] == "/plugin")
+                {
+                    string file = args[++i];
+                    if (file.EndsWith(PluginUtility.DllSuffix, StringComparison.OrdinalIgnoreCase) && File.Exists(file))
+                    {
+                        try
+                        {
+                            assemblies.Add(Assembly.LoadFrom(file));
+                        }
+                        catch
+                        {
+                            // ignore failure
+                        }
+                    }
+                }
+            }
+
             foreach (Assembly assembly in assemblies.Distinct())
             {
                 appAssemblies?.Add(assembly);
