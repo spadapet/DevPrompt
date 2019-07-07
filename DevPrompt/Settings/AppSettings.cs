@@ -284,18 +284,26 @@ namespace DevPrompt.Settings
             });
         }
 
-        private static IEnumerable<PluginDirectorySettings> DefaultPluginDirectories
+        private IEnumerable<PluginDirectorySettings> DefaultPluginDirectories
         {
             get
             {
-                string exeName = Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().Location);
-
                 yield return new PluginDirectorySettings()
                 {
                     ReadOnly = true,
                 };
 
-                yield return new PluginDirectorySettings()
+                yield return this.DefaultUserPluginDirectory;
+            }
+        }
+
+        public PluginDirectorySettings DefaultUserPluginDirectory
+        {
+            get
+            {
+                string exeName = Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().Location);
+
+                return new PluginDirectorySettings()
                 {
                     Directory = $@"%LocalAppData%\{exeName}.Plugins",
                     Recurse = true,
@@ -304,7 +312,7 @@ namespace DevPrompt.Settings
             }
         }
 
-        public IEnumerable<PluginDirectorySettings> AllPluginDirectories => AppSettings.DefaultPluginDirectories.Concat(this.ObservableUserPluginDirectories);
+        public IEnumerable<PluginDirectorySettings> AllPluginDirectories => this.DefaultPluginDirectories.Concat(this.ObservableUserPluginDirectories);
 
         public bool PluginsChanged(AppSettings other)
         {
