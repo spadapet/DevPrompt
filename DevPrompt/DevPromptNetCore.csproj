@@ -11,10 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="packages.config" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Include="..\Build\GlobalAssemblyInfo.cs" Link="Properties\GlobalAssemblyInfo.cs" />
   </ItemGroup>
 
