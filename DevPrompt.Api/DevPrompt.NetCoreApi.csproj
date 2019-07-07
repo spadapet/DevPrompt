@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <None Remove="DevPrompt.Api.nuspec" />
-    <None Remove="packages.config" />
   </ItemGroup>
 
   <ItemGroup>
