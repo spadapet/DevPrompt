@@ -57,6 +57,7 @@
     <Compile Include="ProcessWorkspace\ProcessWorkspaceProvider.cs" />
     <Compile Include="ProcessWorkspace\ProcessWorkspace.cs" />
     <Compile Include="ProcessWorkspace\ProcessListener.cs" />
+    <Compile Include="Settings\AppCustomSettings.cs" />
     <Compile Include="Settings\PluginDirectorySettings.cs" />
     <Compile Include="Settings\WorkspaceSnapshot.cs" />
     <Compile Include="Settings\AppSnapshot.cs" />

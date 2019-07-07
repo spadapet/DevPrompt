@@ -21,7 +21,7 @@ namespace DevPrompt.Settings
         public ObservableCollection<GrabConsoleSettings> ObservableGrabConsoles { get; private set; }
         public ObservableCollection<LinkSettings> ObservableLinks { get; private set; }
         public ObservableCollection<ToolSettings> ObservableTools { get; private set; }
-        public ObservableCollection<PluginDirectorySettings> ObservablePluginDirectories { get; private set; }
+        public ObservableCollection<PluginDirectorySettings> ObservableUserPluginDirectories { get; private set; }
 
         private Dictionary<string, object> customProperties;
         private bool consoleGrabEnabled;
@@ -53,7 +53,7 @@ namespace DevPrompt.Settings
             this.ObservableGrabConsoles.Clear();
             this.ObservableLinks.Clear();
             this.ObservableTools.Clear();
-            this.ObservablePluginDirectories.Clear();
+            this.ObservableUserPluginDirectories.Clear();
             this.customProperties.Clear();
 
             foreach (ConsoleSettings console in copyFrom.Consoles)
@@ -76,9 +76,9 @@ namespace DevPrompt.Settings
                 this.ObservableTools.Add(tool.Clone());
             }
 
-            foreach (PluginDirectorySettings pluginDir in copyFrom.ObservablePluginDirectories)
+            foreach (PluginDirectorySettings pluginDir in copyFrom.ObservableUserPluginDirectories)
             {
-                this.ObservablePluginDirectories.Add(pluginDir.Clone());
+                this.ObservableUserPluginDirectories.Add(pluginDir.Clone());
             }
 
             foreach (KeyValuePair<string, object> pair in copyFrom.CustomProperties)
@@ -158,11 +158,6 @@ namespace DevPrompt.Settings
             if ((filter & DefaultSettingsFilter.Tools) != 0)
             {
                 settings.AddDefaultTools();
-            }
-
-            if ((filter & DefaultSettingsFilter.PluginDirs) != 0)
-            {
-                settings.AddDefaultPluginDirs();
             }
 
             if (settings.ObservableConsoles.Count > 0 && !settings.ObservableConsoles.Any(c => c.RunAtStartup))
@@ -289,7 +284,7 @@ namespace DevPrompt.Settings
             });
         }
 
-        private static IEnumerable<PluginDirectorySettings> DefaultPluginDirs
+        private static IEnumerable<PluginDirectorySettings> DefaultPluginDirectories
         {
             get
             {
@@ -309,10 +304,7 @@ namespace DevPrompt.Settings
             }
         }
 
-        private void AddDefaultPluginDirs()
-        {
-            // No need to do anything, EnsureValid will add them
-        }
+        public IEnumerable<PluginDirectorySettings> AllPluginDirectories => AppSettings.DefaultPluginDirectories.Concat(this.ObservableUserPluginDirectories);
 
         public bool PluginsChanged(AppSettings other)
         {
@@ -320,12 +312,12 @@ namespace DevPrompt.Settings
             HashSet<PluginDirectorySettings> mySet = new HashSet<PluginDirectorySettings>(comparer);
             HashSet<PluginDirectorySettings> otherSet = new HashSet<PluginDirectorySettings>(comparer);
 
-            foreach (PluginDirectorySettings setting in this.PluginDirectories)
+            foreach (PluginDirectorySettings setting in this.UserPluginDirectories)
             {
                 mySet.Add(setting);
             }
 
-            foreach (PluginDirectorySettings setting in other.PluginDirectories)
+            foreach (PluginDirectorySettings setting in other.UserPluginDirectories)
             {
                 otherSet.Add(setting);
             }
@@ -470,7 +462,7 @@ namespace DevPrompt.Settings
         public IList<ToolSettings> Tools => this.ObservableTools;
 
         [DataMember]
-        public IList<PluginDirectorySettings> PluginDirectories => this.ObservablePluginDirectories;
+        public IList<PluginDirectorySettings> UserPluginDirectories => this.ObservableUserPluginDirectories;
 
         [DataMember]
         public bool ConsoleGrabEnabled
@@ -543,7 +535,7 @@ namespace DevPrompt.Settings
             this.ObservableGrabConsoles = new ObservableCollection<GrabConsoleSettings>();
             this.ObservableLinks = new ObservableCollection<LinkSettings>();
             this.ObservableTools = new ObservableCollection<ToolSettings>();
-            this.ObservablePluginDirectories = new ObservableCollection<PluginDirectorySettings>();
+            this.ObservableUserPluginDirectories = new ObservableCollection<PluginDirectorySettings>();
             this.customProperties = new Dictionary<string, object>();
             this.saveTabsOnExit = true;
         }
@@ -585,60 +577,6 @@ namespace DevPrompt.Settings
                     });
                 }
             }
-
-            if ((filter & DefaultSettingsFilter.PluginDirs) != 0)
-            {
-                // Make sure the default plugin dirs are there, and no dupes
-
-                PluginDirectorySettings[] pluginDirs = AppSettings.DefaultPluginDirs.ToArray();
-                PluginDirectorySettings.Comparer comparer = new PluginDirectorySettings.Comparer();
-
-                foreach (PluginDirectorySettings dir in pluginDirs)
-                {
-                    for (int i = 0; i < this.PluginDirectories.Count; i++)
-                    {
-                        if (comparer.Equals(dir, this.PluginDirectories[i]))
-                        {
-                            this.PluginDirectories.RemoveAt(i--);
-                        }
-                    }
-                }
-
-                foreach (PluginDirectorySettings dir in pluginDirs.Reverse())
-                {
-                    this.PluginDirectories.Insert(0, dir.Clone());
-                }
-            }
         }
-    }
-
-    [DataContract]
-    internal class AppCustomSettings
-    {
-        private Dictionary<string, object> customProperties;
-
-        public AppCustomSettings()
-        {
-            this.Initialize();
-        }
-
-        public AppCustomSettings(AppSettings settings)
-        {
-            this.Initialize();
-
-            foreach (KeyValuePair<string, object> pair in settings.CustomProperties)
-            {
-                this.customProperties[pair.Key] = pair.Value;
-            }
-        }
-
-        [OnDeserializing]
-        private void Initialize(StreamingContext context = default(StreamingContext))
-        {
-            this.customProperties = new Dictionary<string, object>();
-        }
-
-        [DataMember]
-        public ICollection<KeyValuePair<string, object>> CustomProperties => this.customProperties;
     }
 }

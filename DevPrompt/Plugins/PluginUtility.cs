@@ -70,7 +70,7 @@ namespace DevPrompt.Plugins
             Assembly thisAssembly = Assembly.GetExecutingAssembly();
             List<Assembly> assemblies = new List<Assembly> { thisAssembly };
 
-            foreach (PluginDirectorySettings pluginDir in app.Settings.PluginDirectories)
+            foreach (PluginDirectorySettings pluginDir in app.Settings.AllPluginDirectories)
             {
                 if (pluginDir.Enabled)
                 {

@@ -57,9 +57,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\DevPrompt.Api\DevPrompt.Api.csproj">
       <Project>{69e79abb-e387-479b-b007-64c25966ded6}</Project>
       <Name>DevPrompt.Api</Name>

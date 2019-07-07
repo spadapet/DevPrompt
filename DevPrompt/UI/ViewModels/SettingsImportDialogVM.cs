@@ -116,14 +116,14 @@ namespace DevPrompt.UI.ViewModels
 
             if (this.PluginsIndex == 0)
             {
-                targetSettings.PluginDirectories.Clear();
+                targetSettings.UserPluginDirectories.Clear();
             }
 
             if (this.PluginsIndex != 2)
             {
-                foreach (PluginDirectorySettings setting in this.settings.PluginDirectories)
+                foreach (PluginDirectorySettings setting in this.settings.UserPluginDirectories)
                 {
-                    targetSettings.PluginDirectories.Add(setting.Clone());
+                    targetSettings.UserPluginDirectories.Add(setting.Clone());
                 }
             }
 

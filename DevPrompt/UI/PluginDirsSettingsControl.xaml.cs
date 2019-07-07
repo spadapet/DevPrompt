@@ -17,12 +17,12 @@ namespace DevPrompt.UI
         public PluginDirsSettingsControl(SettingsDialogVM viewModel)
         {
             this.ViewModel = viewModel;
-            this.ViewModel.Settings.ObservablePluginDirectories.CollectionChanged += this.OnSettingsChanged;
+            this.ViewModel.Settings.ObservableUserPluginDirectories.CollectionChanged += this.OnSettingsChanged;
 
-            this.MoveUpCommand = CommandHelpers.CreateMoveUpCommand(() => this.dataGrid, this.ViewModel.Settings.ObservablePluginDirectories);
-            this.MoveDownCommand = CommandHelpers.CreateMoveDownCommand(() => this.dataGrid, this.ViewModel.Settings.ObservablePluginDirectories);
-            this.DeleteCommand = CommandHelpers.CreateDeleteCommand(() => this.dataGrid, this.ViewModel.Settings.ObservablePluginDirectories, o => o.ReadOnly);
-            this.ResetCommand = CommandHelpers.CreateResetCommand((s) => s.PluginDirectories, this.ViewModel.Settings.ObservablePluginDirectories, AppSettings.DefaultSettingsFilter.PluginDirs);
+            this.MoveUpCommand = CommandHelpers.CreateMoveUpCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableUserPluginDirectories);
+            this.MoveDownCommand = CommandHelpers.CreateMoveDownCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableUserPluginDirectories);
+            this.DeleteCommand = CommandHelpers.CreateDeleteCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableUserPluginDirectories, o => o.ReadOnly);
+            this.ResetCommand = CommandHelpers.CreateResetCommand((s) => s.UserPluginDirectories, this.ViewModel.Settings.ObservableUserPluginDirectories, AppSettings.DefaultSettingsFilter.PluginDirs);
 
             this.InitializeComponent();
         }

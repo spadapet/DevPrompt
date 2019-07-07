@@ -189,7 +189,7 @@ namespace DevPrompt
                 this.Settings.ObservableGrabConsoles.CollectionChanged += this.OnSettingsPropertyChanged;
                 this.Settings.ObservableLinks.CollectionChanged += this.OnSettingsPropertyChanged;
                 this.Settings.ObservableTools.CollectionChanged += this.OnSettingsPropertyChanged;
-                this.Settings.ObservablePluginDirectories.CollectionChanged += this.OnSettingsPropertyChanged;
+                this.Settings.ObservableUserPluginDirectories.CollectionChanged += this.OnSettingsPropertyChanged;
             }
         }
 
