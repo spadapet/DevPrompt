@@ -28,7 +28,6 @@
     <Compile Include="Avatars\IAvatarSite.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="MenuItemProvider.cs" />
-    <Compile Include="PluginInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\DesignerViewModels\LoginPageDesignerVM.cs" />
     <Compile Include="UI\DesignerViewModels\PullRequestDesignerVM.cs" />

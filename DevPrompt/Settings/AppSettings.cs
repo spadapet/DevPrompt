@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -15,8 +16,9 @@ namespace DevPrompt.Settings
     /// Saves/loads application settings
     /// </summary>
     [DataContract]
-    internal class AppSettings : Api.PropertyNotifier, Api.IAppSettings
+    internal class AppSettings : Api.PropertyNotifier, INotifyCollectionChanged, Api.IAppSettings
     {
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
         public ObservableCollection<ConsoleSettings> ObservableConsoles { get; private set; }
         public ObservableCollection<GrabConsoleSettings> ObservableGrabConsoles { get; private set; }
         public ObservableCollection<LinkSettings> ObservableLinks { get; private set; }
@@ -544,8 +546,20 @@ namespace DevPrompt.Settings
             this.ObservableLinks = new ObservableCollection<LinkSettings>();
             this.ObservableTools = new ObservableCollection<ToolSettings>();
             this.ObservableUserPluginDirectories = new ObservableCollection<PluginDirectorySettings>();
+
+            this.ObservableConsoles.CollectionChanged += this.OnObservableCollectionChanged;
+            this.ObservableGrabConsoles.CollectionChanged += this.OnObservableCollectionChanged;
+            this.ObservableLinks.CollectionChanged += this.OnObservableCollectionChanged;
+            this.ObservableTools.CollectionChanged += this.OnObservableCollectionChanged;
+            this.ObservableUserPluginDirectories.CollectionChanged += this.OnObservableCollectionChanged;
+
             this.customProperties = new Dictionary<string, object>();
             this.saveTabsOnExit = true;
+        }
+
+        private void OnObservableCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            this.CollectionChanged?.Invoke(sender, args);
         }
 
         private static DataContractSerializer GetDataContractSerializer<T>(App app)

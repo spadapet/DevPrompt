@@ -30,7 +30,6 @@ namespace DevPrompt
         public IEnumerable<Api.IAppListener> AppListeners => this.appListeners ?? Enumerable.Empty<Api.IAppListener>();
         public IEnumerable<Api.IMenuItemProvider> MenuItemProviders => this.menuItemProviders ?? Enumerable.Empty<Api.IMenuItemProvider>();
         public IEnumerable<Api.IWorkspaceProvider> WorkspaceProviders => this.workspaceProviders ?? Enumerable.Empty<Api.IWorkspaceProvider>();
-        public IEnumerable<Api.IPluginInfo> PluginInfos => this.pluginInfos ?? Enumerable.Empty<Api.IPluginInfo>();
         public IEnumerable<Assembly> PluginAssemblies => this.pluginAssemblies ?? Enumerable.Empty<Assembly>();
 
         private CompositionHost compositionHost;
@@ -39,7 +38,6 @@ namespace DevPrompt
         private Api.IAppListener[] appListeners;
         private Api.IMenuItemProvider[] menuItemProviders;
         private Api.IWorkspaceProvider[] workspaceProviders;
-        private Api.IPluginInfo[] pluginInfos;
         private List<Assembly> pluginAssemblies;
         private bool saveSettingsPending;
         private bool loadedSettings;
@@ -68,10 +66,7 @@ namespace DevPrompt
         private void Dispose()
         {
             this.Settings.PropertyChanged -= this.OnSettingsPropertyChanged;
-            this.Settings.ObservableConsoles.CollectionChanged -= this.OnSettingsPropertyChanged;
-            this.Settings.ObservableGrabConsoles.CollectionChanged -= this.OnSettingsPropertyChanged;
-            this.Settings.ObservableLinks.CollectionChanged -= this.OnSettingsPropertyChanged;
-            this.Settings.ObservableTools.CollectionChanged -= this.OnSettingsPropertyChanged;
+            this.Settings.CollectionChanged -= this.OnSettingsPropertyChanged;
 
             this.ClearPlugins();
             this.NativeApp?.Dispose();
@@ -154,7 +149,6 @@ namespace DevPrompt
                 this.processListeners = this.GetOrderedExports<Interop.IProcessListener>().ToArray();
                 this.menuItemProviders = this.GetOrderedExports<Api.IMenuItemProvider>().ToArray();
                 this.workspaceProviders = this.GetOrderedExports<Api.IWorkspaceProvider>().ToArray();
-                this.pluginInfos = this.GetOrderedExports<Api.IPluginInfo>().ToArray();
             }
             else
             {
@@ -174,7 +168,6 @@ namespace DevPrompt
             this.processListeners = null;
             this.menuItemProviders = null;
             this.workspaceProviders = null;
-            this.pluginInfos = null;
         }
 
         private async Task InitSettings()
@@ -185,11 +178,7 @@ namespace DevPrompt
                 this.Settings.CopyFrom(settings);
 
                 this.Settings.PropertyChanged += this.OnSettingsPropertyChanged;
-                this.Settings.ObservableConsoles.CollectionChanged += this.OnSettingsPropertyChanged;
-                this.Settings.ObservableGrabConsoles.CollectionChanged += this.OnSettingsPropertyChanged;
-                this.Settings.ObservableLinks.CollectionChanged += this.OnSettingsPropertyChanged;
-                this.Settings.ObservableTools.CollectionChanged += this.OnSettingsPropertyChanged;
-                this.Settings.ObservableUserPluginDirectories.CollectionChanged += this.OnSettingsPropertyChanged;
+                this.Settings.CollectionChanged += this.OnSettingsPropertyChanged;
             }
         }
 

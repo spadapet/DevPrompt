@@ -27,7 +27,6 @@
     <Compile Include="Constants.cs" />
     <Compile Include="IApp.cs" />
     <Compile Include="IAppListener.cs" />
-    <Compile Include="IPluginInfo.cs" />
     <Compile Include="OrderAttribute.cs" />
     <Compile Include="Process\GrabProcess.cs" />
     <Compile Include="Process\ProcessCommand.cs" />
