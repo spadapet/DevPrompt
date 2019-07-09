@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using DevPrompt.UI.Settings;
+using System.Diagnostics;
 using System.Windows;
 
 namespace DevPrompt.UI.ViewModels
@@ -9,9 +10,8 @@ namespace DevPrompt.UI.ViewModels
         Grab,
         Tools,
         Links,
-        PluginDirs,
 
-        Default = Consoles
+        Default = Consoles,
     }
 
     /// <summary>
@@ -35,20 +35,10 @@ namespace DevPrompt.UI.ViewModels
             {
                 switch (this.TabType)
                 {
-                    case SettingsTabType.Consoles:
-                        return "Consoles";
-
-                    case SettingsTabType.Grab:
-                        return "Grab";
-
-                    case SettingsTabType.Links:
-                        return "Links";
-
-                    case SettingsTabType.Tools:
-                        return "Tools";
-
-                    case SettingsTabType.PluginDirs:
-                        return "Plugins";
+                    case SettingsTabType.Consoles: return Resources.SettingsTabType_Consoles;
+                    case SettingsTabType.Grab: return Resources.SettingsTabType_Grab;
+                    case SettingsTabType.Links: return Resources.SettingsTabType_Links;
+                    case SettingsTabType.Tools: return Resources.SettingsTabType_Tools;
 
                     default:
                         Debug.Fail($"Missing name for tab: {this.TabType}");
@@ -79,10 +69,6 @@ namespace DevPrompt.UI.ViewModels
 
                         case SettingsTabType.Tools:
                             this.viewElement = new ToolsSettingsControl(this.viewModel);
-                            break;
-
-                        case SettingsTabType.PluginDirs:
-                            this.viewElement = new PluginDirsSettingsControl(this.viewModel);
                             break;
 
                         default:

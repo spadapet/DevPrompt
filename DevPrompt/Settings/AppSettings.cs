@@ -24,6 +24,7 @@ namespace DevPrompt.Settings
         public ObservableCollection<LinkSettings> ObservableLinks { get; private set; }
         public ObservableCollection<ToolSettings> ObservableTools { get; private set; }
         public ObservableCollection<PluginDirectorySettings> ObservableUserPluginDirectories { get; private set; }
+        public ObservableCollection<NuGetPluginSettings> ObservableNuGetPlugins { get; private set; }
 
         private Dictionary<string, object> customProperties;
         private bool consoleGrabEnabled;
@@ -56,6 +57,7 @@ namespace DevPrompt.Settings
             this.ObservableLinks.Clear();
             this.ObservableTools.Clear();
             this.ObservableUserPluginDirectories.Clear();
+            this.ObservableNuGetPlugins.Clear();
             this.customProperties.Clear();
 
             foreach (ConsoleSettings console in copyFrom.Consoles)
@@ -81,6 +83,11 @@ namespace DevPrompt.Settings
             foreach (PluginDirectorySettings pluginDir in copyFrom.ObservableUserPluginDirectories)
             {
                 this.ObservableUserPluginDirectories.Add(pluginDir.Clone());
+            }
+
+            foreach (NuGetPluginSettings nuget in copyFrom.ObservableNuGetPlugins)
+            {
+                this.ObservableNuGetPlugins.Add(nuget.Clone());
             }
 
             foreach (KeyValuePair<string, object> pair in copyFrom.CustomProperties)
@@ -286,58 +293,29 @@ namespace DevPrompt.Settings
             });
         }
 
-        private IEnumerable<PluginDirectorySettings> DefaultPluginDirectories
-        {
-            get
-            {
-                yield return new PluginDirectorySettings()
-                {
-                    ReadOnly = true,
-                };
-
-                yield return this.DefaultUserPluginDirectory;
-            }
-        }
-
-        public PluginDirectorySettings DefaultUserPluginDirectory
+        public IEnumerable<PluginDirectorySettings> PluginDirectories
         {
             get
             {
                 string exeName = Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().Location);
 
-                return new PluginDirectorySettings()
+                yield return new PluginDirectorySettings()
+                {
+                    ReadOnly = true,
+                };
+
+                yield return new PluginDirectorySettings()
                 {
                     Directory = $@"%LocalAppData%\{exeName}.Plugins",
                     Recurse = true,
                     ReadOnly = true,
                 };
+
+                foreach (PluginDirectorySettings userDir in this.UserPluginDirectories)
+                {
+                    yield return userDir;
+                }
             }
-        }
-
-        public IEnumerable<PluginDirectorySettings> AllPluginDirectories => this.DefaultPluginDirectories.Concat(this.ObservableUserPluginDirectories);
-
-        public bool PluginsChanged(AppSettings other)
-        {
-            IEqualityComparer<PluginDirectorySettings> comparer = new PluginDirectorySettings.Comparer();
-            HashSet<PluginDirectorySettings> mySet = new HashSet<PluginDirectorySettings>(comparer);
-            HashSet<PluginDirectorySettings> otherSet = new HashSet<PluginDirectorySettings>(comparer);
-
-            foreach (PluginDirectorySettings setting in this.UserPluginDirectories)
-            {
-                mySet.Add(setting);
-            }
-
-            foreach (PluginDirectorySettings setting in other.UserPluginDirectories)
-            {
-                otherSet.Add(setting);
-            }
-
-            if (!mySet.SetEquals(otherSet))
-            {
-                return true;
-            }
-
-            return false;
         }
 
         public static async Task<T> UnsafeLoad<T>(App app, string path)
@@ -475,6 +453,9 @@ namespace DevPrompt.Settings
         public IList<PluginDirectorySettings> UserPluginDirectories => this.ObservableUserPluginDirectories;
 
         [DataMember]
+        public IList<NuGetPluginSettings> NuGetPlugins => this.ObservableNuGetPlugins;
+
+        [DataMember]
         public bool ConsoleGrabEnabled
         {
             get => this.consoleGrabEnabled;
@@ -546,12 +527,14 @@ namespace DevPrompt.Settings
             this.ObservableLinks = new ObservableCollection<LinkSettings>();
             this.ObservableTools = new ObservableCollection<ToolSettings>();
             this.ObservableUserPluginDirectories = new ObservableCollection<PluginDirectorySettings>();
+            this.ObservableNuGetPlugins = new ObservableCollection<NuGetPluginSettings>();
 
             this.ObservableConsoles.CollectionChanged += this.OnObservableCollectionChanged;
             this.ObservableGrabConsoles.CollectionChanged += this.OnObservableCollectionChanged;
             this.ObservableLinks.CollectionChanged += this.OnObservableCollectionChanged;
             this.ObservableTools.CollectionChanged += this.OnObservableCollectionChanged;
             this.ObservableUserPluginDirectories.CollectionChanged += this.OnObservableCollectionChanged;
+            this.ObservableNuGetPlugins.CollectionChanged += this.OnObservableCollectionChanged;
 
             this.customProperties = new Dictionary<string, object>();
             this.saveTabsOnExit = true;

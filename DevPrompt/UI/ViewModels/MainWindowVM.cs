@@ -1,4 +1,6 @@
 ﻿using DevPrompt.Settings;
+using DevPrompt.UI.Plugins;
+using DevPrompt.UI.Settings;
 using DevPrompt.Utility;
 using System;
 using System.Collections.Generic;
@@ -109,30 +111,32 @@ namespace DevPrompt.UI.ViewModels
 
         private void ShowSettingsDialog(SettingsTabType tab)
         {
-            SettingsDialog dialog = new SettingsDialog(this.Window, this.AppSettings, tab)
-            {
-                Owner = this.Window
-            };
+            SettingsDialog dialog = new SettingsDialog(this.Window, this.AppSettings, tab);
 
             if (dialog.ShowDialog() == true)
             {
-                bool pluginsChanged = this.AppSettings.PluginsChanged(dialog.ViewModel.Settings);
                 this.AppSettings.CopyFrom(dialog.ViewModel.Settings);
+            }
+        }
 
-                if (pluginsChanged && MessageBox.Show(
-                    this.Window,
-                    "Plugins have changed, would you like to restart the app now?",
-                    "DevPrompt",
-                    MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                {
-                    this.Window.CloseAndRestart();
-                }
+        private void ShowPluginSettingsDialog(PluginsTabType tab)
+        {
+            PluginsDialog dialog = new PluginsDialog(this.Window, this.AppSettings, tab);
+
+            if (dialog.ShowDialog() == true)
+            {
+                this.AppSettings.CopyFrom(dialog.ViewModel.Settings);
             }
         }
 
         public ICommand SettingsCommand => new Api.DelegateCommand(() =>
         {
             this.ShowSettingsDialog(SettingsTabType.Default);
+        });
+
+        public ICommand PluginsCommand => new Api.DelegateCommand(() =>
+        {
+            this.ShowPluginSettingsDialog(PluginsTabType.Default);
         });
 
         public ICommand CustomizeConsoleGrabCommand => new Api.DelegateCommand(() =>
@@ -403,7 +407,7 @@ namespace DevPrompt.UI.ViewModels
 
         public void InitWorkspaces(AppSnapshot snapshot)
         {
-            foreach (Api.IWorkspaceProvider provider in this.Window.App.WorkspaceProviders)
+            foreach (Api.IWorkspaceProvider provider in this.Window.App.PluginState.WorkspaceProviders)
             {
                 Api.IWorkspaceVM workspace = new Api.WorkspaceVM(this, provider, snapshot.FindWorkspaceSnapshot(provider.WorkspaceId));
                 this.AddWorkspace(workspace, false);

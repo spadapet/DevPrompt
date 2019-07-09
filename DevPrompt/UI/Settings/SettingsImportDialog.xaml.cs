@@ -2,7 +2,7 @@
 using DevPrompt.UI.ViewModels;
 using System.Windows;
 
-namespace DevPrompt.UI
+namespace DevPrompt.UI.Settings
 {
     internal partial class SettingsImportDialog : Window
     {

@@ -1,4 +1,5 @@
 ﻿using DevPrompt.Settings;
+using DevPrompt.UI.Settings;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -35,7 +36,6 @@ namespace DevPrompt.UI.ViewModels
                     new SettingsTabVM(this, SettingsTabType.Grab),
                     new SettingsTabVM(this, SettingsTabType.Tools),
                     new SettingsTabVM(this, SettingsTabType.Links),
-                    new SettingsTabVM(this, SettingsTabType.PluginDirs),
                 };
 
             this.ActiveTabType = activeTabType;

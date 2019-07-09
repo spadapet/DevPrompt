@@ -92,18 +92,5 @@ namespace DevPrompt.Settings
                 }
             }
         }
-
-        public class Comparer : IEqualityComparer<PluginDirectorySettings>
-        {
-            public bool Equals(PluginDirectorySettings x, PluginDirectorySettings y)
-            {
-                return x.ExpandedDirectory == y.ExpandedDirectory && x.Recurse == y.Recurse && x.Enabled == y.Enabled;
-            }
-
-            public int GetHashCode(PluginDirectorySettings obj)
-            {
-                return obj.ExpandedDirectory.GetHashCode() ^ obj.Recurse.GetHashCode() ^ (obj.Enabled.GetHashCode() << 1);
-            }
-        }
     }
 }

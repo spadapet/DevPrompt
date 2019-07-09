@@ -249,7 +249,7 @@ namespace DevPrompt.UI
 
         private void AddPluginMenuItems(ItemsControl menu, Api.MenuType menuType)
         {
-            if (!this.App.ArePluginsInitialized)
+            if (!this.App.PluginState.Initialized)
             {
                 // Try again later
                 return;
@@ -260,7 +260,7 @@ namespace DevPrompt.UI
                 separator.Tag = null;
                 int index = menu.Items.IndexOf(separator);
 
-                foreach (Api.IMenuItemProvider provider in this.App.MenuItemProviders)
+                foreach (Api.IMenuItemProvider provider in this.App.PluginState.MenuItemProviders)
                 {
                     try
                     {

@@ -5,11 +5,8 @@ using DevPrompt.UI;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using System.Composition;
-using System.Composition.Hosting;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -24,32 +21,15 @@ namespace DevPrompt
     internal partial class App : Application, IAppHost, Api.IApp
     {
         public AppSettings Settings { get; }
+        public PluginState PluginState { get; private set; }
         public NativeApp NativeApp { get; private set; }
-        public bool ArePluginsInitialized => this.processCache != null;
-        public IEnumerable<IProcessListener> ProcessListeners => this.processListeners ?? Enumerable.Empty<IProcessListener>();
-        public IEnumerable<Api.IAppListener> AppListeners => this.appListeners ?? Enumerable.Empty<Api.IAppListener>();
-        public IEnumerable<Api.IMenuItemProvider> MenuItemProviders => this.menuItemProviders ?? Enumerable.Empty<Api.IMenuItemProvider>();
-        public IEnumerable<Api.IWorkspaceProvider> WorkspaceProviders => this.workspaceProviders ?? Enumerable.Empty<Api.IWorkspaceProvider>();
-        public IEnumerable<Assembly> PluginAssemblies => this.pluginAssemblies ?? Enumerable.Empty<Assembly>();
 
-        private CompositionHost compositionHost;
-        private IProcessCache processCache;
-        private IProcessListener[] processListeners;
-        private Api.IAppListener[] appListeners;
-        private Api.IMenuItemProvider[] menuItemProviders;
-        private Api.IWorkspaceProvider[] workspaceProviders;
-        private List<Assembly> pluginAssemblies;
-        private bool saveSettingsPending;
-        private bool loadedSettings;
-        private List<Task> criticalTasks;
-        private State state;
+        private enum RunningState { Run, Restart, ShutDown }
+        private enum SettingsState { None, Loaded, SavePending }
 
-        private enum State
-        {
-            Run,
-            Restart,
-            ShutDown,
-        }
+        private List<Task> criticalTasks; // process won't exit until all critical tasks are done
+        private RunningState runningState;
+        private SettingsState settingsState;
 
         public App()
         {
@@ -57,6 +37,8 @@ namespace DevPrompt
 
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             this.Settings = new AppSettings();
+            this.PluginState = new PluginState(this);
+
             this.Startup += this.OnStartup;
             this.Exit += this.OnExit;
 
@@ -68,7 +50,7 @@ namespace DevPrompt
             this.Settings.PropertyChanged -= this.OnSettingsPropertyChanged;
             this.Settings.CollectionChanged -= this.OnSettingsPropertyChanged;
 
-            this.ClearPlugins();
+            this.PluginState?.Dispose();
             this.NativeApp?.Dispose();
         }
 
@@ -86,19 +68,19 @@ namespace DevPrompt
             this.MainWindow.Show();
 
             await this.InitSettings();
-            await this.InitPlugins();
+            await this.PluginState.Initialize();
             await this.InitCustomSettings();
-            this.loadedSettings = true;
-            AppSnapshot snapshot = await AppSnapshot.Load(this, AppSnapshot.DefaultPath);
+            this.settingsState = SettingsState.Loaded;
 
-            foreach (Api.IAppListener listener in this.AppListeners)
+            foreach (Api.IAppListener listener in this.PluginState.AppListeners)
             {
                 listener.OnStartup(this);
             }
 
+            AppSnapshot snapshot = await AppSnapshot.Load(this, AppSnapshot.DefaultPath);
             this.MainWindow?.InitWorkspaces(snapshot);
 
-            foreach (Api.IAppListener listener in this.AppListeners)
+            foreach (Api.IAppListener listener in this.PluginState.AppListeners)
             {
                 if (this.MainWindow?.ViewModel is Api.IWindow window)
                 {
@@ -111,7 +93,7 @@ namespace DevPrompt
         {
             Debug.Assert(this.MainWindow == null && this.criticalTasks.Count == 0);
 
-            foreach (Api.IAppListener listener in this.AppListeners)
+            foreach (Api.IAppListener listener in this.PluginState.AppListeners)
             {
                 listener.OnExit(this);
             }
@@ -121,7 +103,7 @@ namespace DevPrompt
 
         public void OnWindowClosing(MainWindow window)
         {
-            foreach (Api.IAppListener listener in this.AppListeners)
+            foreach (Api.IAppListener listener in this.PluginState.AppListeners)
             {
                 listener.OnClosing(this, window.ViewModel);
             }
@@ -129,50 +111,17 @@ namespace DevPrompt
 
         public void OnWindowClosed(MainWindow window, bool restart)
         {
-            if (this.state == State.Run && restart)
+            if (this.runningState == RunningState.Run && restart)
             {
-                this.state = State.Restart;
+                this.runningState = RunningState.Restart;
             }
 
             this.CheckShutdown(windowClosed: true);
         }
 
-        private async Task InitPlugins()
-        {
-            this.pluginAssemblies = new List<Assembly>();
-            this.compositionHost = await PluginUtility.CreatePluginHost(this, this.pluginAssemblies);
-
-            if (this.compositionHost != null)
-            {
-                this.processCache = this.compositionHost.GetExport<Interop.IProcessCache>();
-                this.appListeners = this.GetOrderedExports<Api.IAppListener>().ToArray();
-                this.processListeners = this.GetOrderedExports<Interop.IProcessListener>().ToArray();
-                this.menuItemProviders = this.GetOrderedExports<Api.IMenuItemProvider>().ToArray();
-                this.workspaceProviders = this.GetOrderedExports<Api.IWorkspaceProvider>().ToArray();
-            }
-            else
-            {
-                // Plugin support is broken (maybe missing DLLs) but the app should work anyway
-                this.processCache = new Interop.NativeProcessCache();
-            }
-        }
-
-        private void ClearPlugins()
-        {
-            this.compositionHost?.Dispose();
-            this.compositionHost = null;
-            this.pluginAssemblies = null;
-
-            this.processCache = null;
-            this.appListeners = null;
-            this.processListeners = null;
-            this.menuItemProviders = null;
-            this.workspaceProviders = null;
-        }
-
         private async Task InitSettings()
         {
-            if (!this.loadedSettings)
+            if (this.settingsState == SettingsState.None)
             {
                 AppSettings settings = await AppSettings.Load(this, AppSettings.DefaultPath);
                 this.Settings.CopyFrom(settings);
@@ -184,7 +133,7 @@ namespace DevPrompt
 
         private async Task InitCustomSettings()
         {
-            if (!this.loadedSettings)
+            if (this.settingsState == SettingsState.None)
             {
                 AppCustomSettings customSettings = await AppSettings.LoadCustom(this, AppSettings.DefaultCustomPath);
                 this.Settings.CopyFrom(customSettings);
@@ -198,25 +147,18 @@ namespace DevPrompt
 
         public void SaveSettings(string path = null)
         {
-            if (this.loadedSettings && !this.saveSettingsPending)
+            if (this.settingsState == SettingsState.Loaded)
             {
-                this.saveSettingsPending = true;
+                this.settingsState = SettingsState.SavePending;
 
                 Action action = () =>
                 {
-                    this.saveSettingsPending = false;
+                    this.settingsState = SettingsState.Loaded;
                     this.Settings.Save(this, path);
                 };
 
                 this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, action);
             }
-        }
-
-        private IEnumerable<T> GetOrderedExports<T>()
-        {
-            return this.compositionHost.GetExports<ExportFactory<T, Api.OrderAttribute>>()
-                .OrderBy(i => i.Metadata.Order)
-                .Select(i => i.CreateExport().Value);
         }
 
         public void AddCriticalTask(Task task)
@@ -225,7 +167,7 @@ namespace DevPrompt
 
             lock (this.criticalTasks)
             {
-                if (this.state != State.ShutDown && task != null && !this.criticalTasks.Contains(task))
+                if (this.runningState != RunningState.ShutDown && task != null && !this.criticalTasks.Contains(task))
                 {
                     this.criticalTasks.Add(task);
                     added = true;
@@ -258,25 +200,25 @@ namespace DevPrompt
         {
             Action action = () =>
             {
-                if (this.state != State.ShutDown && (windowClosed || this.MainWindow == null))
+                if (this.runningState != RunningState.ShutDown && (windowClosed || this.MainWindow == null))
                 {
                     int taskCount = 0;
                     lock (this.criticalTasks)
                     {
                         taskCount = this.criticalTasks.Count;
-                        if (taskCount == 0 && this.state == State.Run)
+                        if (taskCount == 0 && this.runningState == RunningState.Run)
                         {
-                            this.state = State.ShutDown;
+                            this.runningState = RunningState.ShutDown;
                         }
                     }
 
                     if (taskCount == 0)
                     {
-                        if (this.state == State.ShutDown)
+                        if (this.runningState == RunningState.ShutDown)
                         {
                             this.Shutdown();
                         }
-                        else if (this.state == State.Restart)
+                        else if (this.runningState == RunningState.Restart)
                         {
                             this.Restart();
                         }
@@ -289,8 +231,11 @@ namespace DevPrompt
 
         private void Restart()
         {
-            this.state = State.Run;
-            this.ClearPlugins();
+            this.runningState = RunningState.Run;
+
+            this.PluginState.Dispose();
+            this.PluginState = new PluginState(this);
+
 
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -303,36 +248,32 @@ namespace DevPrompt
             this.MainWindow?.OnSessionEnded();
         }
 
-        void IAppHost.OnProcessOpening(Interop.IProcess process, bool activate, string path)
+        private void CallProcessListeners(Action<IProcessListener> action)
         {
-            foreach (Interop.IProcessListener listener in this.ProcessListeners)
+            foreach (IProcessListener listener in this.PluginState.ProcessListeners)
             {
-                listener.OnProcessOpening(process, activate, path);
+                action(listener);
             }
         }
 
-        void IAppHost.OnProcessClosing(Interop.IProcess process)
+        void IAppHost.OnProcessOpening(IProcess process, bool activate, string path)
         {
-            foreach (Interop.IProcessListener listener in this.ProcessListeners)
-            {
-                listener.OnProcessClosing(process);
-            }
+            this.CallProcessListeners(l => l.OnProcessOpening(process, activate, path));
         }
 
-        void IAppHost.OnProcessEnvChanged(Interop.IProcess process, string env)
+        void IAppHost.OnProcessClosing(IProcess process)
         {
-            foreach (Interop.IProcessListener listener in this.ProcessListeners)
-            {
-                listener.OnProcessEnvChanged(process, env);
-            }
+            this.CallProcessListeners(l => l.OnProcessClosing(process));
         }
 
-        void IAppHost.OnProcessTitleChanged(Interop.IProcess process, string title)
+        void IAppHost.OnProcessEnvChanged(IProcess process, string env)
         {
-            foreach (Interop.IProcessListener listener in this.ProcessListeners)
-            {
-                listener.OnProcessTitleChanged(process, title);
-            }
+            this.CallProcessListeners(l => l.OnProcessEnvChanged(process, env));
+        }
+
+        void IAppHost.OnProcessTitleChanged(IProcess process, string title)
+        {
+            this.CallProcessListeners(l => l.OnProcessTitleChanged(process, title));
         }
 
         int IAppHost.CanGrab(string exePath, bool automatic)
@@ -391,9 +332,9 @@ namespace DevPrompt
 
         Api.IProcessHost Api.IApp.CreateProcessHost(IntPtr parentHwnd)
         {
-            if (this.processCache != null)
+            if (this.PluginState.ProcessCache != null)
             {
-                return this.NativeApp?.CreateProcessHost(this.processCache, parentHwnd);
+                return this.NativeApp?.CreateProcessHost(this.PluginState.ProcessCache, parentHwnd);
             }
 
             Debug.Fail("CreateProcessHost called before app init is complete");

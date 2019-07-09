@@ -21,7 +21,7 @@ namespace DevPrompt.Settings
             Type resolvedType = knownTypeResolver.ResolveName(typeName, typeNamespace, declaredType, null);
             if (resolvedType == null && typeNamespace == SettingTypeResolver.Uri)
             {
-                foreach (Assembly assembly in this.app.PluginAssemblies)
+                foreach (Assembly assembly in this.app.PluginState.PluginAssemblies)
                 {
                     resolvedType = assembly.GetType(typeName, throwOnError: false);
                     if (resolvedType != null)
@@ -41,7 +41,7 @@ namespace DevPrompt.Settings
                 return true;
             }
 
-            if (this.app.PluginAssemblies.Contains(type.Assembly))
+            if (this.app.PluginState.PluginAssemblies.Contains(type.Assembly))
             {
                 typeNamespace = new XmlDictionaryString(XmlDictionary.Empty, SettingTypeResolver.Uri, 0);
                 typeName = new XmlDictionaryString(XmlDictionary.Empty, type.FullName, 0);

@@ -49,7 +49,9 @@
     <Compile Include="Interop\NativeProcessCache.cs" />
     <Compile Include="Interop\NativeProcessListener.cs" />
     <Compile Include="Plugins\ExportProvider.cs" />
-    <Compile Include="Plugins\PluginUtility.cs" />
+    <Compile Include="Plugins\PluginSource.cs" />
+    <Compile Include="Plugins\PluginSourceType.cs" />
+    <Compile Include="Plugins\PluginState.cs" />
     <Compile Include="ProcessWorkspace\ProcessWorkspaceSnapshot.cs" />
     <Compile Include="ProcessWorkspace\ProcessWorkspaceControl.xaml.cs">
       <DependentUpon>ProcessWorkspaceControl.xaml</DependentUpon>
@@ -57,7 +59,13 @@
     <Compile Include="ProcessWorkspace\ProcessWorkspaceProvider.cs" />
     <Compile Include="ProcessWorkspace\ProcessWorkspace.cs" />
     <Compile Include="ProcessWorkspace\ProcessListener.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Settings\AppCustomSettings.cs" />
+    <Compile Include="Settings\NuGetPluginSettings.cs" />
     <Compile Include="Settings\PluginDirectorySettings.cs" />
     <Compile Include="Settings\WorkspaceSnapshot.cs" />
     <Compile Include="Settings\AppSnapshot.cs" />
@@ -81,32 +89,43 @@
       <DependentUpon>AboutDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Controls\DragItemsControl.cs" />
-    <Compile Include="UI\SettingsDialog.xaml.cs">
+    <Compile Include="UI\Plugins\AvailablePluginsControl.xaml.cs">
+      <DependentUpon>AvailablePluginsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Plugins\InstallPluginsControl.xaml.cs">
+      <DependentUpon>InstallPluginsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Plugins\UpdatePluginsControl.xaml.cs">
+      <DependentUpon>UpdatePluginsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Plugins\PluginsDialog.xaml.cs">
+      <DependentUpon>PluginsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Settings\SettingsDialog.xaml.cs">
       <DependentUpon>SettingsDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\SettingsImportDialog.xaml.cs">
+    <Compile Include="UI\Settings\SettingsImportDialog.xaml.cs">
       <DependentUpon>SettingsImportDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\TabNameDialog.xaml.cs">
       <DependentUpon>TabNameDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\GrabSettingsControl.xaml.cs">
+    <Compile Include="UI\Settings\GrabSettingsControl.xaml.cs">
       <DependentUpon>GrabSettingsControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\LinksSettingsControl.xaml.cs">
+    <Compile Include="UI\Settings\LinksSettingsControl.xaml.cs">
       <DependentUpon>LinksSettingsControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\PluginDirsSettingsControl.xaml.cs">
-      <DependentUpon>PluginDirsSettingsControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ToolsSettingsControl.xaml.cs">
+    <Compile Include="UI\Settings\ToolsSettingsControl.xaml.cs">
       <DependentUpon>ToolsSettingsControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\ConsolesSettingsControl.xaml.cs">
+    <Compile Include="UI\Settings\ConsolesSettingsControl.xaml.cs">
       <DependentUpon>ConsolesSettingsControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ProcessWorkspace\ProcessTab.cs" />
     <Compile Include="UI\ViewModels\InstallBranchDialogVM.cs" />
+    <Compile Include="UI\ViewModels\PluginsTabVM.cs" />
+    <Compile Include="UI\ViewModels\PluginsDialogVM.cs" />
     <Compile Include="UI\ViewModels\SettingsTabVM.cs" />
     <Compile Include="UI\ViewModels\SettingsDialogVM.cs" />
     <Compile Include="UI\ViewModels\SettingsImportDialogVM.cs" />
@@ -137,15 +156,31 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\SettingsDialog.xaml">
+    <Page Include="UI\Plugins\AvailablePluginsControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\SettingsImportDialog.xaml">
+    <Page Include="UI\Plugins\InstallPluginsControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\SettingsStyles.xaml">
+    <Page Include="UI\Plugins\UpdatePluginsControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Plugins\PluginsDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Settings\SettingsDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Settings\SettingsImportDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Settings\SettingsStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -153,23 +188,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\GrabSettingsControl.xaml">
+    <Page Include="UI\Settings\GrabSettingsControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\LinksSettingsControl.xaml">
+    <Page Include="UI\Settings\LinksSettingsControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\PluginDirsSettingsControl.xaml">
+    <Page Include="UI\Settings\ToolsSettingsControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\ToolsSettingsControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\ConsolesSettingsControl.xaml">
+    <Page Include="UI\Settings\ConsolesSettingsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -181,7 +212,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="UI\Controls\ProcessHostWindow.cs" />
+    <Compile Include="ProcessWorkspace\ProcessHostWindow.cs" />
     <Compile Include="Interop\IAppHost.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="UI\MainWindow.xaml.cs">
@@ -205,5 +236,12 @@
       <Version>1.2.0</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

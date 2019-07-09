@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
 
-namespace DevPrompt.UI.Controls
+namespace DevPrompt.ProcessWorkspace
 {
     /// <summary>
     /// Hooks the native process host window into WPF

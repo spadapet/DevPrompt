@@ -60,6 +60,7 @@
             <MenuItem Header="_File" SubmenuOpened="OnFileMenuOpened">
                 <Separator Tag="[End]" />
                 <MenuItem Header="_Settings..." Command="{Binding SettingsCommand}" />
+                <MenuItem Header="_Plugins..." Command="{Binding PluginsCommand}" />
                 <Separator />
                 <Separator Tag="[Plugins]" />
                 <MenuItem Header="E_xit" InputGestureText="Alt+F4" Command="{Binding ExitCommand}" />

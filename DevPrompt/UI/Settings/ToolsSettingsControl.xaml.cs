@@ -4,7 +4,7 @@ using DevPrompt.Utility;
 using System.Collections.Specialized;
 using System.Windows.Controls;
 
-namespace DevPrompt.UI
+namespace DevPrompt.UI.Settings
 {
     internal partial class ToolsSettingsControl : UserControl
     {

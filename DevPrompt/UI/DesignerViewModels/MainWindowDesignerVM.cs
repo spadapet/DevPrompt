@@ -33,6 +33,7 @@ namespace DevPrompt.UI.DesignerViewModels
         public ICommand VisualStudioDogfoodCommand => null;
         public ICommand InstallVisualStudioBranchCommand => null;
         public ICommand SettingsCommand => null;
+        public ICommand PluginsCommand => null;
         public ICommand CustomizeConsoleGrabCommand => null;
         public ICommand CustomizeToolsCommand => null;
         public ICommand CustomizeLinksCommand => null;
