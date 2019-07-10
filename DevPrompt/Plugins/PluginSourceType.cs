@@ -1,20 +1,11 @@
-﻿using System.Reflection;
-
-namespace DevPrompt.Plugins
+﻿namespace DevPrompt.Plugins
 {
-    internal class PluginSource
+    internal enum PluginSourceType
     {
-        public PluginSourceType PluginType { get; }
-        public string Id { get; }
-        public string Path { get; }
-        public Assembly Assembly { get; }
-
-        public PluginSource(PluginSourceType pluginType, string id, string path, Assembly assembly)
-        {
-            this.PluginType = pluginType;
-            this.Id = id;
-            this.Path = path;
-            this.Assembly = assembly;
-        }
+        None,
+        BuiltIn, // The EXE itself
+        CommandLine, // /plugin on command line, not persisted
+        Directory, // Found in search paths
+        NuGet, // nuget.org search
     }
 }

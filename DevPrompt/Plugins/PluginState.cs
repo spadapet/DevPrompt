@@ -17,14 +17,14 @@ namespace DevPrompt.Plugins
     {
         public IProcessCache ProcessCache { get; private set; }
         public bool Initialized => this.ProcessCache != null;
-        public IEnumerable<Assembly> PluginAssemblies => this.pluginAssemblies ?? Enumerable.Empty<Assembly>();
+        public IEnumerable<PluginSource> Plugins => this.plugins;
         public IEnumerable<Api.IAppListener> AppListeners => this.appListeners ?? Enumerable.Empty<Api.IAppListener>();
         public IEnumerable<IProcessListener> ProcessListeners => this.processListeners ?? Enumerable.Empty<IProcessListener>();
         public IEnumerable<Api.IMenuItemProvider> MenuItemProviders => this.menuItemProviders ?? Enumerable.Empty<Api.IMenuItemProvider>();
         public IEnumerable<Api.IWorkspaceProvider> WorkspaceProviders => this.workspaceProviders ?? Enumerable.Empty<Api.IWorkspaceProvider>();
 
         private App app;
-        private List<Assembly> pluginAssemblies;
+        private List<PluginSource> plugins;
         private CompositionHost compositionHost;
         private Api.IAppListener[] appListeners;
         private IProcessListener[] processListeners;
@@ -33,14 +33,16 @@ namespace DevPrompt.Plugins
 
 #if NET_FRAMEWORK
         private const string DllSuffix = ".Plugin.dll";
+        private const string NuGetPlatformDir = "net40";
 #else
         private const string DllSuffix = ".NetCorePlugin.dll";
+        private const string NuGetPlatformDir = "net40";
 #endif
 
         public PluginState(App app)
         {
             this.app = app;
-            this.pluginAssemblies = new List<Assembly>();
+            this.plugins = new List<PluginSource>();
         }
 
         public void Dispose()
@@ -76,7 +78,9 @@ namespace DevPrompt.Plugins
 
         private async Task<CompositionHost> CreatePluginHost()
         {
-            List<Assembly> localAssemblies = new List<Assembly>();
+            List<PluginSource> plugins = new List<PluginSource>();
+            PluginDirectorySettings[] pluginDirectories = this.app.Settings.PluginDirectories.ToArray();
+            NuGetPluginSettings[] nugetPlugins = this.app.Settings.NuGetPlugins.ToArray();
 
             CompositionHost compositionHost = await Task.Run(() =>
             {
@@ -91,9 +95,11 @@ namespace DevPrompt.Plugins
                     conventions.ForType<IProcessCache>().Shared();
                     conventions.ForType<IProcessListener>().Shared();
 
+                    plugins.AddRange(PluginState.LoadPlugins(pluginDirectories, nugetPlugins));
+
                     CompositionHost host = new ContainerConfiguration()
                         .WithDefaultConventions(conventions)
-                        .WithAssemblies(this.GetPluginAssemblies(localAssemblies), conventions)
+                        .WithAssemblies(plugins.Select(p => p.Assembly), conventions)
                         .WithProvider(new ExportProvider(this.app))
                         .CreateContainer();
 
@@ -106,65 +112,86 @@ namespace DevPrompt.Plugins
                 }
             });
 
-            this.pluginAssemblies.AddRange(localAssemblies);
+            this.plugins.AddRange(plugins);
 
             return compositionHost;
         }
 
-        private IEnumerable<Assembly> GetPluginAssemblies(ICollection<Assembly> appAssemblies)
+        private class PluginSourceComparer : IEqualityComparer<PluginSource>
         {
-            List<Assembly> assemblies = new List<Assembly> { Assembly.GetExecutingAssembly() };
+            public bool Equals(PluginSource x, PluginSource y) => x.Assembly == y.Assembly;
+            public int GetHashCode(PluginSource obj) => obj.Assembly.GetHashCode();
+        }
 
-            foreach (PluginDirectorySettings pluginDir in this.app.Settings.PluginDirectories)
+        private static IEnumerable<PluginSource> LoadPlugins(IEnumerable<PluginDirectorySettings> pluginDirectories, IEnumerable<NuGetPluginSettings> nugetPlugins)
+        {
+            // The app itself is always a plugin
+            HashSet<PluginSource> plugins = new HashSet<PluginSource>(new PluginSourceComparer())
             {
-                if (pluginDir.Enabled)
-                {
-                    assemblies.AddRange(this.GetPluginAssemblies(pluginDir.ExpandedDirectory, pluginDir.Recurse));
-                }
-            }
+                new PluginSource(PluginSourceType.BuiltIn, Assembly.GetExecutingAssembly()),
+            };
 
-            // User can force specific plugins from the command line
+            // Users can force specific plugins from the command line
             string[] args = Environment.GetCommandLineArgs();
             for (int i = 1; i + 1 < args.Length; i++)
             {
                 if (args[i] == "/plugin")
                 {
                     string file = args[++i];
-                    if (file.EndsWith(PluginState.DllSuffix, StringComparison.OrdinalIgnoreCase) && File.Exists(file))
+                    foreach (Assembly assembly in PluginState.LoadAssemblies(file, recursive: false))
                     {
-                        try
-                        {
-                            assemblies.Add(Assembly.LoadFrom(file));
-                        }
-                        catch
-                        {
-                            // ignore failure
-                        }
+                        plugins.Add(new PluginSource(PluginSourceType.CommandLine, assembly));
                     }
                 }
             }
 
-            foreach (Assembly assembly in assemblies.Distinct())
+            // Load from all plugin directories
+            foreach (PluginDirectorySettings pluginDir in pluginDirectories)
             {
-                appAssemblies?.Add(assembly);
-                yield return assembly;
+                if (pluginDir.Enabled)
+                {
+                    foreach (Assembly assembly in PluginState.LoadAssemblies(pluginDir.ExpandedDirectory, pluginDir.Recurse))
+                    {
+                        plugins.Add(new PluginSource(PluginSourceType.Directory, assembly));
+                    }
+                }
             }
+
+            // Load from NuGet packages
+            foreach (NuGetPluginSettings nuget in nugetPlugins)
+            {
+                if (nuget.Enabled)
+                {
+                    string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages", nuget.Id, nuget.Version, "tools", PluginState.NuGetPlatformDir);
+                    foreach (Assembly assembly in PluginState.LoadAssemblies(path, recursive: false))
+                    {
+                        plugins.Add(new PluginSource(PluginSourceType.NuGet, assembly));
+                    }
+                }
+            }
+
+            return plugins;
         }
 
-        private IEnumerable<Assembly> GetPluginAssemblies(string path, bool recursive)
+        private static IEnumerable<Assembly> LoadAssemblies(string path, bool recursive)
         {
             List<Assembly> assemblies = new List<Assembly>();
             IEnumerable<string> files = Enumerable.Empty<string>();
 
             try
             {
-                if (Directory.Exists(path))
+                if (File.Exists(path))
+                {
+                    files = new string[] { path };
+                }
+                else if (Directory.Exists(path))
                 {
                     files = Directory.EnumerateFiles(path, "*" + PluginState.DllSuffix, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).ToArray();
                 }
             }
             catch
             {
+                // ignore failure
             }
 
             foreach (string file in files)
