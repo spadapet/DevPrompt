@@ -1,5 +1,5 @@
-﻿using System.Windows.Controls;
-using DevPrompt.UI.ViewModels;
+﻿using DevPrompt.UI.ViewModels;
+using System.Windows.Controls;
 
 namespace DevPrompt.UI.Plugins
 {

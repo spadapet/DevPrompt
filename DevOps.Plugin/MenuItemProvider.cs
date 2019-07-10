@@ -19,9 +19,8 @@ namespace DevOps
                 case MenuType.Tools:
                     yield return new MenuItem()
                     {
-                        Header = "Pull request dashboard",
-                        Command = new DelegateCommand(obj => this.OnPullRequestDashboard((IWindow)obj)),
-                        CommandParameter = window
+                        Header = Resources.PullRequestDashboardMenuName,
+                        Command = new DelegateCommand(() => this.OnPullRequestDashboard(window)),
                     };
                     break;
             }

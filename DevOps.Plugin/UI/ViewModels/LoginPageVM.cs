@@ -53,20 +53,13 @@ namespace DevOps.UI.ViewModels
             this.cancellationTokenSource.Dispose();
         }
 
-        public IWindow Window
-        {
-            get
-            {
-                return this.tab.Window;
-            }
-        }
+        public IWindow Window => this.tab.Window;
+        public string AuthenticationBase64 => Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + this.PersonalAccessToken));
+        public ICommand OkCommand => this.okCommand;
 
         public string OrganizationName
         {
-            get
-            {
-                return this.organizationName ?? string.Empty;
-            }
+            get => this.organizationName ?? string.Empty;
 
             set
             {
@@ -79,10 +72,7 @@ namespace DevOps.UI.ViewModels
 
         public string ProjectName
         {
-            get
-            {
-                return this.projectName ?? string.Empty;
-            }
+            get => this.projectName ?? string.Empty;
 
             set
             {
@@ -95,10 +85,7 @@ namespace DevOps.UI.ViewModels
 
         public string PersonalAccessToken
         {
-            get
-            {
-                return this.personalAccessToken ?? string.Empty;
-            }
+            get => this.personalAccessToken ?? string.Empty;
 
             set
             {
@@ -107,22 +94,6 @@ namespace DevOps.UI.ViewModels
                     this.OnPropertyChanged(nameof(this.AuthenticationBase64));
                     this.okCommand.UpdateCanExecute();
                 }
-            }
-        }
-
-        public string AuthenticationBase64
-        {
-            get
-            {
-                return Convert.ToBase64String(Encoding.ASCII.GetBytes(":" + this.PersonalAccessToken));
-            }
-        }
-
-        public ICommand OkCommand
-        {
-            get
-            {
-                return this.okCommand;
             }
         }
 

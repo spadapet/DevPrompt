@@ -52,21 +52,8 @@ namespace DevOps.UI.ViewModels
             this.avatarHttpClient.Dispose();
         }
 
-        public IList<PullRequestVM> PullRequests
-        {
-            get
-            {
-                return this.pullRequests;
-            }
-        }
-
-        public IWindow Window
-        {
-            get
-            {
-                return this.Tab.Window;
-            }
-        }
+        public IList<PullRequestVM> PullRequests => this.pullRequests;
+        public IWindow Window => this.Tab.Window;
 
         public async Task OnLoaded()
         {

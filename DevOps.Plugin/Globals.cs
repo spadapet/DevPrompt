@@ -2,51 +2,38 @@
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Composition;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace DevOps
 {
     /// <summary>
-    /// The intention of this Globals class is to cache VSS connections
-    /// globally so that each view doesn't have to authenticate.
-    /// The implementation is not here yet, but that's the intent.
+    /// Stores global data for this plugin, only one will ever be created at a time.
+    /// VSS connections are cached here so that they can be shared among views.
     /// </summary>
     [Export(typeof(IAppListener))]
     internal class Globals : IAppListener, IDisposable
     {
         public static Globals Instance { get; private set; }
-        public IApp App { get; }
-        private readonly ConcurrentDictionary<string, VssConnection> vssConnections;
-        private bool disposed;
+        private readonly Dictionary<string, VssConnection> vssConnections;
 
-        [ImportingConstructor]
-        public Globals(IApp app)
+        public Globals()
         {
             Globals.Instance = this;
 
-            this.App = app;
-            this.vssConnections = new ConcurrentDictionary<string, VssConnection>();
+            this.vssConnections = new Dictionary<string, VssConnection>();
         }
 
         public void Dispose()
         {
-            Debug.Assert(!this.disposed);
-
-            if (!this.disposed)
+            foreach (VssConnection connection in this.vssConnections.Values)
             {
-                this.disposed = true;
-
-                foreach (VssConnection connection in this.vssConnections.Values)
-                {
-                    connection.Dispose();
-                }
-
-                this.vssConnections.Clear();
+                connection.Dispose();
             }
+
+            this.vssConnections.Clear();
 
             Globals.Instance = null;
         }
@@ -56,9 +43,15 @@ namespace DevOps
             if (!this.vssConnections.TryGetValue(organizationName, out VssConnection connection))
             {
                 Uri uri = await VssConnectionHelper.GetOrganizationUrlAsync(organizationName, cancellationToken);
-                VssCredentials credentials = new VssBasicCredential(string.Empty, personalAccessToken);
-                connection = new VssConnection(uri, credentials);
-                this.vssConnections.TryAdd(organizationName, connection);
+
+                // Check again in case a connection was added during the async call
+                if (!this.vssConnections.TryGetValue(organizationName, out connection))
+                {
+                    VssCredentials credentials = new VssBasicCredential(string.Empty, personalAccessToken);
+                    connection = new VssConnection(uri, credentials);
+
+                    this.vssConnections[organizationName] = connection;
+                }
             }
 
             return connection;
