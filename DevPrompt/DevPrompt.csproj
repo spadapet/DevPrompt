@@ -92,8 +92,8 @@
     <Compile Include="UI\Plugins\AvailablePluginsControl.xaml.cs">
       <DependentUpon>AvailablePluginsControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Plugins\InstallPluginsControl.xaml.cs">
-      <DependentUpon>InstallPluginsControl.xaml</DependentUpon>
+    <Compile Include="UI\Plugins\InstalledPluginsControl.xaml.cs">
+      <DependentUpon>InstalledPluginsControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Plugins\UpdatePluginsControl.xaml.cs">
       <DependentUpon>UpdatePluginsControl.xaml</DependentUpon>
@@ -132,6 +132,7 @@
     <Compile Include="UI\ViewModels\TabNameDialogVM.cs" />
     <Compile Include="Utility\DelegateConverter.cs" />
     <Compile Include="Utility\DelegateMultiConverter.cs" />
+    <Compile Include="Utility\JsonTokenizer.cs" />
     <Compile Include="Utility\VisibleToBoolConverter.cs" />
     <Compile Include="Utility\CommandHelpers.cs" />
     <Compile Include="Utility\DelegateDisposable.cs" />
@@ -160,7 +161,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\Plugins\InstallPluginsControl.xaml">
+    <Page Include="UI\Plugins\InstalledPluginsControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

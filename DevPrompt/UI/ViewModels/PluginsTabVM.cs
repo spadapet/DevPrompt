@@ -54,7 +54,7 @@ namespace DevPrompt.UI.ViewModels
                     switch (this.TabType)
                     {
                         case PluginsTabType.PluginInstalled:
-                            this.viewElement = new InstallPluginsControl(this.viewModel);
+                            this.viewElement = new InstalledPluginsControl(this.viewModel);
                             break;
 
                         case PluginsTabType.PluginAvailable:

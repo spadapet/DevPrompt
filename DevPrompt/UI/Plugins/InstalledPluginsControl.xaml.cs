@@ -3,11 +3,11 @@ using System.Windows.Controls;
 
 namespace DevPrompt.UI.Plugins
 {
-    internal partial class InstallPluginsControl : UserControl
+    internal partial class InstalledPluginsControl : UserControl
     {
         public PluginsDialogVM ViewModel { get; }
 
-        public InstallPluginsControl(PluginsDialogVM viewModel)
+        public InstalledPluginsControl(PluginsDialogVM viewModel)
         {
             this.ViewModel = viewModel;
             this.InitializeComponent();
