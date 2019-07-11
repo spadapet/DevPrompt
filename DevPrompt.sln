@@ -28,6 +28,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{A46204E7
 		Build\csharp.netfx.props = Build\csharp.netfx.props
 		Build\csharp.props = Build\csharp.props
 		Build\GlobalAssemblyInfo.cs = Build\GlobalAssemblyInfo.cs
+		Build\publickey-verify.reg = Build\publickey-verify.reg
 		shared.props = shared.props
 	EndProjectSection
 EndProject
