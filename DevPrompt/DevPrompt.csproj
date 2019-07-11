@@ -132,7 +132,12 @@
     <Compile Include="UI\ViewModels\TabNameDialogVM.cs" />
     <Compile Include="Utility\DelegateConverter.cs" />
     <Compile Include="Utility\DelegateMultiConverter.cs" />
-    <Compile Include="Utility\JsonTokenizer.cs" />
+    <Compile Include="Utility\Json\JsonException.cs" />
+    <Compile Include="Utility\Json\JsonParser.cs" />
+    <Compile Include="Utility\Json\JsonToken.cs" />
+    <Compile Include="Utility\Json\JsonTokenizer.cs" />
+    <Compile Include="Utility\Json\JsonDynamic.cs" />
+    <Compile Include="Utility\Json\JsonValue.cs" />
     <Compile Include="Utility\VisibleToBoolConverter.cs" />
     <Compile Include="Utility\CommandHelpers.cs" />
     <Compile Include="Utility\DelegateDisposable.cs" />

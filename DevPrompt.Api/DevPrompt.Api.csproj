@@ -53,6 +53,7 @@
     <Compile Include="UI\TabVM.cs" />
     <Compile Include="UI\WorkspaceVM.cs" />
     <Compile Include="Utility\DelegateCommand.cs" />
+    <Compile Include="Utility\IJsonValue.cs" />
     <Compile Include="Utility\PropertyNotifier.cs" />
   </ItemGroup>
   <ItemGroup>

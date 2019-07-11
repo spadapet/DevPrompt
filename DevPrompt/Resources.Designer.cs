@@ -61,6 +61,96 @@ namespace DevPrompt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to JSON parse failure at {0}, token={1}.
+        /// </summary>
+        internal static string JsonException_Message {
+            get {
+                return ResourceManager.GetString("JsonException.Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to JSON parse failure at {0}, token={1}, {2}.
+        /// </summary>
+        internal static string JsonException_Message2 {
+            get {
+                return ResourceManager.GetString("JsonException.Message2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected comma or close bracket after array.
+        /// </summary>
+        internal static string JsonParser_ExpectedCommaOrBracket {
+            get {
+                return ResourceManager.GetString("JsonParser.ExpectedCommaOrBracket", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected comma or close curly brace after value.
+        /// </summary>
+        internal static string JsonParser_ExpectedCommaOrCurly {
+            get {
+                return ResourceManager.GetString("JsonParser.ExpectedCommaOrCurly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected a colon after the key name.
+        /// </summary>
+        internal static string JsonParser_ExpectedKeyColon {
+            get {
+                return ResourceManager.GetString("JsonParser.ExpectedKeyColon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected a string key name.
+        /// </summary>
+        internal static string JsonParser_ExpectedKeyName {
+            get {
+                return ResourceManager.GetString("JsonParser.ExpectedKeyName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected open curly brace.
+        /// </summary>
+        internal static string JsonParser_ExpectedObject {
+            get {
+                return ResourceManager.GetString("JsonParser.ExpectedObject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicate key: {0}.
+        /// </summary>
+        internal static string JsonParser_ExpectedUniqueKey {
+            get {
+                return ResourceManager.GetString("JsonParser.ExpectedUniqueKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected a value.
+        /// </summary>
+        internal static string JsonParser_ExpectedValue {
+            get {
+                return ResourceManager.GetString("JsonParser.ExpectedValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid string.
+        /// </summary>
+        internal static string JsonParser_InvalidStringToken {
+            get {
+                return ResourceManager.GetString("JsonParser.InvalidStringToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Available.
         /// </summary>
         internal static string PluginsTabType_PluginAvailable {

@@ -59,6 +59,8 @@ namespace DevOps
 
         void IAppListener.OnStartup(IApp app)
         {
+            IJsonValue value = app.ParseJson(@"{ ""foo"": true, ""bar"": [ 1, 2, 3, { ""goo"": ""goo2"" } ] } ");
+            value = null;
         }
 
         void IAppListener.OnOpened(IApp app, IWindow window)

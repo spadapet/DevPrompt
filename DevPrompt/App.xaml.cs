@@ -2,6 +2,7 @@
 using DevPrompt.Plugins;
 using DevPrompt.Settings;
 using DevPrompt.UI;
+using DevPrompt.Utility.Json;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -303,6 +304,18 @@ namespace DevPrompt
         bool Api.IApp.IsElevated => Program.IsElevated;
         bool Api.IApp.IsMainProcess => Program.IsMainProcess;
         bool Api.IApp.IsMicrosoftDomain => Program.IsMicrosoftDomain;
+
+        Api.IJsonValue Api.IApp.ParseJson(string json)
+        {
+            try
+            {
+                return JsonParser.Parse(json);
+            }
+            catch (JsonException)
+            {
+                return default(JsonValue);
+            }
+        }
 
         IEnumerable<Api.IWindow> Api.IApp.Windows
         {

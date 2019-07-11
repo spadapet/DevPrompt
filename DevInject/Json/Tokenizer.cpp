@@ -78,21 +78,27 @@ Json::Value Json::Token::GetValue() const
                     break;
 
                 case 'u':
-                {
-                    wchar_t buffer[5] = { cur[2], cur[3], cur[4], cur[5], '\0' };
-                    wchar_t* stopped = nullptr;
-                    unsigned long decoded = wcstoul(buffer, &stopped, 16);
-                    if (!*stopped)
+                    if (cur + 5 < end)
                     {
-                        val.append(1, (wchar_t)(decoded & 0xFFFF));
-                        cur += 6;
+                        wchar_t buffer[5] = { cur[2], cur[3], cur[4], cur[5], '\0' };
+                        wchar_t* stopped = nullptr;
+                        unsigned long decoded = wcstoul(buffer, &stopped, 16);
+
+                        if (!*stopped)
+                        {
+                            val.append(1, (wchar_t)(decoded & 0xFFFF));
+                            cur += 6;
+                        }
+                        else
+                        {
+                            cur = nullptr;
+                        }
                     }
                     else
                     {
                         cur = nullptr;
                     }
-                }
-                break;
+                    break;
 
                 default:
                     cur = nullptr;

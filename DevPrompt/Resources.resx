@@ -117,6 +117,36 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="JsonException.Message" xml:space="preserve">
+    <value>JSON parse failure at {0}, token={1}</value>
+  </data>
+  <data name="JsonException.Message2" xml:space="preserve">
+    <value>JSON parse failure at {0}, token={1}, {2}</value>
+  </data>
+  <data name="JsonParser.ExpectedCommaOrBracket" xml:space="preserve">
+    <value>Expected comma or close bracket after array</value>
+  </data>
+  <data name="JsonParser.ExpectedCommaOrCurly" xml:space="preserve">
+    <value>Expected comma or close curly brace after value</value>
+  </data>
+  <data name="JsonParser.ExpectedKeyColon" xml:space="preserve">
+    <value>Expected a colon after the key name</value>
+  </data>
+  <data name="JsonParser.ExpectedKeyName" xml:space="preserve">
+    <value>Expected a string key name</value>
+  </data>
+  <data name="JsonParser.ExpectedObject" xml:space="preserve">
+    <value>Expected open curly brace</value>
+  </data>
+  <data name="JsonParser.ExpectedUniqueKey" xml:space="preserve">
+    <value>Duplicate key: {0}</value>
+  </data>
+  <data name="JsonParser.ExpectedValue" xml:space="preserve">
+    <value>Expected a value</value>
+  </data>
+  <data name="JsonParser.InvalidStringToken" xml:space="preserve">
+    <value>Invalid string</value>
+  </data>
   <data name="PluginsTabType.PluginAvailable" xml:space="preserve">
     <value>Available</value>
   </data>
