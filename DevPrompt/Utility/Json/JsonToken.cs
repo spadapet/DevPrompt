@@ -23,7 +23,7 @@ namespace DevPrompt.Utility.Json
     }
 
     [DebuggerDisplay("{Type}")]
-    internal struct JsonToken
+    internal struct JsonToken : IEquatable<JsonToken>
     {
         public JsonTokenType Type { get; }
         public int Start { get; }
@@ -34,6 +34,31 @@ namespace DevPrompt.Utility.Json
             this.Type = type;
             this.Start = start;
             this.Length = length;
+        }
+
+        public override int GetHashCode()
+        {
+            return ((int)this.Type << 24) ^ (this.Length << 16) ^ this.Start;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is JsonToken other && this.Equals(other);
+        }
+
+        public bool Equals(JsonToken other)
+        {
+            return this.Type == other.Type && this.Start == other.Start && this.Length == other.Length;
+        }
+
+        public static bool operator ==(JsonToken x, JsonToken y)
+        {
+            return x.Equals(y);
+        }
+
+        public static bool operator !=(JsonToken x, JsonToken y)
+        {
+            return !x.Equals(y);
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)] public bool IsNone => this.Type == JsonTokenType.None;
@@ -50,7 +75,7 @@ namespace DevPrompt.Utility.Json
         [DebuggerBrowsable(DebuggerBrowsableState.Never)] public bool IsOpenBracket => this.Type == JsonTokenType.OpenBracket;
         [DebuggerBrowsable(DebuggerBrowsableState.Never)] public bool IsCloseBracket => this.Type == JsonTokenType.CloseBracket;
 
-        public JsonValue GetValue(string json)
+        public JsonValue GetValue(JsonValueContext context)
         {
             JsonValueType valueType = JsonValueType.Unset;
 
@@ -74,7 +99,7 @@ namespace DevPrompt.Utility.Json
                     break;
             }
 
-            return new JsonValue(valueType, this, json);
+            return new JsonValue(valueType, this, context);
         }
 
         public string GetText(string json)
@@ -86,7 +111,7 @@ namespace DevPrompt.Utility.Json
         {
             if (!this.IsString)
             {
-                throw new InvalidOperationException($"JsonToken is not a String: {this.Type}");
+                throw new JsonException(this, string.Format(CultureInfo.CurrentCulture, Resources.JsonValue_WrongType, JsonTokenType.String));
             }
 
             StringBuilder value = new StringBuilder(this.Length);

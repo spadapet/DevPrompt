@@ -16,5 +16,7 @@ namespace DevPrompt.Api
         int Int { get; }
         double Double { get; }
         string String { get; }
+        object Value { get; }
+        dynamic Dynamic { get; }
     }
 }

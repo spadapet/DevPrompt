@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 
 namespace DevPrompt.Utility.Json
@@ -17,31 +18,65 @@ namespace DevPrompt.Utility.Json
         Dictionary,
     }
 
-    [DebuggerDisplay("{DebuggerString}")]
-    [DebuggerTypeProxy(typeof(DebugView))]
-    internal struct JsonValue : Api.IJsonValue
+    internal struct JsonValue : Api.IJsonValue, IEquatable<JsonValue>
     {
         public JsonValueType Type { get; }
+        private JsonValueContext context;
         private JsonToken token;
         private object value;
-        private string json;
 
-        public JsonValue(JsonValueType type, JsonToken token, string json)
+        public JsonValue(JsonValueType type, JsonToken token, JsonValueContext context)
         {
             this.Type = type;
+            this.context = context;
             this.token = token;
             this.value = null;
-            this.json = json;
         }
 
-        public JsonValue(JsonValueType type, object value, string json)
+        public JsonValue(JsonValueType type, object value, JsonValueContext context)
             : this()
         {
             this.Type = type;
+            this.context = context;
             this.token = default;
             this.value = value;
-            this.json = json;
         }
+
+        public override int GetHashCode()
+        {
+            return ((int)this.Type << 8) ^
+                this.context.GetHashCode() ^
+                this.token.GetHashCode() ^
+                (this.value != null ? this.value.GetHashCode() : 0);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is JsonValue other && this.Equals(other);
+        }
+
+        public bool Equals(JsonValue other)
+        {
+            return this.Type == other.Type &&
+                this.context == other.context &&
+                this.token.Equals(other.token) &&
+                this.value == other.value;
+        }
+
+        public static bool operator ==(JsonValue x, JsonValue y)
+        {
+            return x.Equals(y);
+        }
+
+        public static bool operator !=(JsonValue x, JsonValue y)
+        {
+            return !x.Equals(y);
+        }
+
+        public static explicit operator bool(JsonValue value) => value.Bool;
+        public static explicit operator int(JsonValue value) => value.Int;
+        public static explicit operator double(JsonValue value) => value.Double;
+        public static explicit operator string(JsonValue value) => value.String;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)] public bool IsArray => this.Type == JsonValueType.Array;
         [DebuggerBrowsable(DebuggerBrowsableState.Never)] public bool IsBool => this.Type == JsonValueType.Bool;
@@ -51,11 +86,7 @@ namespace DevPrompt.Utility.Json
         [DebuggerBrowsable(DebuggerBrowsableState.Never)] public bool IsString => this.Type == JsonValueType.String;
         [DebuggerBrowsable(DebuggerBrowsableState.Never)] public bool IsUnset => this.Type == JsonValueType.Unset;
 
-        public static explicit operator bool(JsonValue value) => value.Bool;
-        public static explicit operator int(JsonValue value) => value.Int;
-        public static explicit operator double(JsonValue value) => value.Double;
-        public static explicit operator string(JsonValue value) => value.String;
-
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool Bool
         {
             get
@@ -65,29 +96,32 @@ namespace DevPrompt.Utility.Json
                     return this.token.Type == JsonTokenType.True;
                 }
 
-                throw new InvalidOperationException($"JsonValue not a Bool: {this.Type}");
+                throw new JsonException(this.token, string.Format(CultureInfo.CurrentCulture, Resources.JsonValue_WrongType, JsonValueType.Bool));
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public int Int => (int)this.Double;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public double Double
         {
             get
             {
                 if (this.IsNumber)
                 {
-                    string str = this.token.GetText(this.json);
+                    string str = this.token.GetText(this.context.Json);
                     if (double.TryParse(str, out double value))
                     {
                         return value;
                     }
                 }
 
-                throw new InvalidOperationException($"JsonValue not a Number: {this.Type}");
+                throw new JsonException(this.token, string.Format(CultureInfo.CurrentCulture, Resources.JsonValue_WrongType, JsonValueType.Number));
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public string String
         {
             get
@@ -97,17 +131,18 @@ namespace DevPrompt.Utility.Json
                     case JsonValueType.Null:
                     case JsonValueType.Bool:
                     case JsonValueType.Number:
-                        return this.token.GetText(this.json);
+                        return this.token.GetText(this.context.Json);
 
                     case JsonValueType.String:
-                        return this.token.GetDecodedString(this.json);
+                        return this.token.GetDecodedString(this.context.Json);
 
                     default:
-                        throw new InvalidOperationException($"JsonValue not a String: {this.Type}");
+                        throw new JsonException(this.token, string.Format(CultureInfo.CurrentCulture, Resources.JsonValue_WrongType, JsonValueType.String));
                 }
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public IReadOnlyList<JsonValue> Array
         {
             get
@@ -117,10 +152,11 @@ namespace DevPrompt.Utility.Json
                     return value;
                 }
 
-                throw new InvalidOperationException($"JsonValue not an Array: {this.Type}");
+                throw new JsonException(this.token, string.Format(CultureInfo.CurrentCulture, Resources.JsonValue_WrongType, JsonValueType.Array));
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public IReadOnlyDictionary<string, JsonValue> Dictionary
         {
             get
@@ -130,9 +166,15 @@ namespace DevPrompt.Utility.Json
                     return value;
                 }
 
-                throw new InvalidOperationException($"JsonValue not a Dictionary: {this.Type}");
+                throw new JsonException(this.token, string.Format(CultureInfo.CurrentCulture, Resources.JsonValue_WrongType, JsonValueType.Dictionary));
             }
         }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public dynamic Dynamic => this.context.GetDynamic(this);
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Api.IJsonValue Boxed => this.context.GetInterface(this);
 
         public JsonValue this[string path] => this.GetFromPath(path, 0);
 
@@ -194,36 +236,31 @@ namespace DevPrompt.Utility.Json
             return default;
         }
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string DebuggerString
+        public override string ToString()
         {
-            get
+            switch (this.Type)
             {
-                switch (this.Type)
-                {
-                    case JsonValueType.Unset:
-                        return "<unset>";
+                case JsonValueType.Unset:
+                    return "<unset>";
 
-                    case JsonValueType.Null:
-                    case JsonValueType.Bool:
-                    case JsonValueType.Number:
-                    case JsonValueType.String:
-                        return this.String;
+                case JsonValueType.Null:
+                case JsonValueType.Bool:
+                case JsonValueType.Number:
+                case JsonValueType.String:
+                    return this.String;
 
-                    case JsonValueType.Array:
-                        return $"Array, Count={this.Array.Count}";
+                case JsonValueType.Array:
+                    return $"Array, Count={this.Array.Count}";
 
-                    case JsonValueType.Dictionary:
-                        return $"Dictionary, Count={this.Dictionary.Count}";
+                case JsonValueType.Dictionary:
+                    return $"Dictionary, Count={this.Dictionary.Count}";
 
-                    default:
-                        return null;
-                }
+                default:
+                    return null;
             }
         }
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private object DebuggerValue
+        public object Value
         {
             get
             {
@@ -239,10 +276,8 @@ namespace DevPrompt.Utility.Json
                         return this.String;
 
                     case JsonValueType.Array:
-                        return this.Array;
-
                     case JsonValueType.Dictionary:
-                        return this.Dictionary;
+                        return this.value;
 
                     default:
                         return null;
@@ -252,19 +287,58 @@ namespace DevPrompt.Utility.Json
 
         IEnumerator<Api.IJsonValue> IEnumerable<Api.IJsonValue>.GetEnumerator()
         {
-            return this.Array.Select(v => (Api.IJsonValue)v).GetEnumerator();
+            if (this.IsArray)
+            {
+                return this.Array.Select(v => v.Boxed).GetEnumerator();
+            }
+            else if (this.IsDictionary)
+            {
+                return this.Dictionary.Values.Select(v => v.Boxed).GetEnumerator();
+            }
+
+            IReadOnlyList<Api.IJsonValue> list = System.Array.Empty<Api.IJsonValue>();
+            return list.GetEnumerator();
+        }
+
+        IEnumerator<KeyValuePair<string, Api.IJsonValue>> IEnumerable<KeyValuePair<string, Api.IJsonValue>>.GetEnumerator()
+        {
+            if (this.IsDictionary)
+            {
+                return this.Dictionary.Select(pair => new KeyValuePair<string, Api.IJsonValue>(pair.Key, pair.Value.Boxed)).GetEnumerator();
+            }
+
+            IReadOnlyList<KeyValuePair<string, Api.IJsonValue>> list = System.Array.Empty<KeyValuePair<string, Api.IJsonValue>>();
+            return list.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            if (this.IsArray)
+            {
+                IEnumerable<Api.IJsonValue> enumerable = this;
+                IEnumerator<Api.IJsonValue> enumerator = enumerable.GetEnumerator();
+                return enumerator;
+            }
+            else if (this.IsDictionary)
+            {
+                IEnumerable<KeyValuePair<string, Api.IJsonValue>> enumerable = this;
+                IEnumerator<KeyValuePair<string, Api.IJsonValue>> enumerator = enumerable.GetEnumerator();
+                return enumerator;
+            }
+
+            return System.Array.Empty<Api.IJsonValue>().GetEnumerator();
         }
 
         bool IReadOnlyDictionary<string, Api.IJsonValue>.ContainsKey(string key)
         {
-            return this.Dictionary.ContainsKey(key);
+            return this.IsDictionary && this.Dictionary.ContainsKey(key);
         }
 
         bool IReadOnlyDictionary<string, Api.IJsonValue>.TryGetValue(string key, out Api.IJsonValue value)
         {
-            if (this.Dictionary.TryGetValue(key, out JsonValue jsonValue))
+            if (this.IsDictionary && this.Dictionary.TryGetValue(key, out JsonValue jsonValue))
             {
-                value = jsonValue;
+                value = jsonValue.Boxed;
                 return true;
             }
 
@@ -272,42 +346,18 @@ namespace DevPrompt.Utility.Json
             return false;
         }
 
-        IEnumerator<KeyValuePair<string, Api.IJsonValue>> IEnumerable<KeyValuePair<string, Api.IJsonValue>>.GetEnumerator()
-        {
-            return this.Dictionary.Select(pair => new KeyValuePair<string, Api.IJsonValue>(pair.Key, pair.Value)).GetEnumerator();
-        }
+        int IReadOnlyCollection<Api.IJsonValue>.Count => this.IsArray ? this.Array.Count : 0;
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            IEnumerable<Api.IJsonValue> enumerable = this;
-            IEnumerator<Api.IJsonValue> enumerator = enumerable.GetEnumerator();
-            return enumerator;
-        }
+        IEnumerable<string> IReadOnlyDictionary<string, Api.IJsonValue>.Keys =>
+            this.IsDictionary ? this.Dictionary.Keys : Enumerable.Empty<string>();
 
-        int IReadOnlyCollection<Api.IJsonValue>.Count => this.Array.Count;
+        IEnumerable<Api.IJsonValue> IReadOnlyDictionary<string, Api.IJsonValue>.Values =>
+            this.IsDictionary ? this.Dictionary.Values.Select(v => v.Boxed) : Enumerable.Empty<Api.IJsonValue>();
 
-        IEnumerable<string> IReadOnlyDictionary<string, Api.IJsonValue>.Keys => this.Dictionary.Keys;
-
-        IEnumerable<Api.IJsonValue> IReadOnlyDictionary<string, Api.IJsonValue>.Values => this.Dictionary.Values.Select(v => (Api.IJsonValue)v);
-
-        int IReadOnlyCollection<KeyValuePair<string, Api.IJsonValue>>.Count => this.Dictionary.Count;
+        int IReadOnlyCollection<KeyValuePair<string, Api.IJsonValue>>.Count => this.IsDictionary ? this.Dictionary.Count : 0;
 
         Api.IJsonValue IReadOnlyDictionary<string, Api.IJsonValue>.this[string key] => this[key];
 
         Api.IJsonValue IReadOnlyList<Api.IJsonValue>.this[int index] => this[index];
-
-        // Just for the VS debugger
-        public class DebugView
-        {
-            private JsonValue value;
-
-            public DebugView(JsonValue value)
-            {
-                this.value = value;
-            }
-
-            public JsonValueType Type => this.value.Type;
-            public object Value => this.value.DebuggerValue;
-        }
     }
 }

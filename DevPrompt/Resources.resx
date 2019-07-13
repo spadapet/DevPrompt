@@ -147,6 +147,9 @@
   <data name="JsonParser.InvalidStringToken" xml:space="preserve">
     <value>Invalid string</value>
   </data>
+  <data name="JsonValue.WrongType" xml:space="preserve">
+    <value>JSON value is not a {0}</value>
+  </data>
   <data name="PluginsTabType.PluginAvailable" xml:space="preserve">
     <value>Available</value>
   </data>

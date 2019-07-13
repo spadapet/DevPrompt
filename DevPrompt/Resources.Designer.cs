@@ -151,6 +151,15 @@ namespace DevPrompt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to JSON value is not a {0}.
+        /// </summary>
+        internal static string JsonValue_WrongType {
+            get {
+                return ResourceManager.GetString("JsonValue.WrongType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Available.
         /// </summary>
         internal static string PluginsTabType_PluginAvailable {

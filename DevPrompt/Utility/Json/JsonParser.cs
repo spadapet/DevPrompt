@@ -11,13 +11,13 @@ namespace DevPrompt.Utility.Json
             return parser.RootValue;
         }
 
-        private string json;
         private JsonTokenizer tokenizer;
+        private JsonValueContext context;
 
         private JsonParser(string json)
         {
-            this.json = json ?? string.Empty;
-            this.tokenizer = new JsonTokenizer(this.json);
+            this.tokenizer = new JsonTokenizer(json);
+            this.context = new JsonValueContext(json);
         }
 
         private JsonToken NextToken => this.tokenizer.NextToken;
@@ -49,7 +49,7 @@ namespace DevPrompt.Utility.Json
                         throw new JsonException(token, Resources.JsonParser_ExpectedKeyName);
                     }
 
-                    string key = token.GetDecodedString(this.json);
+                    string key = token.GetDecodedString(this.context.Json);
                     if (key == null || dict.ContainsKey(key))
                     {
                         throw new JsonException(token, (key == null)
@@ -78,7 +78,7 @@ namespace DevPrompt.Utility.Json
                     }
                 }
 
-                return new JsonValue(JsonValueType.Dictionary, dict, this.json);
+                return new JsonValue(JsonValueType.Dictionary, dict, this.context);
             }
         }
 
@@ -104,13 +104,13 @@ namespace DevPrompt.Utility.Json
                     }
                 }
 
-                return new JsonValue(JsonValueType.Array, values, this.json);
+                return new JsonValue(JsonValueType.Array, values, this.context);
             }
         }
 
         public JsonValue GetValue(JsonToken token)
         {
-            JsonValue value = token.GetValue(this.json);
+            JsonValue value = token.GetValue(this.context);
 
             if (value.IsUnset)
             {

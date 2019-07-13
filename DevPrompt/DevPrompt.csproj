@@ -138,6 +138,7 @@
     <Compile Include="Utility\Json\JsonTokenizer.cs" />
     <Compile Include="Utility\Json\JsonDynamic.cs" />
     <Compile Include="Utility\Json\JsonValue.cs" />
+    <Compile Include="Utility\Json\JsonValueContext.cs" />
     <Compile Include="Utility\VisibleToBoolConverter.cs" />
     <Compile Include="Utility\CommandHelpers.cs" />
     <Compile Include="Utility\DelegateDisposable.cs" />
