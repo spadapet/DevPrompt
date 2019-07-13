@@ -11,7 +11,7 @@ namespace DevPrompt.UI.ViewModels
     /// <summary>
     /// View model for the settings dialog
     /// </summary>
-    internal class SettingsDialogVM : Api.PropertyNotifier
+    internal class SettingsDialogVM : Api.PropertyNotifier, IDisposable
     {
         public AppSettings Settings { get; }
         private MainWindow window;
@@ -39,6 +39,10 @@ namespace DevPrompt.UI.ViewModels
                 };
 
             this.ActiveTabType = activeTabType;
+        }
+
+        public void Dispose()
+        {
         }
 
         public IList<SettingsTabVM> Tabs => this.tabs;

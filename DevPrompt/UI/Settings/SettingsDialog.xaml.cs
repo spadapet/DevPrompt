@@ -1,10 +1,11 @@
 ﻿using DevPrompt.Settings;
 using DevPrompt.UI.ViewModels;
+using System;
 using System.Windows;
 
 namespace DevPrompt.UI.Settings
 {
-    internal partial class SettingsDialog : Window
+    internal partial class SettingsDialog : Window, IDisposable
     {
         public SettingsDialogVM ViewModel { get; }
 
@@ -14,6 +15,11 @@ namespace DevPrompt.UI.Settings
             this.ViewModel = new SettingsDialogVM(window, this, settings, activeTabType);
 
             this.InitializeComponent();
+        }
+
+        public void Dispose()
+        {
+            this.ViewModel.Dispose();
         }
 
         private void OnClickOk(object sender, RoutedEventArgs args)

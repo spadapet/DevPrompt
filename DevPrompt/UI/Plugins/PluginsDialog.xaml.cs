@@ -1,10 +1,11 @@
 ﻿using DevPrompt.Settings;
 using DevPrompt.UI.ViewModels;
+using System;
 using System.Windows;
 
 namespace DevPrompt.UI.Plugins
 {
-    internal partial class PluginsDialog : Window
+    internal partial class PluginsDialog : Window, IDisposable
     {
         public PluginsDialogVM ViewModel { get; }
 
@@ -14,6 +15,11 @@ namespace DevPrompt.UI.Plugins
             this.ViewModel = new PluginsDialogVM(window, this, settings, activeTabType);
 
             this.InitializeComponent();
+        }
+
+        public void Dispose()
+        {
+            this.ViewModel.Dispose();
         }
 
         private void OnClickOk(object sender, RoutedEventArgs args)

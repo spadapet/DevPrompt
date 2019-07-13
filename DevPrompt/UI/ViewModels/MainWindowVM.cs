@@ -111,21 +111,23 @@ namespace DevPrompt.UI.ViewModels
 
         private void ShowSettingsDialog(SettingsTabType tab)
         {
-            SettingsDialog dialog = new SettingsDialog(this.Window, this.AppSettings, tab);
-
-            if (dialog.ShowDialog() == true)
+            using (SettingsDialog dialog = new SettingsDialog(this.Window, this.AppSettings, tab))
             {
-                this.AppSettings.CopyFrom(dialog.ViewModel.Settings);
+                if (dialog.ShowDialog() == true)
+                {
+                    this.AppSettings.CopyFrom(dialog.ViewModel.Settings);
+                }
             }
         }
 
         private void ShowPluginSettingsDialog(PluginsTabType tab)
         {
-            PluginsDialog dialog = new PluginsDialog(this.Window, this.AppSettings, tab);
-
-            if (dialog.ShowDialog() == true)
+            using (PluginsDialog dialog = new PluginsDialog(this.Window, this.AppSettings, tab))
             {
-                this.AppSettings.CopyFrom(dialog.ViewModel.Settings);
+                if (dialog.ShowDialog() == true)
+                {
+                    this.AppSettings.CopyFrom(dialog.ViewModel.Settings);
+                }
             }
         }
 

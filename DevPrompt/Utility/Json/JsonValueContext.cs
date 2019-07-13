@@ -2,38 +2,26 @@
 
 namespace DevPrompt.Utility.Json
 {
+    /// <summary>
+    /// Global data about a JSON document that all values reference
+    /// </summary>
     internal class JsonValueContext
     {
         public string Json { get; }
-        private ConcurrentDictionary<JsonValue, JsonDynamic> dynamicCache;
         private ConcurrentDictionary<JsonValue, Api.IJsonValue> interfaceCache;
 
         public JsonValueContext(string json)
         {
             this.Json = json ?? string.Empty;
-            this.dynamicCache = new ConcurrentDictionary<JsonValue, JsonDynamic>();
             this.interfaceCache = new ConcurrentDictionary<JsonValue, Api.IJsonValue>();
         }
 
-        public dynamic GetDynamic(JsonValue value)
-        {
-            return this.dynamicCache.GetOrAdd(value, JsonValueContext.CreateJsonDynamic);
-        }
-
+        /// <summary>
+        /// Cache values that get moved to the heap
+        /// </summary>
         public Api.IJsonValue GetInterface(JsonValue value)
         {
-            return this.interfaceCache.GetOrAdd(value, JsonValueContext.CreateInterface);
-        }
-
-        private static JsonDynamic CreateJsonDynamic(JsonValue value)
-        {
-            return new JsonDynamic(value);
-        }
-
-        private static Api.IJsonValue CreateInterface(JsonValue value)
-        {
-            // move to the heap
-            return value;
+            return this.interfaceCache.GetOrAdd(value, v => v);
         }
     }
 }

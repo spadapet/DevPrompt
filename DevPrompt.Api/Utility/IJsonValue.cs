@@ -7,8 +7,9 @@ namespace DevPrompt.Api
         bool IsArray { get; }
         bool IsBool { get; }
         bool IsDictionary { get; }
+        bool IsDouble { get; }
+        bool IsInt { get; }
         bool IsNull { get; }
-        bool IsNumber { get; }
         bool IsString { get; }
         bool IsUnset { get; }
 
@@ -17,6 +18,5 @@ namespace DevPrompt.Api
         double Double { get; }
         string String { get; }
         object Value { get; }
-        dynamic Dynamic { get; }
     }
 }
