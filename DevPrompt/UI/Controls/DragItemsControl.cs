@@ -37,7 +37,7 @@ namespace DevPrompt.UI.Controls
         {
             get
             {
-                return WpfHelpers.FindVisualAncestor<IDragHost>(this);
+                return WpfUtility.FindVisualAncestor<IDragHost>(this);
             }
         }
 
@@ -88,7 +88,7 @@ namespace DevPrompt.UI.Controls
             ItemCollection items = this.Items;
             Point point = args.GetPosition(this);
             IInputElement hit = this.InputHitTest(point);
-            ContentPresenter item = WpfHelpers.FindItemContainer<ContentPresenter>(this, hit as DependencyObject, includeSelf: true);
+            ContentPresenter item = WpfUtility.FindItemContainer<ContentPresenter>(this, hit as DependencyObject, includeSelf: true);
 
             if (item == null)
             {
@@ -183,7 +183,7 @@ namespace DevPrompt.UI.Controls
         {
             if (args.MouseDevice.Captured != null)
             {
-                if (WpfHelpers.FindItemContainer<ContentPresenter>(this, sender, includeSelf: true) is ContentPresenter item && !this.dragging)
+                if (WpfUtility.FindItemContainer<ContentPresenter>(this, sender, includeSelf: true) is ContentPresenter item && !this.dragging)
                 {
                     this.mouseCapturePoint = args.GetPosition(this);
                     this.captureItem = item;

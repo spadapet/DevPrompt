@@ -5,10 +5,11 @@ namespace DevPrompt.Utility.Json
 {
     internal class JsonParser
     {
-        public static JsonValue Parse(string json)
+        public static Api.IJsonValue Parse(string json)
         {
             JsonParser parser = new JsonParser(json);
-            return parser.RootValue;
+            JsonValue value = parser.RootValue;
+            return parser.context.GetInterface(value);
         }
 
         private JsonTokenizer tokenizer;
@@ -26,13 +27,20 @@ namespace DevPrompt.Utility.Json
         {
             get
             {
-                JsonToken token = this.NextToken;
-                if (!token.IsOpenCurly)
+                try
                 {
-                    throw new JsonException(token, Resources.JsonParser_ExpectedObject);
-                }
+                    JsonToken token = this.NextToken;
+                    if (!token.IsOpenCurly)
+                    {
+                        throw new JsonException(token, Resources.JsonParser_ExpectedObject);
+                    }
 
-                return this.NextObject;
+                    return this.NextObject;
+                }
+                catch (JsonException ex)
+                {
+                    return new JsonValue(JsonValueType.Exception, ex, this.context);
+                }
             }
         }
 
@@ -112,7 +120,7 @@ namespace DevPrompt.Utility.Json
         {
             JsonValue value = token.GetValue(this.context);
 
-            if (value.IsUnset)
+            if (value.IsType(JsonValueType.Unset))
             {
                 if (token.IsOpenCurly)
                 {

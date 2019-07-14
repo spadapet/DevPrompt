@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 
 [assembly: AssemblyTitle("DevPrompt")]
 [assembly: AssemblyDescription("Tabbed command prompts for developers")]
+[assembly: InternalsVisibleTo("DevPromptTests, PublicKey=00240000048000009400000006020000002400005253413100040000010001006d44a6df3acec46bef12f9c1bb5e87a5472146aac531e37bf28ccb4558333bd936c44b4d602d5cc786027a6b55c3e3c1756ff63e6b29e70e59ee3270bc648ff75b934dd82cd635a642b8fb37ac8bdf01d58d3abfee3f37c91ccbff3f9438fa34efc50cce3bcd4ced9126cd36a40dab8291b9ae56c108aa7974b739af16a443ce")]

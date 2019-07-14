@@ -307,14 +307,7 @@ namespace DevPrompt
 
         Api.IJsonValue Api.IApp.ParseJson(string json)
         {
-            try
-            {
-                return JsonParser.Parse(json);
-            }
-            catch (JsonException)
-            {
-                return default(JsonValue);
-            }
+            return JsonParser.Parse(json);
         }
 
         IEnumerable<Api.IWindow> Api.IApp.Windows

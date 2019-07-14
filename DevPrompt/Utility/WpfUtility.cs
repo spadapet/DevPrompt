@@ -4,7 +4,7 @@ using System.Windows.Media;
 
 namespace DevPrompt.Utility
 {
-    internal static class WpfHelpers
+    internal static class WpfUtility
     {
         public static T FindVisualAncestor<T>(DependencyObject item, bool includeSelf = false) where T : class
         {
@@ -30,10 +30,10 @@ namespace DevPrompt.Utility
 
             if (control.IsAncestorOf(child))
             {
-                parent = WpfHelpers.FindVisualAncestor<T>(child, includeSelf: true);
+                parent = WpfUtility.FindVisualAncestor<T>(child, includeSelf: true);
                 while (parent != null && control.ItemContainerGenerator.ItemFromContainer(parent) == DependencyProperty.UnsetValue)
                 {
-                    parent = WpfHelpers.FindVisualAncestor<T>(parent, includeSelf: false);
+                    parent = WpfUtility.FindVisualAncestor<T>(parent, includeSelf: false);
                 }
             }
 

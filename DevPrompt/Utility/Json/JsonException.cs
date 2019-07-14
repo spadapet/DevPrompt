@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace DevPrompt.Utility.Json
 {
-    internal class JsonException : Exception
+    internal class JsonException : Exception, Api.IJsonException
     {
         public JsonToken ErrorToken { get; }
         private string message;
@@ -13,6 +13,11 @@ namespace DevPrompt.Utility.Json
             this.ErrorToken = errorToken;
             this.message = message;
         }
+
+        string Api.IJsonException.Message => this.Message;
+        string Api.IJsonException.TokenType => this.ErrorToken.Type.ToString();
+        int Api.IJsonException.TokenStart => this.ErrorToken.Start;
+        int Api.IJsonException.TokenLength => this.ErrorToken.Length;
 
         public override string Message
         {

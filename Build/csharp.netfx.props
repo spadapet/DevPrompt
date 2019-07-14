@@ -10,6 +10,7 @@
         <PlatformTarget>AnyCPU</PlatformTarget>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <FileAlignment>512</FileAlignment>
+        <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">16.0</VisualStudioVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
