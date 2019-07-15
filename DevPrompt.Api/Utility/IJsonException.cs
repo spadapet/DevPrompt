@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace DevPrompt.Api
+﻿namespace DevPrompt.Api
 {
     public interface IJsonException
     {

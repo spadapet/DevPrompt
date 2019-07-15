@@ -1,6 +1,5 @@
 ﻿using DevPrompt.Settings;
 using DevPrompt.UI.Plugins;
-using DevPrompt.Utility.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;

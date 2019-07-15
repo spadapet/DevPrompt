@@ -2,9 +2,8 @@
 using DevPrompt.Utility.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace DevPromptTests
+namespace DevPrompt.Tests
 {
     [TestClass]
     public class JsonTests

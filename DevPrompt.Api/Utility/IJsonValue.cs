@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace DevPrompt.Api
 {
     /// <summary>
-    /// The value accessor methods will throw if the type is wrong.
+    /// The value properties will throw if the type is wrong.
     /// For example, don't ever call Double unless IsDouble is true.
     /// </summary>
     public interface IJsonValue
@@ -26,6 +25,10 @@ namespace DevPrompt.Api
         IJsonException Exception { get; }
         int Int { get; }
         string String { get; }
+
+        /// <summary>
+        /// Never throws and returns the appropriate type, or null
+        /// </summary>
         object Value { get; }
 
         /// <summary>
