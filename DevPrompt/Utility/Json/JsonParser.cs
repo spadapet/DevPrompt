@@ -8,47 +8,49 @@ namespace DevPrompt.Utility.Json
         public static Api.IJsonValue Parse(string json)
         {
             JsonParser parser = new JsonParser(json);
-            JsonValue value = parser.RootValue;
-            return parser.context.GetInterface(value);
+            JsonValueData value = parser.RootValue;
+            return parser.context.GetValue(value);
         }
 
         private JsonTokenizer tokenizer;
-        private JsonValueContext context;
+        private JsonContext context;
+        private HashSet<string> keyCache;
+        private Stack<Dictionary<string, JsonValueData>> parseDicts;
+        private Stack<List<JsonValueData>> parseArrays;
+        private const int bufferSize = 32;
 
         private JsonParser(string json)
         {
             this.tokenizer = new JsonTokenizer(json);
-            this.context = new JsonValueContext(json);
+            this.context = new JsonContext(json);
+            this.keyCache = new HashSet<string>(JsonParser.bufferSize);
+            this.parseDicts = new Stack<Dictionary<string, JsonValueData>>(JsonParser.bufferSize);
+            this.parseArrays = new Stack<List<JsonValueData>>(JsonParser.bufferSize);
         }
 
         private JsonToken NextToken => this.tokenizer.NextToken;
 
-        private JsonValue RootValue
+        private JsonValueData RootValue
         {
             get
             {
-                try
+                JsonToken token = this.NextToken;
+                if (!token.IsOpenCurly)
                 {
-                    JsonToken token = this.NextToken;
-                    if (!token.IsOpenCurly)
-                    {
-                        throw new JsonException(token, Resources.JsonParser_ExpectedObject);
-                    }
+                    throw new JsonException(token, Resources.JsonParser_ExpectedObject);
+                }
 
-                    return this.NextObject;
-                }
-                catch (JsonException ex)
-                {
-                    return new JsonValue(JsonValueType.Exception, ex, this.context);
-                }
+                return this.NextObject;
             }
         }
 
-        public JsonValue NextObject
+        public JsonValueData NextObject
         {
             get
             {
-                Dictionary<string, JsonValue> dict = new Dictionary<string, JsonValue>();
+                Dictionary<string, JsonValueData> parseDict = (this.parseDicts.Count > 0)
+                    ? this.parseDicts.Pop()
+                    : new Dictionary<string, JsonValueData>(JsonParser.bufferSize);
 
                 for (JsonToken token = this.NextToken; !token.IsCloseCurly;)
                 {
@@ -57,12 +59,21 @@ namespace DevPrompt.Utility.Json
                         throw new JsonException(token, Resources.JsonParser_ExpectedKeyName);
                     }
 
-                    string key = token.GetDecodedString(this.context.Json);
-                    if (key == null || dict.ContainsKey(key))
+                    string key = JsonTokenizer.DecodeString(this.context.Json, token);
+                    if (key == null)
                     {
-                        throw new JsonException(token, (key == null)
-                            ? Resources.JsonParser_InvalidStringToken
-                            : string.Format(CultureInfo.CurrentCulture, Resources.JsonParser_ExpectedUniqueKey, key));
+                        throw new JsonException(token, Resources.JsonParser_InvalidStringToken);
+                    }
+
+                    if (parseDict.ContainsKey(key))
+                    {
+                        throw new JsonException(token, string.Format(CultureInfo.CurrentCulture, Resources.JsonParser_ExpectedUniqueKey, key));
+                    }
+
+                    if (!this.keyCache.TryGetValue(key, out string actualKey))
+                    {
+                        actualKey = key;
+                        this.keyCache.Add(key);
                     }
 
                     token = this.NextToken;
@@ -72,7 +83,7 @@ namespace DevPrompt.Utility.Json
                     }
 
                     token = this.NextToken;
-                    dict.Add(key, this.GetValue(token));
+                    parseDict.Add(actualKey, this.GetValue(token));
 
                     token = this.NextToken;
                     if (!token.IsComma && !token.IsCloseCurly)
@@ -86,19 +97,25 @@ namespace DevPrompt.Utility.Json
                     }
                 }
 
-                return new JsonValue(JsonValueType.Dictionary, dict, this.context);
+                JsonValues actualDict = (parseDict.Count > 0) ? new JsonValues(parseDict, this.context) : this.context.EmptyDictionary;
+                parseDict.Clear();
+                this.parseDicts.Push(parseDict);
+
+                return new JsonValueData(JsonValueType.Dictionary, JsonToken.None, actualDict, this.context);
             }
         }
 
-        public JsonValue NextArray
+        public JsonValueData NextArray
         {
             get
             {
-                List<JsonValue> values = new List<JsonValue>();
+                List<JsonValueData> parseArray = (this.parseArrays.Count > 0)
+                    ? this.parseArrays.Pop()
+                    : new List<JsonValueData>(JsonParser.bufferSize);
 
                 for (JsonToken token = this.NextToken; !token.IsCloseBracket;)
                 {
-                    values.Add(this.GetValue(token));
+                    parseArray.Add(this.GetValue(token));
 
                     token = this.NextToken;
                     if (!token.IsComma && !token.IsCloseBracket)
@@ -112,31 +129,48 @@ namespace DevPrompt.Utility.Json
                     }
                 }
 
-                return new JsonValue(JsonValueType.Array, values, this.context);
+                JsonValues actualArray = (parseArray.Count > 0) ? new JsonValues(parseArray, this.context) : this.context.EmptyArray;
+                parseArray.Clear();
+                this.parseArrays.Push(parseArray);
+
+                return new JsonValueData(JsonValueType.Array, JsonToken.None, actualArray, this.context);
             }
         }
 
-        public JsonValue GetValue(JsonToken token)
+        public JsonValueData GetValue(JsonToken token)
         {
-            JsonValue value = token.GetValue(this.context);
+            JsonValueType valueType;
 
-            if (value.IsType(JsonValueType.Unset))
+            switch (token.Type)
             {
-                if (token.IsOpenCurly)
-                {
-                    value = this.NextObject;
-                }
-                else if (token.IsOpenBracket)
-                {
-                    value = this.NextArray;
-                }
-                else
-                {
+                case JsonTokenType.False:
+                case JsonTokenType.True:
+                    valueType = JsonValueType.Bool;
+                    break;
+
+                case JsonTokenType.Null:
+                    valueType = JsonValueType.Null;
+                    break;
+
+                case JsonTokenType.Number:
+                    valueType = JsonValueType.Number;
+                    break;
+
+                case JsonTokenType.String:
+                    valueType = JsonValueType.String;
+                    break;
+
+                case JsonTokenType.OpenCurly:
+                    return this.NextObject;
+
+                case JsonTokenType.OpenBracket:
+                    return this.NextArray;
+
+                default:
                     throw new JsonException(token, Resources.JsonParser_ExpectedValue);
-                }
             }
 
-            return value;
+            return new JsonValueData(valueType, token, this.context.EmptyArray, this.context);
         }
     }
 }

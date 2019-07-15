@@ -1,4 +1,7 @@
-﻿namespace DevPrompt.Utility.Json
+﻿using System.Globalization;
+using System.Text;
+
+namespace DevPrompt.Utility.Json
 {
     internal class JsonTokenizer
     {
@@ -115,6 +118,98 @@
 
                 return new JsonToken(type, start, this.pos - start);
             }
+        }
+
+        public static string DecodeString(string json, JsonToken token)
+        {
+            if (!token.IsString)
+            {
+                throw new JsonException(token, string.Format(CultureInfo.CurrentCulture, Resources.JsonValue_WrongType, JsonTokenType.String));
+            }
+
+            int start = token.Start + 1;
+            int length = token.Length - 2;
+
+            if (json.IndexOf('\\', start, length) == -1)
+            {
+                // No escaped characters
+                return json.Substring(start, length);
+            }
+
+            StringBuilder value = new StringBuilder(length);
+
+            int cur = start;
+            for (int end = start + length; cur != -1 && cur < end;)
+            {
+                if (json[cur] == '\\')
+                {
+                    switch (cur + 1 < end ? json[cur + 1] : '\0')
+                    {
+                        case '\"':
+                        case '\\':
+                        case '/':
+                            value.Append(json[cur + 1]);
+                            cur += 2;
+                            break;
+
+                        case 'b':
+                            value.Append('\b');
+                            cur += 2;
+                            break;
+
+                        case 'f':
+                            value.Append('\f');
+                            cur += 2;
+                            break;
+
+                        case 'n':
+                            value.Append('\n');
+                            cur += 2;
+                            break;
+
+                        case 'r':
+                            value.Append('\r');
+                            cur += 2;
+                            break;
+
+                        case 't':
+                            value.Append('\t');
+                            cur += 2;
+                            break;
+
+                        case 'u':
+                            if (cur + 5 < end)
+                            {
+                                string buffer = json.Substring(cur + 2, 4);
+                                if (uint.TryParse(buffer, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uint decoded))
+                                {
+                                    value.Append((char)decoded);
+                                    cur += 6;
+                                }
+                                else
+                                {
+                                    cur = -1;
+                                }
+                            }
+                            else
+                            {
+                                cur = -1;
+                            }
+                            break;
+
+                        default:
+                            cur = -1;
+                            break;
+                    }
+                }
+                else
+                {
+                    value.Append(json[cur]);
+                    cur++;
+                }
+            }
+
+            return (cur != -1) ? value.ToString() : null;
         }
 
         private static bool IsHexDigit(char ch)

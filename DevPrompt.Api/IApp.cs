@@ -20,6 +20,10 @@ namespace DevPrompt.Api
         IEnumerable<GrabProcess> GrabProcesses { get; }
         void GrabProcess(int id);
         IProcessHost CreateProcessHost(IntPtr parentHwnd);
+
+        /// <summary>
+        /// Return value is also a dynamic for runtime type checking
+        /// </summary>
         IJsonValue ParseJson(string json);
     }
 }

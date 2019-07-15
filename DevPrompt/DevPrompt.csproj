@@ -133,12 +133,14 @@
     <Compile Include="Utility\DelegateConverter.cs" />
     <Compile Include="Utility\DelegateMultiConverter.cs" />
     <Compile Include="Utility\HashUtility.cs" />
+    <Compile Include="Utility\Json\JsonValue.cs" />
     <Compile Include="Utility\Json\JsonException.cs" />
+    <Compile Include="Utility\Json\JsonValues.cs" />
     <Compile Include="Utility\Json\JsonParser.cs" />
     <Compile Include="Utility\Json\JsonToken.cs" />
     <Compile Include="Utility\Json\JsonTokenizer.cs" />
-    <Compile Include="Utility\Json\JsonValue.cs" />
-    <Compile Include="Utility\Json\JsonValueContext.cs" />
+    <Compile Include="Utility\Json\JsonValueData.cs" />
+    <Compile Include="Utility\Json\JsonContext.cs" />
     <Compile Include="Utility\VisibleToBoolConverter.cs" />
     <Compile Include="Utility\CommandHelpers.cs" />
     <Compile Include="Utility\DelegateDisposable.cs" />
