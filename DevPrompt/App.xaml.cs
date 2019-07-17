@@ -310,6 +310,16 @@ namespace DevPrompt
             return JsonParser.Parse(json);
         }
 
+        dynamic Api.IApp.ParseJsonAsDynamic(string json)
+        {
+            return JsonParser.Parse(json).Dynamic;
+        }
+
+        T Api.IApp.ParseJsonAsType<T>(string json)
+        {
+            return JsonParser.Parse(json).Convert<T>();
+        }
+
         IEnumerable<Api.IWindow> Api.IApp.Windows
         {
             get

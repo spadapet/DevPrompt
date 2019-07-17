@@ -8,7 +8,13 @@ namespace DevPrompt.Utility.Json
         public JsonToken ErrorToken { get; }
         private string message;
 
-        public JsonException(JsonToken errorToken, string message = null)
+        public JsonException(string message)
+        {
+            this.ErrorToken = JsonToken.None;
+            this.message = message;
+        }
+
+        public JsonException(JsonToken errorToken, string message)
         {
             this.ErrorToken = errorToken;
             this.message = message;

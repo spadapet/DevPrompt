@@ -469,7 +469,7 @@ namespace DevPrompt.Settings
             set => this.SetPropertyValue(ref this.saveTabsOnExit, value);
         }
 
-        // [DataMember]
+        // Saved from AppCustomSettings, not from here
         public ICollection<KeyValuePair<string, object>> CustomProperties => this.customProperties;
 
         public bool TryGetProperty<T>(string name, out T value)

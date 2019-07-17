@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="JsonConvert.InvalidValue" xml:space="preserve">
+    <value>The JSON value is not valid</value>
+  </data>
+  <data name="JsonConvert.TypeFailed" xml:space="preserve">
+    <value>Failed to convert JSON value '{0}' to type '{1}'</value>
+  </data>
   <data name="JsonException.Message" xml:space="preserve">
     <value>JSON parse failure at {0}, token={1}</value>
   </data>

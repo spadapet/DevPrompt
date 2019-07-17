@@ -61,6 +61,24 @@ namespace DevPrompt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The JSON value is not valid.
+        /// </summary>
+        internal static string JsonConvert_InvalidValue {
+            get {
+                return ResourceManager.GetString("JsonConvert.InvalidValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to convert JSON value &apos;{0}&apos; to type &apos;{1}&apos;.
+        /// </summary>
+        internal static string JsonConvert_TypeFailed {
+            get {
+                return ResourceManager.GetString("JsonConvert.TypeFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to JSON parse failure at {0}, token={1}.
         /// </summary>
         internal static string JsonException_Message {

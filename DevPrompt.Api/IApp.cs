@@ -21,9 +21,8 @@ namespace DevPrompt.Api
         void GrabProcess(int id);
         IProcessHost CreateProcessHost(IntPtr parentHwnd);
 
-        /// <summary>
-        /// Return value is also a dynamic for runtime type checking
-        /// </summary>
         IJsonValue ParseJson(string json);
+        dynamic ParseJsonAsDynamic(string json);
+        T ParseJsonAsType<T>(string json);
     }
 }

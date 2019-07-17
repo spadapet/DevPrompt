@@ -1,5 +1,6 @@
 ﻿using DevPrompt.Api;
 using DevPrompt.Utility.Json;
+using Microsoft.CSharp.RuntimeBinder;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,11 +13,11 @@ namespace DevPrompt.Tests
         [TestMethod]
         public void DictionaryEnum()
         {
-            dynamic value = JsonParser.Parse(@"{ ""0"": 0, ""1"": 1, ""2"": 2, ""3"": 3, ""4"": 4 }");
+            dynamic value = JsonParser.Parse(@"{ ""0"": 0, ""1"": 1, ""2"": 2, ""3"": 3, ""4"": 4 }").Dynamic;
 
-            foreach (KeyValuePair<string, IJsonValue> pair in value)
+            foreach (KeyValuePair<string, dynamic> pair in value)
             {
-                int i = (dynamic)pair.Value;
+                int i = pair.Value;
                 Assert.AreEqual(i, int.Parse(pair.Key));
                 Assert.AreSame(pair.Value, value[pair.Key]);
             }
@@ -25,48 +26,62 @@ namespace DevPrompt.Tests
         [TestMethod]
         public void ArrayEnum()
         {
-            IJsonValue value = JsonParser.Parse(@"{ ""array"": [ 0, 1, 2, 3, 4 ] }");
-            Assert.IsTrue(value.IsDictionary);
-
-            IJsonValue array = value["array"];
-            Assert.IsTrue(array.IsArray);
+            dynamic value = JsonParser.Parse(@"{ ""array"": [ 0, 1, 2, 3, 4 ] }").Dynamic;
+            dynamic[] array = value.array;
 
             int i = 0;
-            foreach (IJsonValue child in array.Array)
+            foreach (int child in array)
             {
-                Assert.AreEqual(child.Int, i++);
+                Assert.AreEqual(child, i++);
             }
 
-            for (i = 0; i < array.Array.Count; i++)
+            for (i = 0; i < array.Length; i++)
             {
-                Assert.AreEqual(array[i].Int, i);
+                int h = array[i];
+                Assert.AreEqual(h, i);
             }
-
-            Assert.IsFalse(array[i].IsValid);
         }
 
         [TestMethod]
+        public void ReuseJsonValue()
+        {
+            dynamic value = JsonParser.Parse(
+@"{
+    ""a"": [ 32, ""foo"", true, null ],
+    ""b"": [ 32, ""foo"", true, null ]
+}").Dynamic;
+
+            dynamic[] array1 = value.a;
+            dynamic[] array2 = value.b;
+
+            Assert.AreEqual(array1.Length, array2.Length);
+
+            for (int i = 0; i < array1.Length; i++)
+            {
+                Assert.ReferenceEquals(array1[i], array2[i]);
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(RuntimeBinderException))]
         public void MissingLookup()
         {
-            IJsonValue value = JsonParser.Parse(@"{ ""foo"": ""bar"" }");
+            dynamic value = JsonParser.Parse(@"{ ""foo"": ""bar"" }").Dynamic;
+            _ = value.bar;
+        }
 
-            IJsonValue bar = value["bar"];
-            Assert.IsTrue(!bar.IsValid);
-
-            bar = bar["foo"];
-            Assert.IsTrue(!bar.IsValid);
-
-            bar = value[10];
-            Assert.IsTrue(!bar.IsValid);
-
-            bar = bar[10];
-            Assert.IsTrue(!bar.IsValid);
+        [TestMethod]
+        [ExpectedException(typeof(RuntimeBinderException))]
+        public void MissingIndex()
+        {
+            dynamic value = JsonParser.Parse(@"{ ""foo"": [ 0, 1 ] }").Dynamic;
+            _ = value.foo[10];
         }
 
         [TestMethod]
         public void SimpleLookupTypes()
         {
-            IJsonValue value = JsonParser.Parse(
+            dynamic value = JsonParser.Parse(
 @"{
     ""string"": ""bar"",
     ""int"": 32,
@@ -75,33 +90,23 @@ namespace DevPrompt.Tests
     ""null"": null,
     ""array"": [ 0, 1, 2 ],
     ""dict"": { ""array"": [ 0, 1, 2 ] },
-}");
+}").Dynamic;
 
-            IJsonValue stringValue = value["string"];
-            IJsonValue intValue = value["int"];
-            IJsonValue doubleValue = value["double"];
-            IJsonValue boolValue = value["bool"];
-            IJsonValue nullValue = value["null"];
-            IJsonValue arrayValue = value["array"];
-            IJsonValue dictValue = value["dict"];
+            string stringValue = value.@string;
+            int intValue = value.@int;
+            double doubleValue = value.@double;
+            bool boolValue = value.@bool;
+            object nullValue = value.@null;
+            dynamic[] arrayValue = value.array;
+            IDictionary<string, dynamic> dictValue = value.dict;
 
-            Assert.IsTrue(stringValue.IsString);
-            Assert.IsTrue(intValue.IsInt);
-            Assert.IsTrue(intValue.IsDouble);
-            Assert.IsTrue(doubleValue.IsDouble);
-            Assert.IsFalse(doubleValue.IsInt);
-            Assert.IsTrue(boolValue.IsBool);
-            Assert.IsTrue(nullValue.IsNull);
-            Assert.IsTrue(arrayValue.IsArray);
-            Assert.IsTrue(dictValue.IsDictionary);
-
-            IJsonValue nestedIntValue = value["array"][1];
-            IJsonValue nestedArrayValue = value["dict"]["array"];
-
-            Assert.IsTrue(nestedIntValue.IsInt);
-            Assert.AreEqual(1, nestedIntValue.Int);
-            Assert.IsTrue(nestedArrayValue.IsArray);
-            CollectionAssert.AreEqual(arrayValue.Array.ToList(), nestedArrayValue.Array.ToList());
+            Assert.AreEqual("bar", stringValue);
+            Assert.AreEqual(32, intValue);
+            Assert.AreEqual(32.5, doubleValue);
+            Assert.AreEqual(true, boolValue);
+            Assert.AreEqual(null, nullValue);
+            Assert.AreEqual(3, arrayValue.Length);
+            Assert.AreEqual(1, dictValue.Count);
         }
     }
 }

@@ -13,11 +13,7 @@ namespace DevPrompt.Utility.Json
     /// </summary>
     [DebuggerTypeProxy(typeof(DebuggerView))]
     [DebuggerDisplay("{this.value}")]
-    internal class JsonValue
-        : DynamicObject
-        , Api.IJsonValue
-        , IReadOnlyList<Api.IJsonValue>
-        , IReadOnlyDictionary<string, Api.IJsonValue>
+    internal class JsonValue : Api.IJsonValue, IReadOnlyList<Api.IJsonValue>, IReadOnlyDictionary<string, Api.IJsonValue>
     {
         private JsonValueData value;
 
@@ -44,6 +40,9 @@ namespace DevPrompt.Utility.Json
         double Api.IJsonValue.Double => (this.IsType(JsonValueType.Number) && double.TryParse(this.value.ToString(), out double value)) ? value : throw this.WrongType(JsonValueType.Number);
         int Api.IJsonValue.Int => (this.IsType(JsonValueType.Number) && int.TryParse(this.value.ToString(), out int value)) ? value : throw this.WrongType(JsonValueType.Number);
         string Api.IJsonValue.String => this.IsType(JsonValueType.String) ? JsonTokenizer.DecodeString(this.value.Context.Json, this.value.Token) : throw this.WrongType(JsonValueType.String);
+        dynamic Api.IJsonValue.Dynamic => !this.IsType(JsonValueType.Null) ? this.value.Context.GetDynamic(this) : null;
+        T Api.IJsonValue.Convert<T>() => this.value.Context.Converter.Convert<T>(this);
+        object Api.IJsonValue.Convert(Type type) => this.value.Context.Converter.Convert(this, type);
 
         Api.IJsonValue Api.IJsonValue.this[int index] => this.value.List.Array[index].Value;
         Api.IJsonValue Api.IJsonValue.this[string key] => this.value.List.Dictionary[key].Value;
@@ -85,6 +84,34 @@ namespace DevPrompt.Utility.Json
                 }
 
                 return null;
+            }
+        }
+
+        bool Api.IJsonValue.TryConvert<T>(out T value)
+        {
+            try
+            {
+                value = this.value.Context.Converter.Convert<T>(this);
+                return true;
+            }
+            catch
+            {
+                value = default;
+                return false;
+            }
+        }
+
+        bool Api.IJsonValue.TryConvert(Type type, out object value)
+        {
+            try
+            {
+                value = this.value.Context.Converter.Convert(this, type);
+                return true;
+            }
+            catch
+            {
+                value = null;
+                return false;
             }
         }
 
@@ -139,67 +166,6 @@ namespace DevPrompt.Utility.Json
         int IReadOnlyCollection<Api.IJsonValue>.Count => this.value.List.Array.Count;
         Api.IJsonValue IReadOnlyDictionary<string, Api.IJsonValue>.this[string key] => this.value.List.Dictionary[key].Value;
         Api.IJsonValue IReadOnlyList<Api.IJsonValue>.this[int index] => this.value.List.Array[index].Value;
-
-        public override bool TryConvert(ConvertBinder binder, out object result)
-        {
-            result = ((Api.IJsonValue)this).Value;
-            if (result != null && !binder.Type.IsAssignableFrom(result.GetType()))
-            {
-                if (result is IConvertible convertible)
-                {
-                    try
-                    {
-                        result = Convert.ChangeType(result, binder.Type, CultureInfo.InvariantCulture);
-                    }
-                    catch
-                    {
-                        result = null;
-                    }
-                }
-                else
-                {
-                    result = null;
-                }
-            }
-
-            return result != null;
-        }
-
-        public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object result)
-        {
-            Api.IJsonValue currentValue = this;
-
-            for (int i = 0; i < indexes.Length; i++)
-            {
-                if (indexes[i] is int intIndex)
-                {
-                    currentValue = currentValue[intIndex];
-                }
-                else if (indexes[i] is string stringIndex)
-                {
-                    currentValue = currentValue[stringIndex];
-                }
-                else
-                {
-                    // Force an invalid value
-                    currentValue = currentValue[-1];
-                }
-            }
-
-            result = currentValue;
-            return true;
-        }
-
-        public override bool TryGetMember(GetMemberBinder binder, out object result)
-        {
-            result = ((Api.IJsonValue)this)[binder.Name];
-            return true;
-        }
-
-        public override IEnumerable<string> GetDynamicMemberNames()
-        {
-            return ((Api.IJsonValue)this).Dictionary.Keys;
-        }
 
         private class DebuggerView
         {
