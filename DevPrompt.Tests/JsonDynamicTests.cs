@@ -1,9 +1,7 @@
-﻿using DevPrompt.Api;
-using DevPrompt.Utility.Json;
+﻿using DevPrompt.Utility.Json;
 using Microsoft.CSharp.RuntimeBinder;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace DevPrompt.Tests
 {
@@ -13,7 +11,7 @@ namespace DevPrompt.Tests
         [TestMethod]
         public void DictionaryEnum()
         {
-            dynamic value = JsonParser.Parse(@"{ ""0"": 0, ""1"": 1, ""2"": 2, ""3"": 3, ""4"": 4 }").Dynamic;
+            dynamic value = JsonParser.ParseAsDynamic(@"{ ""0"": 0, ""1"": 1, ""2"": 2, ""3"": 3, ""4"": 4 }");
 
             foreach (KeyValuePair<string, dynamic> pair in value)
             {
@@ -26,7 +24,7 @@ namespace DevPrompt.Tests
         [TestMethod]
         public void ArrayEnum()
         {
-            dynamic value = JsonParser.Parse(@"{ ""array"": [ 0, 1, 2, 3, 4 ] }").Dynamic;
+            dynamic value = JsonParser.ParseAsDynamic(@"{ ""array"": [ 0, 1, 2, 3, 4 ] }");
             dynamic[] array = value.array;
 
             int i = 0;
@@ -45,11 +43,11 @@ namespace DevPrompt.Tests
         [TestMethod]
         public void ReuseJsonValue()
         {
-            dynamic value = JsonParser.Parse(
+            dynamic value = JsonParser.ParseAsDynamic(
 @"{
     ""a"": [ 32, ""foo"", true, null ],
     ""b"": [ 32, ""foo"", true, null ]
-}").Dynamic;
+}");
 
             dynamic[] array1 = value.a;
             dynamic[] array2 = value.b;
@@ -66,7 +64,7 @@ namespace DevPrompt.Tests
         [ExpectedException(typeof(RuntimeBinderException))]
         public void MissingLookup()
         {
-            dynamic value = JsonParser.Parse(@"{ ""foo"": ""bar"" }").Dynamic;
+            dynamic value = JsonParser.ParseAsDynamic(@"{ ""foo"": ""bar"" }");
             _ = value.bar;
         }
 
@@ -74,14 +72,14 @@ namespace DevPrompt.Tests
         [ExpectedException(typeof(RuntimeBinderException))]
         public void MissingIndex()
         {
-            dynamic value = JsonParser.Parse(@"{ ""foo"": [ 0, 1 ] }").Dynamic;
+            dynamic value = JsonParser.ParseAsDynamic(@"{ ""foo"": [ 0, 1 ] }");
             _ = value.foo[10];
         }
 
         [TestMethod]
         public void SimpleLookupTypes()
         {
-            dynamic value = JsonParser.Parse(
+            dynamic value = JsonParser.ParseAsDynamic(
 @"{
     ""string"": ""bar"",
     ""int"": 32,
@@ -90,7 +88,7 @@ namespace DevPrompt.Tests
     ""null"": null,
     ""array"": [ 0, 1, 2 ],
     ""dict"": { ""array"": [ 0, 1, 2 ] },
-}").Dynamic;
+}");
 
             string stringValue = value.@string;
             int intValue = value.@int;

@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="JsonConvert.ExpectedArray" xml:space="preserve">
+    <value>Expected a JSON array for populating a collection</value>
+  </data>
+  <data name="JsonConvert.InvalidMember" xml:space="preserve">
+    <value>Unexpected member '{0}' on type '{1}'</value>
+  </data>
   <data name="JsonConvert.InvalidValue" xml:space="preserve">
     <value>The JSON value is not valid</value>
   </data>

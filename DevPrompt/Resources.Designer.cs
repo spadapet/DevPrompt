@@ -61,6 +61,24 @@ namespace DevPrompt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Expected a JSON array for populating a collection.
+        /// </summary>
+        internal static string JsonConvert_ExpectedArray {
+            get {
+                return ResourceManager.GetString("JsonConvert.ExpectedArray", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected member &apos;{0}&apos; on type &apos;{1}&apos;.
+        /// </summary>
+        internal static string JsonConvert_InvalidMember {
+            get {
+                return ResourceManager.GetString("JsonConvert.InvalidMember", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The JSON value is not valid.
         /// </summary>
         internal static string JsonConvert_InvalidValue {

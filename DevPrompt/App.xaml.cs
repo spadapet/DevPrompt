@@ -312,12 +312,12 @@ namespace DevPrompt
 
         dynamic Api.IApp.ParseJsonAsDynamic(string json)
         {
-            return JsonParser.Parse(json).Dynamic;
+            return JsonParser.ParseAsDynamic(json);
         }
 
         T Api.IApp.ParseJsonAsType<T>(string json)
         {
-            return JsonParser.Parse(json).Convert<T>();
+            return JsonParser.ParseAsType<T>(json);
         }
 
         IEnumerable<Api.IWindow> Api.IApp.Windows

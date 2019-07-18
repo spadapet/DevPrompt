@@ -23,6 +23,7 @@
     <Compile Include="..\Build\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="JsonConvertTests.cs" />
     <Compile Include="JsonDynamicTests.cs" />
     <Compile Include="JsonValueTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

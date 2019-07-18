@@ -12,6 +12,16 @@ namespace DevPrompt.Utility.Json
             return parser.context.GetValue(value);
         }
 
+        public static dynamic ParseAsDynamic(string json)
+        {
+            return JsonParser.Parse(json).Dynamic;
+        }
+
+        public static T ParseAsType<T>(string json)
+        {
+            return JsonParser.Parse(json).Convert<T>();
+        }
+
         private JsonTokenizer tokenizer;
         private JsonContext context;
         private HashSet<string> keyCache;
