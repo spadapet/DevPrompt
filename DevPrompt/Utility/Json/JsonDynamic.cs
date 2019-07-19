@@ -5,7 +5,7 @@ using System.Dynamic;
 namespace DevPrompt.Utility.Json
 {
     /// <summary>
-    /// Heap copy of JsonValue that allows dynamic binding too
+    /// Wrapper for IJsonValue that allows dynamic binding and conversion
     /// </summary>
     [DebuggerTypeProxy(typeof(DebuggerView))]
     [DebuggerDisplay("{this.value}")]

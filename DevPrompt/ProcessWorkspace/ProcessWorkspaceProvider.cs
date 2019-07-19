@@ -1,11 +1,10 @@
-﻿using DevPrompt.Api;
-using System;
+﻿using System;
 using System.Composition;
 
 namespace DevPrompt.ProcessWorkspace
 {
     [Export(typeof(Api.IWorkspaceProvider))]
-    [Api.Order(Constants.HigherPriority)]
+    [Api.Order(Api.Constants.HigherPriority)]
     internal class ProcessWorkspaceProvider : Api.IWorkspaceProvider
     {
         public Guid WorkspaceId => Api.Constants.ProcessWorkspaceId;

@@ -324,7 +324,6 @@ namespace DevPrompt.Utility.Json
 
         private abstract class CachedMemberInfo
         {
-            public abstract Type ValueType { get; }
             public abstract string Name { get; }
             public abstract CachedMemberKind Kind { get; }
 
@@ -351,7 +350,6 @@ namespace DevPrompt.Utility.Json
         private class CachedFieldInfo : CachedMemberInfo
         {
             public FieldInfo FieldInfo { get; }
-            public override Type ValueType { get; }
             public override string Name { get; }
             public override CachedMemberKind Kind { get; }
             private CachedCollectionInterfaceInfo[] collectionInterfaces;
@@ -359,7 +357,6 @@ namespace DevPrompt.Utility.Json
             public CachedFieldInfo(JsonConvert owner, FieldInfo info)
             {
                 this.FieldInfo = info;
-                this.ValueType = info.FieldType;
                 this.Name = info.Name;
                 this.collectionInterfaces = owner.GetCollectionInterfacesForType(info.FieldType);
                 this.Kind = (this.collectionInterfaces.Length > 0) ? CachedMemberKind.AddToCollection : CachedMemberKind.SetValue;
@@ -369,7 +366,7 @@ namespace DevPrompt.Utility.Json
             {
                 if (this.Kind == CachedMemberKind.SetValue)
                 {
-                    object setValue = value.Convert(this.ValueType);
+                    object setValue = value.Convert(this.FieldInfo.FieldType);
                     this.FieldInfo.SetValue(target, setValue);
                 }
                 else if (this.Kind == CachedMemberKind.AddToCollection)
@@ -383,7 +380,6 @@ namespace DevPrompt.Utility.Json
         private class CachedPropertyInfo : CachedMemberInfo
         {
             public PropertyInfo PropertyInfo { get; }
-            public override Type ValueType { get; }
             public override string Name { get; }
             public override CachedMemberKind Kind { get; }
             private MethodInfo getMethod;
@@ -393,7 +389,6 @@ namespace DevPrompt.Utility.Json
             public CachedPropertyInfo(JsonConvert owner, PropertyInfo info)
             {
                 this.PropertyInfo = info;
-                this.ValueType = info.PropertyType;
                 this.Name = info.Name;
                 this.Kind = CachedMemberKind.None;
 
@@ -416,7 +411,7 @@ namespace DevPrompt.Utility.Json
             {
                 if (this.Kind == CachedMemberKind.SetValue)
                 {
-                    object setValue = value.Convert(this.ValueType);
+                    object setValue = value.Convert(this.PropertyInfo.PropertyType);
                     this.setMethod.Invoke(target, new object[] { setValue });
                 }
                 else if (this.Kind == CachedMemberKind.AddToCollection)

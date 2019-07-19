@@ -8,7 +8,7 @@ using System.Linq;
 namespace DevPrompt.Utility.Json
 {
     /// <summary>
-    /// Heap copy of JsonValue that allows dynamic binding too
+    /// Heap copy of JsonValue that implements IJsonValue
     /// </summary>
     [DebuggerTypeProxy(typeof(DebuggerView))]
     [DebuggerDisplay("{this.value}")]

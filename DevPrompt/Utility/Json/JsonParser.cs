@@ -111,7 +111,7 @@ namespace DevPrompt.Utility.Json
                 parseDict.Clear();
                 this.parseDicts.Push(parseDict);
 
-                return new JsonValueData(JsonValueType.Dictionary, JsonToken.None, actualDict, this.context);
+                return new JsonValueData(JsonValueType.Dictionary, JsonToken.None, actualDict);
             }
         }
 
@@ -143,7 +143,7 @@ namespace DevPrompt.Utility.Json
                 parseArray.Clear();
                 this.parseArrays.Push(parseArray);
 
-                return new JsonValueData(JsonValueType.Array, JsonToken.None, actualArray, this.context);
+                return new JsonValueData(JsonValueType.Array, JsonToken.None, actualArray);
             }
         }
 
@@ -180,7 +180,7 @@ namespace DevPrompt.Utility.Json
                     throw new JsonException(token, Resources.JsonParser_ExpectedValue);
             }
 
-            return new JsonValueData(valueType, token, this.context.EmptyArray, this.context);
+            return new JsonValueData(valueType, token, this.context.EmptyArray);
         }
     }
 }

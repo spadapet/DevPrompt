@@ -22,21 +22,20 @@ namespace DevPrompt.Utility.Json
         public JsonValueType Type { get; }
         public JsonToken Token { get; }
         public JsonValues List { get; }
-        public JsonContext Context { get; }
+        public JsonContext Context => this.List.Context;
 
-        public JsonValueData(JsonValueType type, JsonToken token, JsonValues list, JsonContext context)
+        public JsonValueData(JsonValueType type, JsonToken token, JsonValues list)
         {
-            Debug.Assert(list != null && context != null);
-            Debug.Assert(token.Start >= 0 && token.Start <= context.Json.Length && token.Start + token.Length <= context.Json.Length);
+            Debug.Assert(list != null);
+            Debug.Assert(token.Start >= 0 && token.Start <= list.Context.Json.Length && token.Start + token.Length <= list.Context.Json.Length);
 
             this.Type = type;
             this.Token = token;
             this.List = list;
-            this.Context = context;
         }
 
         public JsonValue Value => this.Context.GetValue(this);
-        public static JsonValueData None(JsonContext context) => new JsonValueData(JsonValueType.None, JsonToken.None, context.EmptyArray, context);
+        public static JsonValueData None(JsonContext context) => new JsonValueData(JsonValueType.None, JsonToken.None, context.EmptyArray);
 
         public override int GetHashCode() => HashUtility.CombineHashCodes(
             this.Type.GetHashCode(),

@@ -11,17 +11,17 @@ namespace DevPrompt.Utility.Json
     [DebuggerTypeProxy(typeof(DebuggerView))]
     internal class JsonValues : IReadOnlyList<JsonValueData>, IReadOnlyDictionary<string, JsonValueData>
     {
+        public JsonContext Context { get; }
         private int[] keyHashes;
         private string[] keys;
         private JsonValueData[] values;
-        private JsonContext context;
 
         public JsonValues(List<JsonValueData> values, JsonContext context)
         {
             this.keyHashes = System.Array.Empty<int>();
             this.keys = System.Array.Empty<string>();
             this.values = new JsonValueData[values.Count];
-            this.context = context;
+            this.Context = context;
 
             values.CopyTo(this.values);
         }
@@ -31,7 +31,7 @@ namespace DevPrompt.Utility.Json
             this.keyHashes = new int[values.Count];
             this.keys = new string[values.Count];
             this.values = new JsonValueData[values.Count];
-            this.context = context;
+            this.Context = context;
 
             values.Values.CopyTo(this.values, 0);
             values.Keys.CopyTo(this.keys, 0);
@@ -46,7 +46,7 @@ namespace DevPrompt.Utility.Json
         public IReadOnlyList<JsonValueData> Array => this;
         public IReadOnlyDictionary<string, JsonValueData> Dictionary => this;
 
-        JsonValueData IReadOnlyList<JsonValueData>.this[int index] => (index >= 0 && index < this.values.Length) ? this.values[index] : JsonValueData.None(this.context);
+        JsonValueData IReadOnlyList<JsonValueData>.this[int index] => (index >= 0 && index < this.values.Length) ? this.values[index] : JsonValueData.None(this.Context);
         int IReadOnlyCollection<JsonValueData>.Count => this.values.Length;
         IEnumerator<JsonValueData> IEnumerable<JsonValueData>.GetEnumerator() => ((IList<JsonValueData>)this.values).GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => this.IsArray ? (IEnumerator)this.Array.GetEnumerator() : (IEnumerator)this.Dictionary.GetEnumerator();
@@ -67,7 +67,7 @@ namespace DevPrompt.Utility.Json
         bool IReadOnlyDictionary<string, JsonValueData>.TryGetValue(string key, out JsonValueData value)
         {
             int i = this.IndexOfKey(key);
-            value = (i != -1) ? this.values[i] : JsonValueData.None(this.context);
+            value = (i != -1) ? this.values[i] : JsonValueData.None(this.Context);
             return i != -1;
         }
 
@@ -76,7 +76,7 @@ namespace DevPrompt.Utility.Json
             get
             {
                 int i = this.IndexOfKey(key);
-                return (i != -1) ? this.values[i] : JsonValueData.None(this.context);
+                return (i != -1) ? this.values[i] : JsonValueData.None(this.Context);
             }
         }
 
