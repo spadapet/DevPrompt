@@ -3,10 +3,16 @@
 #include "Utility.h"
 
 static UINT WM_CUSTOM_DETACH = ::RegisterWindowMessage(L"DevInject::WM_CUSTOM_DETACH");
+static UINT WM_CUSTOM_ATTACHED = ::RegisterWindowMessage(L"DevInject::WM_CUSTOM_ATTACHED");
 
 UINT DevInject::GetDetachMessage()
 {
     return ::WM_CUSTOM_DETACH;
+}
+
+UINT DevInject::GetAttachedMessage()
+{
+    return ::WM_CUSTOM_ATTACHED;
 }
 
 std::wstring DevInject::GetModuleFileName(HMODULE handle)

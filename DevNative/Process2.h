@@ -34,7 +34,7 @@ public:
     virtual LRESULT WindowProc(HWND hwnd, UINT message, WPARAM wp, LPARAM lp) override;
 
 private:
-    void SetChildWindow(HWND hwnd);
+    void SetChildWindow(HWND hwnd, DWORD processId);
     HWND GetChildWindow() const;
     void PostDispose();
     void InjectConhost(HWND conhostHwnd);

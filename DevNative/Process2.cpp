@@ -81,7 +81,7 @@ void Process::Detach()
 
     if (this->GetProcessId())
     {
-        this->SetChildWindow(nullptr);
+        this->SetChildWindow(nullptr, this->GetProcessId());
         ::InterlockedExchange(&this->processId, 0);
         this->SendMessageAsync(PIPE_COMMAND_DETACH);
     }
@@ -224,7 +224,7 @@ bool Process::IsActive()
     return false;
 }
 
-void Process::SetChildWindow(HWND hwnd)
+void Process::SetChildWindow(HWND hwnd, DWORD processId)
 {
     assert(App::IsMainThread());
 
@@ -281,7 +281,7 @@ void Process::SetChildWindow(HWND hwnd)
             ::SetWindowLong(childHwnd, GWL_EXSTYLE, exstyle);
 
             ::SetWindowPos(childHwnd, HWND_TOP, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, SWP_FRAMECHANGED | SWP_SHOWWINDOW | SWP_NOACTIVATE);
-            ::SetForegroundWindow(childHwnd);
+            ::AllowSetForegroundWindow(processId);
             ::PostMessage(childHwnd, DevInject::GetDetachMessage(), 0, 0);
         }
     }
@@ -727,9 +727,9 @@ Json::Dict Process::HandleMessage(HANDLE process, const Json::Dict& input)
         HWND hwnd = input.Get(PIPE_PROPERTY_HWND).TryGetHwndFromString();
         if (hwnd)
         {
-            this->app->PostToMainThread([self, hwnd]()
+            this->app->PostToMainThread([self, hwnd, process]()
             {
-                self->SetChildWindow(hwnd);
+                self->SetChildWindow(hwnd, ::GetProcessId(process));
             }, true);
         }
     }

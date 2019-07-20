@@ -123,6 +123,17 @@ static LRESULT __stdcall ConhostWindowProc(HWND hwnd, UINT msg, WPARAM wp, LPARA
                 DevInject::BeginDetach(hwnd);
                 return 0;
             }
+            else if (msg == DevInject::GetAttachedMessage())
+            {
+                HWND root = ::GetAncestor(hwnd, GA_ROOT);
+                if (::IsIconic(root))
+                {
+                    ::ShowWindow(root, SW_RESTORE);
+                }
+
+                ::SetForegroundWindow(root);
+                return 0;
+            }
             break;
         }
 
@@ -166,6 +177,7 @@ static unsigned int __stdcall InitializeThread(void*)
         if (hwndParent)
         {
             ::AttachWindowProc(hwnd, hwndParent);
+            ::PostMessage(hwnd, DevInject::GetAttachedMessage(), 0, 0);
         }
     });
 
