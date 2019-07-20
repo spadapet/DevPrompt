@@ -20,9 +20,5 @@ namespace DevPrompt.Api
         IEnumerable<GrabProcess> GrabProcesses { get; }
         void GrabProcess(int id);
         IProcessHost CreateProcessHost(IntPtr parentHwnd);
-
-        IJsonValue ParseJson(string json);
-        dynamic ParseJsonAsDynamic(string json);
-        T ParseJsonAsType<T>(string json);
     }
 }

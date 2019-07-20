@@ -77,7 +77,6 @@
     <Compile Include="Settings\ConsoleSettings.cs" />
     <Compile Include="Settings\SettingTypeResolver.cs" />
     <Compile Include="UI\DesignerViewModels\MainWindowDesignerVM.cs" />
-    <Compile Include="UI\DesignerViewModels\WorkspaceDesignerVM.cs" />
     <Compile Include="UI\DesignerViewModels\TabDesignerVM.cs" />
     <Compile Include="UI\InstallBranchDialog.xaml.cs">
       <DependentUpon>InstallBranchDialog.xaml</DependentUpon>
@@ -130,6 +129,7 @@
     <Compile Include="Utility\DelegateConverter.cs" />
     <Compile Include="Utility\DelegateMultiConverter.cs" />
     <Compile Include="Utility\HashUtility.cs" />
+    <Compile Include="Utility\HttpClientWrapper.cs" />
     <Compile Include="Utility\Json\JsonConvert.cs" />
     <Compile Include="Utility\Json\JsonDynamic.cs" />
     <Compile Include="Utility\Json\JsonValue.cs" />
@@ -140,6 +140,7 @@
     <Compile Include="Utility\Json\JsonTokenizer.cs" />
     <Compile Include="Utility\Json\JsonValueData.cs" />
     <Compile Include="Utility\Json\JsonContext.cs" />
+    <Compile Include="Utility\NuGet\NuGetServiceIndex.cs" />
     <Compile Include="Utility\VisibleToBoolConverter.cs" />
     <Compile Include="Utility\CommandHelpers.cs" />
     <Compile Include="Utility\DelegateDisposable.cs" />

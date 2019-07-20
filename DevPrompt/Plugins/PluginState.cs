@@ -90,7 +90,7 @@ namespace DevPrompt.Plugins
                     conventions.ForType<Api.IApp>().Shared();
                     conventions.ForType<Api.IAppListener>().Shared();
                     conventions.ForType<Api.IAppSettings>().Shared();
-                    conventions.ForType<Api.IWindow>().Shared();
+                    conventions.ForType<Api.IHttpClient>().Shared();
                     conventions.ForType<Api.IProcessListener>().Shared();
                     conventions.ForType<IProcessCache>().Shared();
                     conventions.ForType<IProcessListener>().Shared();

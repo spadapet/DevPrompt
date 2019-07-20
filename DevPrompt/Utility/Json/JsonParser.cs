@@ -1,8 +1,31 @@
 ﻿using System.Collections.Generic;
+using System.Composition;
 using System.Globalization;
 
 namespace DevPrompt.Utility.Json
 {
+    /// <summary>
+    /// JSON parser available for plugins to Import
+    /// </summary>
+    [Export(typeof(Api.IWorkspaceProvider))]
+    internal class JsonParserExport : Api.IJsonParser
+    {
+        Api.IJsonValue Api.IJsonParser.Parse(string json)
+        {
+            return JsonParser.Parse(json);
+        }
+
+        dynamic Api.IJsonParser.ParseAsDynamic(string json)
+        {
+            return JsonParser.ParseAsDynamic(json);
+        }
+
+        T Api.IJsonParser.ParseAsType<T>(string json)
+        {
+            return JsonParser.ParseAsType<T>(json);
+        }
+    }
+
     internal class JsonParser
     {
         public static Api.IJsonValue Parse(string json)

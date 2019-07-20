@@ -30,6 +30,10 @@ namespace DevPrompt.Plugins
             {
                 yield return ExportProvider.CreateExport(contract, this.ActivateAppSettings, true);
             }
+            else if (contract.ContractType == typeof(Api.IHttpClient))
+            {
+                yield return ExportProvider.CreateExport(contract, this.ActivateHttpClient, true);
+            }
         }
 
         private object ActivateApp(LifetimeContext context, CompositionOperation operation)
@@ -40,6 +44,11 @@ namespace DevPrompt.Plugins
         private object ActivateAppSettings(LifetimeContext context, CompositionOperation operation)
         {
             return this.app.Settings;
+        }
+
+        private object ActivateHttpClient(LifetimeContext context, CompositionOperation operation)
+        {
+            return this.app.HttpClient;
         }
 
         private static ExportDescriptorPromise CreateExport(CompositionContract contract, CompositeActivator activator, bool shared)

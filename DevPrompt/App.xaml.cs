@@ -2,7 +2,7 @@
 using DevPrompt.Plugins;
 using DevPrompt.Settings;
 using DevPrompt.UI;
-using DevPrompt.Utility.Json;
+using DevPrompt.Utility;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -22,6 +22,7 @@ namespace DevPrompt
     internal partial class App : Application, IAppHost, Api.IApp
     {
         public AppSettings Settings { get; }
+        public HttpClientWrapper HttpClient { get; }
         public PluginState PluginState { get; private set; }
         public NativeApp NativeApp { get; private set; }
 
@@ -38,6 +39,7 @@ namespace DevPrompt
 
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             this.Settings = new AppSettings();
+            this.HttpClient = new HttpClientWrapper();
             this.PluginState = new PluginState(this);
 
             this.Startup += this.OnStartup;
@@ -51,7 +53,8 @@ namespace DevPrompt
             this.Settings.PropertyChanged -= this.OnSettingsPropertyChanged;
             this.Settings.CollectionChanged -= this.OnSettingsPropertyChanged;
 
-            this.PluginState?.Dispose();
+            this.PluginState.Dispose();
+            this.HttpClient.Dispose();
             this.NativeApp?.Dispose();
         }
 
@@ -304,21 +307,6 @@ namespace DevPrompt
         bool Api.IApp.IsElevated => Program.IsElevated;
         bool Api.IApp.IsMainProcess => Program.IsMainProcess;
         bool Api.IApp.IsMicrosoftDomain => Program.IsMicrosoftDomain;
-
-        Api.IJsonValue Api.IApp.ParseJson(string json)
-        {
-            return JsonParser.Parse(json);
-        }
-
-        dynamic Api.IApp.ParseJsonAsDynamic(string json)
-        {
-            return JsonParser.ParseAsDynamic(json);
-        }
-
-        T Api.IApp.ParseJsonAsType<T>(string json)
-        {
-            return JsonParser.ParseAsType<T>(json);
-        }
 
         IEnumerable<Api.IWindow> Api.IApp.Windows
         {

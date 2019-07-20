@@ -1,5 +1,6 @@
 ﻿using DevPrompt.Settings;
 using DevPrompt.UI.Plugins;
+using DevPrompt.Utility.NuGet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,18 +56,17 @@ namespace DevPrompt.UI.ViewModels
             this.httpClient.Dispose();
         }
 
-        public /*async*/ void Initialize()
+        public async void Initialize()
         {
             try
             {
-                //string servicesJsonText = await this.httpClient.GetStringAsync("https://api.nuget.org/v3/index.json");
-                //Api.IJsonValue servicesRoot = JsonParser.Parse(servicesJsonText);
-                //foreach (Api.IJsonValue service in servicesRoot["resources"])
-                //{
-                //}
+                using (NuGetServiceIndex nuget = await NuGetServiceIndex.Create(this.httpClient))
+                {
+                }
             }
             catch
             {
+                // TODO: Show error in dialog
             }
         }
 
