@@ -161,16 +161,6 @@ namespace DevPrompt.UI.ViewModels
             this.RunExternalProcess(@"https://github.com/spadapet/DevPrompt/issues");
         });
 
-        public ICommand CheckForUpdatesCommand => new Api.DelegateCommand(() =>
-        {
-            CheckForUpdatesDialog dialog = new CheckForUpdatesDialog(this)
-            {
-                Owner = this.Window,
-            };
-
-            dialog.ShowDialog();
-        });
-
         public ICommand AboutCommand => new Api.DelegateCommand(() =>
         {
             AboutDialog dialog = new AboutDialog(this)
