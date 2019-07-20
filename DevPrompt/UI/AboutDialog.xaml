@@ -5,10 +5,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="About DevPrompt" Width="375" Height="225"
+        Title="About DevPrompt" Width="375" Height="250"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         ShowInTaskbar="False"
+        Loaded="OnLoaded"
+        Unloaded="OnUnloaded"
         WindowStyle="SingleBorderWindow"
         Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
@@ -27,7 +29,9 @@
         <StackPanel Grid.Column="1" Margin="10" HorizontalAlignment="Left">
             <TextBlock><Bold><Run Text="DevPrompt "/></Bold><Run Text="{Binding AppVersion, Mode=OneTime}" /></TextBlock>
             <TextBlock Text="{Binding CopyrightYear, Mode=OneTime}" />
-            <RichTextBox Margin="-5,10,0,10" IsReadOnly="True" BorderThickness="0" IsDocumentEnabled="True" Background="Transparent">
+            <TextBlock Margin="0,10,0,0">Latest version: <Bold><Run Text="{Binding AppLatestVersion, Mode=OneWay}" /></Bold></TextBlock>
+            <TextBlock Margin="0,20,0,0">Download the latest version from here:</TextBlock>
+            <RichTextBox Margin="-5,0,0,10" IsReadOnly="True" BorderThickness="0" IsDocumentEnabled="True" Background="Transparent">
                 <FlowDocument PagePadding="0">
                     <Paragraph>
                         <Hyperlink NavigateUri="https://github.com/spadapet/DevPrompt" RequestNavigate="OnHyperlink">https://github.com/spadapet/DevPrompt</Hyperlink>

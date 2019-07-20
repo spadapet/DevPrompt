@@ -76,9 +76,6 @@
     <Compile Include="Settings\LinkSettings.cs" />
     <Compile Include="Settings\ConsoleSettings.cs" />
     <Compile Include="Settings\SettingTypeResolver.cs" />
-    <Compile Include="UI\CheckForUpdatesDialog.xaml.cs">
-      <DependentUpon>CheckForUpdatesDialog.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\DesignerViewModels\MainWindowDesignerVM.cs" />
     <Compile Include="UI\DesignerViewModels\WorkspaceDesignerVM.cs" />
     <Compile Include="UI\DesignerViewModels\TabDesignerVM.cs" />
@@ -154,10 +151,6 @@
     <Page Include="ProcessWorkspace\ProcessWorkspaceControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\CheckForUpdatesDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\InstallBranchDialog.xaml">
       <Generator>MSBuild:Compile</Generator>

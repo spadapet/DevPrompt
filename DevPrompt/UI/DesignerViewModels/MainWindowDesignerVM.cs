@@ -39,7 +39,6 @@ namespace DevPrompt.UI.DesignerViewModels
         public ICommand CustomizeLinksCommand => null;
         // Help menu
         public ICommand ReportAnIssueCommand => null;
-        public ICommand CheckForUpdatesCommand => null;
         public ICommand AboutCommand => null;
 
         public AppSettings AppSettings => null;
