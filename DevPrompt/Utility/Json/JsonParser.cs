@@ -7,7 +7,7 @@ namespace DevPrompt.Utility.Json
     /// <summary>
     /// JSON parser available for plugins to Import
     /// </summary>
-    [Export(typeof(Api.IWorkspaceProvider))]
+    [Export(typeof(Api.IJsonParser))]
     internal class JsonParserExport : Api.IJsonParser
     {
         Api.IJsonValue Api.IJsonParser.Parse(string json)

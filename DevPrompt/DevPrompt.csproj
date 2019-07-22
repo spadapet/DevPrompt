@@ -129,7 +129,7 @@
     <Compile Include="Utility\DelegateConverter.cs" />
     <Compile Include="Utility\DelegateMultiConverter.cs" />
     <Compile Include="Utility\HashUtility.cs" />
-    <Compile Include="Utility\HttpClientWrapper.cs" />
+    <Compile Include="Utility\HttpClientHelper.cs" />
     <Compile Include="Utility\Json\JsonConvert.cs" />
     <Compile Include="Utility\Json\JsonDynamic.cs" />
     <Compile Include="Utility\Json\JsonValue.cs" />

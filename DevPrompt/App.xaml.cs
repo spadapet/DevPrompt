@@ -22,7 +22,7 @@ namespace DevPrompt
     internal partial class App : Application, IAppHost, Api.IApp
     {
         public AppSettings Settings { get; }
-        public HttpClientWrapper HttpClient { get; }
+        public HttpClientHelper HttpClient { get; }
         public PluginState PluginState { get; private set; }
         public NativeApp NativeApp { get; private set; }
 
@@ -39,7 +39,7 @@ namespace DevPrompt
 
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             this.Settings = new AppSettings();
-            this.HttpClient = new HttpClientWrapper();
+            this.HttpClient = new HttpClientHelper();
             this.PluginState = new PluginState(this);
 
             this.Startup += this.OnStartup;
