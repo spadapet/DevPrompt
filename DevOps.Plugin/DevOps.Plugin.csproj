@@ -48,6 +48,7 @@
     <Compile Include="UI\ViewModels\PullRequestPageVM.cs" />
     <Compile Include="PullRequestTab.cs" />
     <Compile Include="UI\ViewModels\PullRequestVM.cs" />
+    <Compile Include="Utility\AzureDevOpsClient.cs" />
     <Compile Include="Utility\NegateBoolConverter.cs" />
   </ItemGroup>
   <ItemGroup>
