@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 
 namespace DevPrompt.Utility.Json
 {
@@ -167,16 +168,20 @@ namespace DevPrompt.Utility.Json
             {
                 result = this.ConvertObject(value.Dictionary, type);
             }
+            else if (value.IsArray)
+            {
+                result = this.ConvertArray(value.Array, type);
+            }
             else if (value.IsNull)
             {
                 if (type.IsValueType)
                 {
-                    JsonConvert.Exception(Resources.JsonConvert_TypeFailed, value, type);
+                    throw JsonConvert.Exception(Resources.JsonConvert_TypeFailed, value, type);
                 }
             }
             else if (!value.IsValid)
             {
-                JsonConvert.Exception(Resources.JsonConvert_InvalidValue);
+                throw JsonConvert.Exception(Resources.JsonConvert_InvalidValue);
             }
             else
             {
@@ -196,12 +201,12 @@ namespace DevPrompt.Utility.Json
             {
                 if (!value.IsNull)
                 {
-                    JsonConvert.Exception(Resources.JsonConvert_TypeFailed, value, type);
+                    throw JsonConvert.Exception(Resources.JsonConvert_TypeFailed, value, type);
                 }
             }
             else if (!type.IsAssignableFrom(result.GetType()))
             {
-                JsonConvert.Exception(Resources.JsonConvert_TypeFailed, value, type);
+                throw JsonConvert.Exception(Resources.JsonConvert_TypeFailed, value, type);
             }
 
             return result;
@@ -223,6 +228,23 @@ namespace DevPrompt.Utility.Json
             return result;
         }
 
+        private object ConvertArray(IReadOnlyList<Api.IJsonValue> values, Type type)
+        {
+            if (type.IsArray)
+            {
+                Array result = (Array)Activator.CreateInstance(type, new object[] { values.Count });
+                for (int i = 0; i < values.Count; i++)
+                {
+                    object value = values[i].Convert(type.GetElementType());
+                    result.SetValue(value, i);
+                }
+
+                return result;
+            }
+
+            throw JsonConvert.Exception(Resources.JsonConvert_TypeFailed, values, type);
+        }
+
         private CachedTypeInfo GetTypeInfo(Type type)
         {
             return this.typeInfos.GetOrAdd(type, t => new CachedTypeInfo(this, t));
@@ -239,21 +261,24 @@ namespace DevPrompt.Utility.Json
             {
                 List<CachedCollectionInterfaceInfo> interfaceInfos = new List<CachedCollectionInterfaceInfo>();
 
-                IEnumerable<Type> interfaceTypes = newType.GetInterfaces();
-                if (type.IsInterface)
+                if (!type.IsArray)
                 {
-                    interfaceTypes = interfaceTypes.Append(type);
-                }
-
-                foreach (Type interfaceType in interfaceTypes)
-                {
-                    // These interfaces need an "Add" method
-                    if (typeof(IList).IsAssignableFrom(interfaceType) || (interfaceType.IsGenericType && typeof(ICollection<>) == interfaceType.GetGenericTypeDefinition()))
+                    IEnumerable<Type> interfaceTypes = newType.GetInterfaces();
+                    if (type.IsInterface)
                     {
-                        CachedCollectionInterfaceInfo interfaceInfo = this.GetCollectionInterfaceInfo(interfaceType);
-                        if (interfaceInfo.Parameters.Length == 1)
+                        interfaceTypes = interfaceTypes.Append(type);
+                    }
+
+                    foreach (Type interfaceType in interfaceTypes)
+                    {
+                        // These interfaces need an "Add" method
+                        if (typeof(IList).IsAssignableFrom(interfaceType) || (interfaceType.IsGenericType && typeof(ICollection<>) == interfaceType.GetGenericTypeDefinition()))
                         {
-                            interfaceInfos.Add(interfaceInfo);
+                            CachedCollectionInterfaceInfo interfaceInfo = this.GetCollectionInterfaceInfo(interfaceType);
+                            if (interfaceInfo.Parameters.Length == 1)
+                            {
+                                interfaceInfos.Add(interfaceInfo);
+                            }
                         }
                     }
                 }
@@ -262,9 +287,9 @@ namespace DevPrompt.Utility.Json
             });
         }
 
-        private static void Exception(string message, params object[] args)
+        private static JsonException Exception(string message, params object[] args)
         {
-            throw new JsonException(string.Format(CultureInfo.CurrentCulture, message, args));
+            return new JsonException(string.Format(CultureInfo.CurrentCulture, message, args));
         }
 
         private class CachedTypeInfo
@@ -319,6 +344,7 @@ namespace DevPrompt.Utility.Json
         {
             None,
             SetValue,
+            SetArray,
             AddToCollection,
         }
 
@@ -328,6 +354,19 @@ namespace DevPrompt.Utility.Json
             public abstract CachedMemberKind Kind { get; }
 
             public abstract void Set(object target, Api.IJsonValue value);
+
+            protected string GetName(MemberInfo info)
+            {
+                foreach (DataMemberAttribute dataMember in info.GetCustomAttributes(typeof(DataMemberAttribute), inherit: true).OfType<DataMemberAttribute>())
+                {
+                    if (dataMember.IsNameSetExplicitly && !string.IsNullOrEmpty(dataMember.Name))
+                    {
+                        return dataMember.Name;
+                    }
+                }
+
+                return info.Name;
+            }
 
             protected void AddToCollection(object collection, CachedCollectionInterfaceInfo[] interfaces, Api.IJsonValue value)
             {
@@ -357,22 +396,45 @@ namespace DevPrompt.Utility.Json
             public CachedFieldInfo(JsonConvert owner, FieldInfo info)
             {
                 this.FieldInfo = info;
-                this.Name = info.Name;
+                this.Name = this.GetName(info);
                 this.collectionInterfaces = owner.GetCollectionInterfacesForType(info.FieldType);
-                this.Kind = (this.collectionInterfaces.Length > 0) ? CachedMemberKind.AddToCollection : CachedMemberKind.SetValue;
+                this.Kind = (this.collectionInterfaces.Length > 0)
+                    ? CachedMemberKind.AddToCollection
+                    : (info.FieldType.IsArray ? CachedMemberKind.SetArray : CachedMemberKind.SetValue);
             }
 
             public override void Set(object target, Api.IJsonValue value)
             {
-                if (this.Kind == CachedMemberKind.SetValue)
+                switch (this.Kind)
                 {
-                    object setValue = value.Convert(this.FieldInfo.FieldType);
-                    this.FieldInfo.SetValue(target, setValue);
-                }
-                else if (this.Kind == CachedMemberKind.AddToCollection)
-                {
-                    object collection = this.FieldInfo.GetValue(target);
-                    this.AddToCollection(collection, this.collectionInterfaces, value);
+                    case CachedMemberKind.SetValue:
+                        {
+                            object setValue = value.Convert(this.FieldInfo.FieldType);
+                            this.FieldInfo.SetValue(target, setValue);
+                        }
+                        break;
+
+                    case CachedMemberKind.SetArray:
+                        {
+                            Type type = this.FieldInfo.FieldType.GetElementType();
+                            Array array = (Array)Activator.CreateInstance(this.FieldInfo.FieldType, new object[] { value.Array.Count });
+
+                            int i = 0;
+                            foreach (Api.IJsonValue child in value.Array)
+                            {
+                                array.SetValue(child.Convert(this.FieldInfo.FieldType.GetElementType()), i++);
+                            }
+
+                            this.FieldInfo.SetValue(target, array);
+                        }
+                        break;
+
+                    case CachedMemberKind.AddToCollection:
+                        {
+                            object collection = this.FieldInfo.GetValue(target);
+                            this.AddToCollection(collection, this.collectionInterfaces, value);
+                        }
+                        break;
                 }
             }
         }
@@ -389,7 +451,7 @@ namespace DevPrompt.Utility.Json
             public CachedPropertyInfo(JsonConvert owner, PropertyInfo info)
             {
                 this.PropertyInfo = info;
-                this.Name = info.Name;
+                this.Name = this.GetName(info);
                 this.Kind = CachedMemberKind.None;
 
                 this.getMethod = this.PropertyInfo.GetGetMethod(nonPublic: false);
@@ -403,21 +465,44 @@ namespace DevPrompt.Utility.Json
                 else if (this.getMethod != null)
                 {
                     this.collectionInterfaces = owner.GetCollectionInterfacesForType(info.PropertyType);
-                    this.Kind = (this.collectionInterfaces.Length > 0) ? CachedMemberKind.AddToCollection : CachedMemberKind.SetValue;
+                    this.Kind = (this.collectionInterfaces.Length > 0)
+                        ? CachedMemberKind.AddToCollection
+                       : (info.PropertyType.IsArray ? CachedMemberKind.SetArray : CachedMemberKind.SetValue);
                 }
             }
 
             public override void Set(object target, Api.IJsonValue value)
             {
-                if (this.Kind == CachedMemberKind.SetValue)
+                switch (this.Kind)
                 {
-                    object setValue = value.Convert(this.PropertyInfo.PropertyType);
-                    this.setMethod.Invoke(target, new object[] { setValue });
-                }
-                else if (this.Kind == CachedMemberKind.AddToCollection)
-                {
-                    object collection = this.getMethod.Invoke(target, Array.Empty<object>());
-                    this.AddToCollection(collection, this.collectionInterfaces, value);
+                    case CachedMemberKind.SetValue:
+                        {
+                            object setValue = value.Convert(this.PropertyInfo.PropertyType);
+                            this.setMethod.Invoke(target, new object[] { setValue });
+                        }
+                        break;
+
+                    case CachedMemberKind.SetArray:
+                        {
+                            Type type = this.PropertyInfo.PropertyType.GetElementType();
+                            Array array = (Array)Activator.CreateInstance(this.PropertyInfo.PropertyType, new object[] { value.Array.Count });
+
+                            int i = 0;
+                            foreach (Api.IJsonValue child in value.Array)
+                            {
+                                array.SetValue(child.Convert(this.PropertyInfo.PropertyType.GetElementType()), i++);
+                            }
+
+                            this.setMethod.Invoke(target, new object[] { array });
+                        }
+                        break;
+
+                    case CachedMemberKind.AddToCollection:
+                        {
+                            object collection = this.getMethod.Invoke(target, Array.Empty<object>());
+                            this.AddToCollection(collection, this.collectionInterfaces, value);
+                        }
+                        break;
                 }
             }
         }

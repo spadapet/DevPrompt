@@ -77,6 +77,8 @@
     <Compile Include="Settings\ConsoleSettings.cs" />
     <Compile Include="Settings\SettingTypeResolver.cs" />
     <Compile Include="UI\DesignerViewModels\MainWindowDesignerVM.cs" />
+    <Compile Include="UI\DesignerViewModels\NuGetPluginDesignerVM.cs" />
+    <Compile Include="UI\DesignerViewModels\PluginsDialogDesignerVM.cs" />
     <Compile Include="UI\DesignerViewModels\TabDesignerVM.cs" />
     <Compile Include="UI\InstallBranchDialog.xaml.cs">
       <DependentUpon>InstallBranchDialog.xaml</DependentUpon>
@@ -120,6 +122,8 @@
     </Compile>
     <Compile Include="ProcessWorkspace\ProcessTab.cs" />
     <Compile Include="UI\ViewModels\InstallBranchDialogVM.cs" />
+    <Compile Include="UI\ViewModels\NuGetPluginVM.cs" />
+    <Compile Include="UI\ViewModels\IPluginVM.cs" />
     <Compile Include="UI\ViewModels\PluginsTabVM.cs" />
     <Compile Include="UI\ViewModels\PluginsDialogVM.cs" />
     <Compile Include="UI\ViewModels\SettingsTabVM.cs" />
@@ -140,6 +144,9 @@
     <Compile Include="Utility\Json\JsonTokenizer.cs" />
     <Compile Include="Utility\Json\JsonValueData.cs" />
     <Compile Include="Utility\Json\JsonContext.cs" />
+    <Compile Include="Utility\NuGet\NuGetSearchResultVersion.cs" />
+    <Compile Include="Utility\NuGet\NuGetSearchResult.cs" />
+    <Compile Include="Utility\NuGet\NuGetService.cs" />
     <Compile Include="Utility\NuGet\NuGetServiceIndex.cs" />
     <Compile Include="Utility\VisibleToBoolConverter.cs" />
     <Compile Include="Utility\CommandHelpers.cs" />

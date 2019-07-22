@@ -5,10 +5,29 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:DevPrompt.UI.ViewModels"
+    xmlns:dvm="clr-namespace:DevPrompt.UI.DesignerViewModels"
     mc:Ignorable="d"
     MinWidth="350" MinHeight="200" d:DesignWidth="400" d:DesignHeight="200"
-    DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+    DataContext="{Binding ViewModel,RelativeSource={RelativeSource Mode=Self}}"
+    d:DataContext="{d:DesignInstance dvm:PluginsDialogDesignerVM, IsDesignTimeCreatable=True}">
+    <UserControl.Resources>
+        <DataTemplate x:Key="PluginDataTemplate" DataType="{x:Type vm:IPluginVM}">
+            <Grid>
+                <TextBlock Text="{Binding Title}" />
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
     <Grid>
-        <TextBlock Text="Available"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="100" />
+        </Grid.ColumnDefinitions>
+        <ListBox ItemsSource="{Binding AvailablePlugins}" ItemTemplate="{StaticResource PluginDataTemplate}" />
+        <Grid Grid.Column="1" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+            <StackPanel Orientation="Vertical" Margin="10">
+                <Button Content="Install" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

@@ -160,10 +160,9 @@ namespace DevPrompt.Plugins
             // Load from NuGet packages
             foreach (NuGetPluginSettings nuget in nugetPlugins)
             {
-                if (nuget.Enabled)
+                if (nuget.Enabled && Directory.Exists(nuget.Path))
                 {
-                    string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages", nuget.Id, nuget.Version, "tools", PluginState.NuGetPlatformDir);
-                    foreach (Assembly assembly in PluginState.LoadAssemblies(path, recursive: false))
+                    foreach (Assembly assembly in PluginState.LoadAssemblies(nuget.Path, recursive: false))
                     {
                         plugins.Add(new PluginSource(PluginSourceType.NuGet, assembly));
                     }
