@@ -41,10 +41,31 @@
                 </StackPanel>
             </Grid>
         </DataTemplate>
+
+        <DataTemplate x:Key="AccountDataTemplate" DataType="{x:Type vm:AccountVM}">
+            <TextBlock Text="{Binding Name}" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="ProjectDataTemplate" DataType="{x:Type vm:ProjectReferenceVM}">
+            <TextBlock Text="{Binding Name}" />
+        </DataTemplate>
     </UserControl.Resources>
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Margin="5">
+            <TextBlock Text="Account:" VerticalAlignment="Center" Margin="0,0,5,0" />
+            <ComboBox VerticalAlignment="Center" ItemsSource="{Binding Accounts}" ItemTemplate="{StaticResource AccountDataTemplate}" SelectedItem="{Binding CurrentAccount, Mode=TwoWay}" />
+            <TextBlock Text="Project:" VerticalAlignment="Center" Margin="20,0,5,0" />
+            <ComboBox VerticalAlignment="Center" ItemsSource="{Binding Projects}" ItemTemplate="{StaticResource ProjectDataTemplate}" SelectedValue="{Binding CurrentProject, Mode=TwoWay}" IsEnabled="{Binding HasProjects}" />
+        </StackPanel>
+
         <ListBox
+            Grid.Row="1"
             ItemsSource="{Binding PullRequests}"
             ItemTemplate="{StaticResource PullRequestDataTemplate}"
             HorizontalContentAlignment="Stretch"

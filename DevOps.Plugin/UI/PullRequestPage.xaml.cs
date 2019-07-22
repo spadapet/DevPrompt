@@ -20,9 +20,9 @@ namespace DevOps.UI
             this.ViewModel.Dispose();
         }
 
-        private async void OnLoaded(object sender, RoutedEventArgs args)
+        private void OnLoaded(object sender, RoutedEventArgs args)
         {
-            await this.ViewModel.OnLoaded();
+            this.ViewModel.OnLoaded();
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs args)

@@ -37,7 +37,26 @@ namespace DevOps.UI.ViewModels
         public GitPullRequest GitPullRequest
         {
             get => this.pr;
-            set => this.SetPropertyValue(ref this.pr, value, name: null);
+            set
+            {
+                if (this.SetPropertyValue(ref this.pr, value, name: null))
+                {
+                    this.OnPropertiesChanged();
+                }
+            }
+        }
+
+        public Uri BaseAddress
+        {
+            get => this.baseUri;
+            set
+            {
+                if (this.SetPropertyValue(ref this.baseUri, value))
+                {
+                    this.OnPropertyChanged(nameof(this.WebLink));
+                    this.OnPropertyChanged(nameof(this.CodeFlowLink));
+                }
+            }
         }
 
         public Uri WebLink => new Uri($@"{this.baseUri}{this.pr.Repository.ProjectReference.Name}/_git/{this.pr.Repository.Name}/pullrequest/{this.pr.PullRequestId}?_a=overview");

@@ -1,9 +1,9 @@
-﻿using System.Net.Http;
+﻿using System.ComponentModel;
+using System.Net.Http;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Navigation;
-using System.ComponentModel;
 
 
 namespace DevPrompt.UI
