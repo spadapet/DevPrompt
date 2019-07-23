@@ -15,7 +15,12 @@ namespace DevOps.Utility
     {
         private VssConnection connection;
 
-        public async Task<List<Account>> GetAccountsAsync(CancellationToken cancelToken)
+        public AzureDevOpsClient(Uri accountUri)
+        {
+            this.connection = new VssConnection(accountUri, new VssClientCredentials());
+        }
+
+        public static async Task<List<Account>> GetAccountsAsync(CancellationToken cancelToken)
         {
             using (VssConnection connection = new VssConnection(new Uri("https://app.vssps.visualstudio.com"), new VssClientCredentials()))
             {
@@ -29,10 +34,8 @@ namespace DevOps.Utility
         /// Return a list of projects from an organization
         /// </summary>
         /// <param name="organizationUri">For example:https://dev.azure.com/microsoft is a valid Uri</param>
-        public async Task<IPagedList<TeamProjectReference>> GetProjectsAsync(Uri organizationUri, CancellationToken cancelToken)
-        {
-            this.InitializeConnection(organizationUri);
-            
+        public async Task<IPagedList<TeamProjectReference>> GetProjectsAsync(CancellationToken cancelToken)
+        {            
             ProjectHttpClient projectClient = await this.connection.GetClientAsync<ProjectHttpClient>(cancelToken);
 
             // Todo: Projects can return more than the default top value, come back and use continuation token
@@ -41,21 +44,11 @@ namespace DevOps.Utility
             return projects;
         }
 
-        public async Task<List<GitPullRequest>> GetPullRequests(Uri organizationUri, string project, GitPullRequestSearchCriteria searchCriteria, CancellationToken cancelToken)
+        public async Task<List<GitPullRequest>> GetPullRequests(string project, GitPullRequestSearchCriteria searchCriteria, CancellationToken cancelToken)
         {
-            this.InitializeConnection(organizationUri);
             GitHttpClient gitClient = await this.connection.GetClientAsync<GitHttpClient>(cancelToken);
             List<GitPullRequest> pullRequests = await gitClient.GetPullRequestsByProjectAsync(project, searchCriteria, cancellationToken:cancelToken);
             return pullRequests;
-        }
-
-        private void InitializeConnection(Uri organizationUri)
-        {
-            if (this.connection == null || this.connection.Uri != organizationUri)
-            {
-                this.connection?.Dispose();
-                this.connection = new VssConnection(organizationUri, new VssClientCredentials());
-            }
         }
     }
 }
