@@ -40,6 +40,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget", "Nuget", "{AFEE30EE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevPrompt.Tests", "DevPrompt.Tests\DevPrompt.Tests.csproj", "{30C11659-7966-4771-B4C2-756C75DE703A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSONTools.Plugin", "JSONTools.Plugin\JSONTools.Plugin.csproj", "{404CE4AB-ACBB-43CA-B1AF-C947367DC17E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -104,6 +106,14 @@ Global
 		{30C11659-7966-4771-B4C2-756C75DE703A}.Release|x64.Build.0 = Release|x64
 		{30C11659-7966-4771-B4C2-756C75DE703A}.Release|x86.ActiveCfg = Release|x86
 		{30C11659-7966-4771-B4C2-756C75DE703A}.Release|x86.Build.0 = Release|x86
+		{404CE4AB-ACBB-43CA-B1AF-C947367DC17E}.Debug|x64.ActiveCfg = Debug|x64
+		{404CE4AB-ACBB-43CA-B1AF-C947367DC17E}.Debug|x64.Build.0 = Debug|x64
+		{404CE4AB-ACBB-43CA-B1AF-C947367DC17E}.Debug|x86.ActiveCfg = Debug|x86
+		{404CE4AB-ACBB-43CA-B1AF-C947367DC17E}.Debug|x86.Build.0 = Debug|x86
+		{404CE4AB-ACBB-43CA-B1AF-C947367DC17E}.Release|x64.ActiveCfg = Release|x64
+		{404CE4AB-ACBB-43CA-B1AF-C947367DC17E}.Release|x64.Build.0 = Release|x64
+		{404CE4AB-ACBB-43CA-B1AF-C947367DC17E}.Release|x86.ActiveCfg = Release|x86
+		{404CE4AB-ACBB-43CA-B1AF-C947367DC17E}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
