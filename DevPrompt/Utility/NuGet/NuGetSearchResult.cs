@@ -16,7 +16,7 @@ namespace DevPrompt.Utility.NuGet
         public string description;
         public string summary;
         public string title;
-        public string licenseUrl;
+        public string iconUrl;
         public string projectUrl;
         public string[] tags;
         public string[] authors;

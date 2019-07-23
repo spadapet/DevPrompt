@@ -10,6 +10,12 @@ namespace DevPrompt.UI.DesignerViewModels
     internal class PluginsDialogDesignerVM
     {
         public AppSettings Settings { get; } = new AppSettings();
+        public IPluginVM CurrentPlugin
+        {
+            get => this.AvailablePlugins[0];
+            set { }
+        }
+
         public IList<IPluginVM> AvailablePlugins { get; } = new List<IPluginVM>()
         {
             new NuGetPluginDesignerVM(),
