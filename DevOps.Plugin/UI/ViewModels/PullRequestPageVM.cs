@@ -3,21 +3,18 @@ using DevOps.Utility;
 using DevPrompt.Api;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
-using Microsoft.VisualStudio.Services.Account;
-using Microsoft.VisualStudio.Services.Client;
-using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace DevOps.UI.ViewModels
 {
@@ -25,13 +22,13 @@ namespace DevOps.UI.ViewModels
     {
         public PullRequestTab Tab { get; }
 
-        private VssAadCredential vssCredentials;
         private ObservableCollection<AccountVM> accounts;
         private ObservableCollection<ProjectReferenceVM> projects;
         private ObservableCollection<PullRequestVM> pullRequests;
         private AzureDevOpsClient accountClient;
         private AccountVM currentAccount;
         private ProjectReferenceVM currentProject;
+        private AzureDevOpsUserContext devopsUserContext;
 
         // Avatars
         private Dictionary<Uri, ImageSource> avatars;
@@ -41,12 +38,12 @@ namespace DevOps.UI.ViewModels
         private CancellationTokenSource cancellationTokenSource;
         private bool disposed;
 
-        public PullRequestPageVM(PullRequestTab tab, IEnumerable<Account> vssAccounts, VssAadCredential creds)
+        public PullRequestPageVM(PullRequestTab tab, AzureDevOpsUserContext userContext)
         {
-            this.vssCredentials = creds;
+            this.devopsUserContext = userContext;
             this.Tab = tab;
             this.cancellationTokenSource = new CancellationTokenSource();
-            this.accounts = new ObservableCollection<AccountVM>(vssAccounts.OrderBy(a => a.AccountName).Select(a => new AccountVM(a)));
+            this.accounts = new ObservableCollection<AccountVM>(userContext.Accounts.OrderBy(a => a.AccountName).Select(a => new AccountVM(a)));
             this.projects = new ObservableCollection<ProjectReferenceVM>();
             this.pullRequests = new ObservableCollection<PullRequestVM>();
             this.currentAccount = new AccountVM(null);
@@ -55,7 +52,7 @@ namespace DevOps.UI.ViewModels
             this.avatars = new Dictionary<Uri, ImageSource>();
             this.pendingAvatars = new Dictionary<Uri, List<IAvatarSite>>();
             this.avatarHttpClient = new HttpClient();
-            //this.avatarHttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", this.AuthenticationBase64);
+            this.avatarHttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.devopsUserContext.AuthenticationResult.AccessToken);
             this.avatarHttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("image/png"));
         }
 
@@ -139,7 +136,7 @@ namespace DevOps.UI.ViewModels
         {
             this.CurrentProject = null;
 
-                this.accountClient = new AzureDevOpsClient(account.Account.AccountUri, this.vssCredentials);
+            this.accountClient = new AzureDevOpsClient(account.Account.AccountUri, this.devopsUserContext);
 
             using (this.Window.BeginLoading())
             {
@@ -231,22 +228,18 @@ namespace DevOps.UI.ViewModels
 
                 try
                 {
-                    await Task.FromException(new NotImplementedException());
+                    HttpResponseMessage response = await this.avatarHttpClient.GetAsync(uri, HttpCompletionOption.ResponseContentRead, this.cancellationTokenSource.Token);
+                    response = response.EnsureSuccessStatusCode();
 
-                    // TODO: Avatar image download. It used to work with personal access tokens.
+                    Stream stream = await response.Content.ReadAsStreamAsync();
+                    BitmapImage bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.UriSource = uri;
+                    bitmap.StreamSource = stream;
+                    bitmap.EndInit();
 
-                    //HttpResponseMessage response = await Globals.Instance.HttpClient.Client.GetAsync(uri, HttpCompletionOption.ResponseContentRead, this.cancellationTokenSource.Token);
-                    //response = response.EnsureSuccessStatusCode();
-                    //
-                    //Stream stream = await response.Content.ReadAsStreamAsync();
-                    //BitmapImage bitmap = new BitmapImage();
-                    //bitmap.BeginInit();
-                    //bitmap.UriSource = uri;
-                    //bitmap.StreamSource = stream;
-                    //bitmap.EndInit();
-                    //
-                    //image = bitmap;
-                    //this.avatars[uri] = image;
+                    image = bitmap;
+                    this.avatars[uri] = image;
                 }
                 catch
                 {
