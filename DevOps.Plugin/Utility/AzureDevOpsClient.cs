@@ -14,14 +14,16 @@ namespace DevOps.Utility
 {
     public class AzureDevOpsClient : IDisposable
     {
+        public static AuthenticationResult AuthResult { get; private set; }
+
         private readonly VssConnection connection;
 
-        public AzureDevOpsClient(Uri accountUri, VssAadCredential vssCredentials)  
+        public AzureDevOpsClient(Uri accountUri, AzureDevOpsUserContext userContext)  
         {
-            this.connection = new VssConnection(accountUri, vssCredentials);
+            this.connection = new VssConnection(accountUri, userContext.VssAadCredential);
         }
 
-        public static async Task<VssAadCredential> CreateVssAadCredentials()
+        public static async Task<AzureDevOpsUserContext> GetUserContext(CancellationToken cancelToken = default)
         {
             const string aadAuthority = "https://login.windows.net/microsoft.com";
             const string aadResource = "499b84ac-1321-427f-aa17-267ca6975798";
@@ -29,19 +31,17 @@ namespace DevOps.Utility
             AuthenticationContext authCtx = new AuthenticationContext(aadAuthority);
             UserCredential userCredential = new UserCredential();
 
-            await authCtx.AcquireTokenAsync(aadResource, aadClientId, userCredential);
-            VssAadCredential credentials = new VssAadCredential(new VssAadToken(authCtx, userCredential));
-            return credentials;
-        }
+            AzureDevOpsUserContext result = new AzureDevOpsUserContext();
+            result.AuthenticationResult = await authCtx.AcquireTokenAsync(aadResource, aadClientId, userCredential);
+            result.VssAadCredential = new VssAadCredential(new VssAadToken(authCtx, userCredential));
 
-        public static async Task<List<Account>> GetAccountsAsync(VssAadCredential creds, CancellationToken cancelToken = default)
-        {
-            using (VssConnection connection = new VssConnection(new Uri("https://app.vssps.visualstudio.com"), creds))
+            using (VssConnection connection = new VssConnection(new Uri("https://app.vssps.visualstudio.com"), result.VssAadCredential))
             {
                 AccountHttpClient accountsClient = await connection.GetClientAsync<AccountHttpClient>(cancelToken);
-                List<Account> accounts = await accountsClient.GetAccountsByMemberAsync(connection.AuthorizedIdentity.Id, cancellationToken: cancelToken);
-                return accounts;
+                result.Accounts = await accountsClient.GetAccountsByMemberAsync(connection.AuthorizedIdentity.Id, cancellationToken: cancelToken);
             }
+
+            return result;
         }
 
         public async Task<IPagedList<TeamProjectReference>> GetProjectsAsync(CancellationToken cancelToken = default)

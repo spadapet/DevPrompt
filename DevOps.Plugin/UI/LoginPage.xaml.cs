@@ -1,15 +1,9 @@
 ﻿using DevOps.UI.ViewModels;
 using DevOps.Utility;
-using Microsoft.VisualStudio.Services.Account;
-using Microsoft.VisualStudio.Services.Client;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 
 namespace DevOps.UI
 {
@@ -33,16 +27,14 @@ namespace DevOps.UI
 
             try
             {
-                List<Account> accounts;
-                VssAadCredential vssAadCred;
+                AzureDevOpsUserContext devopsUserContext;
 
                 using (this.ViewModel.Window.BeginLoading(() => this.cancellationTokenSource.Cancel()))
                 {
-                    vssAadCred = await AzureDevOpsClient.CreateVssAadCredentials();
-                    accounts = await AzureDevOpsClient.GetAccountsAsync(vssAadCred, this.cancellationTokenSource.Token);
+                    devopsUserContext = await AzureDevOpsClient.GetUserContext();
                 }
 
-                PullRequestPageVM vm = new PullRequestPageVM(this.Tab, accounts, vssAadCred);
+                PullRequestPageVM vm = new PullRequestPageVM(this.Tab, devopsUserContext);
                 this.Tab.ViewElement = new PullRequestPage(vm);
             }
             catch (Exception ex)

@@ -50,6 +50,7 @@
     <Compile Include="PullRequestTab.cs" />
     <Compile Include="UI\ViewModels\AccountVM.cs" />
     <Compile Include="UI\ViewModels\PullRequestVM.cs" />
+    <Compile Include="Utility\AzureDevOpsUserContext.cs" />
     <Compile Include="Utility\AzureDevOpsClient.cs" />
     <Compile Include="Utility\NegateBoolConverter.cs" />
   </ItemGroup>
