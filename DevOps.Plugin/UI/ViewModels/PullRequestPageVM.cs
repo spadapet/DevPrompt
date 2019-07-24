@@ -1,20 +1,22 @@
 ﻿using DevOps.Avatars;
 using DevOps.Utility;
 using DevPrompt.Api;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.VisualStudio.Services.Account;
+using Microsoft.VisualStudio.Services.Client;
+using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using System.Windows.Media;
 
 namespace DevOps.UI.ViewModels
@@ -23,6 +25,7 @@ namespace DevOps.UI.ViewModels
     {
         public PullRequestTab Tab { get; }
 
+        private VssAadCredential vssCredentials;
         private ObservableCollection<AccountVM> accounts;
         private ObservableCollection<ProjectReferenceVM> projects;
         private ObservableCollection<PullRequestVM> pullRequests;
@@ -38,11 +41,12 @@ namespace DevOps.UI.ViewModels
         private CancellationTokenSource cancellationTokenSource;
         private bool disposed;
 
-        public PullRequestPageVM(PullRequestTab tab, IEnumerable<Account> accounts)
+        public PullRequestPageVM(PullRequestTab tab, IEnumerable<Account> vssAccounts, VssAadCredential creds)
         {
+            this.vssCredentials = creds;
             this.Tab = tab;
             this.cancellationTokenSource = new CancellationTokenSource();
-            this.accounts = new ObservableCollection<AccountVM>(accounts.OrderBy(a => a.AccountName).Select(a => new AccountVM(a)));
+            this.accounts = new ObservableCollection<AccountVM>(vssAccounts.OrderBy(a => a.AccountName).Select(a => new AccountVM(a)));
             this.projects = new ObservableCollection<ProjectReferenceVM>();
             this.pullRequests = new ObservableCollection<PullRequestVM>();
             this.currentAccount = new AccountVM(null);
@@ -135,8 +139,7 @@ namespace DevOps.UI.ViewModels
         {
             this.CurrentProject = null;
 
-            this.accountClient?.Dispose();
-            this.accountClient = new AzureDevOpsClient(account.Account.AccountUri);
+                this.accountClient = new AzureDevOpsClient(account.Account.AccountUri, this.vssCredentials);
 
             using (this.Window.BeginLoading())
             {
