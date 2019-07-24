@@ -52,7 +52,7 @@ namespace DevOps.UI.ViewModels
             this.avatars = new Dictionary<Uri, ImageSource>();
             this.pendingAvatars = new Dictionary<Uri, List<IAvatarSite>>();
             this.avatarHttpClient = new HttpClient();
-            this.avatarHttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.devopsUserContext.AuthenticationResult.AccessToken);
+            this.avatarHttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", userContext.AuthenticationResult.AccessToken);
             this.avatarHttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("image/png"));
         }
 
