@@ -56,7 +56,7 @@
                 </TextBlock>
                 <TextBlock>
                     <Run Text="Version:" FontWeight="Bold" />
-                    <Run Text="{Binding Version, Mode=OneWay}" />
+                    <Run Text="{Binding LatestVersion, Mode=OneWay}" />
                 </TextBlock>
                 <TextBlock>
                     <Hyperlink NavigateUri="{Binding ProjectUrl, Mode=OneWay}" RequestNavigate="OnHyperlink">More information</Hyperlink>

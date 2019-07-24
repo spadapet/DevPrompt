@@ -10,7 +10,7 @@ namespace DevPrompt.UI.ViewModels
         string Title { get; }
         string Description { get; }
         string Summary { get; }
-        string Version { get; }
+        string LatestVersion { get; }
         Uri ProjectUrl { get; }
         string Authors { get; }
         ImageSource Icon { get; }

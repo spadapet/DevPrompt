@@ -105,7 +105,7 @@ namespace DevPrompt.UI.ViewModels
                 };
             }
 
-            this.availablePlugins.Add(new NuGetPluginVM(settings, version.version, version.idUrl));
+            this.availablePlugins.Add(new NuGetPluginVM(this.Window, settings, version.version, version.idUrl));
         }
 
         public IList<PluginsTabVM> Tabs => this.tabs;

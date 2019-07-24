@@ -116,12 +116,12 @@ namespace DevPrompt.Settings
         {
             get
             {
-                string exeFile = Assembly.GetExecutingAssembly().Location;
                 string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                return Path.Combine(appDataPath, Path.GetFileNameWithoutExtension(exeFile));
+                return Path.Combine(appDataPath, AppSettings.ExeName);
             }
         }
 
+        private static string ExeName => Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().Location);
         public static string DefaultPath => Path.Combine(AppSettings.AppDataPath, "Settings.xml");
         public static string DefaultCustomPath => Path.Combine(AppSettings.AppDataPath, "Settings.Custom.xml");
 
@@ -297,19 +297,31 @@ namespace DevPrompt.Settings
         {
             get
             {
-                string exeName = Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().Location);
-
                 yield return new PluginDirectorySettings()
                 {
                     ReadOnly = true,
                 };
 
-                yield return new PluginDirectorySettings()
+                PluginDirectorySettings appPlugins = new PluginDirectorySettings()
                 {
-                    Directory = $@"%LocalAppData%\{exeName}.Plugins",
+                    Directory = @".\Plugins",
                     Recurse = true,
                     ReadOnly = true,
                 };
+
+                PluginDirectorySettings userPlugins = new PluginDirectorySettings()
+                {
+                    Directory = $@"%LocalAppData%\{AppSettings.ExeName}\Plugins",
+                    Recurse = true,
+                    ReadOnly = true,
+                };
+
+                yield return appPlugins;
+
+                if (!string.Equals(appPlugins.ExpandedDirectory, userPlugins.ExpandedDirectory, StringComparison.OrdinalIgnoreCase))
+                {
+                    yield return userPlugins;
+                }
 
                 foreach (PluginDirectorySettings userDir in this.UserPluginDirectories)
                 {
@@ -317,6 +329,8 @@ namespace DevPrompt.Settings
                 }
             }
         }
+
+        public static string RootNuGetPluginDirectory => Environment.ExpandEnvironmentVariables($@"%LocalAppData%\{AppSettings.ExeName}\Plugins.NuGet");
 
         public static async Task<T> UnsafeLoad<T>(App app, string path)
         {

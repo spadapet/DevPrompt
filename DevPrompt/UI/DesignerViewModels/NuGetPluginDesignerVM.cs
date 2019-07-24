@@ -11,7 +11,7 @@ namespace DevPrompt.UI.DesignerViewModels
         public string Title => "Plugin Title";
         public string Description => "This is my plugin description.";
         public string Summary => "Test summary, it's longer than a description. Explain the features in the plugin.";
-        public string Version => "1.0.1";
+        public string LatestVersion => "1.0.1";
         public Uri ProjectUrl => new Uri("http://www.microsoft.com");
         public string Authors => "Bill Gates";
         public ImageSource Icon => null;
