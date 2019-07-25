@@ -20,15 +20,13 @@ namespace DevPrompt.UI
         public App App { get; }
 
         private bool systemShuttingDown;
-        private bool restartOnClose;
+        private RestartOnClose restartOnClose;
+        private enum RestartOnClose { None, Window, App };
 
-        public MainWindow(App app, string initialErrorText)
+        public MainWindow(App app)
         {
             this.App = app;
-            this.ViewModel = new MainWindowVM(this)
-            {
-                ErrorText = initialErrorText
-            };
+            this.ViewModel = new MainWindowVM(this);
 
             this.InitializeComponent();
 
@@ -320,14 +318,14 @@ namespace DevPrompt.UI
 
         private void OnClosed(object sender, EventArgs args)
         {
-            this.App.OnWindowClosed(this, this.restartOnClose);
+            this.App.OnWindowClosed(this, this.restartOnClose == RestartOnClose.Window, this.restartOnClose == RestartOnClose.App);
         }
 
         private Task OnClosing()
         {
             this.App.OnWindowClosing(this);
 
-            AppSnapshot snapshot = new AppSnapshot(this.ViewModel, force: this.restartOnClose);
+            AppSnapshot snapshot = new AppSnapshot(this.ViewModel, force: this.restartOnClose != RestartOnClose.None);
             return snapshot.Save(this.App);
         }
 
@@ -351,9 +349,9 @@ namespace DevPrompt.UI
             }
         }
 
-        public void CloseAndRestart()
+        public void CloseAndRestart(bool justReopenWindow)
         {
-            this.restartOnClose = true;
+            this.restartOnClose = justReopenWindow ? RestartOnClose.Window : RestartOnClose.App;
             this.Close();
         }
 

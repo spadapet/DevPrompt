@@ -1,16 +1,12 @@
 ﻿using DevPrompt.Api;
 using DevPrompt.Settings;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
-using System.IO.Packaging;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -18,37 +14,102 @@ namespace DevPrompt.UI.ViewModels
 {
     internal class NuGetPluginVM : PropertyNotifier, IPluginVM
     {
-        public string Title => this.settings.Title;
-        public string Description => this.settings.Description;
-        public string Summary => this.settings.Summary;
-        public string Authors => this.settings.Authors;
+        public NuGetPluginSettings PluginSettings { get; }
 
-        private MainWindow window;
-        private NuGetPluginSettings settings;
-        private string latestVersion;
-        private string latestVersionUrl;
-        private string installedVersion;
-        private bool installed;
-        private bool installing;
+        public string Title => this.PluginSettings.Title;
+        public string Description => this.PluginSettings.Description;
+        public string Summary => this.PluginSettings.Summary;
+        public string InstalledVersion => this.PluginSettings.InstalledVersion;
+        public string LatestVersion => this.PluginSettings.LatestVersion;
+        public string Authors => this.PluginSettings.Authors;
+        public bool IsInstalled => this.PluginSettings.IsInstalled;
+
+        private App app;
+        private AppSettings appSettings;
         private BitmapImage icon;
+        private Uri projectUrl;
+        private Task busyTask;
 
-        public NuGetPluginVM(MainWindow window, NuGetPluginSettings settings, string latestVersion, string latestVersionUrl)
+        public NuGetPluginVM(App app, AppSettings appSettings, NuGetPluginSettings pluginSettings)
         {
-            this.window = window;
-            this.settings = settings;
-            this.latestVersion = latestVersion;
-            this.latestVersionUrl = latestVersionUrl;
-            this.installed = !string.IsNullOrEmpty(this.settings.Path);
-            this.installedVersion = this.installed ? this.settings.Version : string.Empty;
+            this.app = app;
+            this.appSettings = appSettings;
+            this.PluginSettings = pluginSettings;
+            this.PluginSettings.PropertyChanged += this.OnModelPropertyChanged;
+        }
+
+        public void Dispose()
+        {
+            this.PluginSettings.PropertyChanged -= this.OnModelPropertyChanged;
+        }
+
+        private void OnModelPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            bool all = string.IsNullOrEmpty(args.PropertyName);
+
+            if (all || args.PropertyName == nameof(this.PluginSettings.Title))
+            {
+                this.OnPropertyChanged(nameof(this.Title));
+            }
+
+            if (all || args.PropertyName == nameof(this.PluginSettings.Description))
+            {
+                this.OnPropertyChanged(nameof(this.Description));
+            }
+
+            if (all || args.PropertyName == nameof(this.PluginSettings.Summary))
+            {
+                this.OnPropertyChanged(nameof(this.Summary));
+            }
+
+            if (all || args.PropertyName == nameof(this.PluginSettings.ProjectUrl))
+            {
+                this.projectUrl = null;
+                this.OnPropertyChanged(nameof(this.ProjectUrl));
+            }
+
+            if (all || args.PropertyName == nameof(this.PluginSettings.IconUrl))
+            {
+                this.icon = null;
+                this.OnPropertyChanged(nameof(this.icon));
+            }
+
+            if (all || args.PropertyName == nameof(this.PluginSettings.Authors))
+            {
+                this.OnPropertyChanged(nameof(this.Authors));
+            }
+
+            if (all || args.PropertyName == nameof(this.PluginSettings.LatestVersion))
+            {
+                this.OnPropertyChanged(nameof(this.LatestVersion));
+                this.OnPropertyChanged(nameof(this.State));
+            }
+
+            if (all || args.PropertyName == nameof(this.PluginSettings.InstalledVersion))
+            {
+                this.OnPropertyChanged(nameof(this.InstalledVersion));
+                this.OnPropertyChanged(nameof(this.State));
+            }
+
+            if (all || args.PropertyName == nameof(this.PluginSettings.IsInstalled))
+            {
+                this.OnPropertyChanged(nameof(this.IsInstalled));
+            }
         }
 
         public Uri ProjectUrl
         {
             get
             {
-                return !string.IsNullOrEmpty(this.settings.ProjectUrl) &&
-                    Uri.TryCreate(this.settings.ProjectUrl, UriKind.Absolute, out Uri uri)
-                    ? uri : null;
+                if (this.projectUrl == null)
+                {
+                    if (!string.IsNullOrEmpty(this.PluginSettings.ProjectUrl) && Uri.TryCreate(this.PluginSettings.ProjectUrl, UriKind.Absolute, out Uri uri))
+                    {
+                        this.projectUrl = uri;
+                    }
+                }
+
+                return this.projectUrl;
             }
         }
 
@@ -58,13 +119,9 @@ namespace DevPrompt.UI.ViewModels
             {
                 if (this.icon == null)
                 {
-                    if (!string.IsNullOrEmpty(this.settings.IconUrl) && Uri.TryCreate(this.settings.IconUrl, UriKind.Absolute, out Uri uri))
+                    if (!string.IsNullOrEmpty(this.PluginSettings.IconUrl) && Uri.TryCreate(this.PluginSettings.IconUrl, UriKind.Absolute, out Uri uri))
                     {
                         this.icon = new BitmapImage(uri);
-                    }
-                    else
-                    {
-                        this.icon = new BitmapImage(new Uri("pack://application:,,,/UI/Images/default-package-icon.png"));
                     }
                 }
 
@@ -72,129 +129,115 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
-        public string LatestVersion
+        public PluginState State
         {
-            get => this.latestVersion;
-            set => this.SetPropertyValue(ref this.latestVersion, value ?? string.Empty);
+            get
+            {
+                PluginState state = PluginState.None;
+                if (!string.IsNullOrEmpty(this.InstalledVersion))
+                {
+                    state |= PluginState.Installed;
+
+                    if (!string.IsNullOrEmpty(this.LatestVersion) && this.LatestVersion != this.InstalledVersion)
+                    {
+                        state |= PluginState.UpdateAvailable;
+                    }
+                }
+
+                if (this.busyTask != null)
+                {
+                    state |= PluginState.Busy;
+                }
+
+                return state;
+            }
         }
 
-        public string LatestVersionUrl
+        private Task SetBusyTask(Task task)
         {
-            get => this.latestVersionUrl;
-            set => this.SetPropertyValue(ref this.latestVersionUrl, value ?? string.Empty);
-        }
+            if (this.busyTask != task)
+            {
+                this.busyTask = task;
+                this.OnPropertyChanged(nameof(this.State));
 
-        public bool IsInstalling
-        {
-            get => this.installing;
-            set => this.SetPropertyValue(ref this.installing, value);
-        }
+                if (task != null)
+                {
+                    this.app.AddCriticalTask(task);
+                }
+            }
 
-        public bool IsInstalled
-        {
-            get => this.installed;
-            set => this.SetPropertyValue(ref this.installed, value);
-        }
-
-        public string InstalledVersion
-        {
-            get => this.installedVersion;
-            set => this.SetPropertyValue(ref this.installedVersion, value ?? string.Empty);
+            return task ?? Task.CompletedTask;
         }
 
         public async Task Install(CancellationToken cancelToken)
         {
-            if (!this.IsInstalled && !this.IsInstalling && this.InstalledVersion != this.LatestVersion)
+            if (!this.State.HasFlag(PluginState.Busy) && (!this.State.HasFlag(PluginState.Installed) || this.State.HasFlag(PluginState.UpdateAvailable)))
             {
-                this.IsInstalling = true;
-                Exception exception = null;
-
                 try
                 {
-                    Api.IHttpClient http = this.window.App.HttpClient;
-                    Api.IJsonValue value = await http.GetJsonAsync(this.LatestVersionUrl, cancelToken);
-                    string contentUrl = value["packageContent"].String;
-
-                    HttpResponseMessage response = await http.Client.GetAsync(contentUrl, HttpCompletionOption.ResponseHeadersRead, cancelToken);
-                    response = response.EnsureSuccessStatusCode();
-
-                    using (Stream zipStream = await response.Content.ReadAsStreamAsync())
-                    using (ZipArchive zip = new ZipArchive(zipStream, ZipArchiveMode.Read, leaveOpen: true))
-                    {
-                        await this.Unzip(zip, cancelToken);
-                    }
+                    await this.SetBusyTask(this.InternalInstall(cancelToken));
                 }
-                catch (Exception ex)
+                finally
                 {
-                    exception = ex;
-                }
-
-                if (exception == null)
-                {
-                    this.IsInstalling = false;
-                    this.installedVersion = this.LatestVersion;
-                    this.IsInstalled = true;
-                }
-                else
-                {
-                    this.window.ViewModel.SetError(exception);
+                    await this.SetBusyTask(null);
                 }
             }
         }
 
-        public async Task Uninstall(CancellationToken cancelToken)
+        public Task Uninstall(CancellationToken cancelToken)
         {
-            if (this.IsInstalled && !this.IsInstalling)
+            if (!this.State.HasFlag(PluginState.Busy) && this.State.HasFlag(PluginState.Installed))
             {
-                this.IsInstalling = true;
-                Exception exception = null;
-
-                try
-                {
-                    await Task.Run(() =>
-                    {
-                        string rootDir = Path.Combine(AppSettings.RootNuGetPluginDirectory, this.settings.Id);
-                        Directory.Delete(rootDir, recursive: true);
-                    });
-                }
-                catch (Exception ex)
-                {
-                    exception = ex;
-                }
-
-                if (exception == null)
-                {
-                    this.IsInstalling = false;
-                    this.InstalledVersion = string.Empty;
-                    this.IsInstalled = false;
-                }
-                else
-                {
-                    this.window.ViewModel.SetError(exception);
-                }
+                this.InternalUninstall();
             }
+
+            return Task.CompletedTask;
         }
 
-        private async Task Unzip(ZipArchive zip, CancellationToken cancelToken)
+        private async Task InternalInstall(CancellationToken cancelToken)
         {
-            string rootDir = Path.Combine(AppSettings.RootNuGetPluginDirectory, this.settings.Id, this.LatestVersion);
-            if (Directory.Exists(rootDir))
+            string versionToInstall = this.LatestVersion;
+            string versionToInstallPath = this.PluginSettings.GetInstallPath(versionToInstall);
+
+            HttpResponseMessage contentResponse = await this.app.HttpClient.Client.GetAsync(this.PluginSettings.LatestVersionPackageUrl, HttpCompletionOption.ResponseHeadersRead, cancelToken);
+            contentResponse = contentResponse.EnsureSuccessStatusCode();
+
+            using (Stream zipStream = await contentResponse.Content.ReadAsStreamAsync())
+            using (ZipArchive zip = new ZipArchive(zipStream, ZipArchiveMode.Read, leaveOpen: true))
             {
-                Directory.Delete(rootDir, recursive: true);
+                await this.Unzip(zip, versionToInstallPath, cancelToken);
             }
 
+            this.PluginSettings.InstalledVersion = versionToInstall;
+            this.appSettings.PluginsChanged = true;
+        }
+
+        private void InternalUninstall()
+        {
+            this.PluginSettings.InstalledVersion = string.Empty;
+            this.appSettings.PluginsChanged = true;
+        }
+
+        private async Task Unzip(ZipArchive zip, string rootDir, CancellationToken cancelToken)
+        {
             foreach (ZipArchiveEntry entry in zip.Entries)
             {
                 const string prefix = "tools/net40/";
                 if (entry.FullName.StartsWith(prefix))
                 {
                     string path = Path.Combine(rootDir, entry.FullName.Substring(prefix.Length));
-                    Directory.CreateDirectory(Path.GetDirectoryName(path));
-                    using (Stream stream = entry.Open())
-                    using (FileStream fileStream = File.Create(path))
+
+                    // Since NuGet package contents can't change, assume that if the file exists, it's good
+                    if (!File.Exists(path))
                     {
-                        const int defaultBufferSize = 81920;
-                        await stream.CopyToAsync(fileStream, defaultBufferSize, cancelToken);
+                        Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+                        using (Stream stream = entry.Open())
+                        using (FileStream fileStream = File.Create(path))
+                        {
+                            const int defaultBufferSize = 81920;
+                            await stream.CopyToAsync(fileStream, defaultBufferSize, cancelToken);
+                        }
                     }
                 }
             }

@@ -6,8 +6,10 @@ using DevPrompt.Utility;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -26,12 +28,13 @@ namespace DevPrompt
         public PluginState PluginState { get; private set; }
         public NativeApp NativeApp { get; private set; }
 
-        private enum RunningState { Run, Restart, ShutDown }
+        private enum RunningState { Run, RestartWindow, RestartApp, ShutDown }
         private enum SettingsState { None, Loaded, SavePending }
 
         private List<Task> criticalTasks; // process won't exit until all critical tasks are done
         private RunningState runningState;
         private SettingsState settingsState;
+        private SettingsState customSettingsState;
 
         public App()
         {
@@ -67,14 +70,19 @@ namespace DevPrompt
         private async void OnStartup(object sender, StartupEventArgs args)
         {
             string errorMessage = string.Empty;
+            bool firstStartup = (this.NativeApp == null);
             this.NativeApp = this.NativeApp ?? NativeMethods.CreateApp(this, out errorMessage);
-            this.MainWindow = new MainWindow(this, errorMessage);
+            this.MainWindow = new MainWindow(this);
+            this.MainWindow.infoBar.SetError(null, errorMessage);
             this.MainWindow.Show();
 
             await this.InitSettings();
-            await this.PluginState.Initialize();
-            await this.InitCustomSettings();
             this.settingsState = SettingsState.Loaded;
+
+            await this.PluginState.Initialize(firstStartup);
+
+            await this.InitCustomSettings();
+            this.customSettingsState = SettingsState.Loaded;
 
             foreach (Api.IAppListener listener in this.PluginState.AppListeners)
             {
@@ -113,11 +121,18 @@ namespace DevPrompt
             }
         }
 
-        public void OnWindowClosed(MainWindow window, bool restart)
+        public void OnWindowClosed(MainWindow window, bool restartWindow, bool restartApp)
         {
-            if (this.runningState == RunningState.Run && restart)
+            if (this.runningState == RunningState.Run)
             {
-                this.runningState = RunningState.Restart;
+                if (restartApp)
+                {
+                    this.runningState = RunningState.RestartApp;
+                }
+                else if (restartWindow)
+                {
+                    this.runningState = RunningState.RestartWindow;
+                }
             }
 
             this.CheckShutdown(windowClosed: true);
@@ -137,7 +152,7 @@ namespace DevPrompt
 
         private async Task InitCustomSettings()
         {
-            if (this.settingsState == SettingsState.None)
+            if (this.customSettingsState == SettingsState.None)
             {
                 AppCustomSettings customSettings = await AppSettings.LoadCustom(this, AppSettings.DefaultCustomPath);
                 this.Settings.CopyFrom(customSettings);
@@ -222,9 +237,13 @@ namespace DevPrompt
                         {
                             this.Shutdown();
                         }
-                        else if (this.runningState == RunningState.Restart)
+                        else if (this.runningState == RunningState.RestartWindow)
                         {
-                            this.Restart();
+                            this.RestartWindow();
+                        }
+                        else if (this.runningState == RunningState.RestartApp)
+                        {
+                            this.RestartApp();
                         }
                     }
                 }
@@ -233,18 +252,42 @@ namespace DevPrompt
             this.Dispatcher.BeginInvoke(action, DispatcherPriority.Normal);
         }
 
-        private void Restart()
+        private void RestartWindow()
         {
             this.runningState = RunningState.Run;
 
             this.PluginState.Dispose();
             this.PluginState = new PluginState(this);
 
-
             GC.Collect();
             GC.WaitForPendingFinalizers();
 
             this.OnStartup(this, null);
+        }
+
+        private void RestartApp()
+        {
+            try
+            {
+                Process currentProcess = Process.GetCurrentProcess();
+                Process process = Process.Start(new ProcessStartInfo(currentProcess.MainModule.FileName, $"/waitfor {currentProcess.Id}")
+                {
+                    UseShellExecute = true
+                });
+
+                if (process != null)
+                {
+                    this.runningState = RunningState.ShutDown;
+                    this.Shutdown();
+                    return;
+                }
+            }
+            catch
+            {
+                // Failed to create a new process, so just restart the window instead
+            }
+
+            this.RestartWindow();
         }
 
         private void OnSessionEnded(object sender, SessionEndedEventArgs args)

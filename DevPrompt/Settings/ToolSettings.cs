@@ -17,7 +17,7 @@ namespace DevPrompt.Settings
 
         public ToolSettings()
         {
-            this.name = DevPrompt.Utility.CommandHelpers.SeparatorName;
+            this.name = DevPrompt.Utility.CommandUtility.SeparatorName;
             this.command = string.Empty;
             this.arguments = string.Empty;
         }

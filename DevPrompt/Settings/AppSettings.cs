@@ -29,6 +29,7 @@ namespace DevPrompt.Settings
         private Dictionary<string, object> customProperties;
         private bool consoleGrabEnabled;
         private bool saveTabsOnExit;
+        private bool pluginsChanged;
         private static readonly object fileLock = new object();
 
         public AppSettings()
@@ -51,6 +52,7 @@ namespace DevPrompt.Settings
         {
             this.ConsoleGrabEnabled = copyFrom.ConsoleGrabEnabled;
             this.SaveTabsOnExit = copyFrom.SaveTabsOnExit;
+            this.PluginsChanged = copyFrom.PluginsChanged;
 
             this.ObservableConsoles.Clear();
             this.ObservableGrabConsoles.Clear();
@@ -124,6 +126,7 @@ namespace DevPrompt.Settings
         private static string ExeName => Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().Location);
         public static string DefaultPath => Path.Combine(AppSettings.AppDataPath, "Settings.xml");
         public static string DefaultCustomPath => Path.Combine(AppSettings.AppDataPath, "Settings.Custom.xml");
+        public static string DefaultNuGetPath => Path.Combine(AppSettings.AppDataPath, "Plugins.NuGet");
 
         [Flags]
         public enum DefaultSettingsFilter
@@ -297,11 +300,6 @@ namespace DevPrompt.Settings
         {
             get
             {
-                yield return new PluginDirectorySettings()
-                {
-                    ReadOnly = true,
-                };
-
                 PluginDirectorySettings appPlugins = new PluginDirectorySettings()
                 {
                     Directory = @".\Plugins",
@@ -329,8 +327,6 @@ namespace DevPrompt.Settings
                 }
             }
         }
-
-        public static string RootNuGetPluginDirectory => Environment.ExpandEnvironmentVariables($@"%LocalAppData%\{AppSettings.ExeName}\Plugins.NuGet");
 
         public static async Task<T> UnsafeLoad<T>(App app, string path)
         {
@@ -481,6 +477,13 @@ namespace DevPrompt.Settings
         {
             get => this.saveTabsOnExit;
             set => this.SetPropertyValue(ref this.saveTabsOnExit, value);
+        }
+
+        // Do not persist this
+        public bool PluginsChanged
+        {
+            get => this.pluginsChanged;
+            set => this.SetPropertyValue(ref this.pluginsChanged, value);
         }
 
         // Saved from AppCustomSettings, not from here

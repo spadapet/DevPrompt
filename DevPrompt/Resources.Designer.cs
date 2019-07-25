@@ -61,6 +61,15 @@ namespace DevPrompt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Using Dispatcher from the wrong thread.
+        /// </summary>
+        internal static string Exception_WrongDispatcherThread {
+            get {
+                return ResourceManager.GetString("Exception.WrongDispatcherThread", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected a JSON array for populating a collection.
         /// </summary>
         internal static string JsonConvert_ExpectedArray {
@@ -196,29 +205,74 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Available.
+        ///   Looks up a localized string similar to Checking for plugins.
         /// </summary>
-        internal static string PluginsTabType_PluginAvailable {
+        internal static string Plugins_FetchingFromNuGet {
             get {
-                return ResourceManager.GetString("PluginsTabType.PluginAvailable", resourceCulture);
+                return ResourceManager.GetString("Plugins.FetchingFromNuGet", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Installed.
+        ///   Looks up a localized string similar to Installing &apos;{0}&apos;.
         /// </summary>
-        internal static string PluginsTabType_PluginInstalled {
+        internal static string Plugins_InstallingProgress {
             get {
-                return ResourceManager.GetString("PluginsTabType.PluginInstalled", resourceCulture);
+                return ResourceManager.GetString("Plugins.InstallingProgress", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Updates.
+        ///   Looks up a localized string similar to Restart DevPrompt?.
         /// </summary>
-        internal static string PluginsTabType_PluginUpdates {
+        internal static string Plugins_RestartCaption {
             get {
-                return ResourceManager.GetString("PluginsTabType.PluginUpdates", resourceCulture);
+                return ResourceManager.GetString("Plugins.RestartCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Plugins have changed and DevPrompt needs to restart to load the changes. Would you like to restart now?.
+        /// </summary>
+        internal static string Plugins_RestartText {
+            get {
+                return ResourceManager.GetString("Plugins.RestartText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Uninstalling &apos;{0}&apos;.
+        /// </summary>
+        internal static string Plugins_UninstallingProgress {
+            get {
+                return ResourceManager.GetString("Plugins.UninstallingProgress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export Settings.
+        /// </summary>
+        internal static string Settings_ExportDialogTitle {
+            get {
+                return ResourceManager.GetString("Settings.ExportDialogTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import Settings.
+        /// </summary>
+        internal static string Settings_ImportDialogTitle {
+            get {
+                return ResourceManager.GetString("Settings.ImportDialogTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to XML Files.
+        /// </summary>
+        internal static string Settings_XmlFilterName {
+            get {
+                return ResourceManager.GetString("Settings.XmlFilterName", resourceCulture);
             }
         }
         
@@ -246,6 +300,15 @@ namespace DevPrompt {
         internal static string SettingsTabType_Links {
             get {
                 return ResourceManager.GetString("SettingsTabType.Links", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Plugins.
+        /// </summary>
+        internal static string SettingsTabType_Plugins {
+            get {
+                return ResourceManager.GetString("SettingsTabType.Plugins", resourceCulture);
             }
         }
         

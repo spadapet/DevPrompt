@@ -19,7 +19,7 @@ namespace DevPrompt.UI.Settings
 
         public void Dispose()
         {
-            this.ViewModel.Dispose();
+            this.progressBar.TransferTasks(this.ViewModel.Window.progressBar);
         }
 
         private void OnClickOk(object sender, RoutedEventArgs args)

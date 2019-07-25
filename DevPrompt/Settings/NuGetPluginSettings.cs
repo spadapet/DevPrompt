@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Runtime.Serialization;
 
 namespace DevPrompt.Settings
@@ -17,10 +19,11 @@ namespace DevPrompt.Settings
         private string projectUrl;
         private string iconUrl;
         private string authors;
-        private string version;
-        private string versionRegistrationUrl;
-        private string path;
-        private bool enabled;
+        private string latestVersion;
+        private string latestVersionUrl;
+        private string latestVersionPackageUrl;
+        private DateTime latestVersionDate;
+        private string installedVersion;
 
         public NuGetPluginSettings()
         {
@@ -31,25 +34,32 @@ namespace DevPrompt.Settings
             this.projectUrl = string.Empty;
             this.iconUrl = string.Empty;
             this.authors = string.Empty;
-            this.version = string.Empty;
-            this.versionRegistrationUrl = string.Empty;
-            this.path = string.Empty;
-            this.enabled = true;
+            this.latestVersion = string.Empty;
+            this.latestVersionUrl = string.Empty;
+            this.latestVersionPackageUrl = string.Empty;
+            this.latestVersionDate = DateTime.MinValue;
+            this.installedVersion = string.Empty;
         }
 
         public NuGetPluginSettings(NuGetPluginSettings copyFrom)
         {
-            this.id = copyFrom.id;
-            this.title = copyFrom.title;
-            this.description = copyFrom.description;
-            this.summary = copyFrom.summary;
-            this.projectUrl = copyFrom.projectUrl;
-            this.iconUrl = copyFrom.iconUrl;
-            this.authors = copyFrom.authors;
-            this.version = copyFrom.version;
-            this.versionRegistrationUrl = copyFrom.versionRegistrationUrl;
-            this.path = copyFrom.path;
-            this.enabled = copyFrom.enabled;
+            this.CopyFrom(copyFrom);
+        }
+
+        public void CopyFrom(NuGetPluginSettings copyFrom)
+        {
+            this.Id = copyFrom.id;
+            this.Title = copyFrom.title;
+            this.Description = copyFrom.description;
+            this.Summary = copyFrom.summary;
+            this.ProjectUrl = copyFrom.projectUrl;
+            this.IconUrl = copyFrom.iconUrl;
+            this.Authors = copyFrom.authors;
+            this.LatestVersion = copyFrom.latestVersion;
+            this.LatestVersionUrl = copyFrom.latestVersionUrl;
+            this.latestVersionPackageUrl = copyFrom.latestVersionPackageUrl;
+            this.latestVersionDate = copyFrom.latestVersionDate;
+            this.InstalledVersion = copyFrom.installedVersion;
         }
 
         public NuGetPluginSettings Clone()
@@ -61,21 +71,13 @@ namespace DevPrompt.Settings
         public string Id
         {
             get => this.id;
-            set => this.SetPropertyValue(ref this.id, value ?? string.Empty);
-        }
-
-        [DataMember]
-        public string Path
-        {
-            get => this.path;
-            set => this.SetPropertyValue(ref this.path, value ?? string.Empty);
-        }
-
-        [DataMember]
-        public bool Enabled
-        {
-            get => this.enabled;
-            set => this.SetPropertyValue(ref this.enabled, value);
+            set
+            {
+                if (this.SetPropertyValue(ref this.id, value ?? string.Empty))
+                {
+                    this.OnPropertyChanged(nameof(this.InstalledRootPath));
+                }
+            }
         }
 
         [DataMember]
@@ -121,17 +123,59 @@ namespace DevPrompt.Settings
         }
 
         [DataMember]
-        public string Version
+        public string LatestVersion
         {
-            get => this.version;
-            set => this.SetPropertyValue(ref this.version, value ?? string.Empty);
+            get => this.latestVersion;
+            set => this.SetPropertyValue(ref this.latestVersion, value ?? string.Empty);
         }
 
         [DataMember]
-        public string VersionRegistrationUrl
+        public string LatestVersionUrl
         {
-            get => this.versionRegistrationUrl;
-            set => this.SetPropertyValue(ref this.versionRegistrationUrl, value ?? string.Empty);
+            get => this.latestVersionUrl;
+            set => this.SetPropertyValue(ref this.latestVersionUrl, value ?? string.Empty);
+        }
+
+        [DataMember]
+        public string LatestVersionPackageUrl
+        {
+            get => this.latestVersionPackageUrl;
+            set => this.SetPropertyValue(ref this.latestVersionPackageUrl, value ?? string.Empty);
+        }
+
+        [DataMember]
+        public DateTime LatestVersionDate
+        {
+            get => this.latestVersionDate;
+            set => this.SetPropertyValue(ref this.latestVersionDate, value);
+        }
+
+        [DataMember]
+        public string InstalledVersion
+        {
+            get => this.installedVersion;
+            set
+            {
+                if (this.SetPropertyValue(ref this.installedVersion, value ?? string.Empty))
+                {
+                    this.OnPropertyChanged(nameof(this.IsInstalled));
+                    this.OnPropertyChanged(nameof(this.InstalledVersionPath));
+                }
+            }
+        }
+
+        public bool IsInstalled => !string.IsNullOrEmpty(this.InstalledVersionPath);
+        public string InstalledRootPath => Path.Combine(AppSettings.DefaultNuGetPath, this.Id);
+        public string InstalledVersionPath => this.GetInstallPath(this.InstalledVersion);
+
+        public string GetInstallPath(string version)
+        {
+            if (!string.IsNullOrEmpty(version) && !string.IsNullOrEmpty(this.id))
+            {
+                return Path.Combine(this.InstalledRootPath, version);
+            }
+
+            return string.Empty;
         }
     }
 }

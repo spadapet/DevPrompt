@@ -1,5 +1,6 @@
 ﻿using DevPrompt.Interop;
 using DevPrompt.Settings;
+using DevPrompt.Utility;
 using System;
 using System.Collections.Generic;
 using System.Composition;
@@ -33,10 +34,8 @@ namespace DevPrompt.Plugins
 
 #if NET_FRAMEWORK
         private const string DllSuffix = ".Plugin.dll";
-        private const string NuGetPlatformDir = "net40";
 #else
         private const string DllSuffix = ".NetCorePlugin.dll";
-        private const string NuGetPlatformDir = "net40";
 #endif
 
         public PluginState(App app)
@@ -50,8 +49,13 @@ namespace DevPrompt.Plugins
             this.compositionHost?.Dispose();
         }
 
-        public async Task Initialize()
+        public async Task Initialize(bool firstStartup)
         {
+            if (firstStartup)
+            {
+                await this.CleanNuGetPlugins();
+            }
+
             this.compositionHost = await this.CreatePluginHost();
 
             if (this.compositionHost != null)
@@ -69,6 +73,81 @@ namespace DevPrompt.Plugins
             }
         }
 
+        private async Task CleanNuGetPlugins()
+        {
+            NuGetPluginSettings[] nugetPlugins = this.app.Settings.NuGetPlugins.Select(p => p.Clone()).ToArray();
+
+            await Task.Run(() =>
+            {
+                Dictionary<string, NuGetPluginSettings> pluginMap = nugetPlugins.ToDictionary(p => p.Id, p => p);
+
+                // Detect installed plugins that were manually deleted
+                foreach (NuGetPluginSettings plugin in nugetPlugins)
+                {
+                    if (plugin.IsInstalled && !Directory.Exists(plugin.InstalledVersionPath))
+                    {
+                        plugin.InstalledVersion = string.Empty;
+                    }
+                }
+
+                try
+                {
+                    if (Directory.Exists(AppSettings.DefaultNuGetPath))
+                    {
+                        foreach (string path in Directory.GetDirectories(AppSettings.DefaultNuGetPath, "*", SearchOption.TopDirectoryOnly))
+                        {
+                            string id = Path.GetFileName(path);
+                            if (pluginMap.TryGetValue(id, out NuGetPluginSettings plugin) && plugin.IsInstalled)
+                            {
+                                foreach (string versionPath in Directory.GetDirectories(plugin.InstalledVersionPath, "*", SearchOption.TopDirectoryOnly))
+                                {
+                                    string version = Path.GetFileName(versionPath);
+                                    if (!string.Equals(version, plugin.InstalledVersion, StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        // This version isn't installed, delete just this one
+                                        Directory.Delete(versionPath, recursive: true);
+                                    }
+                                }
+
+                                // Deleted the last version, so delete its root
+                                if (!Directory.EnumerateFileSystemEntries(plugin.InstalledRootPath).Any())
+                                {
+                                    Directory.Delete(plugin.InstalledRootPath, recursive: true);
+                                }
+                            }
+                            else
+                            {
+                                // Plugin isn't installed at all, delete its root
+                                Directory.Delete(path, recursive: true);
+                            }
+                        }
+
+                        // Deleted the last plugin
+                        if (!Directory.EnumerateFileSystemEntries(AppSettings.DefaultNuGetPath).Any())
+                        {
+                            Directory.Delete(AppSettings.DefaultNuGetPath, recursive: true);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.Fail($"CleanNuGetPlugins failed: {ex}");
+                }
+            });
+
+            // Copy back plugin info, in case some installed plugins were detected as not installed
+            Debug.Assert(nugetPlugins.Length == this.app.Settings.NuGetPlugins.Count);
+
+            for (int i = 0; i < nugetPlugins.Length && i < this.app.Settings.NuGetPlugins.Count; i++)
+            {
+                NuGetPluginSettings appPlugin = this.app.Settings.NuGetPlugins[i];
+                NuGetPluginSettings updatedPlugin = nugetPlugins[i];
+                Debug.Assert(appPlugin.Id == updatedPlugin.Id);
+
+                appPlugin.CopyFrom(updatedPlugin);
+            }
+        }
+
         private IEnumerable<T> GetOrderedExports<T>()
         {
             return this.compositionHost.GetExports<ExportFactory<T, Api.OrderAttribute>>()
@@ -79,8 +158,8 @@ namespace DevPrompt.Plugins
         private async Task<CompositionHost> CreatePluginHost()
         {
             List<PluginSource> plugins = new List<PluginSource>();
-            PluginDirectorySettings[] pluginDirectories = this.app.Settings.PluginDirectories.ToArray();
-            NuGetPluginSettings[] nugetPlugins = this.app.Settings.NuGetPlugins.ToArray();
+            PluginDirectorySettings[] pluginDirectories = this.app.Settings.PluginDirectories.Select(p => p.Clone()).ToArray();
+            NuGetPluginSettings[] nugetPlugins = this.app.Settings.NuGetPlugins.Select(p => p.Clone()).ToArray();
 
             CompositionHost compositionHost = await Task.Run(() =>
             {
@@ -125,6 +204,8 @@ namespace DevPrompt.Plugins
 
         private static IEnumerable<PluginSource> LoadPlugins(IEnumerable<PluginDirectorySettings> pluginDirectories, IEnumerable<NuGetPluginSettings> nugetPlugins)
         {
+            List<string> blockedNames = new List<string>();
+
             // The app itself is always a plugin
             HashSet<PluginSource> plugins = new HashSet<PluginSource>(new PluginSourceComparer())
             {
@@ -138,10 +219,29 @@ namespace DevPrompt.Plugins
                 if (args[i] == "/plugin")
                 {
                     string file = args[++i];
-                    foreach (Assembly assembly in PluginState.LoadAssemblies(file, recursive: false))
+                    foreach (Assembly assembly in PluginState.LoadAssemblies(file, Array.Empty<string>(), recursive: false))
                     {
                         plugins.Add(new PluginSource(PluginSourceType.CommandLine, assembly));
                     }
+                }
+                else if (args[i] == "/noplugin")
+                {
+                    string name = $"{Path.DirectorySeparatorChar}{args[++i]}";
+                    if (!name.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
+                    {
+                        name += ".dll";
+                    }
+
+                    blockedNames.Add(name);
+                }
+            }
+
+            // The user can block all other plugins from loading
+            foreach (string arg in args)
+            {
+                if (arg == "/noplugins")
+                {
+                    return plugins;
                 }
             }
 
@@ -150,7 +250,7 @@ namespace DevPrompt.Plugins
             {
                 if (pluginDir.Enabled)
                 {
-                    foreach (Assembly assembly in PluginState.LoadAssemblies(pluginDir.ExpandedDirectory, pluginDir.Recurse))
+                    foreach (Assembly assembly in PluginState.LoadAssemblies(pluginDir.ExpandedDirectory, blockedNames, pluginDir.Recurse))
                     {
                         plugins.Add(new PluginSource(PluginSourceType.Directory, assembly));
                     }
@@ -160,11 +260,11 @@ namespace DevPrompt.Plugins
             // Load from NuGet packages
             foreach (NuGetPluginSettings nuget in nugetPlugins)
             {
-                if (nuget.Enabled && Directory.Exists(nuget.Path))
+                if (nuget.IsInstalled && Directory.Exists(nuget.InstalledVersionPath))
                 {
-                    foreach (Assembly assembly in PluginState.LoadAssemblies(nuget.Path, recursive: false))
+                    foreach (Assembly assembly in PluginState.LoadAssemblies(nuget.InstalledVersionPath, blockedNames, recursive: false))
                     {
-                        plugins.Add(new PluginSource(PluginSourceType.NuGet, assembly));
+                        plugins.Add(new PluginSource(PluginSourceType.NuGet, assembly, nuget.Id, nuget.InstalledVersion));
                     }
                 }
             }
@@ -172,7 +272,7 @@ namespace DevPrompt.Plugins
             return plugins;
         }
 
-        private static IEnumerable<Assembly> LoadAssemblies(string path, bool recursive)
+        private static IEnumerable<Assembly> LoadAssemblies(string path, IEnumerable<string> blockedNames, bool recursive)
         {
             List<Assembly> assemblies = new List<Assembly>();
             IEnumerable<string> files = Enumerable.Empty<string>();
@@ -195,13 +295,26 @@ namespace DevPrompt.Plugins
 
             foreach (string file in files)
             {
-                try
+                bool blocked = false;
+                foreach (string blockedName in blockedNames)
                 {
-                    assemblies.Add(Assembly.LoadFrom(file));
+                    if (file.EndsWith(blockedName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        blocked = true;
+                        break;
+                    }
                 }
-                catch
+
+                if (!blocked)
                 {
-                    // ignore failure
+                    try
+                    {
+                        assemblies.Add(Assembly.LoadFrom(file));
+                    }
+                    catch
+                    {
+                        // ignore failure
+                    }
                 }
             }
 

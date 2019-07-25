@@ -1,0 +1,58 @@
+﻿<UserControl x:Class="DevPrompt.UI.Controls.TaskProgressBar"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" 
+             d:DesignHeight="18" d:DesignWidth="300"
+             DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisible" />
+    </UserControl.Resources>
+    <Grid Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisible}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="18" />
+        </Grid.ColumnDefinitions>
+
+        <Border BorderThickness="1" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}">
+            <ProgressBar
+                IsIndeterminate="True"
+                IsHitTestVisible="False"
+                BorderThickness="0"
+                BorderBrush="{x:Null}"
+                Background="{x:Null}"
+                Opacity="0.25"/>
+        </Border>
+
+        <TextBlock Text="{Binding LoadingText}" Margin="5,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+
+        <Button Grid.Column="2" Click="OnClickCancel" ToolTip="Cancel">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Grid x:Name="root" Background="Transparent">
+                        <Canvas>
+                            <Ellipse x:Name="circle" Width="18" Height="18" StrokeThickness="0" Stroke="Black" Fill="Red" Opacity="0.5" />
+                            <Line x:Name="line1" X1="5" Y1="5" X2="13" Y2="13" StrokeThickness="2" Stroke="White" />
+                            <Line x:Name="line2" X1="5" Y1="13" X2="13" Y2="5" StrokeThickness="2" Stroke="White" />
+                        </Canvas>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="circle" Property="Opacity" Value="1" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="circle" Property="Opacity" Value="1" />
+                            <Setter TargetName="circle" Property="StrokeThickness" Value="2" />
+                            <Setter TargetName="circle" Property="Fill" Value="Transparent" />
+                            <Setter TargetName="line1" Property="Stroke" Value="Black" />
+                            <Setter TargetName="line2" Property="Stroke" Value="Black" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+    </Grid>
+</UserControl>
