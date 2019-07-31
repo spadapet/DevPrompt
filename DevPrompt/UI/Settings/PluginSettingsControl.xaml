@@ -22,6 +22,7 @@
         <convert:BoolToCollapsedConverter x:Key="BoolToCollapsed" />
         <convert:BoolToNegativeConverter x:Key="BoolToNegative" />
         <convert:StringToVisibilityConverter x:Key="StringToVisible" />
+        <convert:DateToVisibilityConverter x:Key="DateToVisible" />
         <uis:PluginStateToUpdateAvailableVisibility x:Key="PluginStateToUpdateAvailableVisibility" />
         <uis:PluginStateToInstallVisibility x:Key="PluginStateToInstallVisibility" />
         <uis:PluginStateToUpdateVisibility x:Key="PluginStateToUpdateVisibility" />
@@ -158,6 +159,10 @@
                     <Run Text="{x:Static local:Resources.PluginDialog_NewVersion}" FontWeight="Bold" />
                     <Run Text="{Binding LatestVersion, Mode=OneWay}" />
                 </TextBlock>
+                <TextBlock Visibility="{Binding LatestVersionDate, Mode=OneWay, Converter={StaticResource DateToVisible}}">
+                    <Run Text="{x:Static local:Resources.PluginDialog_Date}" FontWeight="Bold" />
+                    <Run Text="{Binding LatestVersionDate, Mode=OneWay, StringFormat=d}" />
+                </TextBlock>
                 <TextBlock Visibility="{Binding ProjectUrl, Mode=OneWay, Converter={StaticResource StringToVisible}}">
                     <Hyperlink NavigateUri="{Binding ProjectUrl, Mode=OneWay}" RequestNavigate="OnHyperlink">More information</Hyperlink>
                 </TextBlock>
@@ -166,6 +171,11 @@
                 </TextBlock>
             </StackPanel>
         </DataTemplate>
+
+        <DataTemplate x:Key="SortTemplate" DataType="{x:Type vm:PluginSortVM}">
+            <TextBlock Text="{Binding Name}" />
+        </DataTemplate>
+        
         <Style x:Key="PluginContainerStyle" TargetType="ListBoxItem">
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         </Style>
@@ -175,15 +185,27 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="175" />
         </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Grid.ColumnSpan="2" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+            <StackPanel Orientation="Horizontal">
+                <Label Content="{x:Static local:Resources.PluginDialog_Sort_Label}" Target="{Binding ElementName=sortCombo}" VerticalAlignment="Center" />
+                <ComboBox x:Name="sortCombo" VerticalAlignment="Center" Padding="4,0,0,0" Width="100" ItemsSource="{Binding Sorts}" SelectedItem="{Binding Sort}" ItemTemplate="{StaticResource SortTemplate}" />
+            </StackPanel>
+        </Grid>
         <ListBox
             x:Name="pluginList"
-            BorderThickness="0,0,1,0"
+            Grid.Row="1"
+            BorderThickness="0,0,2,0"
+            BorderBrush="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
             ItemsSource="{Binding Plugins}"
             ItemTemplate="{StaticResource PluginDataTemplate}"
             ItemContainerStyle="{StaticResource PluginContainerStyle}"
             SelectedItem="{Binding CurrentPlugin, Mode=TwoWay}"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled" />
-        <Grid Grid.Column="1" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+        <Grid Grid.Column="1" Grid.Row="1" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
             <Grid.Resources>
                 <Style TargetType="Button">
                     <Setter Property="Width" Value="100" />

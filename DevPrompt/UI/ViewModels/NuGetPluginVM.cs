@@ -23,6 +23,7 @@ namespace DevPrompt.UI.ViewModels
         public string Summary => this.PluginSettings.Summary;
         public string InstalledVersion => this.PluginSettings.InstalledVersion;
         public string LatestVersion => this.PluginSettings.LatestVersion;
+        public DateTime LatestVersionDate => this.PluginSettings.LatestVersionDate;
         public string Authors => this.PluginSettings.Authors;
         public bool IsInstalled => this.PluginSettings.IsInstalled;
 
@@ -85,6 +86,11 @@ namespace DevPrompt.UI.ViewModels
             {
                 this.OnPropertyChanged(nameof(this.LatestVersion));
                 this.OnPropertyChanged(nameof(this.State));
+            }
+
+            if (all || args.PropertyName == nameof(this.PluginSettings.LatestVersionDate))
+            {
+                this.OnPropertyChanged(nameof(this.LatestVersionDate));
             }
 
             if (all || args.PropertyName == nameof(this.PluginSettings.InstalledVersion))

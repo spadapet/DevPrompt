@@ -13,6 +13,7 @@ namespace DevPrompt.UI.DesignerViewModels
         public string Summary => "Test summary, it's longer than a description. Explain the features in the plugin.";
         public string InstalledVersion => "1.0.0";
         public string LatestVersion => ((this.State & PluginState.UpdateAvailable) == PluginState.UpdateAvailable) ? "1.0.1" : this.InstalledVersion;
+        public DateTime LatestVersionDate => DateTime.MinValue;
         public string Authors => "Bill Gates";
         public Uri ProjectUrl => new Uri("http://www.microsoft.com");
         public ImageSource Icon { get; }

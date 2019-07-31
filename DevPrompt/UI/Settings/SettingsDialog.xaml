@@ -22,7 +22,12 @@
         DataContext="{Binding ViewModel, RelativeSource={RelativeSource Mode=Self}}"
         d:DataContext="{d:DesignInstance vm:SettingsDialogVM, IsDesignTimeCreatable=True}">
     <Window.Resources>
-        <conv:BoolToNegativeConverter x:Key="BoolToNegative" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="SettingsStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <conv:BoolToNegativeConverter x:Key="BoolToNegative" />
+        </ResourceDictionary>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>

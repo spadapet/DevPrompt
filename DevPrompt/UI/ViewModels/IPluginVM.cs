@@ -21,6 +21,7 @@ namespace DevPrompt.UI.ViewModels
         string Summary { get; }
         string InstalledVersion { get; }
         string LatestVersion { get; }
+        DateTime LatestVersionDate { get; }
         string Authors { get; }
         Uri ProjectUrl { get; }
         ImageSource Icon { get; }

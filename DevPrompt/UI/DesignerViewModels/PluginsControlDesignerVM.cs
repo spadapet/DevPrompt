@@ -23,5 +23,13 @@ namespace DevPrompt.UI.DesignerViewModels
             new NuGetPluginDesignerVM(),
             new NuGetPluginDesignerVM(busy: true),
         };
+
+        public IList<PluginSortVM> Sorts { get; } = new List<PluginSortVM>()
+        {
+            new PluginSortVM("Installed", null),
+            new PluginSortVM("Most Recent", null),
+        };
+
+        public PluginSortVM Sort => this.Sorts[0];
     }
 }

@@ -693,6 +693,15 @@ namespace DevPrompt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Date:.
+        /// </summary>
+        public static string PluginDialog_Date {
+            get {
+                return ResourceManager.GetString("PluginDialog.Date", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Install.
         /// </summary>
         public static string PluginDialog_Install {
@@ -725,6 +734,42 @@ namespace DevPrompt {
         public static string PluginDialog_NewVersion {
             get {
                 return ResourceManager.GetString("PluginDialog.NewVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installed.
+        /// </summary>
+        public static string PluginDialog_Sort_Installed {
+            get {
+                return ResourceManager.GetString("PluginDialog.Sort.Installed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Sort by:.
+        /// </summary>
+        public static string PluginDialog_Sort_Label {
+            get {
+                return ResourceManager.GetString("PluginDialog.Sort.Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Most Recent.
+        /// </summary>
+        public static string PluginDialog_Sort_MostRecent {
+            get {
+                return ResourceManager.GetString("PluginDialog.Sort.MostRecent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name.
+        /// </summary>
+        public static string PluginDialog_Sort_Name {
+            get {
+                return ResourceManager.GetString("PluginDialog.Sort.Name", resourceCulture);
             }
         }
         

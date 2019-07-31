@@ -111,14 +111,15 @@
     <Compile Include="UI\ViewModels\IWorkspaceVM.cs" />
     <Compile Include="UI\ViewModels\NuGetPluginVM.cs" />
     <Compile Include="UI\ViewModels\IPluginVM.cs" />
+    <Compile Include="UI\ViewModels\PluginSortVM.cs" />
     <Compile Include="UI\ViewModels\PluginSettingsControlVM.cs" />
     <Compile Include="UI\ViewModels\SettingsTabVM.cs" />
     <Compile Include="UI\ViewModels\SettingsDialogVM.cs" />
     <Compile Include="UI\ViewModels\SettingsImportDialogVM.cs" />
     <Compile Include="UI\ViewModels\WorkspaceVM.cs" />
     <Compile Include="Utility\Converters\BoolToNegativeConverter.cs" />
-    <Compile Include="Utility\Converters\DelegateConverter.cs" />
     <Compile Include="Utility\Converters\DelegateMultiConverter.cs" />
+    <Compile Include="Utility\Converters\DateToVisibilityConverter.cs" />
     <Compile Include="Utility\Converters\StringToVisibilityConverter.cs" />
     <Compile Include="Utility\HashUtility.cs" />
     <Compile Include="Utility\HttpClientHelper.cs" />

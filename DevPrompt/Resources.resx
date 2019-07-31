@@ -329,6 +329,9 @@ Visual Studio=https://visualstudio.microsoft.com</value>
   <data name="PluginDialog.CurrentVersion" xml:space="preserve">
     <value>Current Version:</value>
   </data>
+  <data name="PluginDialog.Date" xml:space="preserve">
+    <value>Date:</value>
+  </data>
   <data name="PluginDialog.Install" xml:space="preserve">
     <value>Install</value>
   </data>
@@ -340,6 +343,18 @@ Visual Studio=https://visualstudio.microsoft.com</value>
   </data>
   <data name="PluginDialog.NewVersion" xml:space="preserve">
     <value>New Version:</value>
+  </data>
+  <data name="PluginDialog.Sort.Installed" xml:space="preserve">
+    <value>Installed</value>
+  </data>
+  <data name="PluginDialog.Sort.Label" xml:space="preserve">
+    <value>_Sort by:</value>
+  </data>
+  <data name="PluginDialog.Sort.MostRecent" xml:space="preserve">
+    <value>Most Recent</value>
+  </data>
+  <data name="PluginDialog.Sort.Name" xml:space="preserve">
+    <value>Name</value>
   </data>
   <data name="PluginDialog.Uninstall" xml:space="preserve">
     <value>Uninstall</value>

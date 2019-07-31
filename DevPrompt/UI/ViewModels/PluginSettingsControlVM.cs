@@ -5,12 +5,14 @@ using DevPrompt.Utility.NuGet;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace DevPrompt.UI.ViewModels
@@ -18,6 +20,7 @@ namespace DevPrompt.UI.ViewModels
     internal class PluginSettingsControlVM : PropertyNotifier, IDisposable
     {
         public IList<IPluginVM> Plugins => this.plugins;
+        public IList<PluginSortVM> Sorts => this.sorts;
         public MainWindow Window => this.settingsVM.Window;
         public App App => this.settingsVM.App;
         public AppSettings AppSettings => this.settingsVM.Settings;
@@ -26,6 +29,8 @@ namespace DevPrompt.UI.ViewModels
 
         private SettingsDialogVM settingsVM;
         private ObservableCollection<IPluginVM> plugins;
+        private ObservableCollection<PluginSortVM> sorts;
+        private PluginSortVM sort;
         private IPluginVM currentPlugin;
         private bool isBusy;
 
@@ -38,6 +43,16 @@ namespace DevPrompt.UI.ViewModels
         {
             this.settingsVM = settingsVM;
             this.plugins = new ObservableCollection<IPluginVM>(this.AppSettings.NuGetPlugins.Select(p => new NuGetPluginVM(this.App, this.AppSettings, p)));
+
+            this.sorts = new ObservableCollection<PluginSortVM>()
+            {
+                new PluginSortVM(Resources.PluginDialog_Sort_Installed, new PluginSortInstalled()),
+                new PluginSortVM(Resources.PluginDialog_Sort_MostRecent, new PluginSortMostRecent()),
+                new PluginSortVM(Resources.PluginDialog_Sort_Name, new PluginSortName()),
+            };
+
+            this.Sort = this.sorts[0];
+
             this.Refresh();
         }
 
@@ -183,6 +198,18 @@ namespace DevPrompt.UI.ViewModels
         {
             get => this.isBusy;
             set => this.SetPropertyValue(ref this.isBusy, value);
+        }
+
+        public PluginSortVM Sort
+        {
+            get => this.sort;
+            set
+            {
+                if (this.SetPropertyValue(ref this.sort, value) && CollectionViewSource.GetDefaultView(this.plugins) is ListCollectionView view)
+                {
+                    view.CustomSort = this.sort.Comparer;
+                }
+            }
         }
 
         public IPluginVM CurrentPlugin
