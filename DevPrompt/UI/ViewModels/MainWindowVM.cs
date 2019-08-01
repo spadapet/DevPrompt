@@ -1,7 +1,7 @@
 ﻿using DevPrompt.Settings;
-using DevPrompt.UI.Plugins;
 using DevPrompt.UI.Settings;
 using DevPrompt.Utility;
+using DevPrompt.Utility.Converters;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -25,6 +25,8 @@ namespace DevPrompt.UI.ViewModels
         public AppSettings AppSettings => this.App.Settings;
         Window Api.IWindow.Window => this.Window;
         Api.IApp Api.IWindow.App => this.App;
+        Api.IProgressBar Api.IWindow.ProgressBar => this.Window.progressBar;
+        Api.IInfoBar Api.IWindow.InfoBar => this.Window.infoBar;
 
         public ICommand ConsoleCommand { get; }
         public ICommand GrabConsoleCommand { get; }
@@ -37,8 +39,6 @@ namespace DevPrompt.UI.ViewModels
         private Dictionary<Api.IWorkspaceVM, MenuItem[]> workspaceMenuItems;
         private IMultiValueConverter workspaceMenuItemVisibilityConverter;
         private Api.IWorkspaceVM activeWorkspace;
-        private readonly Stack<Action> loadingCancelActions;
-        private string errorText;
 
         public MainWindowVM(MainWindow window)
         {
@@ -57,7 +57,6 @@ namespace DevPrompt.UI.ViewModels
             this.workspaces = new ObservableCollection<Api.IWorkspaceVM>();
             this.workspaceMenuItems = new Dictionary<Api.IWorkspaceVM, MenuItem[]>();
             this.workspaceMenuItemVisibilityConverter = new DelegateMultiConverter(this.ConvertWorkspaceMenuItemVisibility);
-            this.loadingCancelActions = new Stack<Action>();
         }
 
         private void Dispose()
@@ -81,8 +80,6 @@ namespace DevPrompt.UI.ViewModels
         {
             this.ActiveWorkspace?.Workspace.OnWindowDeactivated();
         }
-
-        public ICommand ClearErrorTextCommand => new Api.DelegateCommand(this.ClearErrorText);
 
         public ICommand ExitCommand => new Api.DelegateCommand(() => this.Window.Close());
 
@@ -116,17 +113,22 @@ namespace DevPrompt.UI.ViewModels
                 if (dialog.ShowDialog() == true)
                 {
                     this.AppSettings.CopyFrom(dialog.ViewModel.Settings);
-                }
-            }
-        }
 
-        private void ShowPluginSettingsDialog(PluginsTabType tab)
-        {
-            using (PluginsDialog dialog = new PluginsDialog(this.Window, this.AppSettings, tab))
-            {
-                if (dialog.ShowDialog() == true)
-                {
-                    this.AppSettings.CopyFrom(dialog.ViewModel.Settings);
+                    if (this.AppSettings.PluginsChanged)
+                    {
+                        this.AppSettings.PluginsChanged = false;
+
+                        if (MessageBox.Show(
+                            this.Window,
+                            Resources.Plugins_RestartText,
+                            Resources.Plugins_RestartCaption,
+                            MessageBoxButton.YesNo,
+                            MessageBoxImage.Question,
+                            MessageBoxResult.No) == MessageBoxResult.Yes)
+                        {
+                            this.Window.CloseAndRestart(justReopenWindow: false);
+                        }
+                    }
                 }
             }
         }
@@ -138,7 +140,7 @@ namespace DevPrompt.UI.ViewModels
 
         public ICommand PluginsCommand => new Api.DelegateCommand(() =>
         {
-            this.ShowPluginSettingsDialog(PluginsTabType.Default);
+            this.ShowSettingsDialog(SettingsTabType.Plugins);
         });
 
         public ICommand CustomizeConsoleGrabCommand => new Api.DelegateCommand(() =>
@@ -411,86 +413,6 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
-        public void SetError(Exception exception, string text = null)
-        {
-            if (string.IsNullOrEmpty(text))
-            {
-                this.ErrorText = exception?.Message ?? string.Empty;
-            }
-            else
-            {
-                this.ErrorText = text;
-            }
-        }
-
-        public string ErrorText
-        {
-            get
-            {
-                return this.errorText ?? string.Empty;
-            }
-
-            set
-            {
-                if (this.SetPropertyValue(ref this.errorText, value))
-                {
-                    this.OnPropertyChanged(nameof(this.HasErrorText));
-                }
-            }
-        }
-
-        public bool HasErrorText
-        {
-            get
-            {
-                return !string.IsNullOrEmpty(this.ErrorText);
-            }
-        }
-
-        public bool Loading
-        {
-            get
-            {
-                return this.loadingCancelActions.Count > 0;
-            }
-        }
-
-        public IDisposable BeginLoading(Action cancelAction, string text)
-        {
-            this.loadingCancelActions.Push(cancelAction);
-
-            if (this.loadingCancelActions.Count == 1)
-            {
-                this.OnPropertyChanged(nameof(this.Loading));
-            }
-
-            return new DelegateDisposable(() =>
-            {
-                this.loadingCancelActions.Pop();
-
-                if (this.loadingCancelActions.Count == 0)
-                {
-                    this.OnPropertyChanged(nameof(this.Loading));
-                }
-            });
-        }
-
-        public void CancelLoading()
-        {
-            Action[] actions = this.loadingCancelActions.ToArray();
-            this.loadingCancelActions.Clear();
-
-            foreach (Action action in actions)
-            {
-                action?.Invoke();
-            }
-        }
-
-        private void ClearErrorText()
-        {
-            this.SetError(null);
-        }
-
         private void StartConsole(ConsoleSettings settings)
         {
             if (this.FindWorkspace(Api.Constants.ProcessWorkspaceId) is Api.IWorkspaceVM workspaceVM && workspaceVM.Workspace is Api.IProcessWorkspace workspace)
@@ -525,7 +447,7 @@ namespace DevPrompt.UI.ViewModels
 
         public void RunExternalProcess(string path, string arguments = null)
         {
-            this.ClearErrorText();
+            this.Window.infoBar.Clear();
 
             try
             {
@@ -543,7 +465,7 @@ namespace DevPrompt.UI.ViewModels
             }
             catch (Exception ex)
             {
-                this.SetError(ex, $"Error: Failed to start \"{path}\"");
+                this.Window.infoBar.SetError(ex, $"Error: Failed to start \"{path}\"");
             }
         }
     }

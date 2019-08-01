@@ -10,6 +10,8 @@ namespace DevPrompt.Api
     public interface IWindow
     {
         IApp App { get; }
+        IInfoBar InfoBar { get; }
+        IProgressBar ProgressBar { get; }
         Window Window { get; }
         void RunExternalProcess(string path, string arguments = null);
 
@@ -19,11 +21,5 @@ namespace DevPrompt.Api
         IWorkspaceVM FindWorkspace(Guid id);
         void AddWorkspace(IWorkspaceVM workspace, bool activate);
         void RemoveWorkspace(IWorkspaceVM workspace);
-
-        // State
-        void SetError(Exception exception, string text = null);
-        IDisposable BeginLoading(Action cancelAction = null, string text = null);
-        void CancelLoading();
-        bool Loading { get; }
     }
 }

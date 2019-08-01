@@ -5,19 +5,27 @@ using System.Windows.Media;
 
 namespace DevPrompt.UI.ViewModels
 {
-    internal interface IPluginVM
+    [Flags]
+    internal enum PluginState
+    {
+        None = 0x00,
+        Installed = 0x01,
+        UpdateAvailable = 0x02,
+        Busy = 0x04,
+    }
+
+    internal interface IPluginVM : IDisposable
     {
         string Title { get; }
         string Description { get; }
         string Summary { get; }
-        string LatestVersion { get; }
-        Uri ProjectUrl { get; }
-        string Authors { get; }
-        ImageSource Icon { get; }
-
-        bool IsInstalled { get; }
-        bool IsInstalling { get; }
         string InstalledVersion { get; }
+        string LatestVersion { get; }
+        string Authors { get; }
+        Uri ProjectUrl { get; }
+        ImageSource Icon { get; }
+        PluginState State { get; }
+
         Task Install(CancellationToken cancelToken);
         Task Uninstall(CancellationToken cancelToken);
     }

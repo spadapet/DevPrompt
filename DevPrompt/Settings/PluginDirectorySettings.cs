@@ -14,7 +14,6 @@ namespace DevPrompt.Settings
     internal class PluginDirectorySettings : Api.PropertyNotifier
     {
         private string directory;
-        private bool recurse;
         private bool enabled;
         private bool readOnly;
 
@@ -27,7 +26,6 @@ namespace DevPrompt.Settings
         public PluginDirectorySettings(PluginDirectorySettings copyFrom)
         {
             this.directory = copyFrom.directory;
-            this.recurse = copyFrom.recurse;
             this.enabled = copyFrom.enabled;
             this.readOnly = copyFrom.readOnly;
         }
@@ -49,13 +47,6 @@ namespace DevPrompt.Settings
                     this.OnPropertyChanged(nameof(this.ExpandedDirectory));
                 }
             }
-        }
-
-        [DataMember]
-        public bool Recurse
-        {
-            get => this.recurse;
-            set => this.SetPropertyValue(ref this.recurse, value);
         }
 
         [DataMember]

@@ -11,7 +11,7 @@ namespace DevPrompt
         [STAThread]
         public static void Main(string[] args)
         {
-            if (!Program.RestartAsAdmin(args))
+            if (Program.HandleArguments(args))
             {
                 using (ManualResetEvent exitEvent = new ManualResetEvent(false))
                 {
@@ -32,10 +32,25 @@ namespace DevPrompt
             }
         }
 
-        private static bool RestartAsAdmin(string[] args)
+        private static bool HandleArguments(string[] args)
         {
             const string adminSwitch = "/admin";
+            const string waitForSwitch = "/waitfor";
 
+            // Check if we have to wait for a parent process to die
+            for (int i = 0; i + 1 < args.Length; i++)
+            {
+                if (args[i] == waitForSwitch && int.TryParse(args[i + 1], out int waitForProcessId))
+                {
+                    string name = Process.GetCurrentProcess().ProcessName;
+                    if (Process.GetProcessesByName(name).FirstOrDefault(p => p.Id == waitForProcessId) is Process waitForProcess)
+                    {
+                        waitForProcess.WaitForExit();
+                    }
+                }
+            }
+
+            // Check if this process should restart as elevated
             if (args.Length > 0 && args[0] == adminSwitch && !Program.IsElevated)
             {
                 // Try to run again as admin
@@ -55,10 +70,10 @@ namespace DevPrompt
                         info.Verb = "runas";
                         try
                         {
-                            if (System.Diagnostics.Process.Start(info) is System.Diagnostics.Process process)
+                            if (Process.Start(info) is Process process)
                             {
                                 // Quit and let the new process take over
-                                return true;
+                                return false;
                             }
                         }
                         catch
@@ -70,7 +85,7 @@ namespace DevPrompt
             }
 
             // No need to restart
-            return false;
+            return true;
         }
 
         /// <summary>
