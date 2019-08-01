@@ -1,11 +1,9 @@
 ﻿using DevPrompt.Settings;
 using DevPrompt.UI.Settings;
-using DevPrompt.Utility;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
 using System.Windows.Input;
 
 namespace DevPrompt.UI.ViewModels
@@ -16,16 +14,10 @@ namespace DevPrompt.UI.ViewModels
     internal class SettingsDialogVM : Api.PropertyNotifier, IDisposable
     {
         public AppSettings Settings { get; }
-        public MainWindow Window { get; }
-        public SettingsDialog Dialog { get; }
-        public App App => this.Window.App;
-        public IList<SettingsTabVM> Tabs => this.tabs;
-        public Api.IProgressBar ProgressBar => this.Dialog.progressBar;
-        public Api.IInfoBar InfoBar => this.Dialog.infoBar;
-
+        private MainWindow window;
+        private SettingsDialog dialog;
         private SettingsTabVM[] tabs;
         private SettingsTabVM activeTab;
-        private bool isBusy;
 
         public SettingsDialogVM()
             : this(null, null, null, SettingsTabType.Default)
@@ -34,8 +26,8 @@ namespace DevPrompt.UI.ViewModels
 
         public SettingsDialogVM(MainWindow window, SettingsDialog dialog, AppSettings settings, SettingsTabType activeTabType)
         {
-            this.Window = window;
-            this.Dialog = dialog;
+            this.window = window;
+            this.dialog = dialog;
             this.Settings = settings?.Clone();
 
             this.tabs = new SettingsTabVM[]
@@ -44,7 +36,6 @@ namespace DevPrompt.UI.ViewModels
                     new SettingsTabVM(this, SettingsTabType.Grab),
                     new SettingsTabVM(this, SettingsTabType.Tools),
                     new SettingsTabVM(this, SettingsTabType.Links),
-                    new SettingsTabVM(this, SettingsTabType.Plugins),
                 };
 
             this.ActiveTabType = activeTabType;
@@ -52,23 +43,9 @@ namespace DevPrompt.UI.ViewModels
 
         public void Dispose()
         {
-            foreach (SettingsTabVM tab in this.tabs)
-            {
-                tab.Dispose();
-            }
         }
 
-        public bool IsBusy
-        {
-            get => this.isBusy;
-            set => this.SetPropertyValue(ref this.isBusy, value);
-        }
-
-        public IDisposable BeginBusy()
-        {
-            this.IsBusy = true;
-            return new DelegateDisposable(() => this.IsBusy = false);
-        }
+        public IList<SettingsTabVM> Tabs => this.tabs;
 
         public SettingsTabType ActiveTabType
         {
@@ -104,29 +81,29 @@ namespace DevPrompt.UI.ViewModels
         {
             OpenFileDialog dialog = new OpenFileDialog
             {
-                Title = Resources.Settings_ImportDialogTitle,
-                Filter = $"{Resources.Settings_XmlFilterName}|*.xml",
+                Title = "Import Settings",
+                Filter = "XML Files|*.xml",
                 DefaultExt = "xml",
                 CheckFileExists = true
             };
 
-            if (dialog.ShowDialog(this.Dialog) == true)
+            if (dialog.ShowDialog(this.dialog) == true)
             {
                 AppSettings settings = null;
                 try
                 {
-                    settings = await AppSettings.UnsafeLoad<AppSettings>(this.App, dialog.FileName);
+                    settings = await AppSettings.UnsafeLoad<AppSettings>(this.window.App, dialog.FileName);
                 }
                 catch (Exception exception)
                 {
-                    this.Window.infoBar.SetError(exception);
+                    this.window.ViewModel.SetError(exception);
                 }
 
                 if (settings != null)
                 {
                     SettingsImportDialog dialog2 = new SettingsImportDialog(settings)
                     {
-                        Owner = this.Dialog
+                        Owner = this.dialog
                     };
 
                     if (dialog2.ShowDialog() == true)
@@ -141,17 +118,17 @@ namespace DevPrompt.UI.ViewModels
         {
             OpenFileDialog dialog = new OpenFileDialog
             {
-                Title = Resources.Settings_ExportDialogTitle,
-                Filter = $"{Resources.Settings_XmlFilterName}|*.xml",
+                Title = "Export Settings",
+                Filter = "XML Files|*.xml",
                 DefaultExt = "xml",
                 CheckPathExists = true,
                 CheckFileExists = false,
                 ValidateNames = true
             };
 
-            if (dialog.ShowDialog(this.Dialog) == true)
+            if (dialog.ShowDialog(this.dialog) == true)
             {
-                this.App.SaveSettings(dialog.FileName);
+                this.window.App.SaveSettings(dialog.FileName);
             }
         });
     }

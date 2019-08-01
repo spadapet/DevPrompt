@@ -19,22 +19,22 @@ namespace DevPrompt.UI.Settings
             this.ViewModel = viewModel;
             this.ViewModel.Settings.ObservableTools.CollectionChanged += this.OnSettingsChanged;
 
-            this.MoveUpCommand = CommandUtility.CreateMoveUpCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableTools);
-            this.MoveDownCommand = CommandUtility.CreateMoveDownCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableTools);
-            this.DeleteCommand = CommandUtility.CreateDeleteCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableTools);
-            this.ResetCommand = CommandUtility.CreateResetCommand((s) => s.Tools, this.ViewModel.Settings.ObservableTools, AppSettings.DefaultSettingsFilter.Tools);
+            this.MoveUpCommand = CommandHelpers.CreateMoveUpCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableTools);
+            this.MoveDownCommand = CommandHelpers.CreateMoveDownCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableTools);
+            this.DeleteCommand = CommandHelpers.CreateDeleteCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableTools);
+            this.ResetCommand = CommandHelpers.CreateResetCommand((s) => s.Tools, this.ViewModel.Settings.ObservableTools, AppSettings.DefaultSettingsFilter.Tools);
 
             this.InitializeComponent();
         }
 
         private void OnSelectionChanged(object sender, SelectionChangedEventArgs args)
         {
-            CommandUtility.UpdateCommands(this.Dispatcher, this.MoveUpCommand, this.MoveDownCommand, this.DeleteCommand);
+            CommandHelpers.UpdateCommands(this.Dispatcher, this.MoveUpCommand, this.MoveDownCommand, this.DeleteCommand);
         }
 
         private void OnSettingsChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
-            CommandUtility.UpdateCommands(this.Dispatcher, this.MoveUpCommand, this.MoveDownCommand, this.DeleteCommand);
+            CommandHelpers.UpdateCommands(this.Dispatcher, this.MoveUpCommand, this.MoveDownCommand, this.DeleteCommand);
         }
     }
 }

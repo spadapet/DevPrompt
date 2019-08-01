@@ -77,15 +77,9 @@
     <Compile Include="Settings\LinkSettings.cs" />
     <Compile Include="Settings\ConsoleSettings.cs" />
     <Compile Include="Settings\SettingTypeResolver.cs" />
-    <Compile Include="UI\Controls\InfoBar.xaml.cs">
-      <DependentUpon>InfoBar.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\Controls\TaskProgressBar.xaml.cs">
-      <DependentUpon>TaskProgressBar.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\DesignerViewModels\MainWindowDesignerVM.cs" />
     <Compile Include="UI\DesignerViewModels\NuGetPluginDesignerVM.cs" />
-    <Compile Include="UI\DesignerViewModels\PluginsControlDesignerVM.cs" />
+    <Compile Include="UI\DesignerViewModels\PluginsDialogDesignerVM.cs" />
     <Compile Include="UI\DesignerViewModels\TabDesignerVM.cs" />
     <Compile Include="UI\InstallBranchDialog.xaml.cs">
       <DependentUpon>InstallBranchDialog.xaml</DependentUpon>
@@ -94,8 +88,17 @@
       <DependentUpon>AboutDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Controls\DragItemsControl.cs" />
-    <Compile Include="UI\Settings\PluginSettingsControl.xaml.cs">
-      <DependentUpon>PluginSettingsControl.xaml</DependentUpon>
+    <Compile Include="UI\Plugins\AvailablePluginsControl.xaml.cs">
+      <DependentUpon>AvailablePluginsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Plugins\InstalledPluginsControl.xaml.cs">
+      <DependentUpon>InstalledPluginsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Plugins\UpdatePluginsControl.xaml.cs">
+      <DependentUpon>UpdatePluginsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Plugins\PluginsDialog.xaml.cs">
+      <DependentUpon>PluginsDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Settings\SettingsDialog.xaml.cs">
       <DependentUpon>SettingsDialog.xaml</DependentUpon>
@@ -122,15 +125,15 @@
     <Compile Include="UI\ViewModels\InstallBranchDialogVM.cs" />
     <Compile Include="UI\ViewModels\NuGetPluginVM.cs" />
     <Compile Include="UI\ViewModels\IPluginVM.cs" />
-    <Compile Include="UI\ViewModels\PluginSettingsControlVM.cs" />
+    <Compile Include="UI\ViewModels\PluginsTabVM.cs" />
+    <Compile Include="UI\ViewModels\PluginsDialogVM.cs" />
     <Compile Include="UI\ViewModels\SettingsTabVM.cs" />
     <Compile Include="UI\ViewModels\SettingsDialogVM.cs" />
     <Compile Include="UI\ViewModels\SettingsImportDialogVM.cs" />
     <Compile Include="UI\ViewModels\TabNameDialogVM.cs" />
-    <Compile Include="Utility\Converters\BoolToNegativeConverter.cs" />
-    <Compile Include="Utility\Converters\DelegateConverter.cs" />
-    <Compile Include="Utility\Converters\DelegateMultiConverter.cs" />
-    <Compile Include="Utility\Converters\StringToVisibilityConverter.cs" />
+    <Compile Include="Utility\BoolToNegativeConverter.cs" />
+    <Compile Include="Utility\DelegateConverter.cs" />
+    <Compile Include="Utility\DelegateMultiConverter.cs" />
     <Compile Include="Utility\HashUtility.cs" />
     <Compile Include="Utility\HttpClientHelper.cs" />
     <Compile Include="Utility\Json\JsonConvert.cs" />
@@ -143,29 +146,20 @@
     <Compile Include="Utility\Json\JsonTokenizer.cs" />
     <Compile Include="Utility\Json\JsonValueData.cs" />
     <Compile Include="Utility\Json\JsonContext.cs" />
-    <Compile Include="Utility\NuGet\NuGetPackageVersionInfo.cs" />
     <Compile Include="Utility\NuGet\NuGetSearchResultVersion.cs" />
     <Compile Include="Utility\NuGet\NuGetSearchResult.cs" />
     <Compile Include="Utility\NuGet\NuGetService.cs" />
     <Compile Include="Utility\NuGet\NuGetServiceIndex.cs" />
-    <Compile Include="Utility\Converters\BoolToCollapsedConverter.cs" />
-    <Compile Include="Utility\Converters\VisibleToBoolConverter.cs" />
-    <Compile Include="Utility\CommandUtility.cs" />
+    <Compile Include="Utility\BoolToCollapsedConverter.cs" />
+    <Compile Include="Utility\VisibleToBoolConverter.cs" />
+    <Compile Include="Utility\CommandHelpers.cs" />
     <Compile Include="Utility\DelegateDisposable.cs" />
-    <Compile Include="Utility\Converters\ActiveToBoolConverter.cs" />
-    <Compile Include="Utility\Converters\ObjectToVisibilityConverter.cs" />
+    <Compile Include="Utility\ActiveToBoolConverter.cs" />
+    <Compile Include="Utility\ObjectToVisibilityConverter.cs" />
     <Compile Include="Settings\AppSettings.cs" />
     <Compile Include="Utility\VisualStudioSetup.cs" />
     <Compile Include="Utility\WpfUtility.cs" />
     <Page Include="ProcessWorkspace\ProcessWorkspaceControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Controls\InfoBar.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\Controls\TaskProgressBar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -177,7 +171,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\Settings\PluginSettingsControl.xaml">
+    <Page Include="UI\Plugins\AvailablePluginsControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Plugins\InstalledPluginsControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Plugins\UpdatePluginsControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Plugins\PluginsDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -254,6 +260,8 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="UI\Images\default-package-icon.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

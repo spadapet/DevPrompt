@@ -1,5 +1,4 @@
 ﻿using DevPrompt.UI.Settings;
-using System;
 using System.Diagnostics;
 using System.Windows;
 
@@ -11,7 +10,6 @@ namespace DevPrompt.UI.ViewModels
         Grab,
         Tools,
         Links,
-        Plugins,
 
         Default = Consoles,
     }
@@ -19,7 +17,7 @@ namespace DevPrompt.UI.ViewModels
     /// <summary>
     /// View model for a settings tab
     /// </summary>
-    internal class SettingsTabVM : Api.PropertyNotifier, IDisposable
+    internal class SettingsTabVM : Api.PropertyNotifier
     {
         public SettingsTabType TabType { get; }
         private SettingsDialogVM viewModel;
@@ -29,14 +27,6 @@ namespace DevPrompt.UI.ViewModels
         {
             this.TabType = tabType;
             this.viewModel = viewModel;
-        }
-
-        public void Dispose()
-        {
-            if (this.viewElement is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
         }
 
         public string Name
@@ -49,7 +39,6 @@ namespace DevPrompt.UI.ViewModels
                     case SettingsTabType.Grab: return Resources.SettingsTabType_Grab;
                     case SettingsTabType.Links: return Resources.SettingsTabType_Links;
                     case SettingsTabType.Tools: return Resources.SettingsTabType_Tools;
-                    case SettingsTabType.Plugins: return Resources.SettingsTabType_Plugins;
 
                     default:
                         Debug.Fail($"Missing name for tab: {this.TabType}");
@@ -80,10 +69,6 @@ namespace DevPrompt.UI.ViewModels
 
                         case SettingsTabType.Tools:
                             this.viewElement = new ToolsSettingsControl(this.viewModel);
-                            break;
-
-                        case SettingsTabType.Plugins:
-                            this.viewElement = new PluginSettingsControl(this.viewModel);
                             break;
 
                         default:

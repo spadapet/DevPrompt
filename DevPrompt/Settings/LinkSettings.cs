@@ -15,7 +15,7 @@ namespace DevPrompt.Settings
 
         public LinkSettings()
         {
-            this.name = DevPrompt.Utility.CommandUtility.SeparatorName;
+            this.name = DevPrompt.Utility.CommandHelpers.SeparatorName;
             this.address = string.Empty;
         }
 

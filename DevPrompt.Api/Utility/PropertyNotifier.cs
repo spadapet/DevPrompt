@@ -9,24 +9,13 @@ namespace DevPrompt.Api
     /// Base class for all WPF models/view models that notify listeners of property changes
     /// </summary>
     [DataContract]
-    public class PropertyNotifier : INotifyPropertyChanging, INotifyPropertyChanged
+    public class PropertyNotifier : INotifyPropertyChanged
     {
-        public event PropertyChangingEventHandler PropertyChanging;
         public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertiesChanging()
-        {
-            this.OnPropertyChanging(null);
-        }
 
         protected void OnPropertiesChanged()
         {
             this.OnPropertyChanged(null);
-        }
-
-        protected void OnPropertyChanging(string name)
-        {
-            this.PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(name));
         }
 
         protected void OnPropertyChanged(string name)
@@ -39,11 +28,6 @@ namespace DevPrompt.Api
             if (EqualityComparer<T>.Default.Equals(property, value))
             {
                 return false;
-            }
-
-            if (name != null)
-            {
-                this.OnPropertyChanging(name);
             }
 
             property = value;

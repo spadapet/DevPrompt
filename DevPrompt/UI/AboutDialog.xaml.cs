@@ -37,7 +37,7 @@ namespace DevPrompt.UI
         private async void OnLoaded(object sender, RoutedEventArgs args)
         {
             using (HttpClient client = new HttpClient())
-            using (this.window.ProgressBar.Begin(client.CancelPendingRequests, "Checking latest version"))
+            using (this.window.BeginLoading(client.CancelPendingRequests, "Checking latest version"))
             {
                 try
                 {

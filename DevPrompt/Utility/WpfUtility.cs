@@ -1,10 +1,6 @@
-﻿using System;
-using System.Diagnostics;
-using System.Threading;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Threading;
 
 namespace DevPrompt.Utility
 {
@@ -42,30 +38,6 @@ namespace DevPrompt.Utility
             }
 
             return parent;
-        }
-
-        public static void CheckAccess(this Dispatcher dispatcher)
-        {
-            if (dispatcher.Thread.ManagedThreadId != Thread.CurrentThread.ManagedThreadId)
-            {
-                Debug.Fail("Using Dispatcher from wrong thread");
-                throw new InvalidOperationException(Resources.Exception_WrongDispatcherThread);
-            }
-        }
-
-        public static void BeginOrRun(this Dispatcher dispatcher, Action action)
-        {
-            if (action != null)
-            {
-                if (dispatcher.Thread.ManagedThreadId == Thread.CurrentThread.ManagedThreadId)
-                {
-                    action();
-                }
-                else
-                {
-                    dispatcher.BeginInvoke(DispatcherPriority.Normal, action);
-                }
-            }
         }
     }
 }

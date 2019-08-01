@@ -11,13 +11,11 @@ namespace DevPrompt.Plugins
 
         public PluginSource(PluginSourceType pluginType, Assembly assembly, string pluginId = null, string pluginVersion = null)
         {
-            AssemblyName assemblyName = (string.IsNullOrEmpty(pluginId) || string.IsNullOrEmpty(pluginVersion))
-                ? assembly.GetName()
-                : null;
+            AssemblyName assemblyName = assembly.GetName();
 
             this.PluginType = pluginType;
             this.Assembly = assembly;
-            this.PluginId = !string.IsNullOrEmpty(pluginId) ? pluginId : assemblyName.Name;
+            this.PluginId = !string.IsNullOrEmpty(pluginId) ? pluginId : assemblyName.FullName;
             this.PluginVersion = !string.IsNullOrEmpty(pluginVersion) ? pluginVersion : assemblyName.Version.ToString();
         }
     }

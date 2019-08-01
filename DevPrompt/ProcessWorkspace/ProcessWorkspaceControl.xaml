@@ -6,7 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:controls="clr-namespace:DevPrompt.UI.Controls"
-    xmlns:convert="clr-namespace:DevPrompt.Utility.Converters"
+    xmlns:util="clr-namespace:DevPrompt.Utility"
     xmlns:api="dev://DevPrompt.Api"
     mc:Ignorable="d"
     d:DesignHeight="450" d:DesignWidth="800"
@@ -14,9 +14,9 @@
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
-        <convert:ObjectToVisibilityConverter x:Key="ObjectToVisibility" />
-        <convert:ActiveToBoolConverter x:Key="ActiveToBool" />
-        <convert:VisibleToBoolConverter x:Key="VisibleToBool" />
+        <util:ObjectToVisibilityConverter x:Key="ObjectToVisibility" />
+        <util:ActiveToBoolConverter x:Key="ActiveToBool" />
+        <util:VisibleToBoolConverter x:Key="VisibleToBool" />
 
         <ItemsPanelTemplate x:Key="TabItemsPanelTemplate">
             <TabPanel Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />

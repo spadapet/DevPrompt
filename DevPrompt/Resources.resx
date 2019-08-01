@@ -117,9 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Exception.WrongDispatcherThread" xml:space="preserve">
-    <value>Using Dispatcher from the wrong thread</value>
-  </data>
   <data name="JsonConvert.ExpectedArray" xml:space="preserve">
     <value>Expected a JSON array for populating a collection</value>
   </data>
@@ -165,29 +162,14 @@
   <data name="JsonValue.WrongType" xml:space="preserve">
     <value>JSON value is not a {0}</value>
   </data>
-  <data name="Plugins.FetchingFromNuGet" xml:space="preserve">
-    <value>Checking for plugins</value>
+  <data name="PluginsTabType.PluginAvailable" xml:space="preserve">
+    <value>Available</value>
   </data>
-  <data name="Plugins.InstallingProgress" xml:space="preserve">
-    <value>Installing '{0}'</value>
+  <data name="PluginsTabType.PluginInstalled" xml:space="preserve">
+    <value>Installed</value>
   </data>
-  <data name="Plugins.RestartCaption" xml:space="preserve">
-    <value>Restart DevPrompt?</value>
-  </data>
-  <data name="Plugins.RestartText" xml:space="preserve">
-    <value>Plugins have changed and DevPrompt needs to restart to load the changes. Would you like to restart now?</value>
-  </data>
-  <data name="Plugins.UninstallingProgress" xml:space="preserve">
-    <value>Uninstalling '{0}'</value>
-  </data>
-  <data name="Settings.ExportDialogTitle" xml:space="preserve">
-    <value>Export Settings</value>
-  </data>
-  <data name="Settings.ImportDialogTitle" xml:space="preserve">
-    <value>Import Settings</value>
-  </data>
-  <data name="Settings.XmlFilterName" xml:space="preserve">
-    <value>XML Files</value>
+  <data name="PluginsTabType.PluginUpdates" xml:space="preserve">
+    <value>Updates</value>
   </data>
   <data name="SettingsTabType.Consoles" xml:space="preserve">
     <value>Consoles</value>
@@ -197,9 +179,6 @@
   </data>
   <data name="SettingsTabType.Links" xml:space="preserve">
     <value>Tools</value>
-  </data>
-  <data name="SettingsTabType.Plugins" xml:space="preserve">
-    <value>Plugins</value>
   </data>
   <data name="SettingsTabType.Tools" xml:space="preserve">
     <value>Links</value>
