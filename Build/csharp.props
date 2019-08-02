@@ -12,6 +12,7 @@
         <BaseIntermediateOutputPath>$(ProjectOutRoot)</BaseIntermediateOutputPath>
         <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
         <BaseOutputPath>$(ConfigOutRoot)bin\</BaseOutputPath>
+        <BaseOutputPath Condition="$(MSBuildProjectName.EndsWith('.Tests'))">$(ConfigOutRoot)bin.tests\</BaseOutputPath>
         <OutputPath>$(BaseOutputPath)</OutputPath>
     </PropertyGroup>
 
