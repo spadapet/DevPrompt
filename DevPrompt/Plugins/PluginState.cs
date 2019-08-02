@@ -112,7 +112,7 @@ namespace DevPrompt.Plugins
                             string id = Path.GetFileName(path);
                             if (pluginMap.TryGetValue(id, out NuGetPluginSettings plugin) && plugin.IsInstalled)
                             {
-                                foreach (string versionPath in Directory.GetDirectories(plugin.InstalledVersionPath, "*", SearchOption.TopDirectoryOnly))
+                                foreach (string versionPath in Directory.GetDirectories(plugin.InstalledRootPath, "*", SearchOption.TopDirectoryOnly))
                                 {
                                     string version = Path.GetFileName(versionPath);
                                     if (!string.Equals(version, plugin.InstalledVersion, StringComparison.OrdinalIgnoreCase))
