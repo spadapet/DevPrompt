@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
@@ -225,24 +226,38 @@ namespace DevPrompt.UI.ViewModels
 
         private async Task Unzip(ZipArchive zip, string rootDir, CancellationToken cancelToken)
         {
+            string homeDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
             foreach (ZipArchiveEntry entry in zip.Entries)
             {
                 const string prefix = "tools/net40/";
                 if (entry.FullName.StartsWith(prefix))
                 {
                     string path = Path.Combine(rootDir, entry.FullName.Substring(prefix.Length));
-
-                    // Since NuGet package contents can't change, assume that if the file exists, it's good
-                    if (!File.Exists(path))
+                    if (File.Exists(path))
                     {
-                        Directory.CreateDirectory(Path.GetDirectoryName(path));
+                        // Since NuGet package contents can't change, assume that if the file exists, it's good.
+                        continue;
+                    }
 
-                        using (Stream stream = entry.Open())
-                        using (FileStream fileStream = File.Create(path))
+                    if (path.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
+                    {
+                        string fileName = Path.GetFileName(path);
+                        if (fileName.Equals("DevPrompt.Api.dll", StringComparison.OrdinalIgnoreCase) ||
+                            fileName.StartsWith("System.Composition.", StringComparison.OrdinalIgnoreCase))
                         {
-                            const int defaultBufferSize = 81920;
-                            await stream.CopyToAsync(fileStream, defaultBufferSize, cancelToken);
+                            // Don't install any DLLs that also exist in the install directory, I always want my own to be loaded.
+                            continue;
                         }
+                    }
+
+                    Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+                    using (Stream stream = entry.Open())
+                    using (FileStream fileStream = File.Create(path))
+                    {
+                        const int defaultBufferSize = 81920;
+                        await stream.CopyToAsync(fileStream, defaultBufferSize, cancelToken);
                     }
                 }
             }
