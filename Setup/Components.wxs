@@ -18,6 +18,7 @@
                 <File Source="$(var.Bin32)DevNative32.dll" />
                 <File Source="$(var.Bin64)DevPrompt.Api.dll" />
                 <File Source="$(var.Bin64)DevPrompt.exe" />
+                <File Source="$(var.Bin64)DevPrompt.exe.config" />
 
                 <File Source="$(var.Bin64)System.Composition.AttributedModel.dll" />
                 <File Source="$(var.Bin64)System.Composition.Convention.dll" />
