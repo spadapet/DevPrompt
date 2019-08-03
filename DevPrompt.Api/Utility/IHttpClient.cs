@@ -11,7 +11,6 @@ namespace DevPrompt.Api
     {
         HttpClient Client { get; }
 
-        Task<IJsonValue> GetJsonAsync(string uri, CancellationToken cancelToken);
         Task<dynamic> GetJsonAsDynamicAsync(string uri, CancellationToken cancelToken);
         Task<T> GetJsonAsTypeAsync<T>(string uri, CancellationToken cancelToken);
     }

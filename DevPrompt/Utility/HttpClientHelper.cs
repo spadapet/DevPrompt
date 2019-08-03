@@ -1,4 +1,4 @@
-﻿using DevPrompt.Utility.Json;
+﻿using Efficient.Json;
 using System;
 using System.Net.Http;
 using System.Threading;
@@ -24,26 +24,26 @@ namespace DevPrompt.Utility
             this.Client.Dispose();
         }
 
-        public async Task<Api.IJsonValue> GetJsonAsync(string uri, CancellationToken cancelToken)
-        {
-            HttpResponseMessage response = await this.Client.GetAsync(uri, cancelToken);
-            response = response.EnsureSuccessStatusCode();
-            string json = await response.Content.ReadAsStringAsync();
-            return JsonParser.Parse(json);
-        }
-
         public async Task<dynamic> GetJsonAsDynamicAsync(string uri, CancellationToken cancelToken)
         {
-            Api.IHttpClient client = this;
-            Api.IJsonValue value = await client.GetJsonAsync(uri, cancelToken);
+            JsonValue value = await this.GetJsonAsync(uri, cancelToken);
             return value.Dynamic;
         }
 
         public async Task<T> GetJsonAsTypeAsync<T>(string uri, CancellationToken cancelToken)
         {
-            Api.IHttpClient client = this;
-            Api.IJsonValue value = await client.GetJsonAsync(uri, cancelToken);
+            JsonValue value = await this.GetJsonAsync(uri, cancelToken);
             return value.Convert<T>();
+        }
+
+        private async Task<JsonValue> GetJsonAsync(string uri, CancellationToken cancelToken)
+        {
+            HttpResponseMessage response = await this.Client.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, cancelToken);
+            response = response.EnsureSuccessStatusCode();
+
+            // TODO: Detect stream encoding, using streaming parser, and deal with cancellation
+            string json = await response.Content.ReadAsStringAsync();
+            return JsonValue.Parse(json);
         }
     }
 }

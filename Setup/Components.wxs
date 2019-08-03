@@ -20,6 +20,7 @@
                 <File Source="$(var.Bin64)DevPrompt.exe" />
                 <File Source="$(var.Bin64)DevPrompt.exe.config" />
 
+                <File Source="$(var.Bin64)Efficient.Json.dll" />
                 <File Source="$(var.Bin64)System.Composition.AttributedModel.dll" />
                 <File Source="$(var.Bin64)System.Composition.Convention.dll" />
                 <File Source="$(var.Bin64)System.Composition.Hosting.dll" />

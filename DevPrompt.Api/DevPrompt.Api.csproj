@@ -56,10 +56,7 @@
     <Compile Include="UI\TabVM.cs" />
     <Compile Include="UI\WorkspaceVM.cs" />
     <Compile Include="Utility\DelegateCommand.cs" />
-    <Compile Include="Utility\IJsonException.cs" />
     <Compile Include="Utility\IHttpClient.cs" />
-    <Compile Include="Utility\IJsonParser.cs" />
-    <Compile Include="Utility\IJsonValue.cs" />
     <Compile Include="Utility\PropertyNotifier.cs" />
   </ItemGroup>
   <ItemGroup>
