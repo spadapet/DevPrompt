@@ -9,9 +9,15 @@ namespace DevPrompt.Utility.NuGet
     internal class NuGetServiceIndex : IDisposable
     {
         public const string NuGetOrg = "https://api.nuget.org/v3/index.json";
+        private const string SearchQueryService = "SearchQueryService";
+
+#if NET_FRAMEWORK
         public const string PluginSearchTag = "DevPrompt.Plugin";
         public const string PluginSearchHiddenTag = "DevPrompt.Plugin.Hidden";
-        private const string SearchQueryService = "SearchQueryService";
+#else
+        public const string PluginSearchTag = "DevPrompt.NetCore.Plugin";
+        public const string PluginSearchHiddenTag = "DevPrompt.NetCore.Plugin.Hidden";
+#endif
 
         private Api.IHttpClient httpClient;
         private List<NuGetService> services;
