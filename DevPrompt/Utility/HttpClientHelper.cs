@@ -26,14 +26,13 @@ namespace DevPrompt.Utility
 
         public async Task<dynamic> GetJsonAsDynamicAsync(string uri, CancellationToken cancelToken)
         {
-            JsonValue value = await this.GetJsonAsync(uri, cancelToken);
-            return value.Dynamic;
+            return await this.GetJsonAsync(uri, cancelToken);
         }
 
         public async Task<T> GetJsonAsTypeAsync<T>(string uri, CancellationToken cancelToken)
         {
             JsonValue value = await this.GetJsonAsync(uri, cancelToken);
-            return value.Convert<T>();
+            return value.Deserialize<T>();
         }
 
         private async Task<JsonValue> GetJsonAsync(string uri, CancellationToken cancelToken)
