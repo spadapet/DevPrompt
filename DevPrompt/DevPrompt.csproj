@@ -234,7 +234,7 @@
       <Name>DevPrompt.Api</Name>
     </ProjectReference>
     <PackageReference Include="System.Composition" Version="1.2.0" />
-    <PackageReference Include="Efficient.Json" Version="1.1.0" />
+    <PackageReference Include="Efficient.Json" Version="1.1.2" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">

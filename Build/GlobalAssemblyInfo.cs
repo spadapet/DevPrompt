@@ -8,6 +8,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyProduct("DevPrompt")]
 [assembly: AssemblyTrademark("")]
-[assembly: AssemblyVersion("1.5.1.0")]
+[assembly: AssemblyVersion("1.5.2.0")]
 [assembly: ComVisible(false)]
 [assembly: NeutralResourcesLanguage("en", UltimateResourceFallbackLocation.MainAssembly)]
