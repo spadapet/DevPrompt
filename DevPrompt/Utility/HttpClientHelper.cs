@@ -26,23 +26,21 @@ namespace DevPrompt.Utility
 
         public async Task<dynamic> GetJsonAsDynamicAsync(string uri, CancellationToken cancelToken)
         {
-            return await this.GetJsonAsync(uri, cancelToken);
+            string json = await this.GetStringAsync(uri, cancelToken);
+            return JsonValue.Parse(json);
         }
 
         public async Task<T> GetJsonAsTypeAsync<T>(string uri, CancellationToken cancelToken)
         {
-            JsonValue value = await this.GetJsonAsync(uri, cancelToken);
-            return value.Deserialize<T>();
+            string json = await this.GetStringAsync(uri, cancelToken);
+            return JsonValue.Deserialize<T>(json);
         }
 
-        private async Task<JsonValue> GetJsonAsync(string uri, CancellationToken cancelToken)
+        private async Task<string> GetStringAsync(string uri, CancellationToken cancelToken)
         {
             HttpResponseMessage response = await this.Client.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, cancelToken);
             response = response.EnsureSuccessStatusCode();
-
-            // TODO: Detect stream encoding, using streaming parser, and deal with cancellation
-            string json = await response.Content.ReadAsStringAsync();
-            return JsonValue.Parse(json);
+            return await response.Content.ReadAsStringAsync();
         }
     }
 }
