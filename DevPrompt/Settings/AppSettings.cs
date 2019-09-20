@@ -217,7 +217,23 @@ namespace DevPrompt.Settings
 
         private async Task AddVisualStudioDevPrompts()
         {
-            foreach (VisualStudioSetup.Instance instance in await VisualStudioSetup.GetInstances())
+            List<VisualStudioSetup.Instance> instances = new List<VisualStudioSetup.Instance>(await VisualStudioSetup.GetInstances());
+            instances.Sort((x, y) =>
+            {
+                if (!Version.TryParse(x.Version, out Version v1))
+                {
+                    v1 = new Version(0, 0);
+                }
+
+                if (!Version.TryParse(y.Version, out Version v2))
+                {
+                    v2 = new Version(0, 0);
+                }
+
+                return v2.CompareTo(v1);
+            });
+
+            foreach (VisualStudioSetup.Instance instance in instances)
             {
                 string file = Path.Combine(instance.Path, "Common7", "Tools", "VsDevCmd.bat");
                 if (File.Exists(file))

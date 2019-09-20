@@ -125,7 +125,7 @@ namespace DevPrompt.Settings
             }
         }
 
-        public static string DefaultPath => Path.Combine(AppSettings.AppDataPath, "Snapshot.xml");
+        public static string DefaultPath => Path.Combine(AppSettings.AppDataPath, Program.IsElevated ? "Snapshot.admin.xml" : "Snapshot.xml");
 
         public static async Task<AppSnapshot> Load(App app, string path)
         {

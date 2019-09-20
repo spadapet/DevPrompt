@@ -2,6 +2,7 @@
 
 namespace DevPrompt.Utility.NuGet
 {
+    [DataContract]
     internal struct NuGetService
     {
         [DataMember(Name = "@type")]

@@ -3,6 +3,7 @@ using System.Runtime.Serialization;
 
 namespace DevPrompt.Utility.NuGet
 {
+    [DataContract]
     internal struct NuGetPackageVersionInfo
     {
         [DataMember(Name = "@id")]
@@ -11,10 +12,10 @@ namespace DevPrompt.Utility.NuGet
         [DataMember(Name = "@type")]
         public string[] type;
 
-        public string catalogEntry;
-        public bool listed;
-        public string packageContent;
-        public DateTime published;
-        public string registration;
+        [DataMember] public string catalogEntry;
+        [DataMember] public bool listed;
+        [DataMember] public string packageContent;
+        [DataMember] public DateTime published;
+        [DataMember] public string registration;
     }
 }
