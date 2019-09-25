@@ -203,6 +203,11 @@ namespace DevPrompt.UI.ViewModels
             this.ActiveTabWorkspace?.TabCyclePrev();
         });
 
+        public ICommand ContextMenuCommand => new Api.DelegateCommand(() =>
+        {
+            this.ActiveTabWorkspace?.TabContextMenu();
+        });
+
         public string WindowTitle
         {
             get

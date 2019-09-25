@@ -2,6 +2,7 @@
 using DevPrompt.Utility;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
 namespace DevPrompt.ProcessWorkspace
@@ -79,11 +80,28 @@ namespace DevPrompt.ProcessWorkspace
             }
         }
 
+        private void OnTabButtonLoaded(object sender, RoutedEventArgs args)
+        {
+            if (sender is Button button)
+            {
+                this.ViewModel.AddTabButton(button);
+            }
+        }
+
         private void OnTabButtonUnloaded(object sender, RoutedEventArgs args)
         {
-            if (this.ContextMenu is ContextMenu menu)
+            if (sender is Button button)
             {
-                menu.IsOpen = false;
+                this.ViewModel.RemoveTabButton(button);
+            }
+        }
+
+        private void OnTabContextMenuClosed(object sender, RoutedEventArgs args)
+        {
+            if (sender is ContextMenu menu)
+            {
+                menu.Placement = PlacementMode.MousePoint;
+                menu.PlacementTarget = null;
             }
         }
 

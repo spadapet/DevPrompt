@@ -103,6 +103,10 @@ static LRESULT __stdcall ConhostWindowProc(HWND hwnd, UINT msg, WPARAM wp, LPARA
                 }
                 break;
 
+            case VK_APPS:
+                handler = MsgHandler::ParentKeyboard;
+                break;
+
             case VK_CONTROL:
                 handler = MsgHandler::Both;
                 break;

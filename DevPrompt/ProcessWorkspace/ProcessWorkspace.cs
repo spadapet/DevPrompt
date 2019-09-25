@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 
 namespace DevPrompt.ProcessWorkspace
 {
@@ -25,6 +26,7 @@ namespace DevPrompt.ProcessWorkspace
         public static string StaticName => "Command Prompts";
         public static string StaticTooltip => string.Empty;
 
+        private readonly List<Button> tabButtons;
         private readonly ObservableCollection<Api.ITabVM> tabs;
         private readonly LinkedList<Api.ITabVM> tabOrder;
         private LinkedListNode<Api.ITabVM> currentTabCycle;
@@ -39,6 +41,7 @@ namespace DevPrompt.ProcessWorkspace
         public ProcessWorkspace(Api.IWindow window, ProcessWorkspaceSnapshot snapshot = null)
         {
             this.Window = window;
+            this.tabButtons = new List<Button>();
             this.tabs = new ObservableCollection<Api.ITabVM>();
             this.tabs.CollectionChanged += this.OnTabsCollectionChanged;
             this.tabOrder = new LinkedList<Api.ITabVM>();
@@ -87,14 +90,19 @@ namespace DevPrompt.ProcessWorkspace
             }
         }
 
-        IEnumerable<MenuItem> Api.IWorkspace.MenuItems
+        public void AddTabButton(Button button)
         {
-            get
-            {
-                yield return (MenuItem)this.ViewElement.Resources["TabMenu"];
-            }
+            Debug.Assert(button != null && !this.tabButtons.Contains(button));
+            this.tabButtons.Add(button);
         }
 
+        public void RemoveTabButton(Button button)
+        {
+            Debug.Assert(button != null && this.tabButtons.Contains(button));
+            this.tabButtons.Remove(button);
+        }
+
+        IEnumerable<MenuItem> Api.IWorkspace.MenuItems => null;
         UIElement Api.IWorkspace.ViewElement => this.ViewElement;
 
         public ProcessWorkspaceControl ViewElement
@@ -222,6 +230,23 @@ namespace DevPrompt.ProcessWorkspace
 
                 this.currentTabCycle = this.currentTabCycle.Previous ?? this.tabOrder.Last;
                 this.ActiveTab = this.currentTabCycle.Value;
+            }
+        }
+
+        public void TabContextMenu()
+        {
+            if (this.ActiveTab is Api.ITabVM tab)
+            {
+                foreach (Button button in this.tabButtons)
+                {
+                    if (button.DataContext == tab && button.ContextMenu is ContextMenu menu)
+                    {
+                        menu.Placement = PlacementMode.Bottom;
+                        menu.PlacementTarget = button;
+                        menu.IsOpen = true;
+                        break;
+                    }
+                }
             }
         }
 

@@ -38,6 +38,7 @@ namespace DevPrompt.UI
             this.nameActiveTabInputBinding2.Command = this.nameActiveTabInputBinding.Command;
             this.tabCycleNextInputBinding.Command = this.ViewModel.TabCycleNextCommand;
             this.tabCyclePrevInputBinding.Command = this.ViewModel.TabCyclePrevCommand;
+            this.contextMenuTabInputBinding.Command = this.ViewModel.ContextMenuCommand;
 
             this.keyCtrl1.Command = this.ViewModel.QuickStartConsoleCommand;
             this.keyCtrl2.Command = this.ViewModel.QuickStartConsoleCommand;
@@ -364,6 +365,14 @@ namespace DevPrompt.UI
                     if (args.IsUp)
                     {
                         this.ViewModel.ActiveTabWorkspace?.TabCycleStop();
+                    }
+                    break;
+
+                case Key.Apps:
+                    if (args.IsUp)
+                    {
+                        args.Handled = true;
+                        this.ViewModel.ContextMenuCommand.SafeExecute();
                     }
                     break;
             }

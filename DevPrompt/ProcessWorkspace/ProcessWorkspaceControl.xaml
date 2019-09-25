@@ -81,6 +81,7 @@
                 PreviewMouseMove="OnTabButtonMouseMoveEvent"
                 GotMouseCapture="OnTabButtonMouseCaptureEvent"
                 LostMouseCapture="OnTabButtonMouseCaptureEvent"
+                Loaded="OnTabButtonLoaded"
                 Unloaded="OnTabButtonUnloaded"
                 Padding="0"
                 BorderThickness="1,1,1,0"
@@ -93,8 +94,7 @@
                 HorizontalContentAlignment="Stretch"
                 ContentTemplate="{StaticResource TabButtonContentTemplate}">
                 <Button.ContextMenu>
-                    <ContextMenu>
-                        <!-- NOTE: Keep in sync with Tab menu -->
+                    <ContextMenu Closed="OnTabContextMenuClosed">
                         <MenuItem Header="_Set tab name..." InputGestureText="Ctrl+Shift+T" Command="{Binding SetTabNameCommand}" Visibility="{Binding SetTabNameCommand, Converter={StaticResource ObjectToVisibility}}" />
                         <Separator />
                         <MenuItem Header="_Clone" InputGestureText="Ctrl+T" Command="{Binding CloneCommand}" Visibility="{Binding CloneCommand, Converter={StaticResource ObjectToVisibility}}" />
@@ -115,19 +115,6 @@
                 </DataTrigger>
             </DataTemplate.Triggers>
         </DataTemplate>
-
-        <!-- NOTE: Keep in sync with tab's ContextMenu -->
-        <MenuItem x:Key="TabMenu" Header="Ta_b" Visibility="{Binding HasActiveTab, Converter={StaticResource BoolToVisibility}}">
-            <MenuItem Header="_Set tab name..." InputGestureText="Ctrl+Shift+T" Command="{Binding ActiveTab.SetTabNameCommand}" Visibility="{Binding ActiveTab.SetTabNameCommand, Converter={StaticResource ObjectToVisibility}}" />
-            <Separator />
-            <MenuItem Header="_Clone" InputGestureText="Ctrl+T" Command="{Binding ActiveTab.CloneCommand}" Visibility="{Binding ActiveTab.CloneCommand, Converter={StaticResource ObjectToVisibility}}" />
-            <MenuItem Header="Console _Defaults" Command="{Binding ActiveTab.DefaultsCommand}" Visibility="{Binding ActiveTab.DefaultsCommand, Converter={StaticResource ObjectToVisibility}}" />
-            <MenuItem Header="Console _Properties" Command="{Binding ActiveTab.PropertiesCommand}" Visibility="{Binding ActiveTab.PropertiesCommand, Converter={StaticResource ObjectToVisibility}}" />
-            <Separator />
-            <MenuItem Header="D_etach" InputGestureText="Ctrl+Shift+F4" Command="{Binding ActiveTab.DetachCommand}" Visibility="{Binding ActiveTab.DetachCommand, Converter={StaticResource ObjectToVisibility}}" />
-            <MenuItem Header="C_lose" InputGestureText="Ctrl+F4" Command="{Binding ActiveTab.CloseCommand}" Visibility="{Binding ActiveTab.CloseCommand, Converter={StaticResource ObjectToVisibility}}" />
-            <MenuItem Header="Close All But This" Command="{Binding ActiveTab.CloseAllButThisCommand}" Visibility="{Binding ActiveTab.CloseAllButThisCommand, Converter={StaticResource ObjectToVisibility}}" />
-        </MenuItem>
     </UserControl.Resources>
 
     <Grid>
