@@ -1,5 +1,4 @@
-﻿using DevPrompt.Api;
-using DevPrompt.Settings;
+﻿using DevPrompt.Settings;
 using DevPrompt.Utility;
 using DevPrompt.Utility.NuGet;
 using System;
@@ -15,7 +14,7 @@ using System.Windows.Input;
 
 namespace DevPrompt.UI.ViewModels
 {
-    internal class PluginSettingsControlVM : Api.PropertyNotifier, IDisposable
+    internal class PluginSettingsControlVM : PropertyNotifier, IDisposable
     {
         public IList<IPluginVM> Plugins => this.plugins;
         public MainWindow Window => this.settingsVM.Window;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DevPrompt.Utility;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace DevPrompt.Api
+namespace DevPrompt.UI.ViewModels
 {
     /// <summary>
     /// View model to wrap IWorkspace model
@@ -18,24 +19,24 @@ namespace DevPrompt.Api
         public UIElement ViewElement => this.Workspace?.ViewElement;
         public IEnumerable<MenuItem> MenuItems => this.workspace?.MenuItems ?? Enumerable.Empty<MenuItem>();
 
-        private IWindow window;
-        private IWorkspace workspace;
-        private IWorkspaceProvider provider;
-        private IWorkspaceSnapshot snapshot;
-        private ActiveState activeState;
+        private Api.IWindow window;
+        private Api.IWorkspace workspace;
+        private Api.IWorkspaceProvider provider;
+        private Api.IWorkspaceSnapshot snapshot;
+        private Api.ActiveState activeState;
 
-        private WorkspaceVM(IWindow window)
+        private WorkspaceVM(Api.IWindow window)
         {
             this.window = window;
         }
 
-        public WorkspaceVM(IWindow window, IWorkspace workspace)
+        public WorkspaceVM(Api.IWindow window, Api.IWorkspace workspace)
             : this(window)
         {
             this.InitWorkspace(workspace);
         }
 
-        public WorkspaceVM(IWindow window, IWorkspaceProvider provider, IWorkspaceSnapshot snapshot = null)
+        public WorkspaceVM(Api.IWindow window, Api.IWorkspaceProvider provider, Api.IWorkspaceSnapshot snapshot = null)
             : this(window)
         {
             this.provider = provider;
@@ -113,7 +114,7 @@ namespace DevPrompt.Api
             }
         }
 
-        public IWorkspaceSnapshot Snapshot
+        public Api.IWorkspaceSnapshot Snapshot
         {
             get
             {
@@ -121,18 +122,18 @@ namespace DevPrompt.Api
             }
         }
 
-        public IWorkspace Workspace
+        public Api.IWorkspace Workspace
         {
             get
             {
                 if (this.workspace == null && this.provider != null)
                 {
-                    IWorkspaceProvider provider = this.provider;
+                    Api.IWorkspaceProvider provider = this.provider;
                     this.provider = null;
 
                     if (this.snapshot != null)
                     {
-                        IWorkspaceSnapshot snapshot = this.snapshot;
+                        Api.IWorkspaceSnapshot snapshot = this.snapshot;
                         this.snapshot = null;
 
                         this.InitWorkspace(snapshot.Restore(this.window));
@@ -153,7 +154,7 @@ namespace DevPrompt.Api
             }
         }
 
-        private void InitWorkspace(IWorkspace workspace)
+        private void InitWorkspace(Api.IWorkspace workspace)
         {
             this.workspace = workspace;
 
@@ -165,33 +166,33 @@ namespace DevPrompt.Api
 
         private void OnWorkspacePropertyChanged(object sender, PropertyChangedEventArgs args)
         {
-            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(IWorkspace.Name))
+            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.IWorkspace.Name))
             {
                 this.OnPropertyChanged(nameof(this.Name));
             }
 
-            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(IWorkspace.Tooltip))
+            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.IWorkspace.Tooltip))
             {
                 this.OnPropertyChanged(nameof(this.Tooltip));
             }
 
-            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(IWorkspace.Title))
+            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.IWorkspace.Title))
             {
                 this.OnPropertyChanged(nameof(this.Title));
             }
 
-            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(IWorkspace.ViewElement))
+            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.IWorkspace.ViewElement))
             {
                 this.OnPropertyChanged(nameof(this.ViewElement));
             }
 
-            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(IWorkspace.MenuItems))
+            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.IWorkspace.MenuItems))
             {
                 this.OnPropertyChanged(nameof(this.MenuItems));
             }
         }
 
-        public ActiveState ActiveState
+        public Api.ActiveState ActiveState
         {
             get
             {
@@ -202,7 +203,7 @@ namespace DevPrompt.Api
             {
                 if (this.SetPropertyValue(ref this.activeState, value))
                 {
-                    if (this.activeState == ActiveState.Hidden)
+                    if (this.activeState == Api.ActiveState.Hidden)
                     {
                         this.Workspace.OnHiding();
                     }
@@ -213,6 +214,11 @@ namespace DevPrompt.Api
                     }
                 }
             }
+        }
+
+        public void Focus()
+        {
+            this.Workspace?.Focus();
         }
     }
 }

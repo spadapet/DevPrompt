@@ -1,4 +1,5 @@
 ﻿using DevPrompt.UI.ViewModels;
+using DevPrompt.Utility;
 using System;
 using System.Runtime.Serialization;
 
@@ -8,7 +9,7 @@ namespace DevPrompt.ProcessWorkspace
     /// Saves the state of a process tab during shutdown so it can be restored on startup
     /// </summary>
     [DataContract]
-    internal class ProcessSnapshot : Api.PropertyNotifier, Api.ITabSnapshot
+    internal class ProcessSnapshot : PropertyNotifier, Api.ITabSnapshot
     {
         Guid Api.ITabSnapshot.Id => Guid.Empty;
         string Api.ITabSnapshot.Name => this.CachedName;
@@ -60,7 +61,7 @@ namespace DevPrompt.ProcessWorkspace
         {
             if (!string.IsNullOrEmpty(this.State) &&
                 workspace is Api.IProcessWorkspace processWorkspace &&
-                processWorkspace.RestoreProcess(this.State, this.RawName) is Api.ITabVM tab)
+                processWorkspace.RestoreProcess(this.State, this.RawName) is ITabVM tab)
             {
                 return tab.Tab;
             }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows;
 
 namespace DevPrompt.Api
 {
@@ -10,16 +9,19 @@ namespace DevPrompt.Api
     public interface IWindow
     {
         IApp App { get; }
+        IntPtr Handle { get; }
         IInfoBar InfoBar { get; }
         IProgressBar ProgressBar { get; }
-        Window Window { get; }
-        void RunExternalProcess(string path, string arguments = null);
+
+        void Focus();
 
         // Workspaces
-        IEnumerable<IWorkspaceVM> Workspaces { get; }
-        IWorkspaceVM ActiveWorkspace { get; set; }
-        IWorkspaceVM FindWorkspace(Guid id);
-        void AddWorkspace(IWorkspaceVM workspace, bool activate);
-        void RemoveWorkspace(IWorkspaceVM workspace);
+        IEnumerable<IWorkspaceHolder> Workspaces { get; }
+        IWorkspaceHolder ActiveWorkspace { get; set; }
+        IWorkspaceHolder FindWorkspace(Guid id);
+        IWorkspaceHolder AddWorkspace(IWorkspace workspace, bool activate);
+        IWorkspaceHolder AddWorkspace(IWorkspaceProvider provider, bool activate);
+        IWorkspaceHolder AddWorkspace(IWorkspaceProvider provider, IWorkspaceSnapshot snapshot, bool activate);
+        void RemoveWorkspace(IWorkspaceHolder workspace);
     }
 }

@@ -1,6 +1,6 @@
-﻿using DevPrompt.Api;
-using DevPrompt.Plugins;
+﻿using DevPrompt.Plugins;
 using DevPrompt.Settings;
+using DevPrompt.Utility;
 using System;
 using System.ComponentModel;
 using System.IO;

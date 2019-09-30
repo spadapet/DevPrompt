@@ -1,10 +1,11 @@
-﻿using System;
+﻿using DevPrompt.Utility;
+using System;
 using System.Runtime.Serialization;
 
 namespace DevPrompt.Settings
 {
     [DataContract]
-    internal class WorkspaceSnapshot : Api.PropertyNotifier
+    internal class WorkspaceSnapshot : PropertyNotifier
     {
         private Guid id;
         private Api.IWorkspaceSnapshot snapshot;

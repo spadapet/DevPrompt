@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DevPrompt.Utility;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -14,7 +15,7 @@ namespace DevPrompt.Plugins
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{Id}, {Version}")]
-    internal class InstalledPluginInfo : Api.PropertyNotifier
+    internal class InstalledPluginInfo : PropertyNotifier
     {
         private string id;
         private string version;

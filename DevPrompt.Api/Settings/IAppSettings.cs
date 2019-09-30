@@ -5,8 +5,6 @@ namespace DevPrompt.Api
 {
     /// <summary>
     /// Import this to be able to get/set custom settings that are persisted.
-    /// You must Export an ISettingTypes in order to able to load setting types
-    /// that come from your plugin.
     /// </summary>
     public interface IAppSettings : INotifyPropertyChanged
     {

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using DevPrompt.Utility;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.Serialization;
 
@@ -9,7 +10,7 @@ namespace DevPrompt.Plugins
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{FullName}")]
-    internal class InstalledPluginAssemblyInfo : Api.PropertyNotifier
+    internal class InstalledPluginAssemblyInfo : PropertyNotifier
     {
         private AssemblyName assemblyName;
         private string path;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DevPrompt.Utility;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization;
@@ -10,7 +11,7 @@ namespace DevPrompt.Settings
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{ExeName}")]
-    internal class GrabConsoleSettings : Api.PropertyNotifier
+    internal class GrabConsoleSettings : PropertyNotifier
     {
         private string exeName;
         private string tabName;

@@ -78,7 +78,7 @@ namespace DevPrompt.UI
         {
             if (sender is Hyperlink hyperlink && hyperlink.NavigateUri != null)
             {
-                this.window.RunExternalProcess(hyperlink.NavigateUri.ToString());
+                this.window.App.RunExternalProcess(hyperlink.NavigateUri.ToString());
             }
         }
     }

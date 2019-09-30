@@ -12,19 +12,20 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Interop;
 
 namespace DevPrompt.UI.ViewModels
 {
     /// <summary>
     /// View model for the main window (handles all menu items, etc)
     /// </summary>
-    internal class MainWindowVM : Api.PropertyNotifier, Api.IWindow
+    internal class MainWindowVM : PropertyNotifier, Api.IWindow
     {
         public MainWindow Window { get; }
         public App App => this.Window.App;
         public AppSettings AppSettings => this.App.Settings;
-        Window Api.IWindow.Window => this.Window;
         Api.IApp Api.IWindow.App => this.App;
+        IntPtr Api.IWindow.Handle => new WindowInteropHelper(this.Window).Handle;
         Api.IProgressBar Api.IWindow.ProgressBar => this.Window.progressBar;
         Api.IInfoBar Api.IWindow.InfoBar => this.Window.infoBar;
 
@@ -35,10 +36,10 @@ namespace DevPrompt.UI.ViewModels
         public ICommand VisualStudioCommand { get; }
         public ICommand QuickStartConsoleCommand { get; }
 
-        private ObservableCollection<Api.IWorkspaceVM> workspaces;
-        private Dictionary<Api.IWorkspaceVM, MenuItem[]> workspaceMenuItems;
+        private ObservableCollection<IWorkspaceVM> workspaces;
+        private Dictionary<IWorkspaceVM, MenuItem[]> workspaceMenuItems;
         private IMultiValueConverter workspaceMenuItemVisibilityConverter;
-        private Api.IWorkspaceVM activeWorkspace;
+        private IWorkspaceVM activeWorkspace;
 
         public MainWindowVM(MainWindow window)
         {
@@ -47,15 +48,15 @@ namespace DevPrompt.UI.ViewModels
             this.Window.Activated += this.OnWindowActivated;
             this.Window.Deactivated += this.OnWindowDeactivated;
 
-            this.ConsoleCommand = new Api.DelegateCommand((object arg) => this.StartConsole((ConsoleSettings)arg));
-            this.GrabConsoleCommand = new Api.DelegateCommand((object arg) => this.App.GrabProcess((int)arg));
-            this.LinkCommand = new Api.DelegateCommand((object arg) => this.StartLink((LinkSettings)arg));
-            this.ToolCommand = new Api.DelegateCommand((object arg) => this.StartTool((ToolSettings)arg));
-            this.VisualStudioCommand = new Api.DelegateCommand((object arg) => this.StartVisualStudio((VisualStudioSetup.Instance)arg));
-            this.QuickStartConsoleCommand = new Api.DelegateCommand((object arg) => this.QuickStartConsole((int)arg));
+            this.ConsoleCommand = new DelegateCommand((object arg) => this.StartConsole((ConsoleSettings)arg));
+            this.GrabConsoleCommand = new DelegateCommand((object arg) => this.App.GrabProcess((int)arg));
+            this.LinkCommand = new DelegateCommand((object arg) => this.StartLink((LinkSettings)arg));
+            this.ToolCommand = new DelegateCommand((object arg) => this.StartTool((ToolSettings)arg));
+            this.VisualStudioCommand = new DelegateCommand((object arg) => this.StartVisualStudio((VisualStudioSetup.Instance)arg));
+            this.QuickStartConsoleCommand = new DelegateCommand((object arg) => this.QuickStartConsole((int)arg));
 
-            this.workspaces = new ObservableCollection<Api.IWorkspaceVM>();
-            this.workspaceMenuItems = new Dictionary<Api.IWorkspaceVM, MenuItem[]>();
+            this.workspaces = new ObservableCollection<IWorkspaceVM>();
+            this.workspaceMenuItems = new Dictionary<IWorkspaceVM, MenuItem[]>();
             this.workspaceMenuItemVisibilityConverter = new DelegateMultiConverter(this.ConvertWorkspaceMenuItemVisibility);
         }
 
@@ -81,19 +82,19 @@ namespace DevPrompt.UI.ViewModels
             this.ActiveWorkspace?.Workspace.OnWindowDeactivated();
         }
 
-        public ICommand ExitCommand => new Api.DelegateCommand(() => this.Window.Close());
+        public ICommand ExitCommand => new DelegateCommand(() => this.Window.Close());
 
-        public ICommand VisualStudioInstallerCommand => new Api.DelegateCommand(() =>
+        public ICommand VisualStudioInstallerCommand => new DelegateCommand(() =>
         {
             this.RunExternalProcess(VisualStudioSetup.InstallerPath);
         });
 
-        public ICommand VisualStudioDogfoodCommand => new Api.DelegateCommand(() =>
+        public ICommand VisualStudioDogfoodCommand => new DelegateCommand(() =>
         {
             this.RunExternalProcess(VisualStudioSetup.DogfoodInstallerPath);
         });
 
-        public ICommand InstallVisualStudioBranchCommand => new Api.DelegateCommand(() =>
+        public ICommand InstallVisualStudioBranchCommand => new DelegateCommand(() =>
         {
             InstallBranchDialog dialog = new InstallBranchDialog()
             {
@@ -133,37 +134,37 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
-        public ICommand SettingsCommand => new Api.DelegateCommand(() =>
+        public ICommand SettingsCommand => new DelegateCommand(() =>
         {
             this.ShowSettingsDialog(SettingsTabType.Default);
         });
 
-        public ICommand PluginsCommand => new Api.DelegateCommand(() =>
+        public ICommand PluginsCommand => new DelegateCommand(() =>
         {
             this.ShowSettingsDialog(SettingsTabType.Plugins);
         });
 
-        public ICommand CustomizeConsoleGrabCommand => new Api.DelegateCommand(() =>
+        public ICommand CustomizeConsoleGrabCommand => new DelegateCommand(() =>
         {
             this.ShowSettingsDialog(SettingsTabType.Grab);
         });
 
-        public ICommand CustomizeToolsCommand => new Api.DelegateCommand(() =>
+        public ICommand CustomizeToolsCommand => new DelegateCommand(() =>
         {
             this.ShowSettingsDialog(SettingsTabType.Tools);
         });
 
-        public ICommand CustomizeLinksCommand => new Api.DelegateCommand(() =>
+        public ICommand CustomizeLinksCommand => new DelegateCommand(() =>
         {
             this.ShowSettingsDialog(SettingsTabType.Links);
         });
 
-        public ICommand ReportAnIssueCommand => new Api.DelegateCommand(() =>
+        public ICommand ReportAnIssueCommand => new DelegateCommand(() =>
         {
             this.RunExternalProcess(@"https://github.com/spadapet/DevPrompt/issues");
         });
 
-        public ICommand AboutCommand => new Api.DelegateCommand(() =>
+        public ICommand AboutCommand => new DelegateCommand(() =>
         {
             AboutDialog dialog = new AboutDialog(this)
             {
@@ -173,37 +174,49 @@ namespace DevPrompt.UI.ViewModels
             dialog.ShowDialog();
         });
 
-        public ICommand SetActiveTabNameCommand => new Api.DelegateCommand(() =>
+        public ICommand SetActiveTabNameCommand => new DelegateCommand(() =>
         {
-            this.ActiveTabWorkspace?.ActiveTab?.SetTabNameCommand?.SafeExecute();
+            if (this.ActiveTabWorkspace is Api.IProcessWorkspace workspace)
+            {
+                workspace.SetActiveTabName();
+            }
         });
 
-        public ICommand CloseActiveTabCommand => new Api.DelegateCommand(() =>
+        public ICommand CloseActiveTabCommand => new DelegateCommand(() =>
         {
-            this.ActiveTabWorkspace?.ActiveTab?.CloseCommand?.SafeExecute();
+            if (this.ActiveTabWorkspace?.ActiveTab is ITabVM tab)
+            {
+                tab.CloseCommand.SafeExecute();
+            }
         });
 
-        public ICommand DetachActiveTabCommand => new Api.DelegateCommand(() =>
+        public ICommand DetachActiveTabCommand => new DelegateCommand(() =>
         {
-            this.ActiveTabWorkspace?.ActiveTab?.DetachCommand?.SafeExecute();
+            if (this.ActiveTabWorkspace is Api.IProcessWorkspace workspace)
+            {
+                workspace.DetachActiveTab();
+            }
         });
 
-        public ICommand CloneActiveTabCommand => new Api.DelegateCommand(() =>
+        public ICommand CloneActiveTabCommand => new DelegateCommand(() =>
         {
-            this.ActiveTabWorkspace?.ActiveTab?.CloneCommand?.SafeExecute();
+            if (this.ActiveTabWorkspace is Api.IProcessWorkspace workspace)
+            {
+                workspace.CloneActiveTab();
+            }
         });
 
-        public ICommand TabCycleNextCommand => new Api.DelegateCommand(() =>
+        public ICommand TabCycleNextCommand => new DelegateCommand(() =>
         {
             this.ActiveTabWorkspace?.TabCycleNext();
         });
 
-        public ICommand TabCyclePrevCommand => new Api.DelegateCommand(() =>
+        public ICommand TabCyclePrevCommand => new DelegateCommand(() =>
         {
             this.ActiveTabWorkspace?.TabCyclePrev();
         });
 
-        public ICommand ContextMenuCommand => new Api.DelegateCommand(() =>
+        public ICommand ContextMenuCommand => new DelegateCommand(() =>
         {
             this.ActiveTabWorkspace?.TabContextMenu();
         });
@@ -213,7 +226,7 @@ namespace DevPrompt.UI.ViewModels
             get
             {
                 string intro = Program.IsElevated ? "[Dev Admin]" : "[Dev]";
-                string title = this.ActiveWorkspace?.Title?.Trim();
+                string title = this.activeWorkspace?.Title?.Trim();
 
                 if (!string.IsNullOrEmpty(title))
                 {
@@ -224,23 +237,24 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
-        public IEnumerable<Api.IWorkspaceVM> Workspaces => this.workspaces;
+        public IEnumerable<Api.IWorkspaceHolder> Workspaces => this.workspaces;
         public bool HasActiveWorkspace => this.ActiveWorkspace != null;
         public Api.ITabWorkspace ActiveTabWorkspace => this.ActiveWorkspace?.Workspace as Api.ITabWorkspace;
+        public void Focus() => this.Window.Focus();
 
-        public Api.IWorkspaceVM FindWorkspace(Guid id)
+        public Api.IWorkspaceHolder FindWorkspace(Guid id)
         {
             return this.Workspaces.FirstOrDefault(w => w.Id == id);
         }
 
-        public Api.IWorkspaceVM ActiveWorkspace
+        public Api.IWorkspaceHolder ActiveWorkspace
         {
             get => this.activeWorkspace;
 
             set
             {
-                Api.IWorkspaceVM oldWorkspace = this.ActiveWorkspace;
-                if (this.SetPropertyValue(ref this.activeWorkspace, value))
+                IWorkspaceVM oldWorkspace = this.activeWorkspace;
+                if (this.SetPropertyValue(ref this.activeWorkspace, value as IWorkspaceVM))
                 {
                     if (this.activeWorkspace != null)
                     {
@@ -257,7 +271,7 @@ namespace DevPrompt.UI.ViewModels
                         oldWorkspace.ActiveState = Api.ActiveState.Hidden;
                     }
 
-                    this.Window.ViewElement = this.ActiveWorkspace?.ViewElement;
+                    this.Window.ViewElement = this.activeWorkspace?.ViewElement;
 
                     this.OnPropertyChanged(nameof(this.HasActiveWorkspace));
                     this.OnPropertyChanged(nameof(this.WindowTitle));
@@ -269,10 +283,31 @@ namespace DevPrompt.UI.ViewModels
 
         public void FocusActiveWorkspace()
         {
-            this.ActiveWorkspace?.Workspace?.Focus();
+            this.activeWorkspace?.Focus();
         }
 
-        public void AddWorkspace(Api.IWorkspaceVM workspace, bool activate)
+        public Api.IWorkspaceHolder AddWorkspace(Api.IWorkspace workspace, bool activate)
+        {
+            WorkspaceVM workspaceVM = new WorkspaceVM(this, workspace);
+            this.AddWorkspace(workspaceVM, activate);
+            return workspaceVM;
+        }
+
+        public Api.IWorkspaceHolder AddWorkspace(Api.IWorkspaceProvider provider, bool activate)
+        {
+            WorkspaceVM workspaceVM = new WorkspaceVM(this, provider);
+            this.AddWorkspace(workspaceVM, activate);
+            return workspaceVM;
+        }
+
+        public Api.IWorkspaceHolder AddWorkspace(Api.IWorkspaceProvider provider, Api.IWorkspaceSnapshot snapshot, bool activate)
+        {
+            WorkspaceVM workspaceVM = new WorkspaceVM(this, provider, snapshot);
+            this.AddWorkspace(workspaceVM, activate);
+            return workspaceVM;
+        }
+
+        private void AddWorkspace(IWorkspaceVM workspace, bool activate)
         {
             if (!this.workspaces.Contains(workspace))
             {
@@ -289,26 +324,26 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
-        public void RemoveWorkspace(Api.IWorkspaceVM workspace)
+        public void RemoveWorkspace(Api.IWorkspaceHolder workspace)
         {
             bool removingActive = (this.ActiveWorkspace == workspace);
 
-            if (this.workspaces.Remove(workspace))
+            if (workspace is IWorkspaceVM workspaceVM && this.workspaces.Remove(workspaceVM))
             {
                 if (removingActive)
                 {
                     this.ActiveWorkspace = this.workspaces.FirstOrDefault();
                 }
 
-                this.RemoveMainMenuItems(workspace);
-                workspace.PropertyChanged -= this.OnWorkspacePropertyChanged;
-                workspace.Dispose();
+                this.RemoveMainMenuItems(workspaceVM);
+                workspaceVM.PropertyChanged -= this.OnWorkspacePropertyChanged;
+                workspaceVM.Dispose();
             }
         }
 
         private object ConvertWorkspaceMenuItemVisibility(object[] values, Type targetType, object parameter)
         {
-            Api.IWorkspaceVM workspace = (Api.IWorkspaceVM)parameter;
+            IWorkspaceVM workspace = (IWorkspaceVM)parameter;
 
             foreach (object value in values)
             {
@@ -319,7 +354,7 @@ namespace DevPrompt.UI.ViewModels
                         return Visibility.Collapsed;
                     }
                 }
-                else if (value == null || value is Api.IWorkspaceVM)
+                else if (value == null || value is IWorkspaceVM)
                 {
                     if (workspace != value)
                     {
@@ -331,11 +366,11 @@ namespace DevPrompt.UI.ViewModels
             return Visibility.Visible;
         }
 
-        private void AddMainMenuItems(Api.IWorkspaceVM workspace)
+        private void AddMainMenuItems(IWorkspaceVM workspace)
         {
             if (!this.workspaceMenuItems.ContainsKey(workspace) && workspace.CreatedWorkspace)
             {
-                MenuItem[] items = workspace.MenuItems.ToArray();
+                MenuItem[] items = workspace.MenuItems?.ToArray() ?? Array.Empty<MenuItem>();
                 this.workspaceMenuItems[workspace] = items;
 
                 int index = 1;
@@ -368,7 +403,7 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
-        private void RemoveMainMenuItems(Api.IWorkspaceVM workspace)
+        private void RemoveMainMenuItems(IWorkspaceVM workspace)
         {
             if (this.workspaceMenuItems.TryGetValue(workspace, out MenuItem[] items))
             {
@@ -384,19 +419,19 @@ namespace DevPrompt.UI.ViewModels
 
         private void OnWorkspacePropertyChanged(object sender, PropertyChangedEventArgs args)
         {
-            if (sender is Api.IWorkspaceVM workspace && this.ActiveWorkspace == workspace)
+            if (sender is IWorkspaceVM workspace && this.ActiveWorkspace == workspace)
             {
-                if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.IWorkspaceVM.ViewElement))
+                if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(IWorkspaceVM.ViewElement))
                 {
                     this.Window.ViewElement = workspace.ViewElement;
                 }
 
-                if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.IWorkspaceVM.Title))
+                if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(IWorkspaceVM.Title))
                 {
                     this.OnPropertyChanged(nameof(this.WindowTitle));
                 }
 
-                if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.IWorkspaceVM.MenuItems))
+                if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(IWorkspaceVM.MenuItems))
                 {
                     this.RemoveMainMenuItems(workspace);
                     this.AddMainMenuItems(workspace);
@@ -408,7 +443,7 @@ namespace DevPrompt.UI.ViewModels
         {
             foreach (Api.IWorkspaceProvider provider in this.Window.App.PluginState.WorkspaceProviders)
             {
-                Api.IWorkspaceVM workspace = new Api.WorkspaceVM(this, provider, snapshot.FindWorkspaceSnapshot(provider.WorkspaceId));
+                IWorkspaceVM workspace = new WorkspaceVM(this, provider, snapshot.FindWorkspaceSnapshot(provider.WorkspaceId));
                 this.AddWorkspace(workspace, false);
 
                 if (this.ActiveWorkspace == null || workspace.Id == snapshot.ActiveWorkspaceId)
@@ -420,7 +455,7 @@ namespace DevPrompt.UI.ViewModels
 
         private void StartConsole(ConsoleSettings settings)
         {
-            if (this.FindWorkspace(Api.Constants.ProcessWorkspaceId) is Api.IWorkspaceVM workspaceVM && workspaceVM.Workspace is Api.IProcessWorkspace workspace)
+            if (this.FindWorkspace(Api.Constants.ProcessWorkspaceId) is IWorkspaceVM workspaceVM && workspaceVM.Workspace is Api.IProcessWorkspace workspace)
             {
                 this.ActiveWorkspace = workspaceVM;
                 workspace.RunProcess(settings);

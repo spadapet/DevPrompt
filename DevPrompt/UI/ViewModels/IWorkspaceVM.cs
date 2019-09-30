@@ -5,24 +5,18 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace DevPrompt.Api
+namespace DevPrompt.UI.ViewModels
 {
-    /// <summary>
-    /// View model to wrap IWorkspace model
-    /// </summary>
-    public interface IWorkspaceVM : INotifyPropertyChanged, IDisposable
+    public interface IWorkspaceVM : Api.IWorkspaceHolder, INotifyPropertyChanged, IDisposable
     {
-        Guid Id { get; }
         string Name { get; }
         string Tooltip { get; }
         string Title { get; }
-        bool CreatedWorkspace { get; }
         UIElement ViewElement { get; }
         IEnumerable<MenuItem> MenuItems { get; }
-        IWorkspaceSnapshot Snapshot { get; }
-        ActiveState ActiveState { get; set; }
-        IWorkspace Workspace { get; }
-
+        Api.IWorkspaceSnapshot Snapshot { get; }
         ICommand ActivateCommand { get; }
+
+        void Focus();
     }
 }

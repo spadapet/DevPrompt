@@ -1,4 +1,5 @@
 ﻿using DevPrompt.UI.ViewModels;
+using DevPrompt.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,25 +13,25 @@ using System.Windows.Controls.Primitives;
 
 namespace DevPrompt.ProcessWorkspace
 {
-    internal class ProcessWorkspace : Api.PropertyNotifier, Api.IProcessWorkspace
+    internal class ProcessWorkspace : PropertyNotifier, Api.IProcessWorkspace
     {
         public Api.IWindow Window { get; }
         public Guid Id => Api.Constants.ProcessWorkspaceId;
         public string Name => ProcessWorkspace.StaticName;
         public string Tooltip => ProcessWorkspace.StaticTooltip;
-        public string Title => this.ActiveTab?.Title ?? this.Name;
+        public string Title => this.activeTab?.Title ?? this.Name;
         public Api.IWorkspaceSnapshot Snapshot => new ProcessWorkspaceSnapshot(this);
-        public IEnumerable<Api.ITabVM> Tabs => this.tabs;
+        public IEnumerable<Api.ITabHolder> Tabs => this.tabs;
         public Api.IProcessHost ProcessHost => this.ViewElement.ProcessHostWindow?.ProcessHost;
 
         public static string StaticName => "Command Prompts";
         public static string StaticTooltip => string.Empty;
 
-        private readonly List<Button> tabButtons;
-        private readonly ObservableCollection<Api.ITabVM> tabs;
-        private readonly LinkedList<Api.ITabVM> tabOrder;
-        private LinkedListNode<Api.ITabVM> currentTabCycle;
-        private Api.ITabVM activeTab;
+        private readonly HashSet<ButtonInfo> tabButtons;
+        private readonly ObservableCollection<ITabVM> tabs;
+        private readonly LinkedList<ITabVM> tabOrder;
+        private LinkedListNode<ITabVM> currentTabCycle;
+        private ITabVM activeTab;
         private int newTabIndex;
         private ProcessWorkspaceControl viewElement;
         private ProcessWorkspaceSnapshot initialSnapshot;
@@ -38,13 +39,29 @@ namespace DevPrompt.ProcessWorkspace
         private const int NewTabAtEnd = -1;
         private const int NewTabAtEndNoActivate = -2;
 
+        private class ButtonInfo
+        {
+            public Button Button { get; }
+            public ContextMenu ContextMenu => this.Button.ContextMenu;
+            public ITabVM Tab => (ITabVM)this.Button.DataContext;
+            public bool ContextMenuUpdated { get; set; }
+
+            public ButtonInfo(Button button)
+            {
+                this.Button = button;
+            }
+
+            public override bool Equals(object obj) => obj is ButtonInfo info && this.Button == info.Button;
+            public override int GetHashCode() => this.Button.GetHashCode();
+        }
+
         public ProcessWorkspace(Api.IWindow window, ProcessWorkspaceSnapshot snapshot = null)
         {
             this.Window = window;
-            this.tabButtons = new List<Button>();
-            this.tabs = new ObservableCollection<Api.ITabVM>();
+            this.tabButtons = new HashSet<ButtonInfo>();
+            this.tabs = new ObservableCollection<ITabVM>();
             this.tabs.CollectionChanged += this.OnTabsCollectionChanged;
-            this.tabOrder = new LinkedList<Api.ITabVM>();
+            this.tabOrder = new LinkedList<ITabVM>();
             this.newTabIndex = ProcessWorkspace.NewTabAtEnd;
             this.initialSnapshot = snapshot;
         }
@@ -57,8 +74,7 @@ namespace DevPrompt.ProcessWorkspace
 
                 foreach (Api.ITabSnapshot tabSnapshot in snapshot?.Tabs ?? Enumerable.Empty<Api.ITabSnapshot>())
                 {
-                    Api.TabVM tab = new Api.TabVM(this.Window, this, tabSnapshot);
-                    this.AddTab(tab, false);
+                    Api.ITabHolder tab = this.AddTab(tabSnapshot, false);
 
                     if (snapshot.ActiveTabIndex >= 0 &&
                         snapshot.ActiveTabIndex < snapshot.Tabs.Count &&
@@ -92,14 +108,46 @@ namespace DevPrompt.ProcessWorkspace
 
         public void AddTabButton(Button button)
         {
-            Debug.Assert(button != null && !this.tabButtons.Contains(button));
-            this.tabButtons.Add(button);
+            ButtonInfo info = new ButtonInfo(button);
+            Debug.Assert(button != null && !this.tabButtons.Contains(info));
+            this.tabButtons.Add(info);
         }
 
         public void RemoveTabButton(Button button)
         {
-            Debug.Assert(button != null && this.tabButtons.Contains(button));
-            this.tabButtons.Remove(button);
+            int count = this.tabButtons.RemoveWhere(i => i.Button == button);
+            Debug.Assert(count == 1);
+        }
+
+        public void EnsureTab(Button button)
+        {
+            if (this.tabButtons.FirstOrDefault(b => b.Button == button) is ButtonInfo info && info.Button.DataContext is ITabVM tab && !tab.CreatedTab)
+            {
+                // Force tab creation
+                _ = tab.Tab;
+            }
+        }
+
+        public void UpdateContextMenu(ContextMenu menu)
+        {
+            if (this.tabButtons.FirstOrDefault(b => b.ContextMenu == menu) is ButtonInfo info && !info.ContextMenuUpdated && info.Button.DataContext is ITabVM tab)
+            {
+                while (menu.Items.Count > 0 && !(menu.Items[0] is Separator separator && separator.Tag is string name && name == "[Plugins]"))
+                {
+                    menu.Items.RemoveAt(0);
+                }
+
+                if (tab.ContextMenuItems is IEnumerable<FrameworkElement> newItems)
+                {
+                    int pos = 0;
+                    foreach (FrameworkElement newItem in newItems)
+                    {
+                        menu.Items.Insert(pos++, newItem);
+                    }
+                }
+
+                info.ContextMenuUpdated = true;
+            }
         }
 
         IEnumerable<MenuItem> Api.IWorkspace.MenuItems => null;
@@ -129,17 +177,14 @@ namespace DevPrompt.ProcessWorkspace
             this.InitTabs(snapshot);
         }
 
-        public Api.ITabVM ActiveTab
+        public Api.ITabHolder ActiveTab
         {
-            get
-            {
-                return this.activeTab;
-            }
+            get => this.activeTab;
 
             set
             {
-                Api.ITabVM oldTab = this.ActiveTab;
-                if (this.SetPropertyValue(ref this.activeTab, value))
+                ITabVM oldTab = this.activeTab;
+                if (this.SetPropertyValue(ref this.activeTab, value as ITabVM))
                 {
                     if (this.activeTab != null)
                     {
@@ -156,7 +201,7 @@ namespace DevPrompt.ProcessWorkspace
                         oldTab.ActiveState = Api.ActiveState.Hidden;
                     }
 
-                    this.ViewElement.ViewElement = this.ActiveTab?.ViewElement;
+                    this.ViewElement.ViewElement = this.activeTab?.ViewElement;
 
                     this.OnPropertyChanged(nameof(this.HasActiveTab));
                     this.OnPropertyChanged(nameof(this.Title));
@@ -166,17 +211,11 @@ namespace DevPrompt.ProcessWorkspace
             }
         }
 
-        public bool HasActiveTab
-        {
-            get
-            {
-                return this.ActiveTab != null;
-            }
-        }
+        public bool HasActiveTab => this.ActiveTab != null;
 
         public void FocusActiveTab()
         {
-            if (this.ActiveTab is Api.ITabVM tab)
+            if (this.ActiveTab is ITabVM tab)
             {
                 if (this.currentTabCycle != null)
                 {
@@ -235,22 +274,29 @@ namespace DevPrompt.ProcessWorkspace
 
         public void TabContextMenu()
         {
-            if (this.ActiveTab is Api.ITabVM tab)
+            if (this.ActiveTab is ITabVM tab && this.tabButtons.FirstOrDefault(b => b.Tab == tab) is ButtonInfo info && info.ContextMenu is ContextMenu menu)
             {
-                foreach (Button button in this.tabButtons)
-                {
-                    if (button.DataContext == tab && button.ContextMenu is ContextMenu menu)
-                    {
-                        menu.Placement = PlacementMode.Bottom;
-                        menu.PlacementTarget = button;
-                        menu.IsOpen = true;
-                        break;
-                    }
-                }
+                menu.Placement = PlacementMode.Bottom;
+                menu.PlacementTarget = info.Button;
+                menu.IsOpen = true;
             }
         }
 
-        public void AddTab(Api.ITabVM tab, bool activate)
+        public Api.ITabHolder AddTab(Api.ITab tab, bool activate)
+        {
+            TabVM tabVM = new TabVM(this.Window, this, tab);
+            this.AddTab(tabVM, activate);
+            return tabVM;
+        }
+
+        public Api.ITabHolder AddTab(Api.ITabSnapshot snapshot, bool activate)
+        {
+            TabVM tabVM = new TabVM(this.Window, this, snapshot);
+            this.AddTab(tabVM, activate);
+            return tabVM;
+        }
+
+        private void AddTab(ITabVM tab, bool activate)
         {
             if (this.newTabIndex == ProcessWorkspace.NewTabAtEndNoActivate)
             {
@@ -273,13 +319,13 @@ namespace DevPrompt.ProcessWorkspace
             }
         }
 
-        public void RemoveTab(Api.ITabVM tab)
+        public void RemoveTab(Api.ITabHolder tab)
         {
             bool removingActive = (this.ActiveTab == tab);
 
-            if (this.tabs.Remove(tab))
+            if (tab is ITabVM tabVM && this.tabs.Remove(tabVM))
             {
-                this.tabOrder.Remove(tab);
+                this.tabOrder.Remove(tabVM);
                 Debug.Assert(this.tabs.Count == this.tabOrder.Count);
 
                 if (removingActive)
@@ -287,32 +333,48 @@ namespace DevPrompt.ProcessWorkspace
                     this.ActiveTab = this.tabOrder.First?.Value;
                     if (this.ActiveTab == null)
                     {
-                        this.Window.Window.Focus();
+                        this.Window.Focus();
                     }
                 }
 
-                tab.PropertyChanged -= this.OnTabPropertyChanged;
-                tab.Dispose();
+                tabVM.PropertyChanged -= this.OnTabPropertyChanged;
+                tabVM.Dispose();
             }
         }
 
         private void OnTabPropertyChanged(object sender, PropertyChangedEventArgs args)
         {
-            if (sender is Api.ITabVM tab && this.ActiveTab == tab)
+            if (sender is ITabVM tab)
             {
-                if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.ITabVM.ViewElement))
+                if (this.ActiveTab == tab)
                 {
-                    this.ViewElement.ViewElement = tab.ViewElement;
+                    if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(ITabVM.ViewElement))
+                    {
+                        this.ViewElement.ViewElement = tab.ViewElement;
+                    }
+
+                    if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(ITabVM.Title))
+                    {
+                        this.OnPropertyChanged(nameof(this.Title));
+                    }
                 }
 
-                if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.ITabVM.Title))
+                if (this.tabButtons.FirstOrDefault(b => b.Tab == tab) is ButtonInfo info)
                 {
-                    this.OnPropertyChanged(nameof(this.Title));
+                    if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(ITabVM.ContextMenuItems))
+                    {
+                        info.ContextMenuUpdated = false;
+
+                        if (info.ContextMenu is ContextMenu menu && menu.IsOpen)
+                        {
+                            this.UpdateContextMenu(menu);
+                        }
+                    }
                 }
             }
         }
 
-        public Api.ITabVM FindTab(Api.IProcess process)
+        public Api.ITabHolder FindTab(Api.IProcess process)
         {
             return this.tabs.Where(t => t.CreatedTab && t.Tab is ProcessTab tab && tab.Hwnd == process.Hwnd).FirstOrDefault();
         }
@@ -347,19 +409,19 @@ namespace DevPrompt.ProcessWorkspace
             this.TabCycleStop();
         }
 
-        public void OnDrop(Api.ITabVM tab, int droppedIndex, bool copy)
+        public void OnDrop(ITabVM tab, int droppedIndex, bool copy)
         {
             int index = this.tabs.IndexOf(tab);
-            if (index >= 0)
+            if (index >= 0 && tab.Tab is ProcessTab processTab)
             {
-                if (copy && tab.CloneCommand?.CanExecute(null) == true)
+                if (copy)
                 {
                     int oldTabIndex = this.newTabIndex;
                     this.newTabIndex = droppedIndex;
 
                     try
                     {
-                        tab.CloneCommand.Execute(null);
+                        processTab.CloneCommand();
                     }
                     finally
                     {
@@ -374,15 +436,15 @@ namespace DevPrompt.ProcessWorkspace
             }
         }
 
-        public Api.ITabVM RunProcess(Api.IConsoleSettings settings)
+        public Api.ITabHolder RunProcess(Api.IConsoleSettings settings)
         {
             return this.RunProcess(settings.Executable, settings.Arguments, settings.StartingDirectory, settings.TabName);
         }
 
-        public Api.ITabVM RunProcess(string executable, string arguments, string startingDirectory, string tabName)
+        public Api.ITabHolder RunProcess(string executable, string arguments, string startingDirectory, string tabName)
         {
             Api.IProcess process = this.ProcessHost?.RunProcess(executable, arguments, startingDirectory);
-            if (this.FindTab(process) is Api.ITabVM tab)
+            if (this.FindTab(process) is ITabVM tab)
             {
                 if (!string.IsNullOrEmpty(tabName) && tab.Tab is ProcessTab processTab)
                 {
@@ -395,10 +457,10 @@ namespace DevPrompt.ProcessWorkspace
             return null;
         }
 
-        public Api.ITabVM RestoreProcess(string state, string tabName)
+        public Api.ITabHolder RestoreProcess(string state, string tabName)
         {
             Api.IProcess process = this.ProcessHost?.RestoreProcess(state);
-            if (this.FindTab(process) is Api.ITabVM tab)
+            if (this.FindTab(process) is ITabVM tab)
             {
                 if (!string.IsNullOrEmpty(tabName) && tab.Tab is ProcessTab processTab)
                 {
@@ -411,12 +473,12 @@ namespace DevPrompt.ProcessWorkspace
             return null;
         }
 
-        public Api.ITabVM CloneProcess(Api.ITab tab, string tabName)
+        public Api.ITabHolder CloneProcess(Api.ITab tab, string tabName)
         {
             if (tab is ProcessTab processTab)
             {
                 Api.IProcess clone = this.ProcessHost?.CloneProcess(processTab.Process);
-                if (this.FindTab(clone) is Api.ITabVM cloneTab)
+                if (this.FindTab(clone) is ITabVM cloneTab)
                 {
                     if (!string.IsNullOrEmpty(tabName) && cloneTab.Tab is ProcessTab cloneProcessTab)
                     {
@@ -428,6 +490,30 @@ namespace DevPrompt.ProcessWorkspace
             }
 
             return null;
+        }
+
+        public void SetActiveTabName()
+        {
+            if (this.ActiveTab?.Tab is ProcessTab processTab)
+            {
+                processTab.SetTabNameCommand();
+            }
+        }
+
+        public void DetachActiveTab()
+        {
+            if (this.ActiveTab?.Tab is ProcessTab processTab)
+            {
+                processTab.DetachCommand();
+            }
+        }
+
+        public void CloneActiveTab()
+        {
+            if (this.ActiveTab?.Tab is ProcessTab processTab)
+            {
+                processTab.CloneCommand();
+            }
         }
     }
 }

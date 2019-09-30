@@ -1,14 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using DevPrompt.UI.ViewModels;
+using DevPrompt.Utility;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace DevPrompt.Api
+namespace DevPrompt.Settings
 {
     [DataContract]
-    public abstract class TabWorkspaceSnapshot : PropertyNotifier, IWorkspaceSnapshot
+    public abstract class TabWorkspaceSnapshot : PropertyNotifier, Api.IWorkspaceSnapshot
     {
-        private ObservableCollection<ITabSnapshot> tabs;
+        private ObservableCollection<Api.ITabSnapshot> tabs;
         private int activeTabIndex;
 
         public TabWorkspaceSnapshot()
@@ -16,12 +18,12 @@ namespace DevPrompt.Api
             this.Initialize();
         }
 
-        public TabWorkspaceSnapshot(ITabWorkspace workspace)
+        public TabWorkspaceSnapshot(Api.ITabWorkspace workspace)
             : this()
         {
-            foreach (ITabVM tab in workspace?.Tabs ?? Enumerable.Empty<ITabVM>())
+            foreach (ITabVM tab in workspace.Tabs.OfType<ITabVM>())
             {
-                if (tab.Snapshot is ITabSnapshot tabSnapshot)
+                if (tab.Snapshot is Api.ITabSnapshot tabSnapshot)
                 {
                     if (workspace.ActiveTab == tab)
                     {
@@ -42,24 +44,24 @@ namespace DevPrompt.Api
             {
                 this.activeTabIndex = copyFrom.activeTabIndex;
 
-                foreach (ITabSnapshot tab in copyFrom.Tabs)
+                foreach (Api.ITabSnapshot tab in copyFrom.Tabs)
                 {
                     this.tabs.Add(tab.Clone());
                 }
             }
         }
 
-        public abstract IWorkspaceSnapshot Clone();
-        public abstract IWorkspace Restore(IWindow window);
+        public abstract Api.IWorkspaceSnapshot Clone();
+        public abstract Api.IWorkspace Restore(Api.IWindow window);
 
         [OnDeserializing]
         private void Initialize(StreamingContext context = default(StreamingContext))
         {
-            this.tabs = new ObservableCollection<ITabSnapshot>();
+            this.tabs = new ObservableCollection<Api.ITabSnapshot>();
         }
 
         [DataMember]
-        public IList<ITabSnapshot> Tabs => this.tabs;
+        public IList<Api.ITabSnapshot> Tabs => this.tabs;
 
         [DataMember]
         public int ActiveTabIndex

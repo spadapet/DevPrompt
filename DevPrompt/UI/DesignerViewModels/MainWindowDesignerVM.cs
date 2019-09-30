@@ -1,4 +1,5 @@
 ﻿using DevPrompt.Settings;
+using DevPrompt.Utility;
 using System.Collections.Generic;
 using System.Windows.Input;
 
@@ -7,7 +8,7 @@ namespace DevPrompt.UI.DesignerViewModels
     /// <summary>
     /// Sample data for the XAML designer
     /// </summary>
-    internal class MainWindowDesignerVM : Api.PropertyNotifier
+    internal class MainWindowDesignerVM : PropertyNotifier
     {
         private List<Api.ITab> tabs;
 

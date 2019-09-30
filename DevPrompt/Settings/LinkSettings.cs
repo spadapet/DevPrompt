@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using DevPrompt.Utility;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 
 namespace DevPrompt.Settings
@@ -8,7 +9,7 @@ namespace DevPrompt.Settings
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{Name}")]
-    internal class LinkSettings : Api.PropertyNotifier
+    internal class LinkSettings : PropertyNotifier
     {
         private string name;
         private string address;

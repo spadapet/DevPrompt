@@ -12,7 +12,7 @@ namespace DevPrompt.UI.ViewModels
     /// <summary>
     /// View model for the settings dialog
     /// </summary>
-    internal class SettingsDialogVM : Api.PropertyNotifier, IDisposable
+    internal class SettingsDialogVM : PropertyNotifier, IDisposable
     {
         public AppSettings Settings { get; }
         public MainWindow Window { get; }
@@ -99,7 +99,7 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
-        public ICommand ImportCommand => new Api.DelegateCommand(async () =>
+        public ICommand ImportCommand => new DelegateCommand(async () =>
         {
             OpenFileDialog dialog = new OpenFileDialog
             {
@@ -136,7 +136,7 @@ namespace DevPrompt.UI.ViewModels
             }
         });
 
-        public ICommand ExportCommand => new Api.DelegateCommand(() =>
+        public ICommand ExportCommand => new DelegateCommand(() =>
         {
             OpenFileDialog dialog = new OpenFileDialog
             {

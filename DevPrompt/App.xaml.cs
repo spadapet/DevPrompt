@@ -350,7 +350,7 @@ namespace DevPrompt
         }
 
         Api.IAppSettings Api.IApp.Settings => this.Settings;
-        Dispatcher Api.IApp.Dispatcher => this.Dispatcher;
+        Api.IWindow Api.IApp.ActiveWindow => this.MainWindow?.ViewModel;
         bool Api.IApp.IsElevated => Program.IsElevated;
         bool Api.IApp.IsMainProcess => Program.IsMainProcess;
         bool Api.IApp.IsMicrosoftDomain => Program.IsMicrosoftDomain;
@@ -390,6 +390,11 @@ namespace DevPrompt
 
             Debug.Fail("CreateProcessHost called before app init is complete");
             return null;
+        }
+
+        void Api.IApp.RunExternalProcess(string path, string arguments)
+        {
+            this.MainWindow?.ViewModel.RunExternalProcess(path, arguments);
         }
 
         private Assembly OnFailedAssemblyResolve(object sender, ResolveEventArgs args)

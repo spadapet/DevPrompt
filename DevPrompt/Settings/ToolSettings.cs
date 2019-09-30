@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DevPrompt.Utility;
+using System;
 using System.Diagnostics;
 using System.Runtime.Serialization;
 
@@ -9,7 +10,7 @@ namespace DevPrompt.Settings
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{Name}")]
-    internal class ToolSettings : Api.PropertyNotifier
+    internal class ToolSettings : PropertyNotifier
     {
         private string name;
         private string command;

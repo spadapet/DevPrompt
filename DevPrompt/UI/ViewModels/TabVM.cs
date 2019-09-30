@@ -1,46 +1,44 @@
-﻿using System;
+﻿using DevPrompt.Utility;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
-namespace DevPrompt.Api
+namespace DevPrompt.UI.ViewModels
 {
     /// <summary>
-    /// View model to wrap ITab model
+    /// View model to wrap Api.ITab model
     /// </summary>
     public class TabVM : PropertyNotifier, ITabVM
     {
         public string Title => this.Tab?.Title ?? string.Empty;
         public UIElement ViewElement => this.Tab?.ViewElement;
         public bool CreatedTab => this.tab != null;
-        public ICommand CloneCommand => this.Tab?.CloneCommand;
-        public ICommand DetachCommand => this.Tab?.DetachCommand;
-        public ICommand DefaultsCommand => this.Tab?.DefaultsCommand;
-        public ICommand PropertiesCommand => this.Tab?.PropertiesCommand;
-        public ICommand SetTabNameCommand => this.Tab?.SetTabNameCommand;
+        public IEnumerable<FrameworkElement> ContextMenuItems => this.tab?.ContextMenuItems ?? Enumerable.Empty<FrameworkElement>();
 
-        private IWindow window;
-        private ITab tab;
-        private ITabWorkspace workspace;
-        private ITabSnapshot snapshot;
-        private ActiveState activeState;
+        private Api.IWindow window;
+        private Api.ITab tab;
+        private Api.ITabWorkspace workspace;
+        private Api.ITabSnapshot snapshot;
+        private Api.ActiveState activeState;
         private bool restoring;
 
-        private TabVM(IWindow window, ITabWorkspace workspace)
+        private TabVM(Api.IWindow window, Api.ITabWorkspace workspace)
         {
             this.window = window;
             this.workspace = workspace;
         }
 
-        public TabVM(IWindow window, ITabWorkspace workspace, ITab tab)
+        public TabVM(Api.IWindow window, Api.ITabWorkspace workspace, Api.ITab tab)
             : this(window, workspace)
         {
             this.InitTab(tab);
         }
 
-        public TabVM(IWindow window, ITabWorkspace workspace, ITabSnapshot snapshot)
+        public TabVM(Api.IWindow window, Api.ITabWorkspace workspace, Api.ITabSnapshot snapshot)
             : this(window, workspace)
         {
             this.snapshot = snapshot;
@@ -55,7 +53,7 @@ namespace DevPrompt.Api
             }
         }
 
-        private void InitTab(ITab tab)
+        private void InitTab(Api.ITab tab)
         {
             Debug.Assert(this.tab == null || this.tab == tab);
             if (this.tab == null)
@@ -70,29 +68,35 @@ namespace DevPrompt.Api
                 this.OnPropertyChanged(nameof(this.Tab));
                 this.OnPropertyChanged(nameof(this.Name));
                 this.OnPropertyChanged(nameof(this.Tooltip));
+                this.OnPropertyChanged(nameof(this.ContextMenuItems));
             }
         }
 
         private void OnTabPropertyChanged(object sender, PropertyChangedEventArgs args)
         {
-            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(ITab.Name))
+            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.ITab.Name))
             {
                 this.OnPropertyChanged(nameof(this.Name));
             }
 
-            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(ITab.Title))
+            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.ITab.Title))
             {
                 this.OnPropertyChanged(nameof(this.Title));
             }
 
-            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(ITab.Tooltip))
+            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.ITab.Tooltip))
             {
                 this.OnPropertyChanged(nameof(this.Tooltip));
             }
 
-            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(ITab.ViewElement))
+            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.ITab.ViewElement))
             {
                 this.OnPropertyChanged(nameof(this.ViewElement));
+            }
+
+            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.ITab.ContextMenuItems))
+            {
+                this.OnPropertyChanged(nameof(this.ContextMenuItems));
             }
         }
 
@@ -150,7 +154,7 @@ namespace DevPrompt.Api
             }
         }
 
-        public ITabSnapshot Snapshot
+        public Api.ITabSnapshot Snapshot
         {
             get
             {
@@ -158,13 +162,13 @@ namespace DevPrompt.Api
             }
         }
 
-        public ITab Tab
+        public Api.ITab Tab
         {
             get
             {
                 if (this.tab == null && this.snapshot != null)
                 {
-                    ITabSnapshot snapshot = this.snapshot;
+                    Api.ITabSnapshot snapshot = this.snapshot;
                     this.snapshot = null;
 
                     try
@@ -182,7 +186,7 @@ namespace DevPrompt.Api
             }
         }
 
-        public ActiveState ActiveState
+        public Api.ActiveState ActiveState
         {
             get
             {
@@ -193,7 +197,7 @@ namespace DevPrompt.Api
             {
                 if (this.SetPropertyValue(ref this.activeState, value))
                 {
-                    if (this.activeState == ActiveState.Hidden)
+                    if (this.activeState == Api.ActiveState.Hidden)
                     {
                         this.Tab?.OnHiding();
                     }
@@ -220,7 +224,7 @@ namespace DevPrompt.Api
 
         public ICommand CloseAllButThisCommand => new DelegateCommand(() =>
         {
-            foreach (ITabVM tab in this.workspace.Tabs.ToArray())
+            foreach (ITabVM tab in this.workspace.Tabs.OfType<ITabVM>().ToArray())
             {
                 if (tab != this && tab.CloseCommand != null && tab.CloseCommand.CanExecute(null))
                 {
@@ -234,7 +238,7 @@ namespace DevPrompt.Api
             this.Tab?.Focus();
         }
 
-        public bool TakeRestoredTab(ITab tab)
+        public bool TakeRestoredTab(Api.ITab tab)
         {
             // There can only be one tab restoring at a time
             if (this.restoring)

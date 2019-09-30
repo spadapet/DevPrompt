@@ -1,8 +1,6 @@
-﻿using System.ComponentModel;
-
-namespace DevPrompt.Api
+﻿namespace DevPrompt.Api
 {
-    public interface IConsoleSettings : INotifyPropertyChanged
+    public interface IConsoleSettings
     {
         string TabName { get; }
         string Executable { get; }

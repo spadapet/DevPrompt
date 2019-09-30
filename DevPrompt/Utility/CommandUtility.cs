@@ -13,9 +13,9 @@ namespace DevPrompt.Utility
         public const string SeparatorName = "Separator";
         private const string NewItemPlaceholder = "{NewItemPlaceholder}";
 
-        public static Api.DelegateCommand CreateMoveUpCommand<T>(Func<DataGrid> dataGridAccessor, ObservableCollection<T> items)
+        public static DelegateCommand CreateMoveUpCommand<T>(Func<DataGrid> dataGridAccessor, ObservableCollection<T> items)
         {
-            return new Api.DelegateCommand(() =>
+            return new DelegateCommand(() =>
             {
                 DataGrid dataGrid = dataGridAccessor();
 
@@ -31,9 +31,9 @@ namespace DevPrompt.Utility
             });
         }
 
-        public static Api.DelegateCommand CreateMoveDownCommand<T>(Func<DataGrid> dataGridAccessor, ObservableCollection<T> items)
+        public static DelegateCommand CreateMoveDownCommand<T>(Func<DataGrid> dataGridAccessor, ObservableCollection<T> items)
         {
-            return new Api.DelegateCommand(() =>
+            return new DelegateCommand(() =>
             {
                 DataGrid dataGrid = dataGridAccessor();
                 if (dataGrid.SelectedIndex >= 0 && dataGrid.SelectedIndex + 1 < items.Count)
@@ -48,9 +48,9 @@ namespace DevPrompt.Utility
             });
         }
 
-        public static Api.DelegateCommand CreateDeleteCommand<T>(Func<DataGrid> dataGridAccessor, ObservableCollection<T> items, Func<T, bool> readOnlyFunc = null)
+        public static DelegateCommand CreateDeleteCommand<T>(Func<DataGrid> dataGridAccessor, ObservableCollection<T> items, Func<T, bool> readOnlyFunc = null)
         {
-            return new Api.DelegateCommand(() =>
+            return new DelegateCommand(() =>
             {
                 DataGrid dataGrid = dataGridAccessor();
                 int i = dataGrid.SelectedIndex;
@@ -76,9 +76,9 @@ namespace DevPrompt.Utility
             });
         }
 
-        public static Api.DelegateCommand CreateResetCommand<T>(Func<AppSettings, IList<T>> newListAccessor, ObservableCollection<T> items, AppSettings.DefaultSettingsFilter filter)
+        public static DelegateCommand CreateResetCommand<T>(Func<AppSettings, IList<T>> newListAccessor, ObservableCollection<T> items, AppSettings.DefaultSettingsFilter filter)
         {
-            return new Api.DelegateCommand(async () =>
+            return new DelegateCommand(async () =>
             {
                 AppSettings defaultSettings = await AppSettings.GetDefaultSettings(filter);
                 IList<T> newList = newListAccessor(defaultSettings);
@@ -92,11 +92,11 @@ namespace DevPrompt.Utility
             });
         }
 
-        public static void UpdateCommands(Dispatcher dispatcher, params Api.DelegateCommand[] commands)
+        public static void UpdateCommands(Dispatcher dispatcher, params DelegateCommand[] commands)
         {
             Action action = () =>
             {
-                foreach (Api.DelegateCommand command in commands ?? new Api.DelegateCommand[0])
+                foreach (DelegateCommand command in commands ?? new DelegateCommand[0])
                 {
                     command.UpdateCanExecute();
                 }

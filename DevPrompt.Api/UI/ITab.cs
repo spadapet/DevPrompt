@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Input;
 
 namespace DevPrompt.Api
 {
@@ -16,21 +16,11 @@ namespace DevPrompt.Api
         string Title { get; }
         UIElement ViewElement { get; }
         ITabSnapshot Snapshot { get; }
+        IEnumerable<FrameworkElement> ContextMenuItems { get; }
 
         void Focus();
         void OnShowing();
         void OnHiding();
-
-        /// <summary>
-        /// Return false to prevent RemoveTab from being called
-        /// </summary>
-        bool OnClosing();
-
-        // Tab context menu commands. Any of them can return null if the command doesn't make sense.
-        ICommand CloneCommand { get; }
-        ICommand DetachCommand { get; }
-        ICommand DefaultsCommand { get; }
-        ICommand PropertiesCommand { get; }
-        ICommand SetTabNameCommand { get; }
+        bool OnClosing(); // Return false to prevent RemoveTab from being called
     }
 }

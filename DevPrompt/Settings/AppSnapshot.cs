@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DevPrompt.UI.ViewModels;
+using DevPrompt.Utility;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -13,7 +15,7 @@ namespace DevPrompt.Settings
     /// Saves the state of the app during shutdown so it can be restored on startup
     /// </summary>
     [DataContract]
-    internal class AppSnapshot : Api.PropertyNotifier
+    internal class AppSnapshot : PropertyNotifier
     {
         private ObservableCollection<WorkspaceSnapshot> workspaces;
         private Guid activeWorkspaceId;
@@ -62,7 +64,7 @@ namespace DevPrompt.Settings
 
         private void TakeSnapshot(Api.IWindow window)
         {
-            foreach (Api.IWorkspaceVM workspace in window.Workspaces)
+            foreach (IWorkspaceVM workspace in window.Workspaces.OfType<IWorkspaceVM>())
             {
                 if (workspace.Snapshot is Api.IWorkspaceSnapshot workspaceSnapshot)
                 {

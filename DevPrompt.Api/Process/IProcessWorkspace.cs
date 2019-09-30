@@ -4,10 +4,14 @@
     {
         IProcessHost ProcessHost { get; }
 
-        ITabVM FindTab(IProcess process);
-        ITabVM RunProcess(IConsoleSettings settings);
-        ITabVM RunProcess(string executable, string arguments, string startingDirectory, string tabName);
-        ITabVM RestoreProcess(string state, string tabName);
-        ITabVM CloneProcess(ITab tab, string tabName);
+        ITabHolder FindTab(IProcess process);
+        ITabHolder RunProcess(IConsoleSettings settings);
+        ITabHolder RunProcess(string executable, string arguments, string startingDirectory, string tabName);
+        ITabHolder RestoreProcess(string state, string tabName);
+        ITabHolder CloneProcess(ITab tab, string tabName);
+
+        void SetActiveTabName();
+        void DetachActiveTab();
+        void CloneActiveTab();
     }
 }

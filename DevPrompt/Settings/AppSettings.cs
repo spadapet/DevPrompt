@@ -17,7 +17,7 @@ namespace DevPrompt.Settings
     /// Saves/loads application settings
     /// </summary>
     [DataContract]
-    internal class AppSettings : Api.PropertyNotifier, INotifyCollectionChanged, Api.IAppSettings
+    internal class AppSettings : PropertyNotifier, INotifyCollectionChanged, Api.IAppSettings
     {
         public event NotifyCollectionChangedEventHandler CollectionChanged;
         public ObservableCollection<ConsoleSettings> ObservableConsoles { get; private set; }

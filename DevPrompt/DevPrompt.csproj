@@ -70,6 +70,7 @@
     <Compile Include="Plugins\InstalledPluginInfo.cs" />
     <Compile Include="Settings\NuGetPluginSettings.cs" />
     <Compile Include="Settings\PluginDirectorySettings.cs" />
+    <Compile Include="Settings\TabWorkspaceSnapshot.cs" />
     <Compile Include="Settings\WorkspaceSnapshot.cs" />
     <Compile Include="Settings\AppSnapshot.cs" />
     <Compile Include="Settings\GrabConsoleSettings.cs" />
@@ -122,6 +123,8 @@
     </Compile>
     <Compile Include="ProcessWorkspace\ProcessTab.cs" />
     <Compile Include="UI\ViewModels\InstallBranchDialogVM.cs" />
+    <Compile Include="UI\ViewModels\ITabVM.cs" />
+    <Compile Include="UI\ViewModels\IWorkspaceVM.cs" />
     <Compile Include="UI\ViewModels\NuGetPluginVM.cs" />
     <Compile Include="UI\ViewModels\IPluginVM.cs" />
     <Compile Include="UI\ViewModels\PluginSettingsControlVM.cs" />
@@ -129,10 +132,13 @@
     <Compile Include="UI\ViewModels\SettingsDialogVM.cs" />
     <Compile Include="UI\ViewModels\SettingsImportDialogVM.cs" />
     <Compile Include="UI\ViewModels\TabNameDialogVM.cs" />
+    <Compile Include="UI\ViewModels\TabVM.cs" />
+    <Compile Include="UI\ViewModels\WorkspaceVM.cs" />
     <Compile Include="Utility\Converters\BoolToNegativeConverter.cs" />
     <Compile Include="Utility\Converters\DelegateConverter.cs" />
     <Compile Include="Utility\Converters\DelegateMultiConverter.cs" />
     <Compile Include="Utility\Converters\StringToVisibilityConverter.cs" />
+    <Compile Include="Utility\DelegateCommand.cs" />
     <Compile Include="Utility\HashUtility.cs" />
     <Compile Include="Utility\HttpClientHelper.cs" />
     <Compile Include="Utility\NuGet\NuGetPackageVersionInfo.cs" />
@@ -147,6 +153,7 @@
     <Compile Include="Utility\Converters\ActiveToBoolConverter.cs" />
     <Compile Include="Utility\Converters\ObjectToVisibilityConverter.cs" />
     <Compile Include="Settings\AppSettings.cs" />
+    <Compile Include="Utility\PropertyNotifier.cs" />
     <Compile Include="Utility\VisualStudioSetup.cs" />
     <Compile Include="Utility\WpfUtility.cs" />
     <Page Include="ProcessWorkspace\ProcessWorkspaceControl.xaml">

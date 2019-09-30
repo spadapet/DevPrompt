@@ -4,10 +4,11 @@ namespace DevPrompt.Api
 {
     public interface ITabWorkspace : IWorkspace
     {
-        IEnumerable<ITabVM> Tabs { get; }
-        ITabVM ActiveTab { get; set; }
-        void AddTab(ITabVM tab, bool activate);
-        void RemoveTab(ITabVM tab);
+        IEnumerable<ITabHolder> Tabs { get; }
+        ITabHolder ActiveTab { get; set; }
+        ITabHolder AddTab(ITab tab, bool activate);
+        ITabHolder AddTab(ITabSnapshot snapshot, bool activate);
+        void RemoveTab(ITabHolder tab);
 
         void TabCycleStop();
         void TabCycleNext();

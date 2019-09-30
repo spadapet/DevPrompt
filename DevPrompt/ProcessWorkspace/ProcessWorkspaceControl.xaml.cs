@@ -1,4 +1,5 @@
 ﻿using DevPrompt.UI.Controls;
+using DevPrompt.UI.ViewModels;
 using DevPrompt.Utility;
 using System.Windows;
 using System.Windows.Controls;
@@ -58,7 +59,7 @@ namespace DevPrompt.ProcessWorkspace
 
         private void OnTabButtonMouseDown(object sender, MouseButtonEventArgs args)
         {
-            if (args.ChangedButton == MouseButton.Middle && sender is Button button && button.DataContext is Api.ITabVM tab)
+            if (args.ChangedButton == MouseButton.Middle && sender is Button button && button.DataContext is ITabVM tab)
             {
                 tab.CloseCommand?.SafeExecute();
             }
@@ -96,6 +97,14 @@ namespace DevPrompt.ProcessWorkspace
             }
         }
 
+        private void OnTabContextMenuOpened(object sender, RoutedEventArgs args)
+        {
+            if (sender is ContextMenu menu)
+            {
+                this.ViewModel.UpdateContextMenu(menu);
+            }
+        }
+
         private void OnTabContextMenuClosed(object sender, RoutedEventArgs args)
         {
             if (sender is ContextMenu menu)
@@ -105,9 +114,17 @@ namespace DevPrompt.ProcessWorkspace
             }
         }
 
+        private void OnTabButtonContextMenuOpening(object sender, ContextMenuEventArgs args)
+        {
+            if (sender is Button button)
+            {
+                this.ViewModel.EnsureTab(button);
+            }
+        }
+
         void DragItemsControl.IDragHost.OnDrop(ItemsControl source, object droppedModel, int droppedIndex, bool copy)
         {
-            if (source == this.tabItemsControl && droppedModel is Api.ITabVM tab)
+            if (source == this.tabItemsControl && droppedModel is ITabVM tab)
             {
                 this.ViewModel.OnDrop(tab, droppedIndex, copy);
             }
@@ -118,7 +135,7 @@ namespace DevPrompt.ProcessWorkspace
         /// </summary>
         bool DragItemsControl.IDragHost.CanDropCopy(object droppedModel)
         {
-            return droppedModel is Api.ITabVM tab && tab.CloneCommand?.CanExecute(null) == true;
+            return (droppedModel is ITabVM tab) && (tab.Tab is ProcessTab);
         }
     }
 }

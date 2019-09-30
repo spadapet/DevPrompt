@@ -1,15 +1,17 @@
 ﻿using DevPrompt.ProcessWorkspace;
+using DevPrompt.Utility;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Input;
+using System.Windows.Controls;
 
 namespace DevPrompt.UI.ViewModels
 {
     /// <summary>
     /// View model for each process tab (handles context menu items, etc)
     /// </summary>
-    internal class ProcessTab : Api.PropertyNotifier, Api.ITab, IDisposable
+    internal class ProcessTab : PropertyNotifier, Api.ITab, IDisposable
     {
         public Guid Id => Guid.Empty;
         public string Name => this.Process.ExpandEnvironmentVariables(this.RawName);
@@ -98,37 +100,80 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
-        public ICommand CloneCommand => new Api.DelegateCommand(() =>
-        {
-            this.workspace.CloneProcess(this, this.RawName);
-        });
-
-        public ICommand DetachCommand => new Api.DelegateCommand(() =>
-        {
-            this.Process.Detach();
-        });
-
-        public ICommand DefaultsCommand => new Api.DelegateCommand(() =>
-        {
-            this.Process.RunCommand(Api.ProcessCommand.DefaultsDialog);
-        });
-
-        public ICommand PropertiesCommand => new Api.DelegateCommand(() =>
-        {
-            this.Process.RunCommand(Api.ProcessCommand.PropertiesDialog);
-        });
-
-        public ICommand SetTabNameCommand => new Api.DelegateCommand(() =>
+        public void SetTabNameCommand()
         {
             TabNameDialog dialog = new TabNameDialog(this.RawName)
             {
-                Owner = this.window.Window
+                Owner = Application.Current.MainWindow
             };
 
             if (dialog.ShowDialog() == true)
             {
                 this.RawName = dialog.TabName;
             }
-        });
+        }
+
+        public void CloneCommand()
+        {
+            this.workspace.CloneProcess(this, this.RawName);
+        }
+
+        public void DetachCommand()
+        {
+            this.Process.Detach();
+        }
+
+        public void DefaultsCommand()
+        {
+            this.Process.RunCommand(Api.ProcessCommand.DefaultsDialog);
+        }
+
+        public void PropertiesCommand()
+        {
+            this.Process.RunCommand(Api.ProcessCommand.PropertiesDialog);
+        }
+
+        public IEnumerable<FrameworkElement> ContextMenuItems
+        {
+            get
+            {
+                yield return new MenuItem()
+                {
+                    Header = "_Set tab name...",
+                    InputGestureText = "Ctrl+Shift+T",
+                    Command = new DelegateCommand(this.SetTabNameCommand),
+                };
+
+                yield return new Separator();
+
+                yield return new MenuItem()
+                {
+                    Header = "_Clone",
+                    InputGestureText = "Ctrl+T",
+                    Command = new DelegateCommand(this.CloneCommand),
+                };
+
+                yield return new MenuItem()
+                {
+                    Header = "Console _Defaults",
+                    Command = new DelegateCommand(this.DefaultsCommand),
+                };
+
+                yield return new MenuItem()
+                {
+                    Header = "Console _Properties",
+                    Command = new DelegateCommand(this.PropertiesCommand),
+                };
+
+                yield return new Separator();
+
+                yield return new MenuItem()
+                {
+                    Header = "D_etach",
+                    InputGestureText = "Ctrl+Shift+F4",
+                    Command = new DelegateCommand(this.DetachCommand),
+                };
+            }
+        }
     }
 }

@@ -34,7 +34,7 @@ namespace DevPrompt.ProcessWorkspace
                         RawName = this.app.Settings.GetDefaultTabName(path)
                     };
 
-                    Api.ITabVM tabVM = workspace.Tabs.FirstOrDefault(t => t.TakeRestoredTab(tab));
+                    ITabVM tabVM = workspace.Tabs.OfType<ITabVM>().FirstOrDefault(t => t.TakeRestoredTab(tab));
                     if (tabVM != null)
                     {
                         if (activate)
@@ -45,7 +45,7 @@ namespace DevPrompt.ProcessWorkspace
                     else
                     {
                         // No takers, so make a new tab
-                        workspace.AddTab(new Api.TabVM(window, workspace, tab), activate || !workspace.Tabs.Any());
+                        workspace.AddTab(tab, activate || !workspace.Tabs.Any());
                     }
 
                     break;
@@ -59,7 +59,7 @@ namespace DevPrompt.ProcessWorkspace
             {
                 Api.IProcessWorkspace workspace = pair.Item2;
 
-                if (workspace.FindTab(process) is Api.ITabVM tab)
+                if (workspace.FindTab(process) is ITabVM tab)
                 {
                     workspace.RemoveTab(tab);
                     break;
@@ -73,9 +73,9 @@ namespace DevPrompt.ProcessWorkspace
             {
                 foreach (Api.IWindow window in this.app.Windows)
                 {
-                    foreach (Api.IWorkspaceVM vm in window.Workspaces)
+                    foreach (Api.IWorkspaceHolder workspaceHolder in window.Workspaces)
                     {
-                        if (vm.Id == Api.Constants.ProcessWorkspaceId && vm.Workspace is Api.IProcessWorkspace workspace)
+                        if (workspaceHolder.Id == Api.Constants.ProcessWorkspaceId && workspaceHolder.Workspace is Api.IProcessWorkspace workspace)
                         {
                             yield return Tuple.Create(window, workspace);
                         }

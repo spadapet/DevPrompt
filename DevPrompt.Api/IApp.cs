@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows.Threading;
 
 namespace DevPrompt.Api
 {
@@ -10,8 +9,8 @@ namespace DevPrompt.Api
     public interface IApp
     {
         IAppSettings Settings { get; }
+        IWindow ActiveWindow { get; }
         IEnumerable<IWindow> Windows { get; }
-        Dispatcher Dispatcher { get; }
 
         bool IsElevated { get; }
         bool IsMainProcess { get; }
@@ -20,5 +19,6 @@ namespace DevPrompt.Api
         IEnumerable<GrabProcess> GrabProcesses { get; }
         void GrabProcess(int id);
         IProcessHost CreateProcessHost(IntPtr parentHwnd);
+        void RunExternalProcess(string path, string arguments = null);
     }
 }

@@ -6,11 +6,7 @@ using System.Threading.Tasks;
 
 namespace DevPrompt.Utility
 {
-    /// <summary>
-    /// One shared HttpClient across the process, imported by plugins using Api.IHttpClient
-    /// Exported as a singleton from Plugins/ExportProvider.cs since the instance is owned by the App
-    /// </summary>
-    internal class HttpClientHelper : Api.IHttpClient, IDisposable
+    internal class HttpClientHelper : IDisposable
     {
         public HttpClient Client { get; }
 

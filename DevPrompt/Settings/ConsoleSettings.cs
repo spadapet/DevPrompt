@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DevPrompt.Utility;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace DevPrompt.Settings
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{MenuName}")]
-    internal class ConsoleSettings : Api.PropertyNotifier, Api.IConsoleSettings
+    internal class ConsoleSettings : PropertyNotifier, Api.IConsoleSettings
     {
         string Api.IConsoleSettings.TabName => this.TabName;
         string Api.IConsoleSettings.Executable => this.Executable;

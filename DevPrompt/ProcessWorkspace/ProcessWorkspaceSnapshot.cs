@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using DevPrompt.Settings;
+using System.Runtime.Serialization;
 
 namespace DevPrompt.ProcessWorkspace
 {
@@ -6,7 +7,7 @@ namespace DevPrompt.ProcessWorkspace
     /// Saves the state of a process workspace during shutdown so it can be restored on startup
     /// </summary>
     [DataContract]
-    internal class ProcessWorkspaceSnapshot : Api.TabWorkspaceSnapshot, Api.IWorkspaceSnapshot
+    internal class ProcessWorkspaceSnapshot : TabWorkspaceSnapshot, Api.IWorkspaceSnapshot
     {
         internal ProcessWorkspaceSnapshot(ProcessWorkspace workspace)
             : base(workspace)

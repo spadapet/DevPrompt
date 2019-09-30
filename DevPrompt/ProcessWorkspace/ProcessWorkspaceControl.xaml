@@ -7,7 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:controls="clr-namespace:DevPrompt.UI.Controls"
     xmlns:convert="clr-namespace:DevPrompt.Utility.Converters"
-    xmlns:api="dev://DevPrompt.Api"
+    xmlns:vm="clr-namespace:DevPrompt.UI.ViewModels"
     mc:Ignorable="d"
     d:DesignHeight="450" d:DesignWidth="800"
     DataContext="{Binding ViewModel, RelativeSource={RelativeSource Mode=Self}}">
@@ -33,7 +33,7 @@
             </ControlTemplate.Triggers>
         </ControlTemplate>
 
-        <DataTemplate x:Key="TabButtonContentTemplate" DataType="{x:Type api:ITabVM}">
+        <DataTemplate x:Key="TabButtonContentTemplate" DataType="{x:Type vm:ITabVM}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" MinWidth="48" />
@@ -72,7 +72,7 @@
             </DataTemplate.Triggers>
         </DataTemplate>
 
-        <DataTemplate x:Key="TabItemTemplate" DataType="{x:Type api:ITabVM}">
+        <DataTemplate x:Key="TabItemTemplate" DataType="{x:Type vm:ITabVM}">
             <Button
                 x:Name="RootButton"
                 Selector.IsSelected="{Binding ActiveState, Mode=OneWay, Converter={StaticResource VisibleToBool}}"
@@ -83,6 +83,7 @@
                 LostMouseCapture="OnTabButtonMouseCaptureEvent"
                 Loaded="OnTabButtonLoaded"
                 Unloaded="OnTabButtonUnloaded"
+                ContextMenuOpening="OnTabButtonContextMenuOpening"
                 Padding="0"
                 BorderThickness="1,1,1,0"
                 Focusable="False"
@@ -94,14 +95,8 @@
                 HorizontalContentAlignment="Stretch"
                 ContentTemplate="{StaticResource TabButtonContentTemplate}">
                 <Button.ContextMenu>
-                    <ContextMenu Closed="OnTabContextMenuClosed">
-                        <MenuItem Header="_Set tab name..." InputGestureText="Ctrl+Shift+T" Command="{Binding SetTabNameCommand}" Visibility="{Binding SetTabNameCommand, Converter={StaticResource ObjectToVisibility}}" />
-                        <Separator />
-                        <MenuItem Header="_Clone" InputGestureText="Ctrl+T" Command="{Binding CloneCommand}" Visibility="{Binding CloneCommand, Converter={StaticResource ObjectToVisibility}}" />
-                        <MenuItem Header="Console _Defaults" Command="{Binding DefaultsCommand}" Visibility="{Binding DefaultsCommand, Converter={StaticResource ObjectToVisibility}}" />
-                        <MenuItem Header="Console _Properties" Command="{Binding PropertiesCommand}" Visibility="{Binding PropertiesCommand, Converter={StaticResource ObjectToVisibility}}" />
-                        <Separator />
-                        <MenuItem Header="D_etach" InputGestureText="Ctrl+Shift+F4" Command="{Binding DetachCommand}" Visibility="{Binding DetachCommand, Converter={StaticResource ObjectToVisibility}}" />
+                    <ContextMenu Opened="OnTabContextMenuOpened" Closed="OnTabContextMenuClosed">
+                        <Separator Tag="[Plugins]" Visibility="Collapsed" />
                         <MenuItem Header="C_lose" InputGestureText="Ctrl+F4" Command="{Binding CloseCommand}" Visibility="{Binding CloseCommand, Converter={StaticResource ObjectToVisibility}}" />
                         <MenuItem Header="Close All But This" Command="{Binding CloseAllButThisCommand}" Visibility="{Binding CloseAllButThisCommand, Converter={StaticResource ObjectToVisibility}}" />
                     </ContextMenu>

@@ -1,4 +1,7 @@
-﻿using System;
+﻿using DevPrompt.UI.ViewModels;
+using DevPrompt.Utility;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,7 +13,7 @@ namespace DevPrompt.UI.DesignerViewModels
     /// <summary>
     /// Sample data for the XAML designer
     /// </summary>
-    internal class TabDesignerVM : Api.ITabVM, Api.ITab
+    internal class TabDesignerVM : ITabVM, Api.ITab
     {
         public event PropertyChangedEventHandler PropertyChanged { add { } remove { } }
 
@@ -21,16 +24,12 @@ namespace DevPrompt.UI.DesignerViewModels
         public bool CreatedTab => true;
         public Api.ITab Tab => this;
         public Api.ITabSnapshot Snapshot => null;
+        public IEnumerable<FrameworkElement> ContextMenuItems => null;
         public Api.ActiveState ActiveState { get; set; }
 
-        public ICommand ActivateCommand => new Api.DelegateCommand();
-        public ICommand CloseCommand => new Api.DelegateCommand();
-        public ICommand CloseAllButThisCommand => new Api.DelegateCommand();
-        public ICommand CloneCommand => new Api.DelegateCommand();
-        public ICommand DetachCommand => new Api.DelegateCommand();
-        public ICommand DefaultsCommand => new Api.DelegateCommand();
-        public ICommand PropertiesCommand => new Api.DelegateCommand();
-        public ICommand SetTabNameCommand => new Api.DelegateCommand();
+        public ICommand ActivateCommand => new DelegateCommand();
+        public ICommand CloseCommand => new DelegateCommand();
+        public ICommand CloseAllButThisCommand => new DelegateCommand();
 
         public TabDesignerVM(Api.ActiveState activeState = Api.ActiveState.Hidden)
         {

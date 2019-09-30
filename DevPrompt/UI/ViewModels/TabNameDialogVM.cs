@@ -1,10 +1,11 @@
-﻿
+﻿using DevPrompt.Utility;
+
 namespace DevPrompt.UI.ViewModels
 {
     /// <summary>
     /// View model for the tab name dialog
     /// </summary>
-    internal class TabNameDialogVM : Api.PropertyNotifier
+    internal class TabNameDialogVM : PropertyNotifier
     {
         private string name;
 
