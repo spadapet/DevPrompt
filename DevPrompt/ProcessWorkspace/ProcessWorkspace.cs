@@ -43,7 +43,7 @@ namespace DevPrompt.ProcessWorkspace
         {
             public Button Button { get; }
             public ContextMenu ContextMenu => this.Button.ContextMenu;
-            public ITabVM Tab => (ITabVM)this.Button.DataContext;
+            public ITabVM Tab => this.Button.DataContext as ITabVM;
             public bool ContextMenuUpdated { get; set; }
 
             public ButtonInfo(Button button)
