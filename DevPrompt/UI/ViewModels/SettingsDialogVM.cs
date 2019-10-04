@@ -1,4 +1,5 @@
-﻿using DevPrompt.Settings;
+﻿using DevPrompt.ProcessWorkspace.Utility;
+using DevPrompt.Settings;
 using DevPrompt.UI.Settings;
 using DevPrompt.Utility;
 using Microsoft.Win32;

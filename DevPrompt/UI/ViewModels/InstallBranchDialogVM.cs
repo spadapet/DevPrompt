@@ -1,4 +1,4 @@
-﻿using DevPrompt.Utility;
+﻿using DevPrompt.ProcessWorkspace.Utility;
 using System.Windows.Input;
 
 namespace DevPrompt.UI.ViewModels

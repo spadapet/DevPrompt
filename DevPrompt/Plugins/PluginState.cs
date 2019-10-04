@@ -1,4 +1,5 @@
 ﻿using DevPrompt.Interop;
+using DevPrompt.ProcessWorkspace.Utility;
 using DevPrompt.Settings;
 using System;
 using System.Collections.Generic;
@@ -214,9 +215,8 @@ namespace DevPrompt.Plugins
             return compositionHost;
         }
 
-        private static PluginSource CreateBuiltInPluginSource()
+        private static PluginSource CreatePluginSource(Assembly assembly)
         {
-            Assembly assembly = Assembly.GetExecutingAssembly();
             AssemblyName assemblyName = assembly.GetName();
 
             InstalledPluginInfo pluginInfo = new InstalledPluginInfo()
@@ -290,10 +290,13 @@ namespace DevPrompt.Plugins
         private static async Task<IEnumerable<PluginSource>> LoadPlugins(IEnumerable<PluginDirectorySettings> pluginDirectories, IEnumerable<NuGetPluginSettings> nugetPlugins)
         {
             // The app itself is always a plugin
-            HashSet<PluginSource> plugins = new HashSet<PluginSource>(new PluginSourceComparer())
+            PluginSource[] defaultPlugins = new PluginSource[]
             {
-                PluginState.CreateBuiltInPluginSource(),
+                PluginState.CreatePluginSource(Assembly.GetExecutingAssembly()),
+                PluginState.CreatePluginSource(typeof(PropertyNotifier).Assembly),
             };
+
+            HashSet<PluginSource> plugins = new HashSet<PluginSource>(new PluginSourceComparer());
 
             // Users can force specific plugins from the command line
             string[] args = Environment.GetCommandLineArgs();
@@ -350,7 +353,7 @@ namespace DevPrompt.Plugins
                 }
             }
 
-            return plugins;
+            return Enumerable.Concat(defaultPlugins, plugins);
         }
 
         private static IEnumerable<Assembly> LoadAssemblies(string path, bool recursive)

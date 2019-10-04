@@ -1,5 +1,5 @@
-﻿using DevPrompt.Settings;
-using DevPrompt.Utility;
+﻿using DevPrompt.ProcessWorkspace.Utility;
+using DevPrompt.Settings;
 using System;
 using System.Collections.Generic;
 
@@ -15,7 +15,6 @@ namespace DevPrompt.UI.ViewModels
         private int grabIndex;
         private int linksIndex;
         private int toolsIndex;
-        private int pluginsIndex;
         public IList<string> ImportChoices { get; }
 
         public SettingsImportDialogVM(AppSettings settings)
@@ -23,9 +22,9 @@ namespace DevPrompt.UI.ViewModels
             this.settings = settings;
             this.ImportChoices = new string[]
                 {
-                    "Replace existing",
-                    "Add to existing",
-                    "Do not import",
+                    Resources.ImportDialog_ChoiceReplace,
+                    Resources.ImportDialog_ChoiceAdd,
+                    Resources.ImportDialog_ChoiceNone,
                 };
         }
 
@@ -53,12 +52,6 @@ namespace DevPrompt.UI.ViewModels
         {
             get => this.toolsIndex;
             set => this.SetPropertyValue(ref this.toolsIndex, this.FilterIndex(value));
-        }
-
-        public int PluginsIndex
-        {
-            get => this.pluginsIndex;
-            set => this.SetPropertyValue(ref this.pluginsIndex, this.FilterIndex(value));
         }
 
         public void Import(AppSettings targetSettings)
@@ -112,19 +105,6 @@ namespace DevPrompt.UI.ViewModels
                 foreach (ToolSettings setting in this.settings.Tools)
                 {
                     targetSettings.Tools.Add(setting.Clone());
-                }
-            }
-
-            if (this.PluginsIndex == 0)
-            {
-                targetSettings.UserPluginDirectories.Clear();
-            }
-
-            if (this.PluginsIndex != 2)
-            {
-                foreach (PluginDirectorySettings setting in this.settings.UserPluginDirectories)
-                {
-                    targetSettings.UserPluginDirectories.Add(setting.Clone());
                 }
             }
 

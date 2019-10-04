@@ -30,6 +30,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{DE8BCE73
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DevPrompt.NetCoreApi", "DevPrompt.Api\DevPrompt.NetCoreApi.csproj", "{3E7746CA-EA29-452A-B334-94623FD1C2AC}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DevPrompt.NetCoreProcessWorkspace", "DevPrompt.ProcessWorkspace\DevPrompt.NetCoreProcessWorkspace.csproj", "{46718C8B-D308-4B2B-8343-F66B4792520F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -78,6 +80,14 @@ Global
 		{3E7746CA-EA29-452A-B334-94623FD1C2AC}.Release|x64.Build.0 = Release|x64
 		{3E7746CA-EA29-452A-B334-94623FD1C2AC}.Release|x86.ActiveCfg = Release|x86
 		{3E7746CA-EA29-452A-B334-94623FD1C2AC}.Release|x86.Build.0 = Release|x86
+		{46718C8B-D308-4B2B-8343-F66B4792520F}.Debug|x64.ActiveCfg = Debug|x64
+		{46718C8B-D308-4B2B-8343-F66B4792520F}.Debug|x64.Build.0 = Debug|x64
+		{46718C8B-D308-4B2B-8343-F66B4792520F}.Debug|x86.ActiveCfg = Debug|x86
+		{46718C8B-D308-4B2B-8343-F66B4792520F}.Debug|x86.Build.0 = Debug|x86
+		{46718C8B-D308-4B2B-8343-F66B4792520F}.Release|x64.ActiveCfg = Release|x64
+		{46718C8B-D308-4B2B-8343-F66B4792520F}.Release|x64.Build.0 = Release|x64
+		{46718C8B-D308-4B2B-8343-F66B4792520F}.Release|x86.ActiveCfg = Release|x86
+		{46718C8B-D308-4B2B-8343-F66B4792520F}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

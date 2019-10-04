@@ -1,4 +1,5 @@
-﻿using DevPrompt.UI.ViewModels;
+﻿using DevPrompt.ProcessWorkspace.UI.ViewModels;
+using DevPrompt.UI.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Composition;

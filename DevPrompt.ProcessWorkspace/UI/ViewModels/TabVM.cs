@@ -1,4 +1,4 @@
-﻿using DevPrompt.Utility;
+﻿using DevPrompt.ProcessWorkspace.Utility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,12 +7,9 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
-namespace DevPrompt.UI.ViewModels
+namespace DevPrompt.ProcessWorkspace.UI.ViewModels
 {
-    /// <summary>
-    /// View model to wrap Api.ITab model
-    /// </summary>
-    public class TabVM : PropertyNotifier, ITabVM
+    internal class TabVM : PropertyNotifier, ITabVM
     {
         public string Title => this.Tab?.Title ?? string.Empty;
         public UIElement ViewElement => this.Tab?.ViewElement;
@@ -226,9 +223,9 @@ namespace DevPrompt.UI.ViewModels
         {
             foreach (ITabVM tab in this.workspace.Tabs.OfType<ITabVM>().ToArray())
             {
-                if (tab != this && tab.CloseCommand != null && tab.CloseCommand.CanExecute(null))
+                if (tab != this && tab.CloseCommand is ICommand command && command.CanExecute(null))
                 {
-                    tab.CloseCommand.Execute(null);
+                    command.Execute(null);
                 }
             }
         });

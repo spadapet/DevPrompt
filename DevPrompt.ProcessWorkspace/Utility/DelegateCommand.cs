@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace DevPrompt.Utility
+namespace DevPrompt.ProcessWorkspace.Utility
 {
     public class DelegateCommand : PropertyNotifier, ICommand
     {

@@ -17,6 +17,7 @@
                 <File Source="$(var.Bin32)DevInject32.dll" />
                 <File Source="$(var.Bin32)DevNative32.dll" />
                 <File Source="$(var.Bin64)DevPrompt.Api.dll" />
+                <File Source="$(var.Bin64)DevPrompt.ProcessWorkspace.dll" />
                 <File Source="$(var.Bin64)DevPrompt.exe" />
                 <File Source="$(var.Bin64)DevPrompt.exe.config" />
 

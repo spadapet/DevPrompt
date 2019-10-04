@@ -4,8 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DevPrompt"
         mc:Ignorable="d"
-        Title="About DevPrompt" Width="375" Height="250"
+        Title="{x:Static local:Resources.About_Title}" Width="375" Height="250"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         ShowInTaskbar="False"
@@ -29,8 +30,8 @@
         <StackPanel Grid.Column="1" Margin="10" HorizontalAlignment="Left">
             <TextBlock><Bold><Run Text="DevPrompt "/></Bold><Run Text="{Binding AppVersion, Mode=OneTime}" /></TextBlock>
             <TextBlock Text="{Binding CopyrightYear, Mode=OneTime}" />
-            <TextBlock Margin="0,10,0,0">Latest version: <Bold><Run Text="{Binding AppLatestVersion, Mode=OneWay}" /></Bold></TextBlock>
-            <TextBlock Margin="0,10,0,0">Download the latest version from here:</TextBlock>
+            <TextBlock Margin="0,10,0,0"><Run Text="{x:Static local:Resources.About_LatestVersion}" /> <Bold><Run Text="{Binding AppLatestVersion, Mode=OneWay}" /></Bold></TextBlock>
+            <TextBlock Margin="0,10,0,0" Text="{x:Static local:Resources.About_DownloadHere}" />
             <RichTextBox Margin="-5,0,0,10" IsReadOnly="True" BorderThickness="0" IsDocumentEnabled="True" Background="Transparent">
                 <FlowDocument PagePadding="0">
                     <Paragraph>
@@ -47,6 +48,6 @@
                 </FlowDocument>
             </RichTextBox>
         </StackPanel>
-        <Button Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right" Margin="0,0,10,10" Padding="15,2" IsCancel="True" IsDefault="True">Close</Button>
+        <Button Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right" Margin="0,0,10,10" Padding="15,2" IsCancel="True" IsDefault="True" Content="{x:Static local:Resources.Dialog_Close}" />
     </Grid>
 </Window>

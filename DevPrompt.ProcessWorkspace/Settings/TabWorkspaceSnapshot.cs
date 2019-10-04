@@ -1,14 +1,14 @@
-﻿using DevPrompt.UI.ViewModels;
-using DevPrompt.Utility;
+﻿using DevPrompt.ProcessWorkspace.UI.ViewModels;
+using DevPrompt.ProcessWorkspace.Utility;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace DevPrompt.Settings
+namespace DevPrompt.ProcessWorkspace.Settings
 {
     [DataContract]
-    public abstract class TabWorkspaceSnapshot : PropertyNotifier, Api.IWorkspaceSnapshot
+    internal abstract class TabWorkspaceSnapshot : PropertyNotifier, Api.IWorkspaceSnapshot
     {
         private ObservableCollection<Api.ITabSnapshot> tabs;
         private int activeTabIndex;

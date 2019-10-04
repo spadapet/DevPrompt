@@ -22,7 +22,7 @@ namespace DevPrompt {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace DevPrompt {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DevPrompt.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace DevPrompt {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -61,153 +61,713 @@ namespace DevPrompt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to checking....
+        /// </summary>
+        public static string About_Checking {
+            get {
+                return ResourceManager.GetString("About.Checking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Checking latest version.
+        /// </summary>
+        public static string About_CheckProgress {
+            get {
+                return ResourceManager.GetString("About.CheckProgress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download the latest version from here:.
+        /// </summary>
+        public static string About_DownloadHere {
+            get {
+                return ResourceManager.GetString("About.DownloadHere", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to failed.
+        /// </summary>
+        public static string About_Failed {
+            get {
+                return ResourceManager.GetString("About.Failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://github.com/spadapet/DevPrompt/issues.
+        /// </summary>
+        public static string About_IssuesLink {
+            get {
+                return ResourceManager.GetString("About.IssuesLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Latest version:.
+        /// </summary>
+        public static string About_LatestVersion {
+            get {
+                return ResourceManager.GetString("About.LatestVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to http://peterspada.com/DevPrompt/GetLatestVersion.
+        /// </summary>
+        public static string About_LatestVersionLink {
+            get {
+                return ResourceManager.GetString("About.LatestVersionLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to About DevPrompt.
+        /// </summary>
+        public static string About_Title {
+            get {
+                return ResourceManager.GetString("About.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Arguments.
+        /// </summary>
+        public static string ConsoleDialog_Header_Args {
+            get {
+                return ResourceManager.GetString("ConsoleDialog.Header.Args", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Executable.
+        /// </summary>
+        public static string ConsoleDialog_Header_Executable {
+            get {
+                return ResourceManager.GetString("ConsoleDialog.Header.Executable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Menu Name.
+        /// </summary>
+        public static string ConsoleDialog_Header_MenuName {
+            get {
+                return ResourceManager.GetString("ConsoleDialog.Header.MenuName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Run at startup.
+        /// </summary>
+        public static string ConsoleDialog_Header_RunAtStartup {
+            get {
+                return ResourceManager.GetString("ConsoleDialog.Header.RunAtStartup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Starting Directory.
+        /// </summary>
+        public static string ConsoleDialog_Header_StartDir {
+            get {
+                return ResourceManager.GetString("ConsoleDialog.Header.StartDir", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tab Name.
+        /// </summary>
+        public static string ConsoleDialog_Header_TabName {
+            get {
+                return ResourceManager.GetString("ConsoleDialog.Header.TabName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use percent signs to reference environment variables. &apos;Run at startup&apos; only applies when there are no saved tabs at startup..
+        /// </summary>
+        public static string ConsoleDialog_Intro {
+            get {
+                return ResourceManager.GetString("ConsoleDialog.Intro", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restore tabs at startup.
+        /// </summary>
+        public static string ConsoleDialog_RestoreAtStartup {
+            get {
+                return ResourceManager.GetString("ConsoleDialog.RestoreAtStartup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        public static string Dialog_Cancel {
+            get {
+                return ResourceManager.GetString("Dialog.Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close.
+        /// </summary>
+        public static string Dialog_Close {
+            get {
+                return ResourceManager.GetString("Dialog.Close", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete.
+        /// </summary>
+        public static string Dialog_Delete {
+            get {
+                return ResourceManager.GetString("Dialog.Delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Down.
+        /// </summary>
+        public static string Dialog_Down {
+            get {
+                return ResourceManager.GetString("Dialog.Down", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to OK.
+        /// </summary>
+        public static string Dialog_OK {
+            get {
+                return ResourceManager.GetString("Dialog.OK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset.
+        /// </summary>
+        public static string Dialog_Reset {
+            get {
+                return ResourceManager.GetString("Dialog.Reset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Up.
+        /// </summary>
+        public static string Dialog_Up {
+            get {
+                return ResourceManager.GetString("Dialog.Up", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: Failed to start &quot;{0}&quot;.
+        /// </summary>
+        public static string Error_FailedToStart {
+            get {
+                return ResourceManager.GetString("Error.FailedToStart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Using Dispatcher from the wrong thread.
         /// </summary>
-        internal static string Exception_WrongDispatcherThread {
+        public static string Exception_WrongDispatcherThread {
             get {
                 return ResourceManager.GetString("Exception.WrongDispatcherThread", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expected a JSON array for populating a collection.
+        ///   Looks up a localized string similar to Auto grab.
         /// </summary>
-        internal static string JsonConvert_ExpectedArray {
+        public static string GrabDialog_AutoGrab {
             get {
-                return ResourceManager.GetString("JsonConvert.ExpectedArray", resourceCulture);
+                return ResourceManager.GetString("GrabDialog.AutoGrab", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unexpected member &apos;{0}&apos; on type &apos;{1}&apos;.
+        ///   Looks up a localized string similar to Activate on grab.
         /// </summary>
-        internal static string JsonConvert_InvalidMember {
+        public static string GrabDialog_Header_Activate {
             get {
-                return ResourceManager.GetString("JsonConvert.InvalidMember", resourceCulture);
+                return ResourceManager.GetString("GrabDialog.Header.Activate", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The JSON value is not valid.
+        ///   Looks up a localized string similar to Executable Name.
         /// </summary>
-        internal static string JsonConvert_InvalidValue {
+        public static string GrabDialog_Header_ExeName {
             get {
-                return ResourceManager.GetString("JsonConvert.InvalidValue", resourceCulture);
+                return ResourceManager.GetString("GrabDialog.Header.ExeName", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to convert JSON value &apos;{0}&apos; to type &apos;{1}&apos;.
+        ///   Looks up a localized string similar to Tab Name.
         /// </summary>
-        internal static string JsonConvert_TypeFailed {
+        public static string GrabDialog_Header_TabName {
             get {
-                return ResourceManager.GetString("JsonConvert.TypeFailed", resourceCulture);
+                return ResourceManager.GetString("GrabDialog.Header.TabName", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to JSON parse failure at {0}, token={1}.
+        ///   Looks up a localized string similar to When a process from the following list starts to run, its console window can be &quot;grabbed&quot; and become a tab. You need to be running as admin to grab admin processes..
         /// </summary>
-        internal static string JsonException_Message {
+        public static string GrabDialog_Intro {
             get {
-                return ResourceManager.GetString("JsonException.Message", resourceCulture);
+                return ResourceManager.GetString("GrabDialog.Intro", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to JSON parse failure at {0}, token={1}, {2}.
+        ///   Looks up a localized string similar to Add to existing.
         /// </summary>
-        internal static string JsonException_Message2 {
+        public static string ImportDialog_ChoiceAdd {
             get {
-                return ResourceManager.GetString("JsonException.Message2", resourceCulture);
+                return ResourceManager.GetString("ImportDialog.ChoiceAdd", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expected comma or close bracket after array.
+        ///   Looks up a localized string similar to Do not import.
         /// </summary>
-        internal static string JsonParser_ExpectedCommaOrBracket {
+        public static string ImportDialog_ChoiceNone {
             get {
-                return ResourceManager.GetString("JsonParser.ExpectedCommaOrBracket", resourceCulture);
+                return ResourceManager.GetString("ImportDialog.ChoiceNone", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expected comma or close curly brace after value.
+        ///   Looks up a localized string similar to Replace existing.
         /// </summary>
-        internal static string JsonParser_ExpectedCommaOrCurly {
+        public static string ImportDialog_ChoiceReplace {
             get {
-                return ResourceManager.GetString("JsonParser.ExpectedCommaOrCurly", resourceCulture);
+                return ResourceManager.GetString("ImportDialog.ChoiceReplace", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expected a colon after the key name.
+        ///   Looks up a localized string similar to Consoles:.
         /// </summary>
-        internal static string JsonParser_ExpectedKeyColon {
+        public static string ImportDialog_Consoles {
             get {
-                return ResourceManager.GetString("JsonParser.ExpectedKeyColon", resourceCulture);
+                return ResourceManager.GetString("ImportDialog.Consoles", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expected a string key name.
+        ///   Looks up a localized string similar to Grab:.
         /// </summary>
-        internal static string JsonParser_ExpectedKeyName {
+        public static string ImportDialog_Grab {
             get {
-                return ResourceManager.GetString("JsonParser.ExpectedKeyName", resourceCulture);
+                return ResourceManager.GetString("ImportDialog.Grab", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expected open curly brace.
+        ///   Looks up a localized string similar to Choose how settings will be imported:.
         /// </summary>
-        internal static string JsonParser_ExpectedObject {
+        public static string ImportDialog_Intro {
             get {
-                return ResourceManager.GetString("JsonParser.ExpectedObject", resourceCulture);
+                return ResourceManager.GetString("ImportDialog.Intro", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Duplicate key: {0}.
+        ///   Looks up a localized string similar to Links:.
         /// </summary>
-        internal static string JsonParser_ExpectedUniqueKey {
+        public static string ImportDialog_Links {
             get {
-                return ResourceManager.GetString("JsonParser.ExpectedUniqueKey", resourceCulture);
+                return ResourceManager.GetString("ImportDialog.Links", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expected a value.
+        ///   Looks up a localized string similar to Import Settings.
         /// </summary>
-        internal static string JsonParser_ExpectedValue {
+        public static string ImportDialog_Title {
             get {
-                return ResourceManager.GetString("JsonParser.ExpectedValue", resourceCulture);
+                return ResourceManager.GetString("ImportDialog.Title", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid string.
+        ///   Looks up a localized string similar to Tools:.
         /// </summary>
-        internal static string JsonParser_InvalidStringToken {
+        public static string ImportDialog_Tools {
             get {
-                return ResourceManager.GetString("JsonParser.InvalidStringToken", resourceCulture);
+                return ResourceManager.GetString("ImportDialog.Tools", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to JSON value is not a {0}.
+        ///   Looks up a localized string similar to _Branch name:.
         /// </summary>
-        internal static string JsonValue_WrongType {
+        public static string InstallBranch_Label {
             get {
-                return ResourceManager.GetString("JsonValue.WrongType", resourceCulture);
+                return ResourceManager.GetString("InstallBranch.Label", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Install VS Branch.
+        /// </summary>
+        public static string InstallBranch_Title {
+            get {
+                return ResourceManager.GetString("InstallBranch.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Address.
+        /// </summary>
+        public static string LinkDialog_Header_Address {
+            get {
+                return ResourceManager.GetString("LinkDialog.Header.Address", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name.
+        /// </summary>
+        public static string LinkDialog_Header_Name {
+            get {
+                return ResourceManager.GetString("LinkDialog.Header.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Azure DevOps=https://dev.azure.com
+        ///GitHub=https://github.com
+        ///Visual Studio=https://visualstudio.microsoft.com.
+        /// </summary>
+        public static string Links_Default {
+            get {
+                return ResourceManager.GetString("Links.Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _About.
+        /// </summary>
+        public static string Menu_About {
+            get {
+                return ResourceManager.GetString("Menu.About", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Auto Grab.
+        /// </summary>
+        public static string Menu_AutoGrab {
+            get {
+                return ResourceManager.GetString("Menu.AutoGrab", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Customize....
+        /// </summary>
+        public static string Menu_Customize {
+            get {
+                return ResourceManager.GetString("Menu.Customize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to E_xit.
+        /// </summary>
+        public static string Menu_Exit {
+            get {
+                return ResourceManager.GetString("Menu.Exit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _File.
+        /// </summary>
+        public static string Menu_File {
+            get {
+                return ResourceManager.GetString("Menu.File", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Grab.
+        /// </summary>
+        public static string Menu_Grab {
+            get {
+                return ResourceManager.GetString("Menu.Grab", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Help.
+        /// </summary>
+        public static string Menu_Help {
+            get {
+                return ResourceManager.GetString("Menu.Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Links.
+        /// </summary>
+        public static string Menu_Links {
+            get {
+                return ResourceManager.GetString("Menu.Links", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Plugins....
+        /// </summary>
+        public static string Menu_Plugins {
+            get {
+                return ResourceManager.GetString("Menu.Plugins", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Raw cmd.exe.
+        /// </summary>
+        public static string Menu_RawCommandName {
+            get {
+                return ResourceManager.GetString("Menu.RawCommandName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cmd.
+        /// </summary>
+        public static string Menu_RawCommandTabName {
+            get {
+                return ResourceManager.GetString("Menu.RawCommandTabName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Raw powershell.exe.
+        /// </summary>
+        public static string Menu_RawPowerShellName {
+            get {
+                return ResourceManager.GetString("Menu.RawPowerShellName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PowerShell.
+        /// </summary>
+        public static string Menu_RawPowerShellTabName {
+            get {
+                return ResourceManager.GetString("Menu.RawPowerShellTabName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Report an issue.
+        /// </summary>
+        public static string Menu_ReportIssue {
+            get {
+                return ResourceManager.GetString("Menu.ReportIssue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Settings....
+        /// </summary>
+        public static string Menu_Settings {
+            get {
+                return ResourceManager.GetString("Menu.Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Tools.
+        /// </summary>
+        public static string Menu_Tools {
+            get {
+                return ResourceManager.GetString("Menu.Tools", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _VS.
+        /// </summary>
+        public static string Menu_VS {
+            get {
+                return ResourceManager.GetString("Menu.VS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Install _Branch.
+        /// </summary>
+        public static string Menu_VsInstallBranch {
+            get {
+                return ResourceManager.GetString("Menu.VsInstallBranch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Install Dogfood.
+        /// </summary>
+        public static string Menu_VsInstallDogfood {
+            get {
+                return ResourceManager.GetString("Menu.VsInstallDogfood", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Run VS Installer.
+        /// </summary>
+        public static string Menu_VsInstaller {
+            get {
+                return ResourceManager.GetString("Menu.VsInstaller", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Install From Web.
+        /// </summary>
+        public static string Menu_VsInstallFromWeb {
+            get {
+                return ResourceManager.GetString("Menu.VsInstallFromWeb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to VS prompt {0}.
+        /// </summary>
+        public static string Menu_VsPromptName {
+            get {
+                return ResourceManager.GetString("Menu.VsPromptName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to VS {0}.
+        /// </summary>
+        public static string Menu_VsPromptTabName {
+            get {
+                return ResourceManager.GetString("Menu.VsPromptTabName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Updating....
+        /// </summary>
+        public static string Menu_VsUpdating {
+            get {
+                return ResourceManager.GetString("Menu.VsUpdating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Created by:.
+        /// </summary>
+        public static string PluginDialog_CreatedBy {
+            get {
+                return ResourceManager.GetString("PluginDialog.CreatedBy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Current Version:.
+        /// </summary>
+        public static string PluginDialog_CurrentVersion {
+            get {
+                return ResourceManager.GetString("PluginDialog.CurrentVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Install.
+        /// </summary>
+        public static string PluginDialog_Install {
+            get {
+                return ResourceManager.GetString("PluginDialog.Install", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installed.
+        /// </summary>
+        public static string PluginDialog_Installed {
+            get {
+                return ResourceManager.GetString("PluginDialog.Installed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installing.
+        /// </summary>
+        public static string PluginDialog_Installing {
+            get {
+                return ResourceManager.GetString("PluginDialog.Installing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New Version:.
+        /// </summary>
+        public static string PluginDialog_NewVersion {
+            get {
+                return ResourceManager.GetString("PluginDialog.NewVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Uninstall.
+        /// </summary>
+        public static string PluginDialog_Uninstall {
+            get {
+                return ResourceManager.GetString("PluginDialog.Uninstall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update.
+        /// </summary>
+        public static string PluginDialog_Update {
+            get {
+                return ResourceManager.GetString("PluginDialog.Update", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update available.
+        /// </summary>
+        public static string PluginDialog_UpdateAvailable {
+            get {
+                return ResourceManager.GetString("PluginDialog.UpdateAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Version:.
+        /// </summary>
+        public static string PluginDialog_Version {
+            get {
+                return ResourceManager.GetString("PluginDialog.Version", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Checking for plugins.
         /// </summary>
-        internal static string Plugins_FetchingFromNuGet {
+        public static string Plugins_FetchingFromNuGet {
             get {
                 return ResourceManager.GetString("Plugins.FetchingFromNuGet", resourceCulture);
             }
@@ -216,7 +776,7 @@ namespace DevPrompt {
         /// <summary>
         ///   Looks up a localized string similar to Installing &apos;{0}&apos;.
         /// </summary>
-        internal static string Plugins_InstallingProgress {
+        public static string Plugins_InstallingProgress {
             get {
                 return ResourceManager.GetString("Plugins.InstallingProgress", resourceCulture);
             }
@@ -225,7 +785,7 @@ namespace DevPrompt {
         /// <summary>
         ///   Looks up a localized string similar to Restart DevPrompt?.
         /// </summary>
-        internal static string Plugins_RestartCaption {
+        public static string Plugins_RestartCaption {
             get {
                 return ResourceManager.GetString("Plugins.RestartCaption", resourceCulture);
             }
@@ -234,7 +794,7 @@ namespace DevPrompt {
         /// <summary>
         ///   Looks up a localized string similar to Plugins have changed and DevPrompt needs to restart to load the changes. Would you like to restart now?.
         /// </summary>
-        internal static string Plugins_RestartText {
+        public static string Plugins_RestartText {
             get {
                 return ResourceManager.GetString("Plugins.RestartText", resourceCulture);
             }
@@ -243,7 +803,7 @@ namespace DevPrompt {
         /// <summary>
         ///   Looks up a localized string similar to Uninstalling &apos;{0}&apos;.
         /// </summary>
-        internal static string Plugins_UninstallingProgress {
+        public static string Plugins_UninstallingProgress {
             get {
                 return ResourceManager.GetString("Plugins.UninstallingProgress", resourceCulture);
             }
@@ -252,7 +812,7 @@ namespace DevPrompt {
         /// <summary>
         ///   Looks up a localized string similar to Export Settings.
         /// </summary>
-        internal static string Settings_ExportDialogTitle {
+        public static string Settings_ExportDialogTitle {
             get {
                 return ResourceManager.GetString("Settings.ExportDialogTitle", resourceCulture);
             }
@@ -261,7 +821,7 @@ namespace DevPrompt {
         /// <summary>
         ///   Looks up a localized string similar to Import Settings.
         /// </summary>
-        internal static string Settings_ImportDialogTitle {
+        public static string Settings_ImportDialogTitle {
             get {
                 return ResourceManager.GetString("Settings.ImportDialogTitle", resourceCulture);
             }
@@ -270,16 +830,43 @@ namespace DevPrompt {
         /// <summary>
         ///   Looks up a localized string similar to XML Files.
         /// </summary>
-        internal static string Settings_XmlFilterName {
+        public static string Settings_XmlFilterName {
             get {
                 return ResourceManager.GetString("Settings.XmlFilterName", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Export....
+        /// </summary>
+        public static string SettingsDialog_Export {
+            get {
+                return ResourceManager.GetString("SettingsDialog.Export", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import....
+        /// </summary>
+        public static string SettingsDialog_Import {
+            get {
+                return ResourceManager.GetString("SettingsDialog.Import", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        public static string SettingsDialog_Title {
+            get {
+                return ResourceManager.GetString("SettingsDialog.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Consoles.
         /// </summary>
-        internal static string SettingsTabType_Consoles {
+        public static string SettingsTabType_Consoles {
             get {
                 return ResourceManager.GetString("SettingsTabType.Consoles", resourceCulture);
             }
@@ -288,7 +875,7 @@ namespace DevPrompt {
         /// <summary>
         ///   Looks up a localized string similar to Grab.
         /// </summary>
-        internal static string SettingsTabType_Grab {
+        public static string SettingsTabType_Grab {
             get {
                 return ResourceManager.GetString("SettingsTabType.Grab", resourceCulture);
             }
@@ -297,7 +884,7 @@ namespace DevPrompt {
         /// <summary>
         ///   Looks up a localized string similar to Tools.
         /// </summary>
-        internal static string SettingsTabType_Links {
+        public static string SettingsTabType_Links {
             get {
                 return ResourceManager.GetString("SettingsTabType.Links", resourceCulture);
             }
@@ -306,7 +893,7 @@ namespace DevPrompt {
         /// <summary>
         ///   Looks up a localized string similar to Plugins.
         /// </summary>
-        internal static string SettingsTabType_Plugins {
+        public static string SettingsTabType_Plugins {
             get {
                 return ResourceManager.GetString("SettingsTabType.Plugins", resourceCulture);
             }
@@ -315,9 +902,72 @@ namespace DevPrompt {
         /// <summary>
         ///   Looks up a localized string similar to Links.
         /// </summary>
-        internal static string SettingsTabType_Tools {
+        public static string SettingsTabType_Tools {
             get {
                 return ResourceManager.GetString("SettingsTabType.Tools", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Arguments.
+        /// </summary>
+        public static string ToolDialog_Header_Args {
+            get {
+                return ResourceManager.GetString("ToolDialog.Header.Args", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Command.
+        /// </summary>
+        public static string ToolDialog_Header_Command {
+            get {
+                return ResourceManager.GetString("ToolDialog.Header.Command", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name.
+        /// </summary>
+        public static string ToolDialog_Header_Name {
+            get {
+                return ResourceManager.GetString("ToolDialog.Header.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Notepad=%windir%\notepad.exe.
+        /// </summary>
+        public static string Tools_Default {
+            get {
+                return ResourceManager.GetString("Tools.Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} {1}.
+        /// </summary>
+        public static string Window_TitleFormat {
+            get {
+                return ResourceManager.GetString("Window.TitleFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [Dev].
+        /// </summary>
+        public static string Window_TitlePrefix {
+            get {
+                return ResourceManager.GetString("Window.TitlePrefix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [Dev Admin].
+        /// </summary>
+        public static string Window_TitlePrefixAdmin {
+            get {
+                return ResourceManager.GetString("Window.TitlePrefixAdmin", resourceCulture);
             }
         }
     }

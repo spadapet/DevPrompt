@@ -14,5 +14,6 @@ namespace DevPrompt.Api
         void TabCycleNext();
         void TabCyclePrev();
         void TabContextMenu();
+        void TabClose();
     }
 }

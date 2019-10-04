@@ -1,7 +1,7 @@
-﻿using DevPrompt.UI.ViewModels;
+﻿using DevPrompt.ProcessWorkspace.UI.ViewModels;
 using System.Windows;
 
-namespace DevPrompt.UI
+namespace DevPrompt.ProcessWorkspace.UI
 {
     internal partial class TabNameDialog : Window
     {

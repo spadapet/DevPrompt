@@ -4,9 +4,9 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 
-namespace DevPrompt.UI.ViewModels
+namespace DevPrompt.ProcessWorkspace.UI.ViewModels
 {
-    public interface ITabVM : Api.ITabHolder, INotifyPropertyChanged, IDisposable
+    internal interface ITabVM : Api.ITabHolder, INotifyPropertyChanged, IDisposable
     {
         string Name { get; }
         string Tooltip { get; }

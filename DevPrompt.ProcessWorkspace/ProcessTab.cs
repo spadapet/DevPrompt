@@ -1,5 +1,7 @@
 ﻿using DevPrompt.ProcessWorkspace;
-using DevPrompt.Utility;
+using DevPrompt.ProcessWorkspace.Settings;
+using DevPrompt.ProcessWorkspace.UI;
+using DevPrompt.ProcessWorkspace.Utility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -139,7 +141,7 @@ namespace DevPrompt.UI.ViewModels
             {
                 yield return new MenuItem()
                 {
-                    Header = "_Set tab name...",
+                    Header = Resources.Command_SetTabName,
                     InputGestureText = "Ctrl+Shift+T",
                     Command = new DelegateCommand(this.SetTabNameCommand),
                 };
@@ -148,20 +150,20 @@ namespace DevPrompt.UI.ViewModels
 
                 yield return new MenuItem()
                 {
-                    Header = "_Clone",
+                    Header = Resources.Command_Clone,
                     InputGestureText = "Ctrl+T",
                     Command = new DelegateCommand(this.CloneCommand),
                 };
 
                 yield return new MenuItem()
                 {
-                    Header = "Console _Defaults",
+                    Header = Resources.Command_ConsoleDefaults,
                     Command = new DelegateCommand(this.DefaultsCommand),
                 };
 
                 yield return new MenuItem()
                 {
-                    Header = "Console _Properties",
+                    Header = Resources.Command_ConsoleProperties,
                     Command = new DelegateCommand(this.PropertiesCommand),
                 };
 
@@ -169,7 +171,7 @@ namespace DevPrompt.UI.ViewModels
 
                 yield return new MenuItem()
                 {
-                    Header = "D_etach",
+                    Header = Resources.Command_Detach,
                     InputGestureText = "Ctrl+Shift+F4",
                     Command = new DelegateCommand(this.DetachCommand),
                 };

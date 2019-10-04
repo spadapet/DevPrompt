@@ -64,44 +64,44 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Menu x:Name="mainMenu">
-                <MenuItem Header="_File" SubmenuOpened="OnFileMenuOpened">
+                <MenuItem Header="{x:Static dp:Resources.Menu_File}" SubmenuOpened="OnFileMenuOpened">
                     <Separator Tag="[End]" />
-                    <MenuItem Header="_Settings..." Command="{Binding SettingsCommand}" />
-                    <MenuItem Header="_Plugins..." Command="{Binding PluginsCommand}" />
+                    <MenuItem Header="{x:Static dp:Resources.Menu_Settings}" Command="{Binding SettingsCommand}" />
+                    <MenuItem Header="{x:Static dp:Resources.Menu_Plugins}" Command="{Binding PluginsCommand}" />
                     <Separator />
                     <Separator Tag="[Plugins]" />
-                    <MenuItem Header="E_xit" InputGestureText="Alt+F4" Command="{Binding ExitCommand}" />
+                    <MenuItem Header="{x:Static dp:Resources.Menu_Exit}" InputGestureText="Alt+F4" Command="{Binding ExitCommand}" />
                 </MenuItem>
-                <MenuItem Header="_Grab" SubmenuOpened="OnGrabMenuOpened">
+                <MenuItem Header="{x:Static dp:Resources.Menu_Grab}" SubmenuOpened="OnGrabMenuOpened">
                     <Separator Tag="[End]" />
                     <Separator Tag="[Plugins]" />
-                    <MenuItem Header="_Auto Grab" IsCheckable="True" IsChecked="{Binding AppSettings.ConsoleGrabEnabled, Mode=TwoWay}" />
-                    <MenuItem Header="_Customize..." Command="{Binding CustomizeConsoleGrabCommand}" />
+                    <MenuItem Header="{x:Static dp:Resources.Menu_AutoGrab}" IsCheckable="True" IsChecked="{Binding AppSettings.ConsoleGrabEnabled, Mode=TwoWay}" />
+                    <MenuItem Header="{x:Static dp:Resources.Menu_Customize}" Command="{Binding CustomizeConsoleGrabCommand}" />
                 </MenuItem>
-                <MenuItem Header="_VS" SubmenuOpened="OnVsMenuOpened">
-                    <MenuItem Header="Updating..." IsEnabled="False" />
+                <MenuItem Header="{x:Static dp:Resources.Menu_VS}" SubmenuOpened="OnVsMenuOpened">
+                    <MenuItem Header="{x:Static dp:Resources.Menu_VsUpdating}" IsEnabled="False" />
                     <Separator Tag="[End]" />
                     <Separator Tag="[Plugins]" />
-                    <MenuItem Header="_Install From Web" Command="{Binding VisualStudioDogfoodCommand}" Visibility="{Binding Source={x:Static dp:Program.IsNotMicrosoftDomain}, Converter={StaticResource BoolToVisibility}}" />
-                    <MenuItem Header="_Install Dogfood" Command="{Binding VisualStudioDogfoodCommand}" Visibility="{Binding Source={x:Static dp:Program.IsMicrosoftDomain}, Converter={StaticResource BoolToVisibility}}" />
-                    <MenuItem Header="Install _Branch" Command="{Binding InstallVisualStudioBranchCommand}" Visibility="{Binding Source={x:Static dp:Program.IsMicrosoftDomain}, Converter={StaticResource BoolToVisibility}}" />
-                    <MenuItem Header="_Run VS Installer" Command="{Binding VisualStudioInstallerCommand}" />
+                    <MenuItem Header="{x:Static dp:Resources.Menu_VsInstallFromWeb}" Command="{Binding VisualStudioDogfoodCommand}" Visibility="{Binding Source={x:Static dp:Program.IsNotMicrosoftDomain}, Converter={StaticResource BoolToVisibility}}" />
+                    <MenuItem Header="{x:Static dp:Resources.Menu_VsInstallDogfood}" Command="{Binding VisualStudioDogfoodCommand}" Visibility="{Binding Source={x:Static dp:Program.IsMicrosoftDomain}, Converter={StaticResource BoolToVisibility}}" />
+                    <MenuItem Header="{x:Static dp:Resources.Menu_VsInstallBranch}" Command="{Binding InstallVisualStudioBranchCommand}" Visibility="{Binding Source={x:Static dp:Program.IsMicrosoftDomain}, Converter={StaticResource BoolToVisibility}}" />
+                    <MenuItem Header="{x:Static dp:Resources.Menu_VsInstaller}" Command="{Binding VisualStudioInstallerCommand}" />
                 </MenuItem>
-                <MenuItem Header="_Tools" SubmenuOpened="OnToolsMenuOpened">
+                <MenuItem Header="{x:Static dp:Resources.Menu_Tools}" SubmenuOpened="OnToolsMenuOpened">
                     <Separator Tag="[End]" />
                     <Separator Tag="[Plugins]" />
-                    <MenuItem Header="_Customize..." Command="{Binding CustomizeToolsCommand}" />
+                    <MenuItem Header="{x:Static dp:Resources.Menu_Customize}" Command="{Binding CustomizeToolsCommand}" />
                 </MenuItem>
-                <MenuItem Header="_Links" SubmenuOpened="OnLinksMenuOpened">
+                <MenuItem Header="{x:Static dp:Resources.Menu_Links}" SubmenuOpened="OnLinksMenuOpened">
                     <Separator Tag="[End]" />
                     <Separator Tag="[Plugins]" />
-                    <MenuItem Header="_Customize..." Command="{Binding CustomizeLinksCommand}" />
+                    <MenuItem Header="{x:Static dp:Resources.Menu_Customize}" Command="{Binding CustomizeLinksCommand}" />
                 </MenuItem>
                 <Separator Tag="[Plugins]" Visibility="Collapsed" />
-                <MenuItem Header="_Help" SubmenuOpened="OnHelpMenuOpened">
+                <MenuItem Header="{x:Static dp:Resources.Menu_Help}" SubmenuOpened="OnHelpMenuOpened">
                     <Separator Tag="[Plugins]" />
-                    <MenuItem Header="_Report an issue" Command="{Binding ReportAnIssueCommand}" />
-                    <MenuItem Header="_About" Command="{Binding AboutCommand}" />
+                    <MenuItem Header="{x:Static dp:Resources.Menu_ReportIssue}" Command="{Binding ReportAnIssueCommand}" />
+                    <MenuItem Header="{x:Static dp:Resources.Menu_About}" Command="{Binding AboutCommand}" />
                 </MenuItem>
             </Menu>
             <controls:TaskProgressBar x:Name="progressBar" Grid.Column="1" Width="250" Margin="0,0,5,0" />

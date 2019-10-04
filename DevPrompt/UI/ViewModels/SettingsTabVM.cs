@@ -1,5 +1,5 @@
-﻿using DevPrompt.UI.Settings;
-using DevPrompt.Utility;
+﻿using DevPrompt.ProcessWorkspace.Utility;
+using DevPrompt.UI.Settings;
 using System;
 using System.Diagnostics;
 using System.Windows;

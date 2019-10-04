@@ -7,6 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:settings="clr-namespace:DevPrompt.Settings"
     xmlns:core="clr-namespace:System;assembly=mscorlib"
+    xmlns:local="clr-namespace:DevPrompt"
     mc:Ignorable="d"
     MinWidth="350" MinHeight="200" d:DesignWidth="500" d:DesignHeight="250"
     DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
@@ -29,25 +30,25 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock TextWrapping="Wrap" Padding="5,10" Text="Use percent signs to reference environment variables. 'Run at startup' only applies when there are no saved tabs at startup."/>
+        <TextBlock TextWrapping="Wrap" Padding="5,10" Text="{x:Static local:Resources.ConsoleDialog_Intro}"/>
         <DataGrid Grid.Row="1" x:Name="dataGrid" ItemsSource="{Binding ViewModel.Settings.Consoles}" SelectionMode="Single" SelectionChanged="OnSelectionChanged" BorderThickness="0,1">
             <DataGrid.Columns>
-                <DataGridComboBoxColumn Header="Executable" Width="3*" SelectedItemBinding="{Binding ConsoleType}" ItemsSource="{Binding Source={StaticResource ConsoleTypeEnum}}" />
-                <DataGridTextColumn Header="Menu Name" Width="3*" Binding="{Binding MenuName}"/>
-                <DataGridTextColumn Header="Tab Name" Width="2*" Binding="{Binding TabName}"/>
-                <DataGridTextColumn Header="Starting Directory" Width="4*" Binding="{Binding StartingDirectory}"/>
-                <DataGridTextColumn Header="Arguments" Width="6*" Binding="{Binding Arguments}"/>
-                <DataGridCheckBoxColumn Header="Run at startup" Width="2.5*" Binding="{Binding RunAtStartup}" />
+                <DataGridComboBoxColumn Header="{x:Static local:Resources.ConsoleDialog_Header_Executable}" Width="3*" SelectedItemBinding="{Binding ConsoleType}" ItemsSource="{Binding Source={StaticResource ConsoleTypeEnum}}" />
+                <DataGridTextColumn Header="{x:Static local:Resources.ConsoleDialog_Header_MenuName}" Width="3*" Binding="{Binding MenuName}"/>
+                <DataGridTextColumn Header="{x:Static local:Resources.ConsoleDialog_Header_TabName}" Width="2*" Binding="{Binding TabName}"/>
+                <DataGridTextColumn Header="{x:Static local:Resources.ConsoleDialog_Header_StartDir}" Width="4*" Binding="{Binding StartingDirectory}"/>
+                <DataGridTextColumn Header="{x:Static local:Resources.ConsoleDialog_Header_Args}" Width="6*" Binding="{Binding Arguments}"/>
+                <DataGridCheckBoxColumn Header="{x:Static local:Resources.ConsoleDialog_Header_RunAtStartup}" Width="2.5*" Binding="{Binding RunAtStartup}" />
             </DataGrid.Columns>
         </DataGrid>
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10">
-            <Button Padding="5,0" Margin="5,0,0,0" Content="Up" Command="{Binding MoveUpCommand}" />
-            <Button Padding="5,0" Margin="5,0,0,0" Content="Down" Command="{Binding MoveDownCommand}" />
-            <Button Padding="5,0" Margin="5,0,0,0" Content="Delete" Command="{Binding DeleteCommand}" />
-            <Button Padding="5,0" Margin="5,0,0,0" Content="Reset" Command="{Binding ResetCommand}" />
+            <Button Padding="5,0" Margin="5,0,0,0" Content="{x:Static local:Resources.Dialog_Up}" Command="{Binding MoveUpCommand}" />
+            <Button Padding="5,0" Margin="5,0,0,0" Content="{x:Static local:Resources.Dialog_Down}" Command="{Binding MoveDownCommand}" />
+            <Button Padding="5,0" Margin="5,0,0,0" Content="{x:Static local:Resources.Dialog_Delete}" Command="{Binding DeleteCommand}" />
+            <Button Padding="5,0" Margin="5,0,0,0" Content="{x:Static local:Resources.Dialog_Reset}" Command="{Binding ResetCommand}" />
         </StackPanel>
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,5">
-            <CheckBox Name="saveTabsCheckbox" Content="Restore tabs at startup" IsChecked="{Binding ViewModel.Settings.SaveTabsOnExit, Mode=TwoWay}" />
+            <CheckBox Name="saveTabsCheckbox" Content="{x:Static local:Resources.ConsoleDialog_RestoreAtStartup}" IsChecked="{Binding ViewModel.Settings.SaveTabsOnExit, Mode=TwoWay}" />
         </StackPanel>
     </Grid>
 </UserControl>

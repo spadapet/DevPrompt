@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
-namespace DevPrompt.Utility
+namespace DevPrompt.ProcessWorkspace.Utility
 {
     /// <summary>
     /// Base class for all WPF models/view models that notify listeners of property changes

@@ -1,5 +1,8 @@
-﻿using DevPrompt.UI.ViewModels;
-using DevPrompt.Utility;
+﻿using DevPrompt.ProcessWorkspace.Settings;
+using DevPrompt.ProcessWorkspace.UI;
+using DevPrompt.ProcessWorkspace.UI.ViewModels;
+using DevPrompt.ProcessWorkspace.Utility;
+using DevPrompt.UI.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,6 +13,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 
 namespace DevPrompt.ProcessWorkspace
 {
@@ -24,7 +28,7 @@ namespace DevPrompt.ProcessWorkspace
         public IEnumerable<Api.ITabHolder> Tabs => this.tabs;
         public Api.IProcessHost ProcessHost => this.ViewElement.ProcessHostWindow?.ProcessHost;
 
-        public static string StaticName => "Command Prompts";
+        public static string StaticName => Resources.ProcessWorkspace_Name;
         public static string StaticTooltip => string.Empty;
 
         private readonly HashSet<ButtonInfo> tabButtons;
@@ -279,6 +283,14 @@ namespace DevPrompt.ProcessWorkspace
                 menu.Placement = PlacementMode.Bottom;
                 menu.PlacementTarget = info.Button;
                 menu.IsOpen = true;
+            }
+        }
+
+        public void TabClose()
+        {
+            if (this.ActiveTab is ITabVM tab && tab.CloseCommand is ICommand command && command.CanExecute(null))
+            {
+                command.Execute(null);
             }
         }
 

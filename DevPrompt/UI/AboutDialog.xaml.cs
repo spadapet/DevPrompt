@@ -19,7 +19,7 @@ namespace DevPrompt.UI
         public AboutDialog(Api.IWindow window)
         {
             this.window = window;
-            this.appLatestVersion = "checking...";
+            this.appLatestVersion = DevPrompt.Resources.About_Checking;
             this.InitializeComponent();
         }
 
@@ -37,18 +37,18 @@ namespace DevPrompt.UI
         private async void OnLoaded(object sender, RoutedEventArgs args)
         {
             using (HttpClient client = new HttpClient())
-            using (this.window.ProgressBar.Begin(client.CancelPendingRequests, "Checking latest version"))
+            using (this.window.ProgressBar.Begin(client.CancelPendingRequests, DevPrompt.Resources.About_CheckProgress))
             {
                 try
                 {
                     this.httpClient = client;
-                    string versionString = await client.GetStringAsync(@"http://peterspada.com/DevPrompt/GetLatestVersion");
+                    string versionString = await client.GetStringAsync(DevPrompt.Resources.About_LatestVersionLink);
                     this.AppLatestVersion = versionString;
                 }
                 catch
                 {
                     // doesn't matter
-                    this.AppLatestVersion = "failed";
+                    this.AppLatestVersion = DevPrompt.Resources.About_Failed;
                 }
                 finally
                 {

@@ -1,9 +1,11 @@
 ﻿using DevPrompt.Plugins;
+using DevPrompt.ProcessWorkspace.Utility;
 using DevPrompt.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -241,8 +243,8 @@ namespace DevPrompt.Settings
                     string name = instance.DisplayName.Split(' ')[0];
                     this.ObservableConsoles.Add(new ConsoleSettings()
                     {
-                        MenuName = $"VS prompt {name}",
-                        TabName = $"VS {name}",
+                        MenuName = string.Format(CultureInfo.CurrentCulture, Resources.Menu_VsPromptName, name),
+                        TabName = string.Format(CultureInfo.CurrentCulture, Resources.Menu_VsPromptTabName, name),
                         Arguments = $"/k \"{file}\"",
                     });
                 }
@@ -254,15 +256,15 @@ namespace DevPrompt.Settings
             this.ObservableConsoles.Add(new ConsoleSettings()
             {
                 ConsoleType = ConsoleType.Cmd,
-                MenuName = "Raw cmd.exe",
-                TabName = "Cmd",
+                MenuName = Resources.Menu_RawCommandName,
+                TabName = Resources.Menu_RawCommandTabName,
             });
 
             this.ObservableConsoles.Add(new ConsoleSettings()
             {
                 ConsoleType = ConsoleType.PowerShell,
-                MenuName = "Raw powershell.exe",
-                TabName = "PowerShell",
+                MenuName = Resources.Menu_RawPowerShellName,
+                TabName = Resources.Menu_RawPowerShellTabName,
             });
         }
 
@@ -271,46 +273,48 @@ namespace DevPrompt.Settings
             this.GrabConsoles.Add(new GrabConsoleSettings()
             {
                 ExeName = "cmd.exe",
-                TabName = "Cmd",
+                TabName = Resources.Menu_RawCommandTabName,
                 TabActivate = true,
             });
 
             this.GrabConsoles.Add(new GrabConsoleSettings()
             {
                 ExeName = "powershell.exe",
-                TabName = "PowerShell",
+                TabName = Resources.Menu_RawPowerShellTabName,
                 TabActivate = true,
             });
         }
 
         private void AddDefaultLinks()
         {
-            this.Links.Add(new LinkSettings()
+            foreach (string entry in Resources.Links_Default.Split('\r', '\n'))
             {
-                Name = "Azure DevOps",
-                Address = "https://dev.azure.com",
-            });
-
-            this.Links.Add(new LinkSettings()
-            {
-                Name = "GitHub",
-                Address = "https://github.com",
-            });
-
-            this.Links.Add(new LinkSettings()
-            {
-                Name = "Visual Studio",
-                Address = "https://visualstudio.microsoft.com",
-            });
+                int i = entry.IndexOf('=');
+                if (i >= 0)
+                {
+                    this.Links.Add(new LinkSettings()
+                    {
+                        Name = entry.Substring(0, i),
+                        Address = entry.Substring(i + 1),
+                    });
+                }
+            }
         }
 
         private void AddDefaultTools()
         {
-            this.Tools.Add(new ToolSettings()
+            foreach (string entry in Resources.Tools_Default.Split('\r', '\n'))
             {
-                Name = "Notepad",
-                Command = "%windir%\\notepad.exe",
-            });
+                int i = entry.IndexOf('=');
+                if (i >= 0)
+                {
+                    this.Tools.Add(new ToolSettings()
+                    {
+                        Name = entry.Substring(0, i),
+                        Command = entry.Substring(i + 1),
+                    });
+                }
+            }
         }
 
         public IEnumerable<PluginDirectorySettings> PluginDirectories

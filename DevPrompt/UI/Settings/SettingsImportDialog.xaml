@@ -4,8 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DevPrompt"
         mc:Ignorable="d"
-        Title="Import Settings"
+        Title="{x:Static local:Resources.ImportDialog_Title}"
         Width="350"
         Height="280"
         WindowStartupLocation="CenterOwner"
@@ -33,7 +34,6 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.Resources>
                 <Style TargetType="TextBlock">
@@ -43,21 +43,19 @@
                     <Setter Property="Margin" Value="5" />
                 </Style>
             </Grid.Resources>
-            <TextBlock Grid.ColumnSpan="3" TextWrapping="Wrap">Choose how settings will be imported:</TextBlock>
-            <TextBlock Grid.Row="2" Grid.Column="1">Consoles:</TextBlock>
-            <TextBlock Grid.Row="3" Grid.Column="1">Grab:</TextBlock>
-            <TextBlock Grid.Row="4" Grid.Column="1">Links:</TextBlock>
-            <TextBlock Grid.Row="5" Grid.Column="1">Tools:</TextBlock>
-            <TextBlock Grid.Row="6" Grid.Column="1">Plugins:</TextBlock>
+            <TextBlock Grid.ColumnSpan="3" TextWrapping="Wrap" Text="{x:Static local:Resources.ImportDialog_Intro}" />
+            <TextBlock Grid.Row="2" Grid.Column="1" Text="{x:Static local:Resources.ImportDialog_Consoles}" />
+            <TextBlock Grid.Row="3" Grid.Column="1" Text="{x:Static local:Resources.ImportDialog_Grab}" />
+            <TextBlock Grid.Row="4" Grid.Column="1" Text="{x:Static local:Resources.ImportDialog_Links}" />
+            <TextBlock Grid.Row="5" Grid.Column="1" Text="{x:Static local:Resources.ImportDialog_Tools}" />
             <ComboBox Grid.Row="2" Grid.Column="2" ItemsSource="{Binding ImportChoices}" SelectedIndex="{Binding ConsolesIndex}" />
             <ComboBox Grid.Row="3" Grid.Column="2" ItemsSource="{Binding ImportChoices}" SelectedIndex="{Binding GrabIndex}" />
             <ComboBox Grid.Row="4" Grid.Column="2" ItemsSource="{Binding ImportChoices}" SelectedIndex="{Binding LinksIndex}" />
             <ComboBox Grid.Row="5" Grid.Column="2" ItemsSource="{Binding ImportChoices}" SelectedIndex="{Binding ToolsIndex}" />
-            <ComboBox Grid.Row="6" Grid.Column="2" ItemsSource="{Binding ImportChoices}" SelectedIndex="{Binding PluginsIndex}" />
         </Grid>
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,5,15,15" HorizontalAlignment="Right">
-            <Button Content="OK" IsDefault="true" MinWidth="70" Click="OnClickOk" />
-            <Button Content="Cancel" IsCancel="True" Margin="10,0,0,0" MinWidth="70" />
+            <Button Content="{x:Static local:Resources.Dialog_OK}" IsDefault="true" MinWidth="70" Click="OnClickOk" />
+            <Button Content="{x:Static local:Resources.Dialog_Cancel}" IsCancel="True" Margin="10,0,0,0" MinWidth="70" />
         </StackPanel>
     </Grid>
 </Window>

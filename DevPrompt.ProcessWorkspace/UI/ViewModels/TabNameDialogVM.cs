@@ -1,6 +1,6 @@
-﻿using DevPrompt.Utility;
+﻿using DevPrompt.ProcessWorkspace.Utility;
 
-namespace DevPrompt.UI.ViewModels
+namespace DevPrompt.ProcessWorkspace.UI.ViewModels
 {
     /// <summary>
     /// View model for the tab name dialog

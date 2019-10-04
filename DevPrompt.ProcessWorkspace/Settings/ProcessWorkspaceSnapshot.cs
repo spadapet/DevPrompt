@@ -1,7 +1,6 @@
-﻿using DevPrompt.Settings;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
-namespace DevPrompt.ProcessWorkspace
+namespace DevPrompt.ProcessWorkspace.Settings
 {
     /// <summary>
     /// Saves the state of a process workspace during shutdown so it can be restored on startup

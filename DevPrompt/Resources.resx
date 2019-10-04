@@ -117,53 +117,241 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="About.Checking" xml:space="preserve">
+    <value>checking...</value>
+  </data>
+  <data name="About.CheckProgress" xml:space="preserve">
+    <value>Checking latest version</value>
+  </data>
+  <data name="About.DownloadHere" xml:space="preserve">
+    <value>Download the latest version from here:</value>
+  </data>
+  <data name="About.Failed" xml:space="preserve">
+    <value>failed</value>
+  </data>
+  <data name="About.IssuesLink" xml:space="preserve">
+    <value>https://github.com/spadapet/DevPrompt/issues</value>
+  </data>
+  <data name="About.LatestVersion" xml:space="preserve">
+    <value>Latest version:</value>
+  </data>
+  <data name="About.LatestVersionLink" xml:space="preserve">
+    <value>http://peterspada.com/DevPrompt/GetLatestVersion</value>
+  </data>
+  <data name="About.Title" xml:space="preserve">
+    <value>About DevPrompt</value>
+  </data>
+  <data name="ConsoleDialog.Header.Args" xml:space="preserve">
+    <value>Arguments</value>
+  </data>
+  <data name="ConsoleDialog.Header.Executable" xml:space="preserve">
+    <value>Executable</value>
+  </data>
+  <data name="ConsoleDialog.Header.MenuName" xml:space="preserve">
+    <value>Menu Name</value>
+  </data>
+  <data name="ConsoleDialog.Header.RunAtStartup" xml:space="preserve">
+    <value>Run at startup</value>
+  </data>
+  <data name="ConsoleDialog.Header.StartDir" xml:space="preserve">
+    <value>Starting Directory</value>
+  </data>
+  <data name="ConsoleDialog.Header.TabName" xml:space="preserve">
+    <value>Tab Name</value>
+  </data>
+  <data name="ConsoleDialog.Intro" xml:space="preserve">
+    <value>Use percent signs to reference environment variables. 'Run at startup' only applies when there are no saved tabs at startup.</value>
+  </data>
+  <data name="ConsoleDialog.RestoreAtStartup" xml:space="preserve">
+    <value>Restore tabs at startup</value>
+  </data>
+  <data name="Dialog.Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Dialog.Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Dialog.Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Dialog.Down" xml:space="preserve">
+    <value>Down</value>
+  </data>
+  <data name="Dialog.OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Dialog.Reset" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="Dialog.Up" xml:space="preserve">
+    <value>Up</value>
+  </data>
+  <data name="Error.FailedToStart" xml:space="preserve">
+    <value>Error: Failed to start "{0}"</value>
+  </data>
   <data name="Exception.WrongDispatcherThread" xml:space="preserve">
     <value>Using Dispatcher from the wrong thread</value>
   </data>
-  <data name="JsonConvert.ExpectedArray" xml:space="preserve">
-    <value>Expected a JSON array for populating a collection</value>
+  <data name="GrabDialog.AutoGrab" xml:space="preserve">
+    <value>Auto grab</value>
   </data>
-  <data name="JsonConvert.InvalidMember" xml:space="preserve">
-    <value>Unexpected member '{0}' on type '{1}'</value>
+  <data name="GrabDialog.Header.Activate" xml:space="preserve">
+    <value>Activate on grab</value>
   </data>
-  <data name="JsonConvert.InvalidValue" xml:space="preserve">
-    <value>The JSON value is not valid</value>
+  <data name="GrabDialog.Header.ExeName" xml:space="preserve">
+    <value>Executable Name</value>
   </data>
-  <data name="JsonConvert.TypeFailed" xml:space="preserve">
-    <value>Failed to convert JSON value '{0}' to type '{1}'</value>
+  <data name="GrabDialog.Header.TabName" xml:space="preserve">
+    <value>Tab Name</value>
   </data>
-  <data name="JsonException.Message" xml:space="preserve">
-    <value>JSON parse failure at {0}, token={1}</value>
+  <data name="GrabDialog.Intro" xml:space="preserve">
+    <value>When a process from the following list starts to run, its console window can be "grabbed" and become a tab. You need to be running as admin to grab admin processes.</value>
   </data>
-  <data name="JsonException.Message2" xml:space="preserve">
-    <value>JSON parse failure at {0}, token={1}, {2}</value>
+  <data name="ImportDialog.ChoiceAdd" xml:space="preserve">
+    <value>Add to existing</value>
   </data>
-  <data name="JsonParser.ExpectedCommaOrBracket" xml:space="preserve">
-    <value>Expected comma or close bracket after array</value>
+  <data name="ImportDialog.ChoiceNone" xml:space="preserve">
+    <value>Do not import</value>
   </data>
-  <data name="JsonParser.ExpectedCommaOrCurly" xml:space="preserve">
-    <value>Expected comma or close curly brace after value</value>
+  <data name="ImportDialog.ChoiceReplace" xml:space="preserve">
+    <value>Replace existing</value>
   </data>
-  <data name="JsonParser.ExpectedKeyColon" xml:space="preserve">
-    <value>Expected a colon after the key name</value>
+  <data name="ImportDialog.Consoles" xml:space="preserve">
+    <value>Consoles:</value>
   </data>
-  <data name="JsonParser.ExpectedKeyName" xml:space="preserve">
-    <value>Expected a string key name</value>
+  <data name="ImportDialog.Grab" xml:space="preserve">
+    <value>Grab:</value>
   </data>
-  <data name="JsonParser.ExpectedObject" xml:space="preserve">
-    <value>Expected open curly brace</value>
+  <data name="ImportDialog.Intro" xml:space="preserve">
+    <value>Choose how settings will be imported:</value>
   </data>
-  <data name="JsonParser.ExpectedUniqueKey" xml:space="preserve">
-    <value>Duplicate key: {0}</value>
+  <data name="ImportDialog.Links" xml:space="preserve">
+    <value>Links:</value>
   </data>
-  <data name="JsonParser.ExpectedValue" xml:space="preserve">
-    <value>Expected a value</value>
+  <data name="ImportDialog.Title" xml:space="preserve">
+    <value>Import Settings</value>
   </data>
-  <data name="JsonParser.InvalidStringToken" xml:space="preserve">
-    <value>Invalid string</value>
+  <data name="ImportDialog.Tools" xml:space="preserve">
+    <value>Tools:</value>
   </data>
-  <data name="JsonValue.WrongType" xml:space="preserve">
-    <value>JSON value is not a {0}</value>
+  <data name="InstallBranch.Label" xml:space="preserve">
+    <value>_Branch name:</value>
+  </data>
+  <data name="InstallBranch.Title" xml:space="preserve">
+    <value>Install VS Branch</value>
+  </data>
+  <data name="LinkDialog.Header.Address" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="LinkDialog.Header.Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Links.Default" xml:space="preserve">
+    <value>Azure DevOps=https://dev.azure.com
+GitHub=https://github.com
+Visual Studio=https://visualstudio.microsoft.com</value>
+  </data>
+  <data name="Menu.About" xml:space="preserve">
+    <value>_About</value>
+  </data>
+  <data name="Menu.AutoGrab" xml:space="preserve">
+    <value>_Auto Grab</value>
+  </data>
+  <data name="Menu.Customize" xml:space="preserve">
+    <value>_Customize...</value>
+  </data>
+  <data name="Menu.Exit" xml:space="preserve">
+    <value>E_xit</value>
+  </data>
+  <data name="Menu.File" xml:space="preserve">
+    <value>_File</value>
+  </data>
+  <data name="Menu.Grab" xml:space="preserve">
+    <value>_Grab</value>
+  </data>
+  <data name="Menu.Help" xml:space="preserve">
+    <value>_Help</value>
+  </data>
+  <data name="Menu.Links" xml:space="preserve">
+    <value>_Links</value>
+  </data>
+  <data name="Menu.Plugins" xml:space="preserve">
+    <value>_Plugins...</value>
+  </data>
+  <data name="Menu.RawCommandName" xml:space="preserve">
+    <value>Raw cmd.exe</value>
+  </data>
+  <data name="Menu.RawCommandTabName" xml:space="preserve">
+    <value>Cmd</value>
+  </data>
+  <data name="Menu.RawPowerShellName" xml:space="preserve">
+    <value>Raw powershell.exe</value>
+  </data>
+  <data name="Menu.RawPowerShellTabName" xml:space="preserve">
+    <value>PowerShell</value>
+  </data>
+  <data name="Menu.ReportIssue" xml:space="preserve">
+    <value>_Report an issue</value>
+  </data>
+  <data name="Menu.Settings" xml:space="preserve">
+    <value>_Settings...</value>
+  </data>
+  <data name="Menu.Tools" xml:space="preserve">
+    <value>_Tools</value>
+  </data>
+  <data name="Menu.VS" xml:space="preserve">
+    <value>_VS</value>
+  </data>
+  <data name="Menu.VsInstallBranch" xml:space="preserve">
+    <value>Install _Branch</value>
+  </data>
+  <data name="Menu.VsInstallDogfood" xml:space="preserve">
+    <value>_Install Dogfood</value>
+  </data>
+  <data name="Menu.VsInstaller" xml:space="preserve">
+    <value>_Run VS Installer</value>
+  </data>
+  <data name="Menu.VsInstallFromWeb" xml:space="preserve">
+    <value>_Install From Web</value>
+  </data>
+  <data name="Menu.VsPromptName" xml:space="preserve">
+    <value>VS prompt {0}</value>
+  </data>
+  <data name="Menu.VsPromptTabName" xml:space="preserve">
+    <value>VS {0}</value>
+  </data>
+  <data name="Menu.VsUpdating" xml:space="preserve">
+    <value>Updating...</value>
+  </data>
+  <data name="PluginDialog.CreatedBy" xml:space="preserve">
+    <value>Created by:</value>
+  </data>
+  <data name="PluginDialog.CurrentVersion" xml:space="preserve">
+    <value>Current Version:</value>
+  </data>
+  <data name="PluginDialog.Install" xml:space="preserve">
+    <value>Install</value>
+  </data>
+  <data name="PluginDialog.Installed" xml:space="preserve">
+    <value>Installed</value>
+  </data>
+  <data name="PluginDialog.Installing" xml:space="preserve">
+    <value>Installing</value>
+  </data>
+  <data name="PluginDialog.NewVersion" xml:space="preserve">
+    <value>New Version:</value>
+  </data>
+  <data name="PluginDialog.Uninstall" xml:space="preserve">
+    <value>Uninstall</value>
+  </data>
+  <data name="PluginDialog.Update" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="PluginDialog.UpdateAvailable" xml:space="preserve">
+    <value>Update available</value>
+  </data>
+  <data name="PluginDialog.Version" xml:space="preserve">
+    <value>Version:</value>
   </data>
   <data name="Plugins.FetchingFromNuGet" xml:space="preserve">
     <value>Checking for plugins</value>
@@ -189,6 +377,15 @@
   <data name="Settings.XmlFilterName" xml:space="preserve">
     <value>XML Files</value>
   </data>
+  <data name="SettingsDialog.Export" xml:space="preserve">
+    <value>Export...</value>
+  </data>
+  <data name="SettingsDialog.Import" xml:space="preserve">
+    <value>Import...</value>
+  </data>
+  <data name="SettingsDialog.Title" xml:space="preserve">
+    <value>Settings</value>
+  </data>
   <data name="SettingsTabType.Consoles" xml:space="preserve">
     <value>Consoles</value>
   </data>
@@ -203,5 +400,26 @@
   </data>
   <data name="SettingsTabType.Tools" xml:space="preserve">
     <value>Links</value>
+  </data>
+  <data name="ToolDialog.Header.Args" xml:space="preserve">
+    <value>Arguments</value>
+  </data>
+  <data name="ToolDialog.Header.Command" xml:space="preserve">
+    <value>Command</value>
+  </data>
+  <data name="ToolDialog.Header.Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Tools.Default" xml:space="preserve">
+    <value>Notepad=%windir%\notepad.exe</value>
+  </data>
+  <data name="Window.TitleFormat" xml:space="preserve">
+    <value>{0} {1}</value>
+  </data>
+  <data name="Window.TitlePrefix" xml:space="preserve">
+    <value>[Dev]</value>
+  </data>
+  <data name="Window.TitlePrefixAdmin" xml:space="preserve">
+    <value>[Dev Admin]</value>
   </data>
 </root>

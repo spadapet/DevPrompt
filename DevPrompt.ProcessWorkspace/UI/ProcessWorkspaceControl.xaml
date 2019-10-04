@@ -1,22 +1,23 @@
 ﻿<UserControl
-    x:Class="DevPrompt.ProcessWorkspace.ProcessWorkspaceControl"
+    x:Class="DevPrompt.ProcessWorkspace.UI.ProcessWorkspaceControl"
     x:ClassModifier="internal"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-    xmlns:controls="clr-namespace:DevPrompt.UI.Controls"
-    xmlns:convert="clr-namespace:DevPrompt.Utility.Converters"
-    xmlns:vm="clr-namespace:DevPrompt.UI.ViewModels"
+    xmlns:local="clr-namespace:DevPrompt.ProcessWorkspace"
+    xmlns:vm="clr-namespace:DevPrompt.ProcessWorkspace.UI.ViewModels"
+    xmlns:controls="clr-namespace:DevPrompt.ProcessWorkspace.UI.Controls"
+    xmlns:util="clr-namespace:DevPrompt.ProcessWorkspace.Utility"
     mc:Ignorable="d"
     d:DesignHeight="450" d:DesignWidth="800"
     DataContext="{Binding ViewModel, RelativeSource={RelativeSource Mode=Self}}">
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
-        <convert:ObjectToVisibilityConverter x:Key="ObjectToVisibility" />
-        <convert:ActiveToBoolConverter x:Key="ActiveToBool" />
-        <convert:VisibleToBoolConverter x:Key="VisibleToBool" />
+        <util:ObjectToVisibilityConverter x:Key="ObjectToVisibility" />
+        <util:ActiveToBoolConverter x:Key="ActiveToBool" />
+        <util:VisibleToBoolConverter x:Key="VisibleToBool" />
 
         <ItemsPanelTemplate x:Key="TabItemsPanelTemplate">
             <TabPanel Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
@@ -97,8 +98,8 @@
                 <Button.ContextMenu>
                     <ContextMenu Opened="OnTabContextMenuOpened" Closed="OnTabContextMenuClosed">
                         <Separator Tag="[Plugins]" Visibility="Collapsed" />
-                        <MenuItem Header="C_lose" InputGestureText="Ctrl+F4" Command="{Binding CloseCommand}" Visibility="{Binding CloseCommand, Converter={StaticResource ObjectToVisibility}}" />
-                        <MenuItem Header="Close All But This" Command="{Binding CloseAllButThisCommand}" Visibility="{Binding CloseAllButThisCommand, Converter={StaticResource ObjectToVisibility}}" />
+                        <MenuItem Header="{x:Static local:Resources.Command_Close}" InputGestureText="Ctrl+F4" Command="{Binding CloseCommand}" Visibility="{Binding CloseCommand, Converter={StaticResource ObjectToVisibility}}" />
+                        <MenuItem Header="{x:Static local:Resources.Command_CloseAllButThis}" Command="{Binding CloseAllButThisCommand}" Visibility="{Binding CloseAllButThisCommand, Converter={StaticResource ObjectToVisibility}}" />
                     </ContextMenu>
                 </Button.ContextMenu>
             </Button>

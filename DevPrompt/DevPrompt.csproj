@@ -54,13 +54,6 @@
     <Compile Include="Plugins\PluginSource.cs" />
     <Compile Include="Plugins\PluginSourceType.cs" />
     <Compile Include="Plugins\PluginState.cs" />
-    <Compile Include="ProcessWorkspace\ProcessWorkspaceSnapshot.cs" />
-    <Compile Include="ProcessWorkspace\ProcessWorkspaceControl.xaml.cs">
-      <DependentUpon>ProcessWorkspaceControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ProcessWorkspace\ProcessWorkspaceProvider.cs" />
-    <Compile Include="ProcessWorkspace\ProcessWorkspace.cs" />
-    <Compile Include="ProcessWorkspace\ProcessListener.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -70,12 +63,10 @@
     <Compile Include="Plugins\InstalledPluginInfo.cs" />
     <Compile Include="Settings\NuGetPluginSettings.cs" />
     <Compile Include="Settings\PluginDirectorySettings.cs" />
-    <Compile Include="Settings\TabWorkspaceSnapshot.cs" />
     <Compile Include="Settings\WorkspaceSnapshot.cs" />
     <Compile Include="Settings\AppSnapshot.cs" />
     <Compile Include="Settings\GrabConsoleSettings.cs" />
     <Compile Include="Settings\ConsoleType.cs" />
-    <Compile Include="ProcessWorkspace\ProcessSnapshot.cs" />
     <Compile Include="Settings\ToolSettings.cs" />
     <Compile Include="Settings\LinkSettings.cs" />
     <Compile Include="Settings\ConsoleSettings.cs" />
@@ -89,14 +80,12 @@
     <Compile Include="UI\DesignerViewModels\MainWindowDesignerVM.cs" />
     <Compile Include="UI\DesignerViewModels\NuGetPluginDesignerVM.cs" />
     <Compile Include="UI\DesignerViewModels\PluginsControlDesignerVM.cs" />
-    <Compile Include="UI\DesignerViewModels\TabDesignerVM.cs" />
     <Compile Include="UI\InstallBranchDialog.xaml.cs">
       <DependentUpon>InstallBranchDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\AboutDialog.xaml.cs">
       <DependentUpon>AboutDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Controls\DragItemsControl.cs" />
     <Compile Include="UI\Settings\PluginSettingsControl.xaml.cs">
       <DependentUpon>PluginSettingsControl.xaml</DependentUpon>
     </Compile>
@@ -105,9 +94,6 @@
     </Compile>
     <Compile Include="UI\Settings\SettingsImportDialog.xaml.cs">
       <DependentUpon>SettingsImportDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\TabNameDialog.xaml.cs">
-      <DependentUpon>TabNameDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Settings\GrabSettingsControl.xaml.cs">
       <DependentUpon>GrabSettingsControl.xaml</DependentUpon>
@@ -121,9 +107,7 @@
     <Compile Include="UI\Settings\ConsolesSettingsControl.xaml.cs">
       <DependentUpon>ConsolesSettingsControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ProcessWorkspace\ProcessTab.cs" />
     <Compile Include="UI\ViewModels\InstallBranchDialogVM.cs" />
-    <Compile Include="UI\ViewModels\ITabVM.cs" />
     <Compile Include="UI\ViewModels\IWorkspaceVM.cs" />
     <Compile Include="UI\ViewModels\NuGetPluginVM.cs" />
     <Compile Include="UI\ViewModels\IPluginVM.cs" />
@@ -131,14 +115,11 @@
     <Compile Include="UI\ViewModels\SettingsTabVM.cs" />
     <Compile Include="UI\ViewModels\SettingsDialogVM.cs" />
     <Compile Include="UI\ViewModels\SettingsImportDialogVM.cs" />
-    <Compile Include="UI\ViewModels\TabNameDialogVM.cs" />
-    <Compile Include="UI\ViewModels\TabVM.cs" />
     <Compile Include="UI\ViewModels\WorkspaceVM.cs" />
     <Compile Include="Utility\Converters\BoolToNegativeConverter.cs" />
     <Compile Include="Utility\Converters\DelegateConverter.cs" />
     <Compile Include="Utility\Converters\DelegateMultiConverter.cs" />
     <Compile Include="Utility\Converters\StringToVisibilityConverter.cs" />
-    <Compile Include="Utility\DelegateCommand.cs" />
     <Compile Include="Utility\HashUtility.cs" />
     <Compile Include="Utility\HttpClientHelper.cs" />
     <Compile Include="Utility\NuGet\NuGetPackageVersionInfo.cs" />
@@ -147,19 +128,10 @@
     <Compile Include="Utility\NuGet\NuGetService.cs" />
     <Compile Include="Utility\NuGet\NuGetServiceIndex.cs" />
     <Compile Include="Utility\Converters\BoolToCollapsedConverter.cs" />
-    <Compile Include="Utility\Converters\VisibleToBoolConverter.cs" />
     <Compile Include="Utility\CommandUtility.cs" />
     <Compile Include="Utility\DelegateDisposable.cs" />
-    <Compile Include="Utility\Converters\ActiveToBoolConverter.cs" />
-    <Compile Include="Utility\Converters\ObjectToVisibilityConverter.cs" />
     <Compile Include="Settings\AppSettings.cs" />
-    <Compile Include="Utility\PropertyNotifier.cs" />
     <Compile Include="Utility\VisualStudioSetup.cs" />
-    <Compile Include="Utility\WpfUtility.cs" />
-    <Page Include="ProcessWorkspace\ProcessWorkspaceControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="UI\Controls\InfoBar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -192,10 +164,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\TabNameDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="UI\Settings\GrabSettingsControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -220,7 +188,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ProcessWorkspace\ProcessHostWindow.cs" />
     <Compile Include="Interop\IAppHost.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="UI\MainWindow.xaml.cs">
@@ -242,10 +209,14 @@
     </ProjectReference>
     <PackageReference Include="System.Composition" Version="1.2.0" />
     <PackageReference Include="Efficient.Json" Version="1.1.2" />
+    <ProjectReference Include="..\DevPrompt.ProcessWorkspace\DevPrompt.ProcessWorkspace.csproj">
+      <Project>{ba155622-ddbd-48cc-942a-33da3a9fef1f}</Project>
+      <Name>DevPrompt.ProcessWorkspace</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>

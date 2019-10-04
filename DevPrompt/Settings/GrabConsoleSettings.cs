@@ -1,4 +1,4 @@
-﻿using DevPrompt.Utility;
+﻿using DevPrompt.ProcessWorkspace.Utility;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -20,7 +20,7 @@ namespace DevPrompt.Settings
         public GrabConsoleSettings()
         {
             this.exeName = @"cmd.exe";
-            this.tabName = @"cmd";
+            this.tabName = Resources.Menu_RawCommandTabName;
             this.tabActivate = true;
         }
 

@@ -1,4 +1,5 @@
-﻿using DevPrompt.Settings;
+﻿using DevPrompt.ProcessWorkspace.Utility;
+using DevPrompt.Settings;
 using DevPrompt.UI.Settings;
 using DevPrompt.Utility;
 using DevPrompt.Utility.Converters;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -161,7 +163,7 @@ namespace DevPrompt.UI.ViewModels
 
         public ICommand ReportAnIssueCommand => new DelegateCommand(() =>
         {
-            this.RunExternalProcess(@"https://github.com/spadapet/DevPrompt/issues");
+            this.RunExternalProcess(Resources.About_IssuesLink);
         });
 
         public ICommand AboutCommand => new DelegateCommand(() =>
@@ -184,9 +186,9 @@ namespace DevPrompt.UI.ViewModels
 
         public ICommand CloseActiveTabCommand => new DelegateCommand(() =>
         {
-            if (this.ActiveTabWorkspace?.ActiveTab is ITabVM tab)
+            if (this.ActiveTabWorkspace is Api.ITabWorkspace workspace)
             {
-                tab.CloseCommand.SafeExecute();
+                workspace.TabClose();
             }
         });
 
@@ -225,12 +227,12 @@ namespace DevPrompt.UI.ViewModels
         {
             get
             {
-                string intro = Program.IsElevated ? "[Dev Admin]" : "[Dev]";
+                string intro = Program.IsElevated ? Resources.Window_TitlePrefixAdmin : Resources.Window_TitlePrefix;
                 string title = this.activeWorkspace?.Title?.Trim();
 
                 if (!string.IsNullOrEmpty(title))
                 {
-                    return $"{intro} {title}";
+                    return string.Format(CultureInfo.CurrentCulture, Resources.Window_TitleFormat, intro, title);
                 }
 
                 return intro;
@@ -505,7 +507,7 @@ namespace DevPrompt.UI.ViewModels
             }
             catch (Exception ex)
             {
-                this.Window.infoBar.SetError(ex, $"Error: Failed to start \"{path}\"");
+                this.Window.infoBar.SetError(ex, string.Format(CultureInfo.CurrentCulture, Resources.Error_FailedToStart, path));
             }
         }
     }

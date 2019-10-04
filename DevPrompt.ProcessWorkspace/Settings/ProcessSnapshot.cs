@@ -1,9 +1,10 @@
-﻿using DevPrompt.UI.ViewModels;
-using DevPrompt.Utility;
+﻿using DevPrompt.ProcessWorkspace.UI.ViewModels;
+using DevPrompt.ProcessWorkspace.Utility;
+using DevPrompt.UI.ViewModels;
 using System;
 using System.Runtime.Serialization;
 
-namespace DevPrompt.ProcessWorkspace
+namespace DevPrompt.ProcessWorkspace.Settings
 {
     /// <summary>
     /// Saves the state of a process tab during shutdown so it can be restored on startup

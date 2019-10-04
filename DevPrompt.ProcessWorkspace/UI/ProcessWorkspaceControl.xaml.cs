@@ -1,12 +1,12 @@
-﻿using DevPrompt.UI.Controls;
+﻿using DevPrompt.ProcessWorkspace.UI.Controls;
+using DevPrompt.ProcessWorkspace.UI.ViewModels;
 using DevPrompt.UI.ViewModels;
-using DevPrompt.Utility;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
-namespace DevPrompt.ProcessWorkspace
+namespace DevPrompt.ProcessWorkspace.UI
 {
     internal partial class ProcessWorkspaceControl : UserControl, DragItemsControl.IDragHost
     {
@@ -59,9 +59,13 @@ namespace DevPrompt.ProcessWorkspace
 
         private void OnTabButtonMouseDown(object sender, MouseButtonEventArgs args)
         {
-            if (args.ChangedButton == MouseButton.Middle && sender is Button button && button.DataContext is ITabVM tab)
+            if (args.ChangedButton == MouseButton.Middle &&
+                sender is Button button &&
+                button.DataContext is ITabVM tab &&
+                tab.CloseCommand is ICommand command &&
+                command.CanExecute(null))
             {
-                tab.CloseCommand?.SafeExecute();
+                command.Execute(null);
             }
         }
 

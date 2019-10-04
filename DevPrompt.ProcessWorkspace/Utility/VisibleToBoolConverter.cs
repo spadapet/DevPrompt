@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace DevPrompt.Utility.Converters
+namespace DevPrompt.ProcessWorkspace.Utility
 {
-    internal sealed class ActiveToBoolConverter : DelegateConverter
+    internal sealed class VisibleToBoolConverter : DelegateConverter
     {
-        public ActiveToBoolConverter()
-            : base(ActiveToBoolConverter.Convert)
+        public VisibleToBoolConverter()
+            : base(VisibleToBoolConverter.Convert)
         {
         }
 
@@ -13,7 +13,7 @@ namespace DevPrompt.Utility.Converters
         {
             if (value is Api.ActiveState state)
             {
-                return state == Api.ActiveState.Active;
+                return state == Api.ActiveState.Visible;
             }
 
             throw new InvalidOperationException();

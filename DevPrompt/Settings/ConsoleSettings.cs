@@ -1,4 +1,4 @@
-﻿using DevPrompt.Utility;
+﻿using DevPrompt.ProcessWorkspace.Utility;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -29,8 +29,8 @@ namespace DevPrompt.Settings
 
         public ConsoleSettings()
         {
-            this.menuName = @"Command Prompt";
-            this.tabName = @"Cmd";
+            this.menuName = Resources.Menu_RawCommandName;
+            this.tabName = Resources.Menu_RawCommandTabName;
             this.arguments = string.Empty;
             this.startingDirectory = DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.Fixed).Select(d => d.Name).FirstOrDefault();
             this.consoleType = ConsoleType.Cmd;

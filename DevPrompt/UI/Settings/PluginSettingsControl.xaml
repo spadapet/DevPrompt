@@ -8,7 +8,9 @@
     xmlns:vm="clr-namespace:DevPrompt.UI.ViewModels"
     xmlns:dvm="clr-namespace:DevPrompt.UI.DesignerViewModels"
     xmlns:convert="clr-namespace:DevPrompt.Utility.Converters"
+    xmlns:pw="dev://DevPrompt.ProcessWorkspace"
     xmlns:uis="clr-namespace:DevPrompt.UI.Settings"
+    xmlns:local="clr-namespace:DevPrompt"
     xmlns:system="clr-namespace:System;assembly=mscorlib"
     mc:Ignorable="d"
     MinWidth="350" MinHeight="200" d:DesignWidth="500" d:DesignHeight="250"
@@ -16,7 +18,7 @@
     d:DataContext="{d:DesignInstance dvm:PluginsControlDesignerVM, IsDesignTimeCreatable=True}">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisible" />
-        <convert:ObjectToVisibilityConverter x:Key="ObjectToVisible" />
+        <pw:ObjectToVisibilityConverter x:Key="ObjectToVisible" />
         <convert:BoolToCollapsedConverter x:Key="BoolToCollapsed" />
         <convert:BoolToNegativeConverter x:Key="BoolToNegative" />
         <convert:StringToVisibilityConverter x:Key="StringToVisible" />
@@ -39,7 +41,7 @@
             <!-- Green checkbox for "installed" -->
             <uis:PluginStateIconTemplateSelector.InstalledTemplate>
                 <DataTemplate DataType="{x:Type vm:IPluginVM}">
-                    <Canvas Width="18" Height="18" Background="Transparent" ToolTip="Installed">
+                    <Canvas Width="18" Height="18" Background="Transparent" ToolTip="{x:Static local:Resources.PluginDialog_Installed}">
                         <Ellipse Width="18" Height="18" Fill="LimeGreen" />
                         <Polyline Stroke="White" StrokeThickness="3" Points="5.5,8.5 7.5,12.5 12.5,5.5" StrokeEndLineCap="Round" StrokeStartLineCap="Round" StrokeLineJoin="Round" />
                     </Canvas>
@@ -49,7 +51,7 @@
             <!-- Blue up arrow for "update available" -->
             <uis:PluginStateIconTemplateSelector.UpdateAvailableTemplate>
                 <DataTemplate DataType="{x:Type vm:IPluginVM}">
-                    <Canvas Width="18" Height="18" Background="Transparent" ToolTip="Update available">
+                    <Canvas Width="18" Height="18" Background="Transparent" ToolTip="{x:Static local:Resources.PluginDialog_UpdateAvailable}">
                         <Ellipse Width="18" Height="18" Fill="MediumBlue" />
                         <Path Fill="White" Data="M 2,9 9,2 16,9 11,9 11,15 7,15 7,9 Z" />
                     </Canvas>
@@ -59,7 +61,7 @@
             <!-- Spinner for "busy", either installing or updating -->
             <uis:PluginStateIconTemplateSelector.BusyTemplate>
                 <DataTemplate>
-                    <Canvas Width="18" Height="18" Background="Transparent" ToolTip="Installing">
+                    <Canvas Width="18" Height="18" Background="Transparent" ToolTip="{x:Static local:Resources.PluginDialog_Installing}">
                         <Path x:Name="circles" Width="18" Height="18" StrokeThickness="4" Data="M 2,9 A 7,7 180 1 1 16,9 A 7,7 180 1 1 2,9" StrokeDashArray="0,1.5708" StrokeDashCap="Round" StrokeDashOffset="2" RenderTransformOrigin="0.5,0.5">
                             <Path.Stroke>
                                 <LinearGradientBrush>
@@ -141,19 +143,19 @@
                     </Style>
                 </StackPanel.Resources>
                 <TextBlock Visibility="{Binding Authors, Mode=OneWay, Converter={StaticResource StringToVisible}}">
-                    <Run Text="Created By:" FontWeight="Bold" />
+                    <Run Text="{x:Static local:Resources.PluginDialog_CreatedBy}" FontWeight="Bold" />
                     <Run Text="{Binding Authors, Mode=OneWay}" />
                 </TextBlock>
                 <TextBlock Visibility="{Binding State, Converter={StaticResource PluginStateToUpdateAvailableVisibility}, ConverterParameter={StaticResource TrueValue}}">
-                    <Run Text="Version:" FontWeight="Bold" />
+                    <Run Text="{x:Static local:Resources.PluginDialog_Version}" FontWeight="Bold" />
                     <Run Text="{Binding LatestVersion, Mode=OneWay}" />
                 </TextBlock>
                 <TextBlock Visibility="{Binding State, Converter={StaticResource PluginStateToUpdateAvailableVisibility}, ConverterParameter={StaticResource FalseValue}}">
-                    <Run Text="Current Version:" FontWeight="Bold" />
+                    <Run Text="{x:Static local:Resources.PluginDialog_CurrentVersion}" FontWeight="Bold" />
                     <Run Text="{Binding InstalledVersion, Mode=OneWay}" />
                 </TextBlock>
                 <TextBlock Visibility="{Binding State, Converter={StaticResource PluginStateToUpdateAvailableVisibility}, ConverterParameter={StaticResource FalseValue}}">
-                    <Run Text="New Version:" FontWeight="Bold" />
+                    <Run Text="{x:Static local:Resources.PluginDialog_NewVersion}" FontWeight="Bold" />
                     <Run Text="{Binding LatestVersion, Mode=OneWay}" />
                 </TextBlock>
                 <TextBlock Visibility="{Binding ProjectUrl, Mode=OneWay, Converter={StaticResource StringToVisible}}">
@@ -190,7 +192,7 @@
                 </Style>
             </Grid.Resources>
             <StackPanel Orientation="Vertical" Margin="5" Visibility="{Binding CurrentPlugin, Converter={StaticResource ObjectToVisible}}">
-                <Button Content="Install" Command="{Binding InstallPluginCommand}" CommandParameter="{Binding CurrentPlugin}" Visibility="{Binding CurrentPlugin.State, Converter={StaticResource PluginStateToInstallVisibility}, ConverterParameter={StaticResource FalseValue}, FallbackValue=Collapsed}">
+                <Button Content="{x:Static local:Resources.PluginDialog_Install}" Command="{Binding InstallPluginCommand}" CommandParameter="{Binding CurrentPlugin}" Visibility="{Binding CurrentPlugin.State, Converter={StaticResource PluginStateToInstallVisibility}, ConverterParameter={StaticResource FalseValue}, FallbackValue=Collapsed}">
                     <Button.IsEnabled>
                         <MultiBinding Converter="{StaticResource MultiBusyToEnabledConverter}" ConverterParameter="{StaticResource FalseValue}">
                             <Binding Path="IsBusy" />
@@ -199,7 +201,7 @@
                         </MultiBinding>
                     </Button.IsEnabled>
                 </Button>
-                <Button Content="Update" Command="{Binding InstallPluginCommand}" CommandParameter="{Binding CurrentPlugin}" Visibility="{Binding CurrentPlugin.State, Converter={StaticResource PluginStateToUpdateVisibility}, ConverterParameter={StaticResource FalseValue}, FallbackValue=Collapsed}">
+                <Button Content="{x:Static local:Resources.PluginDialog_Update}" Command="{Binding InstallPluginCommand}" CommandParameter="{Binding CurrentPlugin}" Visibility="{Binding CurrentPlugin.State, Converter={StaticResource PluginStateToUpdateVisibility}, ConverterParameter={StaticResource FalseValue}, FallbackValue=Collapsed}">
                     <Button.IsEnabled>
                         <MultiBinding Converter="{StaticResource MultiBusyToEnabledConverter}" ConverterParameter="{StaticResource FalseValue}">
                             <Binding Path="IsBusy" />
@@ -208,7 +210,7 @@
                         </MultiBinding>
                     </Button.IsEnabled>
                 </Button>
-                <Button Content="Uninstall" Command="{Binding UninstallPluginCommand}" CommandParameter="{Binding CurrentPlugin}" Visibility="{Binding CurrentPlugin.State, Converter={StaticResource PluginStateToInstallVisibility}, ConverterParameter={StaticResource TrueValue}, FallbackValue=Collapsed}">
+                <Button Content="{x:Static local:Resources.PluginDialog_Uninstall}" Command="{Binding UninstallPluginCommand}" CommandParameter="{Binding CurrentPlugin}" Visibility="{Binding CurrentPlugin.State, Converter={StaticResource PluginStateToInstallVisibility}, ConverterParameter={StaticResource TrueValue}, FallbackValue=Collapsed}">
                     <Button.IsEnabled>
                         <MultiBinding Converter="{StaticResource MultiBusyToEnabledConverter}" ConverterParameter="{StaticResource FalseValue}">
                             <Binding Path="IsBusy" />

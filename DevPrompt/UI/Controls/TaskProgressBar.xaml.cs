@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -34,7 +35,7 @@ namespace DevPrompt.UI.Controls
 
         public IDisposable Begin(Action cancelAction, string text)
         {
-            this.Dispatcher.CheckAccess();
+            Debug.Assert(this.Dispatcher.CheckAccess());
 
             TaskInfo info = new TaskInfo()
             {
@@ -48,7 +49,7 @@ namespace DevPrompt.UI.Controls
 
         private void PushTask(TaskInfo info)
         {
-            this.Dispatcher.CheckAccess();
+            Debug.Assert(this.Dispatcher.CheckAccess());
 
             info.Owner = this;
             this.tasks.Add(info);
@@ -72,7 +73,7 @@ namespace DevPrompt.UI.Controls
 
         private void Cancel(TaskInfo info)
         {
-            this.Dispatcher.CheckAccess();
+            Debug.Assert(this.Dispatcher.CheckAccess());
 
             if (this.tasks.Remove(info))
             {
@@ -89,7 +90,7 @@ namespace DevPrompt.UI.Controls
 
         public void Cancel()
         {
-            this.Dispatcher.CheckAccess();
+            Debug.Assert(this.Dispatcher.CheckAccess());
 
             foreach (TaskInfo info in this.tasks.ToArray())
             {

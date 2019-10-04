@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Windows;
 
-namespace DevPrompt.Utility.Converters
+namespace DevPrompt.ProcessWorkspace.Utility
 {
-    internal sealed class ObjectToVisibilityConverter : DelegateConverter
+    public sealed class ObjectToVisibilityConverter : DelegateConverter
     {
         public ObjectToVisibilityConverter()
             : base(ObjectToVisibilityConverter.Convert)

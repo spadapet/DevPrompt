@@ -7,8 +7,9 @@
         xmlns:vm="clr-namespace:DevPrompt.UI.ViewModels"
         xmlns:conv="clr-namespace:DevPrompt.Utility.Converters"
         xmlns:control="clr-namespace:DevPrompt.UI.Controls"
+        xmlns:local="clr-namespace:DevPrompt"
         mc:Ignorable="d"
-        Title="Settings"
+        Title="{x:Static local:Resources.SettingsDialog_Title}"
         Width="640"
         Height="350"
         MinWidth="640"
@@ -48,12 +49,12 @@
             <control:TaskProgressBar x:Name="progressBar" HorizontalAlignment="Right" VerticalAlignment="Top" Width="250" Height="18" />
         </Grid>
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="5,10,15,15" HorizontalAlignment="Left">
-            <Button Content="Import..." MinWidth="70" Margin="5,0,10,0" Command="{Binding ImportCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource BoolToNegative}}" />
-            <Button Content="Export..." MinWidth="70" Margin="0,0,10,0" Command="{Binding ExportCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource BoolToNegative}}" />
+            <Button Content="{x:Static local:Resources.SettingsDialog_Import}" MinWidth="70" Margin="5,0,10,0" Command="{Binding ImportCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource BoolToNegative}}" />
+            <Button Content="{x:Static local:Resources.SettingsDialog_Export}" MinWidth="70" Margin="0,0,10,0" Command="{Binding ExportCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource BoolToNegative}}" />
         </StackPanel>
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10,15,15" HorizontalAlignment="Right">
-            <Button Content="OK" IsDefault="true" MinWidth="70" Margin="0,0,10,0" Click="OnClickOk" IsEnabled="{Binding IsBusy, Converter={StaticResource BoolToNegative}}" />
-            <Button Content="Cancel" IsCancel="True" MinWidth="70" />
+            <Button Content="{x:Static local:Resources.Dialog_OK}" IsDefault="true" MinWidth="70" Margin="0,0,10,0" Click="OnClickOk" IsEnabled="{Binding IsBusy, Converter={StaticResource BoolToNegative}}" />
+            <Button Content="{x:Static local:Resources.Dialog_Cancel}" IsCancel="True" MinWidth="70" />
         </StackPanel>
     </Grid>
 </Window>
