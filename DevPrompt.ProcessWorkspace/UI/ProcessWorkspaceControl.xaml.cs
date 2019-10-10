@@ -61,7 +61,7 @@ namespace DevPrompt.ProcessWorkspace.UI
         {
             if (args.ChangedButton == MouseButton.Middle &&
                 sender is Button button &&
-                button.DataContext is ITabVM tab &&
+                button.DataContext is TabVM tab &&
                 tab.CloseCommand is ICommand command &&
                 command.CanExecute(null))
             {
@@ -128,7 +128,7 @@ namespace DevPrompt.ProcessWorkspace.UI
 
         void DragItemsControl.IDragHost.OnDrop(ItemsControl source, object droppedModel, int droppedIndex, bool copy)
         {
-            if (source == this.tabItemsControl && droppedModel is ITabVM tab)
+            if (source == this.tabItemsControl && droppedModel is TabVM tab)
             {
                 this.ViewModel.OnDrop(tab, droppedIndex, copy);
             }
@@ -139,7 +139,7 @@ namespace DevPrompt.ProcessWorkspace.UI
         /// </summary>
         bool DragItemsControl.IDragHost.CanDropCopy(object droppedModel)
         {
-            return (droppedModel is ITabVM tab) && (tab.Tab is ProcessTab);
+            return (droppedModel is TabVM tab) && (tab.Tab is ProcessTab);
         }
     }
 }

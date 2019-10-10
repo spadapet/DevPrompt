@@ -21,7 +21,7 @@ namespace DevPrompt.ProcessWorkspace.Settings
         public TabWorkspaceSnapshot(Api.ITabWorkspace workspace)
             : this()
         {
-            foreach (ITabVM tab in workspace.Tabs.OfType<ITabVM>())
+            foreach (TabVM tab in workspace.Tabs.OfType<TabVM>())
             {
                 if (tab.Snapshot is Api.ITabSnapshot tabSnapshot)
                 {

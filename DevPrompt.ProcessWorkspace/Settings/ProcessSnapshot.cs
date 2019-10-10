@@ -62,7 +62,7 @@ namespace DevPrompt.ProcessWorkspace.Settings
         {
             if (!string.IsNullOrEmpty(this.State) &&
                 workspace is Api.IProcessWorkspace processWorkspace &&
-                processWorkspace.RestoreProcess(this.State, this.RawName) is ITabVM tab)
+                processWorkspace.RestoreProcess(this.State, this.RawName) is TabVM tab)
             {
                 return tab.Tab;
             }

@@ -34,7 +34,6 @@
     <Compile Include="Utility\DelegateCommand.cs" />
     <Compile Include="Utility\DelegateConverter.cs" />
     <Compile Include="UI\Controls\DragItemsControl.cs" />
-    <Compile Include="UI\ViewModels\ITabVM.cs" />
     <Compile Include="Utility\ObjectToVisibilityConverter.cs" />
     <Compile Include="ProcessHostWindow.cs" />
     <Compile Include="ProcessListener.cs" />

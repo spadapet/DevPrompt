@@ -34,7 +34,7 @@
             </ControlTemplate.Triggers>
         </ControlTemplate>
 
-        <DataTemplate x:Key="TabButtonContentTemplate" DataType="{x:Type vm:ITabVM}">
+        <DataTemplate x:Key="TabButtonContentTemplate" DataType="{x:Type vm:TabVM}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" MinWidth="48" />
@@ -73,7 +73,7 @@
             </DataTemplate.Triggers>
         </DataTemplate>
 
-        <DataTemplate x:Key="TabItemTemplate" DataType="{x:Type vm:ITabVM}">
+        <DataTemplate x:Key="TabItemTemplate" DataType="{x:Type vm:TabVM}">
             <Button
                 x:Name="RootButton"
                 Selector.IsSelected="{Binding ActiveState, Mode=OneWay, Converter={StaticResource VisibleToBool}}"

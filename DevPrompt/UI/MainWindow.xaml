@@ -78,6 +78,18 @@
                     <MenuItem Header="{x:Static dp:Resources.Menu_AutoGrab}" IsCheckable="True" IsChecked="{Binding AppSettings.ConsoleGrabEnabled, Mode=TwoWay}" />
                     <MenuItem Header="{x:Static dp:Resources.Menu_Customize}" Command="{Binding CustomizeConsoleGrabCommand}" />
                 </MenuItem>
+                <MenuItem Header="_Calculator" ContextMenuOpening="MenuItem_ContextMenuOpening" SubmenuOpened="MenuItem_SubmenuOpened">
+                    <Grid Width="200" Height="300">
+                        <StackPanel Orientation="Vertical" Margin="5">
+                            <TextBox x:Name="firstFocus" Text="1234.56" />
+                            <TextBox Text="1234.56" />
+                            <TextBox Text="1234.56" />
+                            <Border BorderThickness="2" BorderBrush="Red" Background="Yellow" Height="30" />
+                            <Border BorderThickness="2" BorderBrush="Red" Background="Yellow" Height="30" />
+                            <Border BorderThickness="2" BorderBrush="Red" Background="Yellow" Height="30" />
+                        </StackPanel>
+                    </Grid>
+                </MenuItem>
                 <MenuItem Header="{x:Static dp:Resources.Menu_VS}" SubmenuOpened="OnVsMenuOpened">
                     <MenuItem Header="{x:Static dp:Resources.Menu_VsUpdating}" IsEnabled="False" />
                     <Separator Tag="[End]" />

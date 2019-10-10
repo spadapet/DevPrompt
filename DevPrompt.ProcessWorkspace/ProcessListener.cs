@@ -35,7 +35,7 @@ namespace DevPrompt.ProcessWorkspace
                         RawName = this.app.Settings.GetDefaultTabName(path)
                     };
 
-                    ITabVM tabVM = workspace.Tabs.OfType<ITabVM>().FirstOrDefault(t => t.TakeRestoredTab(tab));
+                    TabVM tabVM = workspace.Tabs.OfType<TabVM>().FirstOrDefault(t => t.TakeRestoredTab(tab));
                     if (tabVM != null)
                     {
                         if (activate)
@@ -60,7 +60,7 @@ namespace DevPrompt.ProcessWorkspace
             {
                 Api.IProcessWorkspace workspace = pair.Item2;
 
-                if (workspace.FindTab(process) is ITabVM tab)
+                if (workspace.FindTab(process) is TabVM tab)
                 {
                     workspace.RemoveTab(tab);
                     break;

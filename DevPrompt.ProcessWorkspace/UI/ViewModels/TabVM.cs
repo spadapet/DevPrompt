@@ -9,7 +9,7 @@ using System.Windows.Input;
 
 namespace DevPrompt.ProcessWorkspace.UI.ViewModels
 {
-    internal class TabVM : PropertyNotifier, ITabVM
+    internal class TabVM : PropertyNotifier, Api.ITabHolder, IDisposable
     {
         public string Title => this.Tab?.Title ?? string.Empty;
         public UIElement ViewElement => this.Tab?.ViewElement;
@@ -221,7 +221,7 @@ namespace DevPrompt.ProcessWorkspace.UI.ViewModels
 
         public ICommand CloseAllButThisCommand => new DelegateCommand(() =>
         {
-            foreach (ITabVM tab in this.workspace.Tabs.OfType<ITabVM>().ToArray())
+            foreach (TabVM tab in this.workspace.Tabs.OfType<TabVM>().ToArray())
             {
                 if (tab != this && tab.CloseCommand is ICommand command && command.CanExecute(null))
                 {
