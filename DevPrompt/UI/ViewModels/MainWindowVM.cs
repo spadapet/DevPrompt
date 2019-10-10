@@ -178,34 +178,22 @@ namespace DevPrompt.UI.ViewModels
 
         public ICommand SetActiveTabNameCommand => new DelegateCommand(() =>
         {
-            if (this.ActiveTabWorkspace is Api.IProcessWorkspace workspace)
-            {
-                workspace.SetActiveTabName();
-            }
+            this.ActiveTabWorkspace?.TabSetName();
         });
 
         public ICommand CloseActiveTabCommand => new DelegateCommand(() =>
         {
-            if (this.ActiveTabWorkspace is Api.ITabWorkspace workspace)
-            {
-                workspace.TabClose();
-            }
+            this.ActiveTabWorkspace?.TabClose();
         });
 
         public ICommand DetachActiveTabCommand => new DelegateCommand(() =>
         {
-            if (this.ActiveTabWorkspace is Api.IProcessWorkspace workspace)
-            {
-                workspace.DetachActiveTab();
-            }
+            this.ActiveTabWorkspace?.TabDetach();
         });
 
         public ICommand CloneActiveTabCommand => new DelegateCommand(() =>
         {
-            if (this.ActiveTabWorkspace is Api.IProcessWorkspace workspace)
-            {
-                workspace.CloneActiveTab();
-            }
+            this.ActiveTabWorkspace?.TabClone();
         });
 
         public ICommand TabCycleNextCommand => new DelegateCommand(() =>

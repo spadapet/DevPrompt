@@ -9,9 +9,5 @@
         ITabHolder RunProcess(string executable, string arguments, string startingDirectory, string tabName);
         ITabHolder RestoreProcess(string state, string tabName);
         ITabHolder CloneProcess(ITab tab, string tabName);
-
-        void SetActiveTabName();
-        void DetachActiveTab();
-        void CloneActiveTab();
     }
 }

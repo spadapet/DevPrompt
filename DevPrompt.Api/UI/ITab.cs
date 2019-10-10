@@ -21,6 +21,9 @@ namespace DevPrompt.Api
         void Focus();
         void OnShowing();
         void OnHiding();
-        bool OnClosing(); // Return false to prevent RemoveTab from being called
+        bool OnClosing(); // Global Ctrl+F4. Return false to prevent RemoveTab from being called
+        void OnSetTabName(); // Global Ctrl+Shift+T
+        void OnClone(); // Global Ctrl+T
+        void OnDetach(); // Global Ctrl+Shift+F4
     }
 }

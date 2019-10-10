@@ -263,7 +263,7 @@ namespace DevPrompt.UI
                 {
                     try
                     {
-                        foreach (MenuItem item in provider.GetMenuItems(menuType, this.ViewModel))
+                        foreach (FrameworkElement item in provider.GetMenuItems(menuType, this.ViewModel))
                         {
                             if (item != null)
                             {

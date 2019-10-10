@@ -15,5 +15,8 @@ namespace DevPrompt.Api
         void TabCyclePrev();
         void TabContextMenu();
         void TabClose();
+        void TabSetName();
+        void TabDetach();
+        void TabClone();
     }
 }

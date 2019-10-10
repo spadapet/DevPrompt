@@ -294,6 +294,21 @@ namespace DevPrompt.ProcessWorkspace
             }
         }
 
+        public void TabSetName()
+        {
+            this.ActiveTab?.Tab?.OnSetTabName();
+        }
+
+        public void TabDetach()
+        {
+            this.ActiveTab?.Tab?.OnDetach();
+        }
+
+        public void TabClone()
+        {
+            this.ActiveTab?.Tab?.OnClone();
+        }
+
         public Api.ITabHolder AddTab(Api.ITab tab, bool activate)
         {
             TabVM tabVM = new TabVM(this.Window, this, tab);
@@ -433,7 +448,7 @@ namespace DevPrompt.ProcessWorkspace
 
                     try
                     {
-                        processTab.CloneCommand();
+                        processTab.OnClone();
                     }
                     finally
                     {
@@ -502,30 +517,6 @@ namespace DevPrompt.ProcessWorkspace
             }
 
             return null;
-        }
-
-        public void SetActiveTabName()
-        {
-            if (this.ActiveTab?.Tab is ProcessTab processTab)
-            {
-                processTab.SetTabNameCommand();
-            }
-        }
-
-        public void DetachActiveTab()
-        {
-            if (this.ActiveTab?.Tab is ProcessTab processTab)
-            {
-                processTab.DetachCommand();
-            }
-        }
-
-        public void CloneActiveTab()
-        {
-            if (this.ActiveTab?.Tab is ProcessTab processTab)
-            {
-                processTab.CloneCommand();
-            }
         }
     }
 }

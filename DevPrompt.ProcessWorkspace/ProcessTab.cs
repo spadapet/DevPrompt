@@ -102,7 +102,7 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
-        public void SetTabNameCommand()
+        public void OnSetTabName()
         {
             TabNameDialog dialog = new TabNameDialog(this.RawName)
             {
@@ -115,22 +115,22 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
-        public void CloneCommand()
+        public void OnClone()
         {
             this.workspace.CloneProcess(this, this.RawName);
         }
 
-        public void DetachCommand()
+        public void OnDetach()
         {
             this.Process.Detach();
         }
 
-        public void DefaultsCommand()
+        public void OnConsoleDefaults()
         {
             this.Process.RunCommand(Api.ProcessCommand.DefaultsDialog);
         }
 
-        public void PropertiesCommand()
+        public void OnConsoleProperties()
         {
             this.Process.RunCommand(Api.ProcessCommand.PropertiesDialog);
         }
@@ -143,7 +143,7 @@ namespace DevPrompt.UI.ViewModels
                 {
                     Header = Resources.Command_SetTabName,
                     InputGestureText = "Ctrl+Shift+T",
-                    Command = new DelegateCommand(this.SetTabNameCommand),
+                    Command = new DelegateCommand(this.OnSetTabName),
                 };
 
                 yield return new Separator();
@@ -152,19 +152,19 @@ namespace DevPrompt.UI.ViewModels
                 {
                     Header = Resources.Command_Clone,
                     InputGestureText = "Ctrl+T",
-                    Command = new DelegateCommand(this.CloneCommand),
+                    Command = new DelegateCommand(this.OnClone),
                 };
 
                 yield return new MenuItem()
                 {
                     Header = Resources.Command_ConsoleDefaults,
-                    Command = new DelegateCommand(this.DefaultsCommand),
+                    Command = new DelegateCommand(this.OnConsoleDefaults),
                 };
 
                 yield return new MenuItem()
                 {
                     Header = Resources.Command_ConsoleProperties,
-                    Command = new DelegateCommand(this.PropertiesCommand),
+                    Command = new DelegateCommand(this.OnConsoleProperties),
                 };
 
                 yield return new Separator();
@@ -173,7 +173,7 @@ namespace DevPrompt.UI.ViewModels
                 {
                     Header = Resources.Command_Detach,
                     InputGestureText = "Ctrl+Shift+F4",
-                    Command = new DelegateCommand(this.DetachCommand),
+                    Command = new DelegateCommand(this.OnDetach),
                 };
             }
         }

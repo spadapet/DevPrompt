@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Windows.Controls;
+using System.Windows;
 
 namespace DevPrompt.Api
 {
@@ -8,6 +8,6 @@ namespace DevPrompt.Api
     /// </summary>
     public interface IMenuItemProvider
     {
-        IEnumerable<MenuItem> GetMenuItems(MenuType menu, IWindow window);
+        IEnumerable<FrameworkElement> GetMenuItems(MenuType menu, IWindow window);
     }
 }
