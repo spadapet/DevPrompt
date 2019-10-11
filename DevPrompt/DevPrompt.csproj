@@ -208,7 +208,7 @@
       <Project>{69e79abb-e387-479b-b007-64c25966ded6}</Project>
       <Name>DevPrompt.Api</Name>
     </ProjectReference>
-    <PackageReference Include="System.Composition" Version="1.2.0" />
+    <PackageReference Include="System.Composition" Version="1.3.0" />
     <PackageReference Include="Efficient.Json" Version="1.1.2" />
     <ProjectReference Include="..\DevPrompt.ProcessWorkspace\DevPrompt.ProcessWorkspace.csproj">
       <Project>{ba155622-ddbd-48cc-942a-33da3a9fef1f}</Project>
