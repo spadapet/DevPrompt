@@ -397,15 +397,5 @@ namespace DevPrompt.UI
         {
             this.ViewModel.FocusActiveWorkspace();
         }
-
-        private void MenuItem_ContextMenuOpening(object sender, ContextMenuEventArgs e)
-        {
-
-        }
-
-        private void MenuItem_SubmenuOpened(object sender, RoutedEventArgs e)
-        {
-            this.firstFocus.Focus();
-        }
     }
 }
