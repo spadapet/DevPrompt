@@ -9,14 +9,5 @@ namespace DevPrompt.Api
         ITabHolder AddTab(ITab tab, bool activate);
         ITabHolder AddTab(ITabSnapshot snapshot, bool activate);
         void RemoveTab(ITabHolder tab);
-
-        void TabCycleStop();
-        void TabCycleNext();
-        void TabCyclePrev();
-        void TabContextMenu();
-        void TabClose();
-        void TabSetName();
-        void TabDetach();
-        void TabClone();
     }
 }

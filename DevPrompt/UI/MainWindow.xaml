@@ -29,16 +29,6 @@
     </Window.Resources>
 
     <Window.InputBindings>
-        <!-- Hot keys needs to match ConhostWindowProc in ConhostContext.cpp -->
-        <KeyBinding x:Name="closeActiveTabInputBinding" Key="F4" Modifiers="Ctrl" />
-        <KeyBinding x:Name="detachActiveTabInputBinding" Key="F4" Modifiers="Ctrl+Shift" />
-        <KeyBinding x:Name="cloneActiveTabInputBinding" Key="T" Modifiers="Ctrl" />
-        <KeyBinding x:Name="nameActiveTabInputBinding" Key="T" Modifiers="Ctrl+Shift" />
-        <KeyBinding x:Name="cloneActiveTabInputBinding2" Key="K" Modifiers="Ctrl" />
-        <KeyBinding x:Name="nameActiveTabInputBinding2" Key="K" Modifiers="Ctrl+Shift" />
-        <KeyBinding x:Name="tabCycleNextInputBinding" Key="Tab" Modifiers="Ctrl" />
-        <KeyBinding x:Name="tabCyclePrevInputBinding" Key="Tab" Modifiers="Ctrl+Shift" />
-        <KeyBinding x:Name="contextMenuTabInputBinding" Key="F10" Modifiers="Shift" />
         <KeyBinding x:Name="keyCtrl1" Key="D1" Modifiers="Ctrl" />
         <KeyBinding x:Name="keyCtrl2" Key="D2" Modifiers="Ctrl" />
         <KeyBinding x:Name="keyCtrl3" Key="D3" Modifiers="Ctrl" />

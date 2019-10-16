@@ -73,12 +73,45 @@ static LRESULT __stdcall ConhostWindowProc(HWND hwnd, UINT msg, WPARAM wp, LPARA
         case WM_CHAR:
             switch (wp)
             {
+            case 2: //  Ctrl-B
+            case 4: //  Ctrl-D
+            case 5: //  Ctrl-E
+            case 7: //  Ctrl-G
             case 11: // Ctrl-K
+            case 12: // Ctrl-L
+            case 14: // Ctrl-N
+            case 15: // Ctrl-O
+            case 16: // Ctrl-P
+            case 17: // Ctrl-Q
+            case 18: // Ctrl-R
+            case 19: // Ctrl-S
             case 20: // Ctrl-T
+            case 21: // Ctrl-U
+            case 23: // Ctrl-W
+            case 24: // Ctrl-X
+            case 25: // Ctrl-Y
+            case 26: // Ctrl-Z
                 handler = MsgHandler::ParentKeyboard;
                 parentMsg = (lp & 0x80000000) ? WM_KEYUP : WM_KEYDOWN;
                 parentWP = 'A' + wp - 1;
                 break;
+
+            // These only work with the SHIFT key down too
+            case 1: // Ctrl-A: Select all
+            case 6: // Ctrl-F: Find
+            case 22: // Ctrl-V: Paste
+                if (::GetKeyState(VK_SHIFT) < 0)
+                {
+                    handler = MsgHandler::ParentKeyboard;
+                }
+                break;
+
+            // These can't be sent away
+            // case 3:  Ctrl-C: Cancel/Copy
+            // case 8:  Ctrl-H: Backspace
+            // case 9:  Ctrl-I: Autocomplete
+            // case 10: Ctrl-J: ???
+            // case 13: Ctrl-M: Mark
             }
             break;
 
@@ -95,6 +128,7 @@ static LRESULT __stdcall ConhostWindowProc(HWND hwnd, UINT msg, WPARAM wp, LPARA
             case '7':
             case '8':
             case '9':
+            case '0':
             case VK_F4:
             case VK_TAB:
                 if (::GetKeyState(VK_CONTROL) < 0)

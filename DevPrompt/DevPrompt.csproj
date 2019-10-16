@@ -133,6 +133,7 @@
     <Compile Include="Utility\DelegateDisposable.cs" />
     <Compile Include="Settings\AppSettings.cs" />
     <Compile Include="Utility\VisualStudioSetup.cs" />
+    <Compile Include="Utility\WorkspaceCommandWrapper.cs" />
     <Page Include="UI\Controls\InfoBar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

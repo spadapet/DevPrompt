@@ -154,8 +154,41 @@ namespace DevPrompt.ProcessWorkspace
             }
         }
 
-        IEnumerable<MenuItem> Api.IWorkspace.MenuItems => null;
+        IEnumerable<FrameworkElement> Api.IWorkspace.MenuItems => Enumerable.Empty<FrameworkElement>();
         UIElement Api.IWorkspace.ViewElement => this.ViewElement;
+
+        IEnumerable<KeyBinding> Api.IWorkspace.KeyBindings => new KeyBinding[]
+        {
+            new KeyBinding(new DelegateCommand(this.TabClose), Key.F4, ModifierKeys.Control),
+            new KeyBinding(new DelegateCommand(this.TabDetach), Key.F4, ModifierKeys.Control | ModifierKeys.Shift),
+            new KeyBinding(new DelegateCommand(this.TabClone), Key.T, ModifierKeys.Control),
+            new KeyBinding(new DelegateCommand(this.TabSetName), Key.T, ModifierKeys.Control | ModifierKeys.Shift),
+            new KeyBinding(new DelegateCommand(this.TabCycleNext), Key.Tab, ModifierKeys.Control),
+            new KeyBinding(new DelegateCommand(this.TabCyclePrev), Key.Tab, ModifierKeys.Control | ModifierKeys.Shift),
+            new KeyBinding(new DelegateCommand(this.TabContextMenu), Key.F10, ModifierKeys.Shift),
+        };
+
+        void Api.IWorkspace.OnKeyEvent(KeyEventArgs args)
+        {
+            switch (args.Key)
+            {
+                case Key.LeftCtrl:
+                case Key.RightCtrl:
+                    if (args.IsUp)
+                    {
+                        this.TabCycleStop();
+                    }
+                    break;
+
+                case Key.Apps:
+                    if (args.IsUp)
+                    {
+                        args.Handled = true;
+                        this.TabContextMenu();
+                    }
+                    break;
+            }
+        }
 
         public ProcessWorkspaceControl ViewElement
         {
@@ -238,7 +271,7 @@ namespace DevPrompt.ProcessWorkspace
             }
         }
 
-        public void TabCycleStop()
+        private void TabCycleStop()
         {
             if (this.currentTabCycle != null)
             {
@@ -248,7 +281,7 @@ namespace DevPrompt.ProcessWorkspace
             }
         }
 
-        public void TabCycleNext()
+        private void TabCycleNext()
         {
             if (this.tabOrder.Count > 1)
             {
@@ -262,7 +295,7 @@ namespace DevPrompt.ProcessWorkspace
             }
         }
 
-        public void TabCyclePrev()
+        private void TabCyclePrev()
         {
             if (this.tabOrder.Count > 1)
             {
@@ -276,7 +309,7 @@ namespace DevPrompt.ProcessWorkspace
             }
         }
 
-        public void TabContextMenu()
+        private void TabContextMenu()
         {
             if (this.ActiveTab is TabVM tab && this.tabButtons.FirstOrDefault(b => b.Tab == tab) is ButtonInfo info && info.ContextMenu is ContextMenu menu)
             {
@@ -286,7 +319,7 @@ namespace DevPrompt.ProcessWorkspace
             }
         }
 
-        public void TabClose()
+        private void TabClose()
         {
             if (this.ActiveTab is TabVM tab && tab.CloseCommand is ICommand command && command.CanExecute(null))
             {
@@ -294,17 +327,17 @@ namespace DevPrompt.ProcessWorkspace
             }
         }
 
-        public void TabSetName()
+        private void TabSetName()
         {
             this.ActiveTab?.Tab?.OnSetTabName();
         }
 
-        public void TabDetach()
+        private void TabDetach()
         {
             this.ActiveTab?.Tab?.OnDetach();
         }
 
-        public void TabClone()
+        private void TabClone()
         {
             this.ActiveTab?.Tab?.OnClone();
         }

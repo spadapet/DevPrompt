@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace DevPrompt.UI.ViewModels
@@ -13,7 +12,8 @@ namespace DevPrompt.UI.ViewModels
         string Tooltip { get; }
         string Title { get; }
         UIElement ViewElement { get; }
-        IEnumerable<MenuItem> MenuItems { get; }
+        IEnumerable<FrameworkElement> MenuItems { get; }
+        IEnumerable<KeyBinding> KeyBindings { get; }
         Api.IWorkspaceSnapshot Snapshot { get; }
         ICommand ActivateCommand { get; }
 

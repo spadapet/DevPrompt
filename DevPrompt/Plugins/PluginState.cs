@@ -21,7 +21,7 @@ namespace DevPrompt.Plugins
         public IEnumerable<PluginSource> Plugins => this.plugins;
         public IEnumerable<Api.IAppListener> AppListeners => this.appListeners ?? Enumerable.Empty<Api.IAppListener>();
         public IEnumerable<IProcessListener> ProcessListeners => this.processListeners ?? Enumerable.Empty<IProcessListener>();
-        public IEnumerable<Api.IMenuItemProvider> MenuItemProviders => this.menuItemProviders ?? Enumerable.Empty<Api.IMenuItemProvider>();
+        public IEnumerable<Api.ICommandProvider> CommandProviders => this.commandProviders ?? Enumerable.Empty<Api.ICommandProvider>();
         public IEnumerable<Api.IWorkspaceProvider> WorkspaceProviders => this.workspaceProviders ?? Enumerable.Empty<Api.IWorkspaceProvider>();
 
         private App app;
@@ -29,7 +29,7 @@ namespace DevPrompt.Plugins
         private CompositionHost compositionHost;
         private Api.IAppListener[] appListeners;
         private IProcessListener[] processListeners;
-        private Api.IMenuItemProvider[] menuItemProviders;
+        private Api.ICommandProvider[] commandProviders;
         private Api.IWorkspaceProvider[] workspaceProviders;
 
 #if NET_FRAMEWORK
@@ -63,7 +63,7 @@ namespace DevPrompt.Plugins
                 this.ProcessCache = this.compositionHost.GetExport<IProcessCache>();
                 this.appListeners = this.GetOrderedExports<Api.IAppListener>().ToArray();
                 this.processListeners = this.GetOrderedExports<IProcessListener>().ToArray();
-                this.menuItemProviders = this.GetOrderedExports<Api.IMenuItemProvider>().ToArray();
+                this.commandProviders = this.GetOrderedExports<Api.ICommandProvider>().ToArray();
                 this.workspaceProviders = this.GetOrderedExports<Api.IWorkspaceProvider>().ToArray();
             }
             else

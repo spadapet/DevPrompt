@@ -1,13 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Input;
 
 namespace DevPrompt.Api
 {
     /// <summary>
-    /// Adds menu items to the main window
+    /// Adds commands to the main window
     /// </summary>
-    public interface IMenuItemProvider
+    public interface ICommandProvider
     {
         IEnumerable<FrameworkElement> GetMenuItems(MenuType menu, IWindow window);
+        IEnumerable<KeyBinding> GetKeyBindings(IWindow window);
     }
 }

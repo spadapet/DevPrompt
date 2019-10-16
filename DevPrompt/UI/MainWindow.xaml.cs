@@ -30,16 +30,6 @@ namespace DevPrompt.UI
 
             this.InitializeComponent();
 
-            this.closeActiveTabInputBinding.Command = this.ViewModel.CloseActiveTabCommand;
-            this.detachActiveTabInputBinding.Command = this.ViewModel.DetachActiveTabCommand;
-            this.cloneActiveTabInputBinding.Command = this.ViewModel.CloneActiveTabCommand;
-            this.nameActiveTabInputBinding.Command = this.ViewModel.SetActiveTabNameCommand;
-            this.cloneActiveTabInputBinding2.Command = this.cloneActiveTabInputBinding.Command;
-            this.nameActiveTabInputBinding2.Command = this.nameActiveTabInputBinding.Command;
-            this.tabCycleNextInputBinding.Command = this.ViewModel.TabCycleNextCommand;
-            this.tabCyclePrevInputBinding.Command = this.ViewModel.TabCyclePrevCommand;
-            this.contextMenuTabInputBinding.Command = this.ViewModel.ContextMenuCommand;
-
             this.keyCtrl1.Command = this.ViewModel.QuickStartConsoleCommand;
             this.keyCtrl2.Command = this.ViewModel.QuickStartConsoleCommand;
             this.keyCtrl3.Command = this.ViewModel.QuickStartConsoleCommand;
@@ -68,6 +58,7 @@ namespace DevPrompt.UI
         {
             this.ViewModel.InitWorkspaces(snapshot);
             this.AddPluginMenuItems(this.mainMenu, Api.MenuType.MenuBar);
+            this.AddPluginKeyBindings();
         }
 
         public UIElement ViewElement
@@ -259,7 +250,7 @@ namespace DevPrompt.UI
                 separator.Tag = null;
                 int index = menu.Items.IndexOf(separator);
 
-                foreach (Api.IMenuItemProvider provider in this.App.PluginState.MenuItemProviders)
+                foreach (Api.ICommandProvider provider in this.App.PluginState.CommandProviders)
                 {
                     try
                     {
@@ -281,6 +272,29 @@ namespace DevPrompt.UI
                 {
                     // No plugins added anything
                     separator.Visibility = Visibility.Collapsed;
+                }
+            }
+        }
+
+        private void AddPluginKeyBindings()
+        {
+            Debug.Assert(this.App.PluginState.Initialized);
+
+            foreach (Api.ICommandProvider provider in this.App.PluginState.CommandProviders)
+            {
+                try
+                {
+                    foreach (KeyBinding binding in provider.GetKeyBindings(this.ViewModel))
+                    {
+                        if (binding != null)
+                        {
+                            this.InputBindings.Add(binding);
+                        }
+                    }
+                }
+                catch
+                {
+                    Debug.Fail($"IMenuItemProvider.GetKeyBindings failed in plugin class {provider.GetType().FullName}");
                 }
             }
         }
@@ -358,24 +372,7 @@ namespace DevPrompt.UI
 
         private void OnKeyEvent(object sender, KeyEventArgs args)
         {
-            switch (args.Key)
-            {
-                case Key.LeftCtrl:
-                case Key.RightCtrl:
-                    if (args.IsUp)
-                    {
-                        this.ViewModel.ActiveTabWorkspace?.TabCycleStop();
-                    }
-                    break;
-
-                case Key.Apps:
-                    if (args.IsUp)
-                    {
-                        args.Handled = true;
-                        this.ViewModel.ContextMenuCommand.SafeExecute();
-                    }
-                    break;
-            }
+            this.ViewModel.ActiveWorkspace?.Workspace?.OnKeyEvent(args);
         }
 
         protected override void OnGotKeyboardFocus(KeyboardFocusChangedEventArgs args)

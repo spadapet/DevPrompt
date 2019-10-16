@@ -39,7 +39,8 @@ namespace DevPrompt.UI.ViewModels
         public ICommand QuickStartConsoleCommand { get; }
 
         private ObservableCollection<IWorkspaceVM> workspaces;
-        private Dictionary<IWorkspaceVM, MenuItem[]> workspaceMenuItems;
+        private Dictionary<IWorkspaceVM, FrameworkElement[]> workspaceMenuItems;
+        private Dictionary<IWorkspaceVM, KeyBinding[]> workspaceKeyBindings;
         private IMultiValueConverter workspaceMenuItemVisibilityConverter;
         private IWorkspaceVM activeWorkspace;
 
@@ -58,7 +59,8 @@ namespace DevPrompt.UI.ViewModels
             this.QuickStartConsoleCommand = new DelegateCommand((object arg) => this.QuickStartConsole((int)arg));
 
             this.workspaces = new ObservableCollection<IWorkspaceVM>();
-            this.workspaceMenuItems = new Dictionary<IWorkspaceVM, MenuItem[]>();
+            this.workspaceMenuItems = new Dictionary<IWorkspaceVM, FrameworkElement[]>();
+            this.workspaceKeyBindings = new Dictionary<IWorkspaceVM, KeyBinding[]>();
             this.workspaceMenuItemVisibilityConverter = new DelegateMultiConverter(this.ConvertWorkspaceMenuItemVisibility);
         }
 
@@ -176,41 +178,6 @@ namespace DevPrompt.UI.ViewModels
             dialog.ShowDialog();
         });
 
-        public ICommand SetActiveTabNameCommand => new DelegateCommand(() =>
-        {
-            this.ActiveTabWorkspace?.TabSetName();
-        });
-
-        public ICommand CloseActiveTabCommand => new DelegateCommand(() =>
-        {
-            this.ActiveTabWorkspace?.TabClose();
-        });
-
-        public ICommand DetachActiveTabCommand => new DelegateCommand(() =>
-        {
-            this.ActiveTabWorkspace?.TabDetach();
-        });
-
-        public ICommand CloneActiveTabCommand => new DelegateCommand(() =>
-        {
-            this.ActiveTabWorkspace?.TabClone();
-        });
-
-        public ICommand TabCycleNextCommand => new DelegateCommand(() =>
-        {
-            this.ActiveTabWorkspace?.TabCycleNext();
-        });
-
-        public ICommand TabCyclePrevCommand => new DelegateCommand(() =>
-        {
-            this.ActiveTabWorkspace?.TabCyclePrev();
-        });
-
-        public ICommand ContextMenuCommand => new DelegateCommand(() =>
-        {
-            this.ActiveTabWorkspace?.TabContextMenu();
-        });
-
         public string WindowTitle
         {
             get
@@ -304,6 +271,7 @@ namespace DevPrompt.UI.ViewModels
                 int index = this.workspaces.Count;
                 this.workspaces.Insert(index, workspace);
                 this.AddMainMenuItems(workspace);
+                this.AddKeyBindings(workspace);
 
                 workspace.PropertyChanged += this.OnWorkspacePropertyChanged;
             }
@@ -325,6 +293,7 @@ namespace DevPrompt.UI.ViewModels
                     this.ActiveWorkspace = this.workspaces.FirstOrDefault();
                 }
 
+                this.RemoveKeyBindings(workspaceVM);
                 this.RemoveMainMenuItems(workspaceVM);
                 workspaceVM.PropertyChanged -= this.OnWorkspacePropertyChanged;
                 workspaceVM.Dispose();
@@ -360,7 +329,7 @@ namespace DevPrompt.UI.ViewModels
         {
             if (!this.workspaceMenuItems.ContainsKey(workspace) && workspace.CreatedWorkspace)
             {
-                MenuItem[] items = workspace.MenuItems?.ToArray() ?? Array.Empty<MenuItem>();
+                FrameworkElement[] items = workspace.MenuItems?.ToArray() ?? Array.Empty<FrameworkElement>();
                 this.workspaceMenuItems[workspace] = items;
 
                 int index = 1;
@@ -395,7 +364,7 @@ namespace DevPrompt.UI.ViewModels
 
         private void RemoveMainMenuItems(IWorkspaceVM workspace)
         {
-            if (this.workspaceMenuItems.TryGetValue(workspace, out MenuItem[] items))
+            if (this.workspaceMenuItems.TryGetValue(workspace, out FrameworkElement[] items))
             {
                 this.workspaceMenuItems.Remove(workspace);
 
@@ -403,7 +372,52 @@ namespace DevPrompt.UI.ViewModels
                 {
                     this.Window.mainMenu.Items.Remove(item);
                 }
+            }
+        }
 
+        private KeyBinding WrapKeyBinding(IWorkspaceVM workspace, KeyBinding binding)
+        {
+            if (binding.Command == null)
+            {
+                return binding;
+            }
+
+            return new KeyBinding(new WorkspaceCommandWrapper(workspace, binding.Command), binding.Key, binding.Modifiers)
+            {
+                CommandParameter = binding.CommandParameter,
+                CommandTarget = binding.CommandTarget,
+            };
+        }
+
+        private void AddKeyBindings(IWorkspaceVM workspace)
+        {
+            if (!this.workspaceKeyBindings.ContainsKey(workspace) && workspace.CreatedWorkspace)
+            {
+                KeyBinding[] items = workspace.KeyBindings?.Select(b => this.WrapKeyBinding(workspace, b)).ToArray() ?? Array.Empty<KeyBinding>();
+                this.workspaceKeyBindings[workspace] = items;
+
+                foreach (KeyBinding item in items)
+                {
+                    this.Window.InputBindings.Add(item);
+                }
+            }
+        }
+
+        private void RemoveKeyBindings(IWorkspaceVM workspace)
+        {
+            if (this.workspaceKeyBindings.TryGetValue(workspace, out KeyBinding[] items))
+            {
+                this.workspaceKeyBindings.Remove(workspace);
+
+                foreach (KeyBinding item in items)
+                {
+                    if (item is IDisposable disposable)
+                    {
+                        disposable.Dispose();
+                    }
+
+                    this.Window.InputBindings.Remove(item);
+                }
             }
         }
 
@@ -425,6 +439,12 @@ namespace DevPrompt.UI.ViewModels
                 {
                     this.RemoveMainMenuItems(workspace);
                     this.AddMainMenuItems(workspace);
+                }
+
+                if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(IWorkspaceVM.KeyBindings))
+                {
+                    this.RemoveKeyBindings(workspace);
+                    this.AddKeyBindings(workspace);
                 }
             }
         }

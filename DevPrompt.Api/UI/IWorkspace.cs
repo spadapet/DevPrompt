@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace DevPrompt.Api
 {
@@ -13,7 +13,8 @@ namespace DevPrompt.Api
         string Tooltip { get; }
         string Title { get; }
         UIElement ViewElement { get; }
-        IEnumerable<MenuItem> MenuItems { get; }
+        IEnumerable<FrameworkElement> MenuItems { get; }
+        IEnumerable<KeyBinding> KeyBindings { get; }
         IWorkspaceSnapshot Snapshot { get; }
 
         void Focus();
@@ -21,5 +22,6 @@ namespace DevPrompt.Api
         void OnHiding();
         void OnWindowActivated();
         void OnWindowDeactivated();
+        void OnKeyEvent(KeyEventArgs args);
     }
 }

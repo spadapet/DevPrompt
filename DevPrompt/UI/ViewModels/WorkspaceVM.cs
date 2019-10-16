@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace DevPrompt.UI.ViewModels
@@ -17,7 +16,8 @@ namespace DevPrompt.UI.ViewModels
         public string Title => this.Workspace?.Title ?? string.Empty;
         public bool CreatedWorkspace => this.workspace != null;
         public UIElement ViewElement => this.Workspace?.ViewElement;
-        public IEnumerable<MenuItem> MenuItems => this.workspace?.MenuItems ?? Enumerable.Empty<MenuItem>();
+        public IEnumerable<FrameworkElement> MenuItems => this.workspace?.MenuItems ?? Enumerable.Empty<FrameworkElement>();
+        public IEnumerable<KeyBinding> KeyBindings => this.workspace?.KeyBindings ?? Enumerable.Empty<KeyBinding>();
 
         private Api.IWindow window;
         private Api.IWorkspace workspace;
@@ -148,6 +148,7 @@ namespace DevPrompt.UI.ViewModels
                     this.OnPropertyChanged(nameof(this.Name));
                     this.OnPropertyChanged(nameof(this.Tooltip));
                     this.OnPropertyChanged(nameof(this.MenuItems));
+                    this.OnPropertyChanged(nameof(this.KeyBindings));
                 }
 
                 return this.workspace;
@@ -189,6 +190,11 @@ namespace DevPrompt.UI.ViewModels
             if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.IWorkspace.MenuItems))
             {
                 this.OnPropertyChanged(nameof(this.MenuItems));
+            }
+
+            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.IWorkspace.KeyBindings))
+            {
+                this.OnPropertyChanged(nameof(this.KeyBindings));
             }
         }
 
