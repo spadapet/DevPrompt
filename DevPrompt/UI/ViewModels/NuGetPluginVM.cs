@@ -232,8 +232,6 @@ namespace DevPrompt.UI.ViewModels
 
         private async Task Unzip(ZipArchive zip, string rootDir, CancellationToken cancelToken)
         {
-            string homeDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
             foreach (ZipArchiveEntry entry in zip.Entries)
             {
                 const string prefix = "tools/net40/";

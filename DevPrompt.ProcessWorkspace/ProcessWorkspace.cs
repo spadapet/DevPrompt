@@ -472,7 +472,7 @@ namespace DevPrompt.ProcessWorkspace
         public void OnDrop(TabVM tab, int droppedIndex, bool copy)
         {
             int index = this.tabs.IndexOf(tab);
-            if (index >= 0 && tab.Tab is ProcessTab processTab)
+            if (index >= 0 && tab.Tab is Api.ITab apiTab)
             {
                 if (copy)
                 {
@@ -481,7 +481,7 @@ namespace DevPrompt.ProcessWorkspace
 
                     try
                     {
-                        processTab.OnClone();
+                        apiTab.OnClone();
                     }
                     finally
                     {

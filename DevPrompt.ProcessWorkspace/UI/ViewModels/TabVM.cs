@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
 
@@ -137,17 +138,50 @@ namespace DevPrompt.ProcessWorkspace.UI.ViewModels
         {
             get
             {
+                string text = null;
+
                 if (this.tab != null)
                 {
-                    return this.tab.Tooltip;
+                    text = this.tab.Tooltip;
                 }
 
                 if (this.snapshot != null)
                 {
-                    return this.snapshot.Tooltip;
+                    text = this.snapshot.Tooltip;
                 }
 
-                return string.Empty;
+                if (string.IsNullOrEmpty(text))
+                {
+                    return null;
+                }
+
+                StringBuilder sb = new StringBuilder(text.Length);
+                string[] lines = text.Split("\r\n".ToCharArray(), StringSplitOptions.None);
+                const int maxLineLength = 128;
+                const int maxLines = 16;
+
+                for (int i = 0; i < maxLines && i < lines.Length; i++)
+                {
+                    string line = lines[i];
+                    if (line.Length > maxLineLength)
+                    {
+                        line = line.Substring(0, maxLineLength) + "...";
+                    }
+
+                    if (i > 0)
+                    {
+                        sb.Append("\r\n");
+                    }
+
+                    sb.Append(line);
+                }
+
+                if (lines.Length > maxLines)
+                {
+                    sb.Append("\r\n...");
+                }
+
+                return sb.ToString();
             }
         }
 

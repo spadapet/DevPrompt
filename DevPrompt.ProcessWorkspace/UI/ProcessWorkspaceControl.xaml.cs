@@ -139,7 +139,7 @@ namespace DevPrompt.ProcessWorkspace.UI
         /// </summary>
         bool DragItemsControl.IDragHost.CanDropCopy(object droppedModel)
         {
-            return (droppedModel is TabVM tab) && (tab.Tab is ProcessTab);
+            return droppedModel is TabVM;
         }
     }
 }
