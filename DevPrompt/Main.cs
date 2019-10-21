@@ -11,6 +11,8 @@ namespace DevPrompt
         [STAThread]
         public static void Main(string[] args)
         {
+            Program.stopwatch = Stopwatch.StartNew();
+
             if (Program.HandleArguments(args))
             {
                 using (ManualResetEvent exitEvent = new ManualResetEvent(false))
@@ -128,7 +130,9 @@ namespace DevPrompt
         public static bool IsMicrosoftDomain { get; }
         public static bool IsNotMicrosoftDomain => !Program.IsMicrosoftDomain;
         public static bool IsElevated { get; }
+        public static TimeSpan TimeSinceStart => Program.stopwatch.Elapsed;
         private static long isMainProcessCount;
+        private static Stopwatch stopwatch;
 
         public static bool IsMainProcess
         {

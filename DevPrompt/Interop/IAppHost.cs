@@ -13,6 +13,7 @@ namespace DevPrompt.Interop
     internal interface IAppHost
     {
         int CanGrab([MarshalAs(UnmanagedType.LPWStr)] string exePath, [MarshalAs(UnmanagedType.VariantBool)] bool automatic);
+        void TrackEvent([MarshalAs(UnmanagedType.LPWStr)] string eventName);
 
         // Processes
         void OnProcessOpening(IProcess process, [MarshalAs(UnmanagedType.VariantBool)] bool activate, [MarshalAs(UnmanagedType.LPWStr)] string path);

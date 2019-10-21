@@ -467,6 +467,12 @@ namespace DevPrompt.UI.ViewModels
         {
             if (this.FindWorkspace(Api.Constants.ProcessWorkspaceId) is IWorkspaceVM workspaceVM && workspaceVM.Workspace is Api.IProcessWorkspace workspace)
             {
+                this.App.Telemetry.TrackEvent("Start.Console", new Dictionary<string, object>()
+                {
+                    { "ConsoleType", settings.ConsoleType },
+                    { "TabCount", workspace.Tabs.Count() + 1 },
+                });
+
                 this.ActiveWorkspace = workspaceVM;
                 workspace.RunProcess(settings);
             }
@@ -482,16 +488,19 @@ namespace DevPrompt.UI.ViewModels
 
         private void StartLink(LinkSettings settings)
         {
+            this.App.Telemetry.TrackEvent("Start.Link");
             this.RunExternalProcess(settings.Address);
         }
 
         private void StartTool(ToolSettings settings)
         {
+            this.App.Telemetry.TrackEvent("Start.Tool");
             this.RunExternalProcess(settings.ExpandedCommand, settings.ExpandedArguments);
         }
 
         private void StartVisualStudio(VisualStudioSetup.Instance instance)
         {
+            this.App.Telemetry.TrackEvent("Start.VS");
             this.RunExternalProcess(instance.ProductPath);
         }
 

@@ -255,6 +255,7 @@ void App::CheckPendingWindows()
                 int canGrab = 0;
                 if (::GetProcessImageFileName(hwndProcess, path, _countof(path)) && SUCCEEDED(this->host->CanGrab(path, VARIANT_TRUE, &canGrab)) && canGrab)
                 {
+                    this->host->TrackEvent(L"Grab.AutoGrabProcess");
                     this->AttachProcess(nullptr, hwndProcess, canGrab == 2);
                 }
 

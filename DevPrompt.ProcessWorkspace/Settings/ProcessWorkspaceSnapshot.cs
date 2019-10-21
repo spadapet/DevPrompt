@@ -8,7 +8,7 @@ namespace DevPrompt.ProcessWorkspace.Settings
     [DataContract]
     internal class ProcessWorkspaceSnapshot : TabWorkspaceSnapshot, Api.IWorkspaceSnapshot
     {
-        internal ProcessWorkspaceSnapshot(ProcessWorkspace workspace)
+        public ProcessWorkspaceSnapshot(ProcessWorkspace workspace)
             : base(workspace)
         {
         }

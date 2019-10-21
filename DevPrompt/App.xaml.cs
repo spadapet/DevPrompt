@@ -24,6 +24,7 @@ namespace DevPrompt
     /// </summary>
     internal partial class App : Application, IAppHost, Api.IApp
     {
+        public Telemetry Telemetry { get; }
         public AppSettings Settings { get; }
         public HttpClientHelper HttpClient { get; }
         public PluginState PluginState { get; private set; }
@@ -40,10 +41,12 @@ namespace DevPrompt
 
         public App()
         {
+            this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
             this.criticalTasks = new List<Task>();
             this.resolvedAssemblies = new ConcurrentDictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
 
-            this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            this.Telemetry = new Telemetry();
             this.Settings = new AppSettings();
             this.HttpClient = new HttpClientHelper();
             this.PluginState = new PluginState(this);
@@ -63,6 +66,7 @@ namespace DevPrompt
             this.PluginState.Dispose();
             this.HttpClient.Dispose();
             this.NativeApp?.Dispose();
+            this.Telemetry.Dispose();
         }
 
         public new MainWindow MainWindow
@@ -73,17 +77,22 @@ namespace DevPrompt
 
         private async void OnStartup(object sender, StartupEventArgs args)
         {
+            Stopwatch timer = Stopwatch.StartNew();
             string errorMessage = string.Empty;
             bool firstStartup = (this.NativeApp == null);
+
             this.NativeApp = this.NativeApp ?? NativeMethods.CreateApp(this, out errorMessage);
             this.MainWindow = new MainWindow(this);
             this.MainWindow.infoBar.SetError(null, errorMessage);
             this.MainWindow.Show();
+            TimeSpan createWindowTime = timer.GetElapsedTimeAndRestart();
 
             await this.InitSettings();
             this.settingsState = SettingsState.Loaded;
+            TimeSpan settingsLoadTime = timer.GetElapsedTimeAndRestart();
 
             await this.PluginState.Initialize(firstStartup);
+            TimeSpan pluginLoadTime = timer.GetElapsedTimeAndRestart();
 
             await this.InitCustomSettings();
             this.customSettingsState = SettingsState.Loaded;
@@ -103,6 +112,20 @@ namespace DevPrompt
                     listener.OnOpened(this, window);
                 }
             }
+
+            TimeSpan pluginInitTime = timer.GetElapsedTimeAndStop();
+
+            this.Telemetry.TrackEvent("App.Startup", new Dictionary<string, object>()
+            {
+                { "CreateWindowTime", createWindowTime },
+                { "SettingsLoadTime", settingsLoadTime },
+                { "PluginLoadTime", pluginLoadTime },
+                { "PluginInitTime", pluginInitTime },
+                { "PluginCount", this.PluginState.Plugins.Count() },
+                { "FirstStartup", firstStartup },
+                { "FirstStartupTime", firstStartup ? (object)Program.TimeSinceStart : null },
+                { "Version", Assembly.GetExecutingAssembly().GetName().Version },
+            });
         }
 
         private void OnExit(object sender, ExitEventArgs args)
@@ -307,6 +330,11 @@ namespace DevPrompt
             }
         }
 
+        void IAppHost.TrackEvent(string eventName)
+        {
+            this.Telemetry.TrackEvent(eventName);
+        }
+
         void IAppHost.OnProcessOpening(IProcess process, bool activate, string path)
         {
             this.CallProcessListeners(l => l.OnProcessOpening(process, activate, path));
@@ -350,6 +378,7 @@ namespace DevPrompt
         }
 
         Api.IAppSettings Api.IApp.Settings => this.Settings;
+        Api.ITelemetry Api.IApp.Telemetry => this.Telemetry;
         Api.IWindow Api.IApp.ActiveWindow => this.MainWindow?.ViewModel;
         bool Api.IApp.IsElevated => Program.IsElevated;
         bool Api.IApp.IsMainProcess => Program.IsMainProcess;
@@ -378,6 +407,7 @@ namespace DevPrompt
         // Api.IApp
         public void GrabProcess(int id)
         {
+            this.Telemetry.TrackEvent("Grab.ManualGrabProcess");
             this.NativeApp?.GrabProcess(id);
         }
 

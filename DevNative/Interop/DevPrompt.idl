@@ -13,6 +13,7 @@ interface IVisualStudioInstances;
 interface IAppHost : IUnknown
 {
     HRESULT CanGrab(const wchar_t* exePath, VARIANT_BOOL automatic, [out, retval] int* value);
+    HRESULT TrackEvent(const wchar_t* eventName);
 
     // Processes
     HRESULT OnProcessOpening(IProcess* process, VARIANT_BOOL activate, const wchar_t* path);

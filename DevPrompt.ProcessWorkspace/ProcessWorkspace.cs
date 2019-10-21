@@ -103,6 +103,12 @@ namespace DevPrompt.ProcessWorkspace
                 {
                     this.ActiveTab = this.tabs[0];
                 }
+
+                this.Window.App.Telemetry.TrackEvent("ProcessWorkspace.InitTabs", new Dictionary<string, object>()
+                {
+                    { "TabCount", this.tabs.Count },
+                    { "FromSnapshot", snapshot != null },
+                });
             }
             finally
             {

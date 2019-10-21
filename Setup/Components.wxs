@@ -22,11 +22,17 @@
                 <File Source="$(var.Bin64)DevPrompt.exe.config" />
 
                 <File Source="$(var.Bin64)Efficient.Json.dll" />
+                <File Source="$(var.Bin64)Microsoft.ApplicationInsights.dll" />
+                <File Source="$(var.Bin64)System.Buffers.dll" />
                 <File Source="$(var.Bin64)System.Composition.AttributedModel.dll" />
                 <File Source="$(var.Bin64)System.Composition.Convention.dll" />
                 <File Source="$(var.Bin64)System.Composition.Hosting.dll" />
                 <File Source="$(var.Bin64)System.Composition.Runtime.dll" />
                 <File Source="$(var.Bin64)System.Composition.TypedParts.dll" />
+                <File Source="$(var.Bin64)System.Diagnostics.DiagnosticSource.dll" />
+                <File Source="$(var.Bin64)System.Memory.dll" />
+                <File Source="$(var.Bin64)System.Numerics.Vectors.dll" />
+                <File Source="$(var.Bin64)System.Runtime.CompilerServices.Unsafe.dll" />
 
                 <RegistryValue Root="HKCU" Key="$(var.RegistryRootKey)" Type="string" Name="InstallVersion" Value="$(var.ProductVersion)" KeyPath="yes" />
             </Component>

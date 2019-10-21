@@ -51,7 +51,8 @@
             <CopyFile Include="$(Bin64)Dev*.exe" />
             <CopyFile Include="$(Bin64)DevPrompt.exe.config" />
             <CopyFile Include="$(Bin64)Efficient.Json.dll" />
-            <CopyFile Include="$(Bin64)System.Composition.*.dll" />
+            <CopyFile Include="$(Bin64)Microsoft.*.dll" />
+            <CopyFile Include="$(Bin64)System.*.dll" />
             <CopyFile Include="$(Bin32)Dev*32.dll" />
             <CopyFile Include="$(Bin32)Dev*32.exe" />
             <NuGetFile Include="$(Bin64)*.nupkg" />

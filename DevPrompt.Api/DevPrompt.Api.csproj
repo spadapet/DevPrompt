@@ -26,6 +26,7 @@
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Constants.cs" />
+    <Compile Include="ITelemetry.cs" />
     <Compile Include="IApp.cs" />
     <Compile Include="IAppListener.cs" />
     <Compile Include="OrderAttribute.cs" />
