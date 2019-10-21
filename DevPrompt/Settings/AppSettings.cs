@@ -240,7 +240,11 @@ namespace DevPrompt.Settings
                 string file = Path.Combine(instance.Path, "Common7", "Tools", "VsDevCmd.bat");
                 if (File.Exists(file))
                 {
-                    string name = instance.DisplayName.Split(' ')[0];
+                    int dotIndex = instance.DisplayName.IndexOf('.');
+                    string name = (dotIndex != -1)
+                        ? instance.DisplayName.Substring(0, dotIndex)
+                        : instance.DisplayName;
+
                     this.ObservableConsoles.Add(new ConsoleSettings()
                     {
                         MenuName = string.Format(CultureInfo.CurrentCulture, Resources.Menu_VsPromptName, name),
