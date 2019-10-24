@@ -34,7 +34,7 @@
             <Button Padding="5,0" Margin="5,0,0,0" Content="{x:Static local:Resources.Dialog_Reset}" Command="{Binding ResetCommand}" />
         </StackPanel>
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,5">
-            <CheckBox Name="autoGrabCheckbox" Content="{x:Static local:Resources.GrabDialog_AutoGrab}" ToolTip="Automatically grabs an externally run console app into a tab. The list above determines which consoles are grabbed." IsChecked="{Binding ViewModel.Settings.ConsoleGrabEnabled, Mode=TwoWay}" />
+            <CheckBox Name="autoGrabCheckbox" Content="{x:Static local:Resources.GrabDialog_AutoGrab}" ToolTip="{x:Static local:Resources.GrabDialog_GrabTooltip}" IsChecked="{Binding ViewModel.Settings.ConsoleGrabEnabled, Mode=TwoWay}" />
         </StackPanel>
     </Grid>
 </UserControl>

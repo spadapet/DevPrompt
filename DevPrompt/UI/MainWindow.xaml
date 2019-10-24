@@ -91,6 +91,8 @@
                 <MenuItem Header="{x:Static dp:Resources.Menu_Help}" SubmenuOpened="OnHelpMenuOpened">
                     <Separator Tag="[Plugins]" />
                     <MenuItem Header="{x:Static dp:Resources.Menu_ReportIssue}" Command="{Binding ReportAnIssueCommand}" />
+                    <MenuItem Header="{x:Static dp:Resources.Menu_Telemetry}" Command="{Binding TelemetryCommand}" />
+                    <Separator />
                     <MenuItem Header="{x:Static dp:Resources.Menu_About}" Command="{Binding AboutCommand}" />
                 </MenuItem>
             </Menu>

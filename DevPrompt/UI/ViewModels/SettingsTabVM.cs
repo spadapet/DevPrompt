@@ -13,6 +13,7 @@ namespace DevPrompt.UI.ViewModels
         Tools,
         Links,
         Plugins,
+        Telemetry,
 
         Default = Consoles,
     }
@@ -51,6 +52,7 @@ namespace DevPrompt.UI.ViewModels
                     case SettingsTabType.Links: return Resources.SettingsTabType_Links;
                     case SettingsTabType.Tools: return Resources.SettingsTabType_Tools;
                     case SettingsTabType.Plugins: return Resources.SettingsTabType_Plugins;
+                    case SettingsTabType.Telemetry: return Resources.SettingsTabType_Telemetry;
 
                     default:
                         Debug.Fail($"Missing name for tab: {this.TabType}");
@@ -85,6 +87,10 @@ namespace DevPrompt.UI.ViewModels
 
                         case SettingsTabType.Plugins:
                             this.viewElement = new PluginSettingsControl(this.viewModel);
+                            break;
+
+                        case SettingsTabType.Telemetry:
+                            this.viewElement = new TelemetrySettingsControl(this.viewModel);
                             break;
 
                         default:

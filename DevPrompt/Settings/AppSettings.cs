@@ -32,6 +32,7 @@ namespace DevPrompt.Settings
         private Dictionary<string, object> customProperties;
         private bool consoleGrabEnabled;
         private bool saveTabsOnExit;
+        private bool telemetryEnabled;
         private bool pluginsChanged;
         private static readonly object fileLock = new object();
 
@@ -55,6 +56,7 @@ namespace DevPrompt.Settings
         {
             this.ConsoleGrabEnabled = copyFrom.ConsoleGrabEnabled;
             this.SaveTabsOnExit = copyFrom.SaveTabsOnExit;
+            this.TelemetryEnabled = copyFrom.TelemetryEnabled;
             this.PluginsChanged = copyFrom.PluginsChanged;
 
             this.ObservableConsoles.Clear();
@@ -502,6 +504,13 @@ namespace DevPrompt.Settings
             set => this.SetPropertyValue(ref this.saveTabsOnExit, value);
         }
 
+        [DataMember]
+        public bool TelemetryEnabled
+        {
+            get => this.telemetryEnabled;
+            set => this.SetPropertyValue(ref this.telemetryEnabled, value);
+        }
+
         // Do not persist this
         public bool PluginsChanged
         {
@@ -578,6 +587,7 @@ namespace DevPrompt.Settings
 
             this.customProperties = new Dictionary<string, object>();
             this.saveTabsOnExit = true;
+            this.telemetryEnabled = true;
         }
 
         private void OnObservableCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)

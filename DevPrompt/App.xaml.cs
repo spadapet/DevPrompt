@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -24,9 +25,9 @@ namespace DevPrompt
     /// </summary>
     internal partial class App : Application, IAppHost, Api.IApp
     {
-        public Telemetry Telemetry { get; }
         public AppSettings Settings { get; }
         public HttpClientHelper HttpClient { get; }
+        public Telemetry Telemetry { get; private set; }
         public PluginState PluginState { get; private set; }
         public NativeApp NativeApp { get; private set; }
 
@@ -46,7 +47,6 @@ namespace DevPrompt
             this.criticalTasks = new List<Task>();
             this.resolvedAssemblies = new ConcurrentDictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
 
-            this.Telemetry = new Telemetry();
             this.Settings = new AppSettings();
             this.HttpClient = new HttpClientHelper();
             this.PluginState = new PluginState(this);
@@ -66,7 +66,7 @@ namespace DevPrompt
             this.PluginState.Dispose();
             this.HttpClient.Dispose();
             this.NativeApp?.Dispose();
-            this.Telemetry.Dispose();
+            this.Telemetry?.Dispose();
         }
 
         public new MainWindow MainWindow
@@ -81,6 +81,7 @@ namespace DevPrompt
             string errorMessage = string.Empty;
             bool firstStartup = (this.NativeApp == null);
 
+            this.Telemetry = await Telemetry.Create(this);
             this.NativeApp = this.NativeApp ?? NativeMethods.CreateApp(this, out errorMessage);
             this.MainWindow = new MainWindow(this);
             this.MainWindow.infoBar.SetError(null, errorMessage);
@@ -118,13 +119,24 @@ namespace DevPrompt
             this.Telemetry.TrackEvent("App.Startup", new Dictionary<string, object>()
             {
                 { "CreateWindowTime", createWindowTime },
-                { "SettingsLoadTime", settingsLoadTime },
-                { "PluginLoadTime", pluginLoadTime },
-                { "PluginInitTime", pluginInitTime },
-                { "PluginCount", this.PluginState.Plugins.Count() },
+                { "Culture", Thread.CurrentThread.CurrentCulture.Name },
+                { "DotNetVersion", Environment.Version },
                 { "FirstStartup", firstStartup },
                 { "FirstStartupTime", firstStartup ? (object)Program.TimeSinceStart : null },
-                { "Version", Assembly.GetExecutingAssembly().GetName().Version },
+                { "HasNativeApp", this.NativeApp != null },
+                { "Is64BitProcess", Environment.Is64BitProcess },
+                { "Is64BitOS ", Environment.Is64BitOperatingSystem },
+                { "IsElevated", Program.IsElevated },
+                { "IsMainProcess", Program.IsMainProcess },
+                { "IsMicrosoftDomain", Program.IsMicrosoftDomain },
+                { "OsPlatform", Environment.OSVersion.Platform },
+                { "OsVersion", Environment.OSVersion.Version },
+                { "PluginCount", this.PluginState.Plugins.Count() },
+                { "PluginInitTime", pluginInitTime },
+                { "PluginLoadTime", pluginLoadTime },
+                { "SettingsLoadTime", settingsLoadTime },
+                { "UICulture", Thread.CurrentThread.CurrentUICulture.Name },
+                { "Version", Program.Version },
             });
         }
 

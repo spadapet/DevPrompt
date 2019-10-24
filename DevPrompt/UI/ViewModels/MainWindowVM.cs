@@ -163,6 +163,11 @@ namespace DevPrompt.UI.ViewModels
             this.ShowSettingsDialog(SettingsTabType.Links);
         });
 
+        public ICommand TelemetryCommand => new DelegateCommand(() =>
+        {
+            this.ShowSettingsDialog(SettingsTabType.Telemetry);
+        });
+
         public ICommand ReportAnIssueCommand => new DelegateCommand(() =>
         {
             this.RunExternalProcess(Resources.About_IssuesLink);

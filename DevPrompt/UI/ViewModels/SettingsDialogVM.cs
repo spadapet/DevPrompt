@@ -45,6 +45,7 @@ namespace DevPrompt.UI.ViewModels
                     new SettingsTabVM(this, SettingsTabType.Tools),
                     new SettingsTabVM(this, SettingsTabType.Links),
                     new SettingsTabVM(this, SettingsTabType.Plugins),
+                    new SettingsTabVM(this, SettingsTabType.Telemetry),
                 };
 
             this.ActiveTabType = activeTabType;

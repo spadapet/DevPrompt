@@ -295,6 +295,15 @@ namespace DevPrompt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Automatically grabs an externally run console app into a tab. The list above determines which consoles are grabbed..
+        /// </summary>
+        public static string GrabDialog_GrabTooltip {
+            get {
+                return ResourceManager.GetString("GrabDialog_GrabTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Activate on grab.
         /// </summary>
         public static string GrabDialog_Header_Activate {
@@ -590,6 +599,15 @@ namespace DevPrompt {
         public static string Menu_Settings {
             get {
                 return ResourceManager.GetString("Menu.Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Telemetry....
+        /// </summary>
+        public static string Menu_Telemetry {
+            get {
+                return ResourceManager.GetString("Menu.Telemetry", resourceCulture);
             }
         }
         
@@ -945,11 +963,40 @@ namespace DevPrompt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Telemetry.
+        /// </summary>
+        public static string SettingsTabType_Telemetry {
+            get {
+                return ResourceManager.GetString("SettingsTabType.Telemetry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Links.
         /// </summary>
         public static string SettingsTabType_Tools {
             get {
                 return ResourceManager.GetString("SettingsTabType.Tools", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable telemetry.
+        /// </summary>
+        public static string TelemetryDialog_Enable {
+            get {
+                return ResourceManager.GetString("TelemetryDialog.Enable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This option gives permission to collect anonymous information about how you use DevPrompt. The limited amount of information collected helps make the application better. You can opt-out by unchecking the &quot;Enable telemetry&quot; box above.
+        ///
+        ///Telemetry is sent over the internet using Microsoft Application Insights and is stored for a limited amount of time..
+        /// </summary>
+        public static string TelemetryDialog_Intro {
+            get {
+                return ResourceManager.GetString("TelemetryDialog.Intro", resourceCulture);
             }
         }
         

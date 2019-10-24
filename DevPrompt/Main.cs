@@ -12,6 +12,7 @@ namespace DevPrompt
         public static void Main(string[] args)
         {
             Program.stopwatch = Stopwatch.StartNew();
+            Program.version = typeof(Program).Assembly.GetName().Version;
 
             if (Program.HandleArguments(args))
             {
@@ -131,6 +132,9 @@ namespace DevPrompt
         public static bool IsNotMicrosoftDomain => !Program.IsMicrosoftDomain;
         public static bool IsElevated { get; }
         public static TimeSpan TimeSinceStart => Program.stopwatch.Elapsed;
+        public static Version Version => Program.version;
+
+        private static Version version;
         private static long isMainProcessCount;
         private static Stopwatch stopwatch;
 

@@ -11,7 +11,7 @@ namespace DevPrompt.UI
     internal partial class AboutDialog : Window, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        public string AppVersion => Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        public string AppVersion => Program.Version.ToString();
         private Api.IWindow window;
         private string appLatestVersion;
         private HttpClient httpClient;

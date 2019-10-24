@@ -104,6 +104,8 @@ namespace DevPrompt.UI.ViewModels
 
         public void OnSetTabName()
         {
+            this.window.App.Telemetry.TrackEvent("ProcessTab.SetTabName");
+
             TabNameDialog dialog = new TabNameDialog(this.RawName)
             {
                 Owner = Application.Current.MainWindow
@@ -117,21 +119,25 @@ namespace DevPrompt.UI.ViewModels
 
         public void OnClone()
         {
+            this.window.App.Telemetry.TrackEvent("ProcessTab.Clone");
             this.workspace.CloneProcess(this, this.RawName);
         }
 
         public void OnDetach()
         {
+            this.window.App.Telemetry.TrackEvent("ProcessTab.Detach");
             this.Process.Detach();
         }
 
         public void OnConsoleDefaults()
         {
+            this.window.App.Telemetry.TrackEvent("ProcessTab.ConsoleDefaults");
             this.Process.RunCommand(Api.ProcessCommand.DefaultsDialog);
         }
 
         public void OnConsoleProperties()
         {
+            this.window.App.Telemetry.TrackEvent("ProcessTab.ConsoleProperties");
             this.Process.RunCommand(Api.ProcessCommand.PropertiesDialog);
         }
 

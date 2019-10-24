@@ -207,6 +207,9 @@
   <data name="GrabDialog.Intro" xml:space="preserve">
     <value>When a process from the following list starts to run, its console window can be "grabbed" and become a tab. You need to be running as admin to grab admin processes.</value>
   </data>
+  <data name="GrabDialog_GrabTooltip" xml:space="preserve">
+    <value>Automatically grabs an externally run console app into a tab. The list above determines which consoles are grabbed.</value>
+  </data>
   <data name="ImportDialog.ChoiceAdd" xml:space="preserve">
     <value>Add to existing</value>
   </data>
@@ -295,6 +298,9 @@ Visual Studio=https://visualstudio.microsoft.com</value>
   </data>
   <data name="Menu.Settings" xml:space="preserve">
     <value>_Settings...</value>
+  </data>
+  <data name="Menu.Telemetry" xml:space="preserve">
+    <value>_Telemetry...</value>
   </data>
   <data name="Menu.Tools" xml:space="preserve">
     <value>_Tools</value>
@@ -413,8 +419,19 @@ Visual Studio=https://visualstudio.microsoft.com</value>
   <data name="SettingsTabType.Plugins" xml:space="preserve">
     <value>Plugins</value>
   </data>
+  <data name="SettingsTabType.Telemetry" xml:space="preserve">
+    <value>Telemetry</value>
+  </data>
   <data name="SettingsTabType.Tools" xml:space="preserve">
     <value>Links</value>
+  </data>
+  <data name="TelemetryDialog.Enable" xml:space="preserve">
+    <value>Enable telemetry</value>
+  </data>
+  <data name="TelemetryDialog.Intro" xml:space="preserve">
+    <value>This option gives permission to collect anonymous information about how you use DevPrompt. The limited amount of information collected helps make the application better. You can opt-out by unchecking the "Enable telemetry" box above.
+
+Telemetry is sent over the internet using Microsoft Application Insights and is stored for a limited amount of time.</value>
   </data>
   <data name="ToolDialog.Header.Args" xml:space="preserve">
     <value>Arguments</value>

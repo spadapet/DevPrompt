@@ -86,6 +86,9 @@
     <Compile Include="UI\AboutDialog.xaml.cs">
       <DependentUpon>AboutDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\Settings\TelemetrySettingsControl.xaml.cs">
+      <DependentUpon>TelemetrySettingsControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Settings\PluginSettingsControl.xaml.cs">
       <DependentUpon>PluginSettingsControl.xaml</DependentUpon>
     </Compile>
@@ -149,6 +152,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\AboutDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Settings\TelemetrySettingsControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

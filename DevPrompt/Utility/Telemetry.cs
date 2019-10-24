@@ -5,24 +5,40 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace DevPrompt.Utility
 {
     internal class Telemetry : IDisposable, Api.ITelemetry
     {
+        private App app;
         private TelemetryConfiguration config;
         private TelemetryClient client;
 
-        public Telemetry()
+        public static Task<Telemetry> Create(App app)
         {
+            return Task.Run(() => new Telemetry(app));
+        }
+
+        private Telemetry(App app)
+        {
+            this.app = app;
             this.config = new TelemetryConfiguration("5c831494-8408-4371-922d-497edc9a7d64");
 #if DEBUG
-            this.config.DisableTelemetry = true;
+            this.config.TelemetryChannel.DeveloperMode = true;
 #endif
             this.client = new TelemetryClient(this.config);
+            this.client.Context.Cloud.RoleInstance = "null"; // don't want it to use the computer name
+            this.client.Context.Component.Version = Program.Version.ToString();
             this.client.Context.Session.Id = Guid.NewGuid().ToString();
-            this.client.Context.Component.Version = this.GetType().Assembly.GetName().Version.ToString();
             this.client.Context.User.Id = Telemetry.GetUserId();
+
+            // Don't let Context.Internal.NodeName use the computer name as the default value
+            PropertyInfo internalProperty = this.client.Context.GetType().GetProperty("Internal", BindingFlags.Instance | BindingFlags.NonPublic);
+            object internalValue = internalProperty?.GetValue(this.client.Context);
+            PropertyInfo nodeNameProperty = internalValue?.GetType().GetProperty("NodeName");
+            nodeNameProperty?.SetValue(internalValue, "null");
         }
 
         public void Dispose()
@@ -61,7 +77,7 @@ namespace DevPrompt.Utility
 
         public void TrackEvent(string eventName, IEnumerable<KeyValuePair<string, object>> properties = null)
         {
-            if (string.IsNullOrEmpty(eventName))
+            if (string.IsNullOrEmpty(eventName) || !this.app.Settings.TelemetryEnabled)
             {
                 return;
             }
@@ -81,7 +97,7 @@ namespace DevPrompt.Utility
                 {
                     if (pair.Value is TimeSpan timeSpan)
                     {
-                        eventMetrics[pair.Key] = timeSpan.TotalSeconds;
+                        eventMetrics[pair.Key] = timeSpan.TotalMilliseconds;
                     }
                     else if (pair.Value.ToString() is string stringValue)
                     {
