@@ -26,8 +26,8 @@ namespace DevPrompt.UI.ViewModels
         public string Authors => this.PluginSettings.Authors;
         public bool IsInstalled => this.PluginSettings.IsInstalled;
 
-        private App app;
-        private AppSettings appSettings;
+        private readonly App app;
+        private readonly AppSettings appSettings;
         private BitmapImage icon;
         private Uri projectUrl;
         private Task busyTask;

@@ -19,17 +19,17 @@ namespace DevPrompt.Utility.NuGet
         public const string PluginSearchHiddenTag = "DevPrompt.NetCore.Plugin.Hidden";
 #endif
 
-        private HttpClientHelper httpClient;
-        private List<NuGetService> services;
+        private readonly HttpClientHelper httpClient;
+        private readonly List<NuGetService> services;
 
         public static async Task<NuGetServiceIndex> Create(HttpClientHelper httpClient, CancellationToken cancelToken, string url = NuGetServiceIndex.NuGetOrg)
         {
-            NuGetServiceIndex nuget = new NuGetServiceIndex(httpClient, cancelToken);
+            NuGetServiceIndex nuget = new NuGetServiceIndex(httpClient);
             await nuget.Initialize(url, cancelToken);
             return nuget;
         }
 
-        private NuGetServiceIndex(HttpClientHelper httpClient, CancellationToken cancelToken)
+        private NuGetServiceIndex(HttpClientHelper httpClient)
         {
             this.httpClient = httpClient;
             this.services = new List<NuGetService>();

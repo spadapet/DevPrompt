@@ -9,7 +9,7 @@ namespace DevPrompt.Interop
     internal class NativeProcessHost : PropertyNotifier, Api.IProcessHost
     {
         public IProcessHost Host { get; }
-        private IProcessCache processCache;
+        private readonly IProcessCache processCache;
 
         public NativeProcessHost(IProcessCache processCache, IProcessHost host)
         {

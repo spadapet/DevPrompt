@@ -38,10 +38,10 @@ namespace DevPrompt.UI.ViewModels
         public ICommand VisualStudioCommand { get; }
         public ICommand QuickStartConsoleCommand { get; }
 
-        private ObservableCollection<IWorkspaceVM> workspaces;
-        private Dictionary<IWorkspaceVM, FrameworkElement[]> workspaceMenuItems;
-        private Dictionary<IWorkspaceVM, KeyBinding[]> workspaceKeyBindings;
-        private IMultiValueConverter workspaceMenuItemVisibilityConverter;
+        private readonly ObservableCollection<IWorkspaceVM> workspaces;
+        private readonly Dictionary<IWorkspaceVM, FrameworkElement[]> workspaceMenuItems;
+        private readonly Dictionary<IWorkspaceVM, KeyBinding[]> workspaceKeyBindings;
+        private readonly IMultiValueConverter workspaceMenuItemVisibilityConverter;
         private IWorkspaceVM activeWorkspace;
 
         public MainWindowVM(MainWindow window)
@@ -343,10 +343,12 @@ namespace DevPrompt.UI.ViewModels
                     // Create a {Binding} so that the menu item is only visible when the workspace is active.
                     // But try and keep any existing {Binding} that's already set on the menu item.
 
-                    MultiBinding binding = new MultiBinding();
-                    binding.Mode = BindingMode.OneWay;
-                    binding.Converter = this.workspaceMenuItemVisibilityConverter;
-                    binding.ConverterParameter = workspace;
+                    MultiBinding binding = new MultiBinding
+                    {
+                        Mode = BindingMode.OneWay,
+                        Converter = this.workspaceMenuItemVisibilityConverter,
+                        ConverterParameter = workspace
+                    };
 
                     if (BindingOperations.GetBindingBase(item, UIElement.VisibilityProperty) is BindingBase visibilityBinding)
                     {

@@ -26,9 +26,9 @@ namespace DevPrompt.UI.ViewModels
         public Api.IProgressBar ProgressBar => this.settingsVM.ProgressBar;
         public Api.IInfoBar InfoBar => this.settingsVM.Dialog.IsLoaded ? this.settingsVM.InfoBar : this.Window.infoBar;
 
-        private SettingsDialogVM settingsVM;
-        private ObservableCollection<IPluginVM> plugins;
-        private ObservableCollection<PluginSortVM> sorts;
+        private readonly SettingsDialogVM settingsVM;
+        private readonly ObservableCollection<IPluginVM> plugins;
+        private readonly ObservableCollection<PluginSortVM> sorts;
         private PluginSortVM sort;
         private IPluginVM currentPlugin;
         private bool isBusy;
@@ -263,7 +263,7 @@ namespace DevPrompt.UI.ViewModels
             CancellationTokenSource myCancelSource = new CancellationTokenSource();
             cancelSource = myCancelSource;
 
-            RoutedEventHandler onUnloaded = (s, a) => myCancelSource.Cancel();
+            void onUnloaded(object s, RoutedEventArgs a) => myCancelSource.Cancel();
             this.settingsVM.Dialog.Unloaded += onUnloaded;
 
             return new DelegateDisposable(() =>

@@ -10,7 +10,7 @@ namespace DevPrompt.UI.ViewModels
     /// </summary>
     internal class SettingsImportDialogVM : PropertyNotifier
     {
-        private AppSettings settings;
+        private readonly AppSettings settings;
         private int consolesIndex;
         private int grabIndex;
         private int linksIndex;

@@ -34,11 +34,11 @@ namespace DevPrompt
         private enum RunningState { Run, RestartWindow, RestartApp, ShutDown }
         private enum SettingsState { None, Loaded, SavePending }
 
-        private List<Task> criticalTasks; // process won't exit until all critical tasks are done
+        private readonly List<Task> criticalTasks; // process won't exit until all critical tasks are done
+        private readonly ConcurrentDictionary<string, Assembly> resolvedAssemblies;
         private RunningState runningState;
         private SettingsState settingsState;
         private SettingsState customSettingsState;
-        private ConcurrentDictionary<string, Assembly> resolvedAssemblies;
 
         public App()
         {
@@ -160,7 +160,7 @@ namespace DevPrompt
             }
         }
 
-        public void OnWindowClosed(MainWindow window, bool restartWindow, bool restartApp)
+        public void OnWindowClosed(bool restartWindow, bool restartApp)
         {
             if (this.runningState == RunningState.Run)
             {

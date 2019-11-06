@@ -19,7 +19,7 @@ namespace DevPrompt.UI.ViewModels
         public IEnumerable<FrameworkElement> MenuItems => this.workspace?.MenuItems ?? Enumerable.Empty<FrameworkElement>();
         public IEnumerable<KeyBinding> KeyBindings => this.workspace?.KeyBindings ?? Enumerable.Empty<KeyBinding>();
 
-        private Api.IWindow window;
+        private readonly Api.IWindow window;
         private Api.IWorkspace workspace;
         private Api.IWorkspaceProvider provider;
         private Api.IWorkspaceSnapshot snapshot;

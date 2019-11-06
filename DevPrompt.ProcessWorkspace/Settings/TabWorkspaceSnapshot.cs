@@ -55,7 +55,7 @@ namespace DevPrompt.ProcessWorkspace.Settings
         public abstract Api.IWorkspace Restore(Api.IWindow window);
 
         [OnDeserializing]
-        private void Initialize(StreamingContext context = default(StreamingContext))
+        private void Initialize(StreamingContext context = default)
         {
             this.tabs = new ObservableCollection<Api.ITabSnapshot>();
         }

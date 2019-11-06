@@ -24,7 +24,7 @@ namespace DevPrompt.ProcessWorkspace.Utility
             return null;
         }
 
-        public static T FindItemContainer<T>(ItemsControl control, DependencyObject child, bool includeSelf) where T : DependencyObject
+        public static T FindItemContainer<T>(ItemsControl control, DependencyObject child) where T : DependencyObject
         {
             T parent = null;
 

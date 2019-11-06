@@ -10,8 +10,8 @@ namespace DevPrompt.Interop
     [Export(typeof(IProcessListener))]
     internal class NativeProcessListener : IProcessListener
     {
-        private IProcessCache processCache;
-        private Api.IProcessListener[] processListeners;
+        private readonly IProcessCache processCache;
+        private readonly Api.IProcessListener[] processListeners;
 
         [ImportingConstructor]
         public NativeProcessListener(

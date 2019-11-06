@@ -9,8 +9,8 @@ namespace DevPrompt.Utility
     {
         public event EventHandler CanExecuteChanged;
 
-        private IWorkspaceVM workspace;
-        private ICommand command;
+        private readonly IWorkspaceVM workspace;
+        private readonly ICommand command;
 
         public WorkspaceCommandWrapper(IWorkspaceVM workspace, ICommand command)
         {

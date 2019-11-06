@@ -9,8 +9,8 @@ namespace DevPrompt.Utility.Converters
         public delegate object ConvertFunc(object[] values, Type targetType, object parameter);
         public delegate object[] ConvertBackFunc(object value, Type[] targetTypes, object parameter);
 
-        private DelegateMultiConverter.ConvertFunc convert;
-        private DelegateMultiConverter.ConvertBackFunc convertBack;
+        private readonly DelegateMultiConverter.ConvertFunc convert;
+        private readonly DelegateMultiConverter.ConvertBackFunc convertBack;
 
         public DelegateMultiConverter(DelegateMultiConverter.ConvertFunc convert, DelegateMultiConverter.ConvertBackFunc convertBack = null)
         {

@@ -6,7 +6,7 @@ namespace DevPrompt.Utility.Converters
 {
     internal sealed class DateToVisibilityConverter : DelegateConverter
     {
-        private static DateTime OldestDate = new DateTime(2019, 1, 1);
+        private static readonly DateTime OldestDate = new DateTime(2019, 1, 1);
 
         public DateToVisibilityConverter()
             : base(DateToVisibilityConverter.Convert)

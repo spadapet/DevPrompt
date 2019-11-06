@@ -24,7 +24,7 @@ namespace DevPrompt.UI.ViewModels
     internal class SettingsTabVM : PropertyNotifier, IDisposable
     {
         public SettingsTabType TabType { get; }
-        private SettingsDialogVM viewModel;
+        private readonly SettingsDialogVM viewModel;
         private UIElement viewElement;
 
         public SettingsTabVM(SettingsDialogVM viewModel, SettingsTabType tabType)

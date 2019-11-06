@@ -24,8 +24,8 @@ namespace DevPrompt.Plugins
         public IEnumerable<Api.ICommandProvider> CommandProviders => this.commandProviders ?? Enumerable.Empty<Api.ICommandProvider>();
         public IEnumerable<Api.IWorkspaceProvider> WorkspaceProviders => this.workspaceProviders ?? Enumerable.Empty<Api.IWorkspaceProvider>();
 
-        private App app;
-        private List<PluginSource> plugins;
+        private readonly App app;
+        private readonly List<PluginSource> plugins;
         private CompositionHost compositionHost;
         private Api.IAppListener[] appListeners;
         private IProcessListener[] processListeners;
@@ -262,12 +262,7 @@ namespace DevPrompt.Plugins
                     }
                 }
 
-                List<Assembly> assemblies = new List<Assembly>();
-                foreach (string file in pluginInfo.PluginContainerFiles)
-                {
-                    assemblies.AddRange(PluginState.LoadAssemblies(root, recursive: false));
-                }
-
+                List<Assembly> assemblies = PluginState.LoadAssemblies(root, recursive: false).ToList();
                 if (assemblies.Count > 0)
                 {
                     AssemblyName name = assemblies[0].GetName();

@@ -17,9 +17,9 @@ namespace DevPrompt.ProcessWorkspace.UI.ViewModels
         public bool CreatedTab => this.tab != null;
         public IEnumerable<FrameworkElement> ContextMenuItems => this.tab?.ContextMenuItems ?? Enumerable.Empty<FrameworkElement>();
 
-        private Api.IWindow window;
+        private readonly Api.IWindow window;
+        private readonly Api.ITabWorkspace workspace;
         private Api.ITab tab;
-        private Api.ITabWorkspace workspace;
         private Api.ITabSnapshot snapshot;
         private Api.ActiveState activeState;
         private bool restoring;

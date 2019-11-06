@@ -23,7 +23,7 @@ namespace DevPrompt.UI.ViewModels
         public Api.IProgressBar ProgressBar => this.Dialog.progressBar;
         public Api.IInfoBar InfoBar => this.Dialog.infoBar;
 
-        private SettingsTabVM[] tabs;
+        private readonly SettingsTabVM[] tabs;
         private SettingsTabVM activeTab;
         private bool isBusy;
 

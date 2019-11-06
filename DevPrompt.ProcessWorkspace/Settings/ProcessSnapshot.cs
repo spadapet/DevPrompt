@@ -45,7 +45,7 @@ namespace DevPrompt.ProcessWorkspace.Settings
         }
 
         [OnDeserializing]
-        private void Initialize(StreamingContext context = default(StreamingContext))
+        private void Initialize(StreamingContext context = default)
         {
             this.cachedName = string.Empty;
             this.cachedTooltip = string.Empty;

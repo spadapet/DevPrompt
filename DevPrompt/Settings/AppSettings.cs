@@ -242,9 +242,9 @@ namespace DevPrompt.Settings
                 string file = Path.Combine(instance.Path, "Common7", "Tools", "VsDevCmd.bat");
                 if (File.Exists(file))
                 {
-                    int dotIndex = instance.DisplayName.IndexOf('.');
+                    int dotIndex = instance.DisplayName.IndexOfAny(" .(".ToCharArray());
                     string name = (dotIndex != -1)
-                        ? instance.DisplayName.Substring(0, dotIndex)
+                        ? instance.DisplayName.Substring(0, dotIndex).Trim()
                         : instance.DisplayName;
 
                     this.ObservableConsoles.Add(new ConsoleSettings()

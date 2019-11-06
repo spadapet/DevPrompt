@@ -12,9 +12,9 @@ namespace DevPrompt.Utility
 {
     internal class Telemetry : IDisposable, Api.ITelemetry
     {
-        private App app;
-        private TelemetryConfiguration config;
-        private TelemetryClient client;
+        private readonly App app;
+        private readonly TelemetryConfiguration config;
+        private readonly TelemetryClient client;
 
         public static Task<Telemetry> Create(App app)
         {

@@ -8,7 +8,7 @@ namespace DevPrompt.Settings
 {
     internal class SettingTypeResolver : DataContractResolver
     {
-        private App app;
+        private readonly App app;
         private const string Uri = "dev://DevPrompt.Settings.SettingTypeResolver";
 
         public SettingTypeResolver(App app)

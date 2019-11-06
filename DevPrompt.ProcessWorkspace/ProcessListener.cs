@@ -13,7 +13,7 @@ namespace DevPrompt.ProcessWorkspace
     [Export(typeof(Api.IProcessListener))]
     internal class ProcessListener : Api.IProcessListener
     {
-        private Api.IApp app;
+        private readonly Api.IApp app;
 
         [ImportingConstructor]
         public ProcessListener(Api.IApp app)

@@ -12,7 +12,7 @@ namespace DevPrompt.UI
     {
         public event PropertyChangedEventHandler PropertyChanged;
         public string AppVersion => Program.Version.ToString();
-        private Api.IWindow window;
+        private readonly Api.IWindow window;
         private string appLatestVersion;
         private HttpClient httpClient;
 

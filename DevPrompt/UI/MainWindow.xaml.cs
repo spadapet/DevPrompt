@@ -333,7 +333,7 @@ namespace DevPrompt.UI
 
         private void OnClosed(object sender, EventArgs args)
         {
-            this.App.OnWindowClosed(this, this.restartOnClose == RestartOnClose.Window, this.restartOnClose == RestartOnClose.App);
+            this.App.OnWindowClosed(this.restartOnClose == RestartOnClose.Window, this.restartOnClose == RestartOnClose.App);
         }
 
         private Task OnClosing()

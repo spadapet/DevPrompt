@@ -88,7 +88,7 @@ namespace DevPrompt.ProcessWorkspace.UI.Controls
             ItemCollection items = this.Items;
             Point point = args.GetPosition(this);
             IInputElement hit = this.InputHitTest(point);
-            ContentPresenter item = WpfUtility.FindItemContainer<ContentPresenter>(this, hit as DependencyObject, includeSelf: true);
+            ContentPresenter item = WpfUtility.FindItemContainer<ContentPresenter>(this, hit as DependencyObject);
 
             if (item == null)
             {
@@ -183,7 +183,7 @@ namespace DevPrompt.ProcessWorkspace.UI.Controls
         {
             if (args.MouseDevice.Captured != null)
             {
-                if (WpfUtility.FindItemContainer<ContentPresenter>(this, sender, includeSelf: true) is ContentPresenter item && !this.dragging)
+                if (WpfUtility.FindItemContainer<ContentPresenter>(this, sender) is ContentPresenter item && !this.dragging)
                 {
                     this.mouseCapturePoint = args.GetPosition(this);
                     this.captureItem = item;

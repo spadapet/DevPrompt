@@ -72,7 +72,7 @@ namespace DevPrompt.UI.Settings
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
-            if (item is ImageSource source)
+            if (item is ImageSource)
             {
                 return this.IconTemplate;
             }

@@ -10,7 +10,7 @@ namespace DevPrompt.ProcessWorkspace
     internal class ProcessHostWindow : HwndHost
     {
         public Api.IProcessHost ProcessHost { get; private set; }
-        private Api.IApp app;
+        private readonly Api.IApp app;
 
         public ProcessHostWindow(Api.IApp app)
         {

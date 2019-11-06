@@ -1,5 +1,6 @@
 ﻿using DevPrompt.Settings;
 using DevPrompt.UI.ViewModels;
+using System;
 using System.Collections.Generic;
 
 namespace DevPrompt.UI.DesignerViewModels
@@ -30,6 +31,10 @@ namespace DevPrompt.UI.DesignerViewModels
             new PluginSortVM("Most Recent", null),
         };
 
-        public PluginSortVM Sort => this.Sorts[0];
+        public PluginSortVM Sort
+        {
+            get => this.Sorts[0];
+            set { }
+        }
     }
 }

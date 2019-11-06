@@ -6,7 +6,7 @@ namespace DevPrompt.Interop
     [Export(typeof(IProcessCache))]
     internal class NativeProcessCache : IProcessCache, IEqualityComparer<IProcess>
     {
-        private Dictionary<IProcess, NativeProcess> processes;
+        private readonly Dictionary<IProcess, NativeProcess> processes;
 
         public NativeProcessCache()
         {

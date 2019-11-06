@@ -9,7 +9,7 @@ namespace DevPrompt.Plugins
     /// </summary>
     internal class ExportProvider : ExportDescriptorProvider
     {
-        private App app;
+        private readonly App app;
 
         public ExportProvider(App app)
         {
