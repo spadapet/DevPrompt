@@ -414,7 +414,7 @@ Visual Studio=https://visualstudio.microsoft.com</value>
     <value>Grab</value>
   </data>
   <data name="SettingsTabType.Links" xml:space="preserve">
-    <value>Tools</value>
+    <value>Links</value>
   </data>
   <data name="SettingsTabType.Plugins" xml:space="preserve">
     <value>Plugins</value>
@@ -423,7 +423,7 @@ Visual Studio=https://visualstudio.microsoft.com</value>
     <value>Telemetry</value>
   </data>
   <data name="SettingsTabType.Tools" xml:space="preserve">
-    <value>Links</value>
+    <value>Tools</value>
   </data>
   <data name="TelemetryDialog.Enable" xml:space="preserve">
     <value>Enable telemetry</value>

@@ -945,7 +945,7 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Tools.
+        ///   Looks up a localized string similar to Links.
         /// </summary>
         public static string SettingsTabType_Links {
             get {
@@ -972,7 +972,7 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Links.
+        ///   Looks up a localized string similar to Tools.
         /// </summary>
         public static string SettingsTabType_Tools {
             get {
