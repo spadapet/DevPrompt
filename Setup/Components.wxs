@@ -9,39 +9,100 @@
                 <RegistryValue Root="HKCU" Key="$(var.RegistryRootKey)" Type="string" Name="InstallDir" Value="[INSTALLDIR]" KeyPath="yes" />
             </Component>
 
-            <Component Id="Main" Guid="$(var.Id_Main)">
-                <File Source="$(var.Bin64)DevInjector64.exe" />
-                <File Source="$(var.Bin64)DevInject64.dll" />
-                <File Source="$(var.Bin64)DevNative64.dll" />
-                <File Source="$(var.Bin32)DevInjector32.exe" />
-                <File Source="$(var.Bin32)DevInject32.dll" />
-                <File Source="$(var.Bin32)DevNative32.dll" />
-                <File Source="$(var.Bin64)DevPrompt.Api.dll" />
-                <File Source="$(var.Bin64)DevPrompt.ProcessWorkspace.dll" />
+            <Component Id="DevPromptExe" Guid="$(var.Id_DevPromptExe)">
                 <File Source="$(var.Bin64)DevPrompt.exe" />
-                <File Source="$(var.Bin64)DevPrompt.exe.config" />
-
-                <File Source="$(var.Bin64)Efficient.Json.dll" />
-                <File Source="$(var.Bin64)Microsoft.ApplicationInsights.dll" />
-                <File Source="$(var.Bin64)System.Buffers.dll" />
-                <File Source="$(var.Bin64)System.Composition.AttributedModel.dll" />
-                <File Source="$(var.Bin64)System.Composition.Convention.dll" />
-                <File Source="$(var.Bin64)System.Composition.Hosting.dll" />
-                <File Source="$(var.Bin64)System.Composition.Runtime.dll" />
-                <File Source="$(var.Bin64)System.Composition.TypedParts.dll" />
-                <File Source="$(var.Bin64)System.Diagnostics.DiagnosticSource.dll" />
-                <File Source="$(var.Bin64)System.Memory.dll" />
-                <File Source="$(var.Bin64)System.Numerics.Vectors.dll" />
-                <File Source="$(var.Bin64)System.Runtime.CompilerServices.Unsafe.dll" />
-
                 <RegistryValue Root="HKCU" Key="$(var.RegistryRootKey)" Type="string" Name="InstallVersion" Value="$(var.ProductVersion)" KeyPath="yes" />
+            </Component>
+            <Component Id="DevPromptExeConfig" Guid="$(var.Id_DevPromptExeConfig)">
+                <File Source="$(var.Bin64)DevPrompt.exe.config" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistrySetupKey)" Type="integer" Name="DevPromptExeConfig" Value="1" KeyPath="yes" />
+            </Component>
+            <Component Id="DevInjector64Exe" Guid="$(var.Id_DevInjector64Exe)">
+                <File Source="$(var.Bin64)DevInjector64.exe" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistrySetupKey)" Type="integer" Name="DevInjector64Exe" Value="1" KeyPath="yes" />
+            </Component>
+            <Component Id="DevInject64Dll" Guid="$(var.Id_DevInject64Dll)">
+                <File Source="$(var.Bin64)DevInject64.dll" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistrySetupKey)" Type="integer" Name="DevInject64Dll" Value="1" KeyPath="yes" />
+            </Component>
+            <Component Id="DevNative64Dll" Guid="$(var.Id_DevNative64Dll)">
+                <File Source="$(var.Bin64)DevNative64.dll" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistrySetupKey)" Type="integer" Name="DevNative64Dll" Value="1" KeyPath="yes" />
+            </Component>
+            <Component Id="DevInjector32Exe" Guid="$(var.Id_DevInjector32Exe)">
+                <File Source="$(var.Bin32)DevInjector32.exe" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistrySetupKey)" Type="integer" Name="DevInjector32Exe" Value="1" KeyPath="yes" />
+            </Component>
+            <Component Id="DevInject32Dll" Guid="$(var.Id_DevInject32Dll)">
+                <File Source="$(var.Bin32)DevInject32.dll" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistrySetupKey)" Type="integer" Name="DevInject32Dll" Value="1" KeyPath="yes" />
+            </Component>
+            <Component Id="DevNative32Dll" Guid="$(var.Id_DevNative32Dll)">
+                <File Source="$(var.Bin32)DevNative32.dll" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistrySetupKey)" Type="integer" Name="DevNative32Dll" Value="1" KeyPath="yes" />
+            </Component>
+            <Component Id="DevPromptApiDll" Guid="$(var.Id_DevPromptApiDll)">
+                <File Source="$(var.Bin64)DevPrompt.Api.dll" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistrySetupKey)" Type="integer" Name="DevPromptApiDll" Value="1" KeyPath="yes" />
+            </Component>
+            <Component Id="DevPromptProcessWorkspaceDll" Guid="$(var.Id_DevPromptProcessWorkspaceDll)">
+                <File Source="$(var.Bin64)DevPrompt.ProcessWorkspace.dll" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistrySetupKey)" Type="integer" Name="DevPromptProcessWorkspaceDll" Value="1" KeyPath="yes" />
+            </Component>
+            <Component Id="EfficientJsonDll" Guid="$(var.Id_EfficientJsonDll)">
+                <File Source="$(var.Bin64)Efficient.Json.dll" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistrySetupKey)" Type="integer" Name="EfficientJsonDll" Value="1" KeyPath="yes" />
+            </Component>
+            <Component Id="MicrosoftApplicationInsightsDll" Guid="$(var.Id_MicrosoftApplicationInsightsDll)">
+                <File Source="$(var.Bin64)Microsoft.ApplicationInsights.dll" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistrySetupKey)" Type="integer" Name="MicrosoftApplicationInsightsDll" Value="1" KeyPath="yes" />
+            </Component>
+            <Component Id="SystemBuffersDll" Guid="$(var.Id_SystemBuffersDll)">
+                <File Source="$(var.Bin64)System.Buffers.dll" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistrySetupKey)" Type="integer" Name="SystemBuffersDll" Value="1" KeyPath="yes" />
+            </Component>
+            <Component Id="SystemCompositionAttributedModelDll" Guid="$(var.Id_SystemCompositionAttributedModelDll)">
+                <File Source="$(var.Bin64)System.Composition.AttributedModel.dll" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistrySetupKey)" Type="integer" Name="SystemCompositionAttributedModelDll" Value="1" KeyPath="yes" />
+            </Component>
+            <Component Id="SystemCompositionConventionDll" Guid="$(var.Id_SystemCompositionConventionDll)">
+                <File Source="$(var.Bin64)System.Composition.Convention.dll" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistrySetupKey)" Type="integer" Name="SystemCompositionConventionDll" Value="1" KeyPath="yes" />
+            </Component>
+            <Component Id="SystemCompositionHostingDll" Guid="$(var.Id_SystemCompositionHostingDll)">
+                <File Source="$(var.Bin64)System.Composition.Hosting.dll" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistrySetupKey)" Type="integer" Name="SystemCompositionHostingDll" Value="1" KeyPath="yes" />
+            </Component>
+            <Component Id="SystemCompositionRuntimeDll" Guid="$(var.Id_SystemCompositionRuntimeDll)">
+                <File Source="$(var.Bin64)System.Composition.Runtime.dll" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistrySetupKey)" Type="integer" Name="SystemCompositionRuntimeDll" Value="1" KeyPath="yes" />
+            </Component>
+            <Component Id="SystemCompositionTypedPartsDll" Guid="$(var.Id_SystemCompositionTypedPartsDll)">
+                <File Source="$(var.Bin64)System.Composition.TypedParts.dll" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistrySetupKey)" Type="integer" Name="SystemCompositionTypedPartsDll" Value="1" KeyPath="yes" />
+            </Component>
+            <Component Id="SystemDiagnosticsDiagnosticSourceDll" Guid="$(var.Id_SystemDiagnosticsDiagnosticSourceDll)">
+                <File Source="$(var.Bin64)System.Diagnostics.DiagnosticSource.dll" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistrySetupKey)" Type="integer" Name="SystemDiagnosticsDiagnosticSourceDll" Value="1" KeyPath="yes" />
+            </Component>
+            <Component Id="SystemMemoryDll" Guid="$(var.Id_SystemMemoryDll)">
+                <File Source="$(var.Bin64)System.Memory.dll" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistrySetupKey)" Type="integer" Name="SystemMemoryDll" Value="1" KeyPath="yes" />
+            </Component>
+            <Component Id="SystemNumericsVectorsDll" Guid="$(var.Id_SystemNumericsVectorsDll)">
+                <File Source="$(var.Bin64)System.Numerics.Vectors.dll" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistrySetupKey)" Type="integer" Name="SystemNumericsVectorsDll" Value="1" KeyPath="yes" />
+            </Component>
+            <Component Id="SystemRuntimeCompilerServicesUnsafeDll" Guid="$(var.Id_SystemRuntimeCompilerServicesUnsafeDll)">
+                <File Source="$(var.Bin64)System.Runtime.CompilerServices.Unsafe.dll" />
+                <RegistryValue Root="HKCU" Key="$(var.RegistrySetupKey)" Type="integer" Name="SystemRuntimeCompilerServicesUnsafeDll" Value="1" KeyPath="yes" />
             </Component>
         </DirectoryRef>
 
         <DirectoryRef Id="ProgramMenuFolder">
             <Component Id="Shortcut" Guid="$(var.Id_Shortcut)">
                 <Shortcut Id="StartMenuDevPrompt" Name="$(var.ProductName)" Target="[INSTALLDIR]DevPrompt.exe" />
-                <RegistryValue Root="HKCU" Key="$(var.RegistryRootKey)" Type="integer" Name="MainShortcut" Value="1" KeyPath="yes"/>
+                <RegistryValue Root="HKCU" Key="$(var.RegistrySetupKey)" Type="integer" Name="Shortcut" Value="1" KeyPath="yes"/>
             </Component>
         </DirectoryRef>
     </Fragment>

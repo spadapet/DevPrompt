@@ -4,9 +4,29 @@
     <Fragment>
         <Feature Id="Main" Title="Files" Absent="disallow" AllowAdvertise="no" ConfigurableDirectory="INSTALLDIR">
             <ComponentRef Id="Folder" />
-            <ComponentRef Id="Main" />
             <ComponentRef Id="Shortcut" />
-            <!--<MergeRef Id="VC141_Runtime" />-->
+            <ComponentRef Id="DevPromptExe" />
+            <ComponentRef Id="DevPromptExeConfig" />
+            <ComponentRef Id="DevInjector64Exe" />
+            <ComponentRef Id="DevInject64Dll" />
+            <ComponentRef Id="DevNative64Dll" />
+            <ComponentRef Id="DevInjector32Exe" />
+            <ComponentRef Id="DevInject32Dll" />
+            <ComponentRef Id="DevNative32Dll" />
+            <ComponentRef Id="DevPromptApiDll" />
+            <ComponentRef Id="DevPromptProcessWorkspaceDll" />
+            <ComponentRef Id="EfficientJsonDll" />
+            <ComponentRef Id="MicrosoftApplicationInsightsDll" />
+            <ComponentRef Id="SystemBuffersDll" />
+            <ComponentRef Id="SystemCompositionAttributedModelDll" />
+            <ComponentRef Id="SystemCompositionConventionDll" />
+            <ComponentRef Id="SystemCompositionHostingDll" />
+            <ComponentRef Id="SystemCompositionRuntimeDll" />
+            <ComponentRef Id="SystemCompositionTypedPartsDll" />
+            <ComponentRef Id="SystemDiagnosticsDiagnosticSourceDll" />
+            <ComponentRef Id="SystemMemoryDll" />
+            <ComponentRef Id="SystemNumericsVectorsDll" />
+            <ComponentRef Id="SystemRuntimeCompilerServicesUnsafeDll" />
         </Feature>
     </Fragment>
 </Wix>

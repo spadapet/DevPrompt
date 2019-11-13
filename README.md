@@ -2,7 +2,7 @@
 Tabbed command prompts for developers
 
 ## Download
-[DevPrompt.msi](http://www.peterspada.com/Download/DevPrompt) - Latest version 1.8.1.1
+[DevPrompt.msi](http://www.peterspada.com/Download/DevPrompt) - Latest version 1.8.4.0
 
 The installation does not run with administrator rights.
 Windows will warn you not to install it since the MSI file is unsigned.

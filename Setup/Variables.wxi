@@ -4,11 +4,33 @@
     <?define ProductName = "DevPrompt" ?>
     <?define ProductVersion = "$(var.DevPromptVersion)" ?>
     <?define ProductLink = "https://github.com/spadapet/DevPrompt" ?>
-
     <?define RegistryRootKey = "Software\$(var.ProductName)" ?>
+    <?define RegistrySetupKey = "$(var.RegistryRootKey)\Setup" ?>
 
-    <?define ProductUpgradeCode = "78EF1CAA-FDDD-4109-BD01-94F9E439E222" ?>
+    <?define Id_ProductUpgrade = "E29215C9-12CB-41E7-ACEA-A0734996786D" ?>
     <?define Id_Folder = "7621530A-B617-448B-BA56-2DF0AE8F0F7A" ?>
-    <?define Id_Main = "ABB6124A-A803-4889-BDFE-ECADBEA2B5C0" ?>
     <?define Id_Shortcut = "35FE78FA-B9FE-4F9A-8719-003B5DDA58C8" ?>
+
+    <?define Id_DevPromptExe = "ABB6124A-A803-4889-BDFE-ECADBEA2B5C0" ?>
+    <?define Id_DevPromptExeConfig = "38C4EC12-9ACA-4CAC-B2DD-99C32333E40A" ?>
+    <?define Id_DevInjector64Exe = "5275B66C-6290-4859-BCA2-0353CA81E360" ?>
+    <?define Id_DevInject64Dll = "6A021D26-54F5-4CDD-8291-BBE8B6783A94" ?>
+    <?define Id_DevNative64Dll = "FECE53F1-896A-4C2E-B57C-7A6E5278A9C9" ?>
+    <?define Id_DevInjector32Exe = "294F8703-4AB9-4465-8541-2D8A87A3064C" ?>
+    <?define Id_DevInject32Dll = "C6A899D9-775E-443C-BF58-31A464A91A35" ?>
+    <?define Id_DevNative32Dll = "27847946-0A2B-4AA0-A660-EE20C24F8F8F" ?>
+    <?define Id_DevPromptApiDll = "7177571F-BFAA-4A9B-B228-92363F51C5BC" ?>
+    <?define Id_DevPromptProcessWorkspaceDll = "BA24EE9A-3D82-4BF6-8776-DDB6DC3F2AE6" ?>
+    <?define Id_EfficientJsonDll = "DFB1C6A0-E7D1-4783-AD82-14759E64023A" ?>
+    <?define Id_MicrosoftApplicationInsightsDll = "3C61CE0B-7E24-4701-B1DA-992D2266E764" ?>
+    <?define Id_SystemBuffersDll = "8063A469-ECED-4916-841A-5186E60A1157" ?>
+    <?define Id_SystemCompositionAttributedModelDll = "1E992C67-78C0-42FB-9C55-7176F304E3F2" ?>
+    <?define Id_SystemCompositionConventionDll = "5AC1B6AD-9407-48ED-A26F-96C86CA2AE6B" ?>
+    <?define Id_SystemCompositionHostingDll = "7A706D4D-F0D3-4384-8029-5937E09FF1E5" ?>
+    <?define Id_SystemCompositionRuntimeDll = "66CCB1D2-6908-4665-A38C-A1BE4C94A29E" ?>
+    <?define Id_SystemCompositionTypedPartsDll = "69096728-3A8F-4DBF-9264-46146471EF85" ?>
+    <?define Id_SystemDiagnosticsDiagnosticSourceDll = "26790E6A-D637-4378-AACD-2DBE638CA7A7" ?>
+    <?define Id_SystemMemoryDll = "16CFCA18-BFF4-4165-AC05-D0AA00B391D8" ?>
+    <?define Id_SystemNumericsVectorsDll = "756EE870-6E50-4402-AC98-CC8190FBD50B" ?>
+    <?define Id_SystemRuntimeCompilerServicesUnsafeDll = "3D9B3FC7-B245-4FD0-95F4-12DA0387DC8E" ?>
 </Include>

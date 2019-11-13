@@ -73,6 +73,7 @@
   <Target Name="BeforeBuild" Condition=" '$(Configuration)' == 'Release' ">
     <!-- Update all files that have the version number in them -->
     <FileUpdate Files="$(DevRoot)Build\GlobalAssemblyInfo.cs" Regex="AssemblyVersion\(&quot;.*?&quot;\)" ReplacementText="AssemblyVersion(&quot;$(DevPromptVersion)&quot;)" />
+    <FileUpdate Files="$(DevRoot)DevPrompt\App.config" Regex="oldVersion.*?DevPromptVersion" ReplacementText="oldVersion=&quot;0.0.0.0-$(DevPromptVersion)&quot; xmlns:v=&quot;DevPromptVersion" />
     <FileUpdate Files="$(DevRoot)DevPrompt\App.config" Regex="(xmlns:v=&quot;DevPromptVersion&quot; .*?=)&quot;.*?&quot;" ReplacementText="$1&quot;$(DevPromptVersion)&quot;" />
     <FileUpdate Files="$(DevRoot)DevPrompt\app.manifest" Regex="assemblyIdentity version=&quot;.*?&quot;" ReplacementText="assemblyIdentity version=&quot;$(DevPromptVersion)&quot;" />
     <FileUpdate Files="$(DevRoot)README.md" Regex="Latest version \d+\.\d+\.\d+\.\d+" ReplacementText="Latest version $(DevPromptVersion)" />

@@ -31,7 +31,6 @@
         <Compile Include="Components.wxs" />
         <Compile Include="Features.wxs" />
         <Compile Include="Directories.wxs" />
-        <Compile Include="MergeModules.wxs" />
         <Compile Include="Product.wxs" />
         <Content Include="license.rtf" />
         <Content Include="Variables.wxi" />

@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <?include "variables.wxi"?>
-    <Product Id="*" Name="$(var.ProductName)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="$(var.CompanyName)" UpgradeCode="e29215c9-12cb-41e7-acea-a0734996786d">
+    <Product Id="*" Name="$(var.ProductName)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="$(var.CompanyName)" UpgradeCode="$(var.Id_ProductUpgrade)">
         <Package InstallerVersion="200" Compressed="yes" InstallScope="perUser" InstallPrivileges="limited" />
-        <MajorUpgrade DowngradeErrorMessage="A newer version of $(var.ProductName) is already installed." />
+        <MajorUpgrade DowngradeErrorMessage="A newer version of $(var.ProductName) is already installed." Schedule="afterInstallExecute" />
         <MediaTemplate EmbedCab="yes" />
         <Icon Id="AppIcon" SourceFile="$(var.DevRoot)DevPrompt\appicon.ico" />
         <CustomAction Id="RunApp" FileKey="DevPrompt.exe" ExeCommand="" Execute="immediate" Impersonate="yes" Return="asyncNoWait" />
