@@ -47,8 +47,9 @@
             <Button Padding="5,0" Margin="5,0,0,0" Content="{x:Static local:Resources.Dialog_Delete}" Command="{Binding DeleteCommand}" />
             <Button Padding="5,0" Margin="5,0,0,0" Content="{x:Static local:Resources.Dialog_Reset}" Command="{Binding ResetCommand}" />
         </StackPanel>
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,5">
-            <CheckBox Name="saveTabsCheckbox" Content="{x:Static local:Resources.ConsoleDialog_RestoreAtStartup}" IsChecked="{Binding ViewModel.Settings.SaveTabsOnExit, Mode=TwoWay}" />
+        <StackPanel Grid.Row="3" Orientation="Vertical" HorizontalAlignment="Left" Margin="5,0,0,5">
+            <CheckBox Name="showVsPrompts" Content="{x:Static local:Resources.ConsoleDialog_ShowVsPrompts}" ToolTip="{x:Static local:Resources.ConsoleDialog_ShowVsPromptsTooltip}" IsChecked="{Binding ViewModel.Settings.ShowVisualStudioPrompts, Mode=TwoWay}" />
+            <CheckBox Name="saveTabsCheckbox" Content="{x:Static local:Resources.ConsoleDialog_RestoreAtStartup}" IsChecked="{Binding ViewModel.Settings.SaveTabsOnExit, Mode=TwoWay}" Margin="0,5,0,0" />
         </StackPanel>
     </Grid>
 </UserControl>

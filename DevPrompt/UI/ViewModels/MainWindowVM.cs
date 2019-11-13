@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -26,6 +27,7 @@ namespace DevPrompt.UI.ViewModels
         public MainWindow Window { get; }
         public App App => this.Window.App;
         public AppSettings AppSettings => this.App.Settings;
+        public IReadOnlyList<ConsoleSettings> VisualStudioConsoles => this.visualStudioConsoles;
         Api.IApp Api.IWindow.App => this.App;
         IntPtr Api.IWindow.Handle => new WindowInteropHelper(this.Window).Handle;
         Api.IProgressBar Api.IWindow.ProgressBar => this.Window.progressBar;
@@ -38,6 +40,7 @@ namespace DevPrompt.UI.ViewModels
         public ICommand VisualStudioCommand { get; }
         public ICommand QuickStartConsoleCommand { get; }
 
+        private readonly ObservableCollection<ConsoleSettings> visualStudioConsoles;
         private readonly ObservableCollection<IWorkspaceVM> workspaces;
         private readonly Dictionary<IWorkspaceVM, FrameworkElement[]> workspaceMenuItems;
         private readonly Dictionary<IWorkspaceVM, KeyBinding[]> workspaceKeyBindings;
@@ -56,8 +59,9 @@ namespace DevPrompt.UI.ViewModels
             this.LinkCommand = new DelegateCommand((object arg) => this.StartLink((LinkSettings)arg));
             this.ToolCommand = new DelegateCommand((object arg) => this.StartTool((ToolSettings)arg));
             this.VisualStudioCommand = new DelegateCommand((object arg) => this.StartVisualStudio((VisualStudioSetup.Instance)arg));
-            this.QuickStartConsoleCommand = new DelegateCommand((object arg) => this.QuickStartConsole((int)arg));
+            this.QuickStartConsoleCommand = new DelegateCommand(async (object arg) => await this.QuickStartConsole((int)arg));
 
+            this.visualStudioConsoles = new ObservableCollection<ConsoleSettings>();
             this.workspaces = new ObservableCollection<IWorkspaceVM>();
             this.workspaceMenuItems = new Dictionary<IWorkspaceVM, FrameworkElement[]>();
             this.workspaceKeyBindings = new Dictionary<IWorkspaceVM, KeyBinding[]>();
@@ -84,6 +88,29 @@ namespace DevPrompt.UI.ViewModels
         private void OnWindowDeactivated(object sender, EventArgs args)
         {
             this.ActiveWorkspace?.Workspace.OnWindowDeactivated();
+        }
+
+        public async Task<bool> UpdateVisualStudioConsolesAsync()
+        {
+            List<ConsoleSettings> consoles = new List<ConsoleSettings>(this.visualStudioConsoles.Count);
+            if (this.AppSettings.ShowVisualStudioPrompts)
+            {
+                consoles.AddRange(await AppSettings.GetVisualStudioConsolesAsync());
+            }
+
+            if (this.visualStudioConsoles.SequenceEqual(consoles))
+            {
+                return false;
+            }
+
+            this.visualStudioConsoles.Clear();
+
+            foreach (ConsoleSettings console in consoles)
+            {
+                this.visualStudioConsoles.Add(console);
+            }
+
+            return true;
         }
 
         public ICommand ExitCommand => new DelegateCommand(() => this.Window.Close());
@@ -485,11 +512,26 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
-        private void QuickStartConsole(int arg)
+        private async Task QuickStartConsole(int arg)
         {
             if (this.AppSettings.Consoles.ElementAtOrDefault(arg) is ConsoleSettings settings)
             {
                 this.StartConsole(settings);
+            }
+            else if (arg >= this.AppSettings.Consoles.Count)
+            {
+                int i = arg - this.AppSettings.Consoles.Count;
+
+                if (i >= this.visualStudioConsoles.Count)
+                {
+                    // Maybe a new VS was just installed
+                    await this.UpdateVisualStudioConsolesAsync();
+                }
+
+                if (this.visualStudioConsoles.ElementAtOrDefault(i) is ConsoleSettings settings2)
+                {
+                    this.StartConsole(settings2);
+                }
             }
         }
 

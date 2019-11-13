@@ -1,6 +1,5 @@
 ﻿using DevPrompt.ProcessWorkspace.UI.Controls;
 using DevPrompt.ProcessWorkspace.UI.ViewModels;
-using DevPrompt.UI.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;

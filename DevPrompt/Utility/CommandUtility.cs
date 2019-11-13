@@ -79,9 +79,9 @@ namespace DevPrompt.Utility
 
         public static DelegateCommand CreateResetCommand<T>(Func<AppSettings, IList<T>> newListAccessor, ObservableCollection<T> items, AppSettings.DefaultSettingsFilter filter)
         {
-            return new DelegateCommand(async () =>
+            return new DelegateCommand(() =>
             {
-                AppSettings defaultSettings = await AppSettings.GetDefaultSettings(filter);
+                AppSettings defaultSettings = AppSettings.GetDefaultSettings(filter);
                 IList<T> newList = newListAccessor(defaultSettings);
 
                 items.Clear();

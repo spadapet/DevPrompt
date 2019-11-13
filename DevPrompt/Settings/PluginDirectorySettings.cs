@@ -1,4 +1,5 @@
 ﻿using DevPrompt.ProcessWorkspace.Utility;
+using DevPrompt.Utility;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -12,7 +13,7 @@ namespace DevPrompt.Settings
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{Directory}")]
-    internal class PluginDirectorySettings : PropertyNotifier
+    internal class PluginDirectorySettings : PropertyNotifier, IEquatable<PluginDirectorySettings>
     {
         private string directory;
         private bool enabled;
@@ -34,6 +35,23 @@ namespace DevPrompt.Settings
         public PluginDirectorySettings Clone()
         {
             return new PluginDirectorySettings(this);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is PluginDirectorySettings other && this.Equals(other);
+        }
+
+        public bool Equals(PluginDirectorySettings other)
+        {
+            return this.directory == other.directory &&
+                this.enabled == other.enabled &&
+                this.readOnly == other.readOnly;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashUtility.CombineHashCodes(this.directory.GetHashCode(), this.enabled.GetHashCode(), this.readOnly.GetHashCode());
         }
 
         [DataMember]

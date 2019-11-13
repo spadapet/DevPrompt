@@ -32,6 +32,7 @@ namespace DevPrompt.Settings
         private Dictionary<string, object> customProperties;
         private bool consoleGrabEnabled;
         private bool saveTabsOnExit;
+        private bool showVisualStudioPrompts;
         private bool telemetryEnabled;
         private bool pluginsChanged;
         private static readonly object fileLock = new object();
@@ -56,6 +57,7 @@ namespace DevPrompt.Settings
         {
             this.ConsoleGrabEnabled = copyFrom.ConsoleGrabEnabled;
             this.SaveTabsOnExit = copyFrom.SaveTabsOnExit;
+            this.ShowVisualStudioPrompts = copyFrom.ShowVisualStudioPrompts;
             this.TelemetryEnabled = copyFrom.TelemetryEnabled;
             this.PluginsChanged = copyFrom.PluginsChanged;
 
@@ -137,42 +139,40 @@ namespace DevPrompt.Settings
         public enum DefaultSettingsFilter
         {
             None = 0,
-            DevPrompts = 0x01,
+            InternalDevPrompts = 0x01,
             RawPrompts = 0x02,
             Grabs = 0x04,
             Links = 0x08,
             Tools = 0x10,
-            PluginDirs = 0x20,
-            Custom = 0x40,
-            All = 0xFF,
+            Custom = 0x20,
+            All = 0xFFFF,
         }
 
-        public static async Task<AppSettings> GetDefaultSettings(DefaultSettingsFilter filter)
+        public static AppSettings GetDefaultSettings(DefaultSettingsFilter filter)
         {
             AppSettings settings = new AppSettings();
 
-            if ((filter & DefaultSettingsFilter.DevPrompts) != 0)
+            if (filter.HasFlag(DefaultSettingsFilter.InternalDevPrompts))
             {
                 settings.AddVisualStudioEnlistments();
-                await settings.AddVisualStudioDevPrompts();
             }
 
-            if ((filter & DefaultSettingsFilter.RawPrompts) != 0)
+            if (filter.HasFlag(DefaultSettingsFilter.RawPrompts))
             {
                 settings.AddRawCommandPrompts();
             }
 
-            if ((filter & DefaultSettingsFilter.Grabs) != 0)
+            if (filter.HasFlag(DefaultSettingsFilter.Grabs))
             {
                 settings.AddDefaultGrabs();
             }
 
-            if ((filter & DefaultSettingsFilter.Links) != 0)
+            if (filter.HasFlag(DefaultSettingsFilter.Links))
             {
                 settings.AddDefaultLinks();
             }
 
-            if ((filter & DefaultSettingsFilter.Tools) != 0)
+            if (filter.HasFlag(DefaultSettingsFilter.Tools))
             {
                 settings.AddDefaultTools();
             }
@@ -209,7 +209,7 @@ namespace DevPrompt.Settings
                     {
                         this.Consoles.Add(new ConsoleSettings()
                         {
-                            MenuName = $"cmd.exe ({enlistment})",
+                            MenuName = $"Razzle ({enlistment})",
                             TabName = $"%BaseDir,{enlistment.Substring(Path.GetPathRoot(enlistment).Length)}%, %_ParentBranch,...%",
                             StartingDirectory = enlistment,
                             Arguments = "/k init.cmd -skipexportsprune",
@@ -219,7 +219,17 @@ namespace DevPrompt.Settings
             }
         }
 
-        private async Task AddVisualStudioDevPrompts()
+        async Task<IEnumerable<Api.IConsoleSettings>> Api.IAppSettings.GetVisualStudioConsoleSettingsAsync()
+        {
+            if (this.ShowVisualStudioPrompts)
+            {
+                return await AppSettings.GetVisualStudioConsolesAsync();
+            }
+
+            return Enumerable.Empty<Api.IConsoleSettings>();
+        }
+
+        public static async Task<IEnumerable<ConsoleSettings>> GetVisualStudioConsolesAsync()
         {
             List<VisualStudioSetup.Instance> instances = new List<VisualStudioSetup.Instance>(await VisualStudioSetup.GetInstances());
             instances.Sort((x, y) =>
@@ -237,6 +247,8 @@ namespace DevPrompt.Settings
                 return v2.CompareTo(v1);
             });
 
+            List<ConsoleSettings> result = new List<ConsoleSettings>(instances.Count);
+
             foreach (VisualStudioSetup.Instance instance in instances)
             {
                 string file = Path.Combine(instance.Path, "Common7", "Tools", "VsDevCmd.bat");
@@ -247,14 +259,17 @@ namespace DevPrompt.Settings
                         ? instance.DisplayName.Substring(0, dotIndex).Trim()
                         : instance.DisplayName;
 
-                    this.ObservableConsoles.Add(new ConsoleSettings()
+                    result.Add(new ConsoleSettings()
                     {
                         MenuName = string.Format(CultureInfo.CurrentCulture, Resources.Menu_VsPromptName, name),
                         TabName = string.Format(CultureInfo.CurrentCulture, Resources.Menu_VsPromptTabName, name),
                         Arguments = $"/k \"{file}\"",
+                        RunAtStartup = (result.Count == 0),
                     });
                 }
             }
+
+            return result;
         }
 
         private void AddRawCommandPrompts()
@@ -391,7 +406,7 @@ namespace DevPrompt.Settings
 
             if (settings == null)
             {
-                settings = await AppSettings.GetDefaultSettings(DefaultSettingsFilter.All);
+                settings = AppSettings.GetDefaultSettings(DefaultSettingsFilter.All);
                 await settings.Save(app, path);
             }
 
@@ -505,6 +520,13 @@ namespace DevPrompt.Settings
         }
 
         [DataMember]
+        public bool ShowVisualStudioPrompts
+        {
+            get => this.showVisualStudioPrompts;
+            set => this.SetPropertyValue(ref this.showVisualStudioPrompts, value);
+        }
+
+        [DataMember]
         public bool TelemetryEnabled
         {
             get => this.telemetryEnabled;
@@ -587,6 +609,7 @@ namespace DevPrompt.Settings
 
             this.customProperties = new Dictionary<string, object>();
             this.saveTabsOnExit = true;
+            this.showVisualStudioPrompts = true;
             this.telemetryEnabled = true;
         }
 
@@ -624,7 +647,7 @@ namespace DevPrompt.Settings
 
         public void EnsureValid(DefaultSettingsFilter filter = DefaultSettingsFilter.All)
         {
-            if ((filter & (DefaultSettingsFilter.DevPrompts | DefaultSettingsFilter.RawPrompts)) != 0)
+            if (filter.HasFlag(DefaultSettingsFilter.InternalDevPrompts) || filter.HasFlag(DefaultSettingsFilter.RawPrompts))
             {
                 if (this.ObservableConsoles.Count == 0)
                 {

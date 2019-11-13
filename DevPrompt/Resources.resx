@@ -165,6 +165,12 @@
   <data name="ConsoleDialog.RestoreAtStartup" xml:space="preserve">
     <value>Restore tabs at startup</value>
   </data>
+  <data name="ConsoleDialog.ShowVsPrompts" xml:space="preserve">
+    <value>Show VS developer commands prompts</value>
+  </data>
+  <data name="ConsoleDialog.ShowVsPromptsTooltip" xml:space="preserve">
+    <value>Shows installed Visual Studio developer command prompts after your custom command prompts</value>
+  </data>
   <data name="Dialog.Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
@@ -282,13 +288,13 @@ Visual Studio=https://visualstudio.microsoft.com</value>
     <value>_Plugins...</value>
   </data>
   <data name="Menu.RawCommandName" xml:space="preserve">
-    <value>Raw cmd.exe</value>
+    <value>cmd.exe</value>
   </data>
   <data name="Menu.RawCommandTabName" xml:space="preserve">
     <value>Cmd</value>
   </data>
   <data name="Menu.RawPowerShellName" xml:space="preserve">
-    <value>Raw powershell.exe</value>
+    <value>powershell.exe</value>
   </data>
   <data name="Menu.RawPowerShellTabName" xml:space="preserve">
     <value>PowerShell</value>

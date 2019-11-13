@@ -205,6 +205,24 @@ namespace DevPrompt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show VS developer commands prompts.
+        /// </summary>
+        public static string ConsoleDialog_ShowVsPrompts {
+            get {
+                return ResourceManager.GetString("ConsoleDialog.ShowVsPrompts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shows installed Visual Studio developer command prompts after your custom command prompts.
+        /// </summary>
+        public static string ConsoleDialog_ShowVsPromptsTooltip {
+            get {
+                return ResourceManager.GetString("ConsoleDialog.ShowVsPromptsTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         public static string Dialog_Cancel {
@@ -549,7 +567,7 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Raw cmd.exe.
+        ///   Looks up a localized string similar to cmd.exe.
         /// </summary>
         public static string Menu_RawCommandName {
             get {
@@ -567,7 +585,7 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Raw powershell.exe.
+        ///   Looks up a localized string similar to powershell.exe.
         /// </summary>
         public static string Menu_RawPowerShellName {
             get {

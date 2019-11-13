@@ -1,6 +1,5 @@
 ﻿using DevPrompt.Settings;
 using DevPrompt.UI.ViewModels;
-using System;
 using System.Collections.Generic;
 
 namespace DevPrompt.UI.DesignerViewModels

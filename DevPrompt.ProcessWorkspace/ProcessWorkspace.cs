@@ -1,4 +1,5 @@
-﻿using DevPrompt.ProcessWorkspace.Settings;
+﻿using DevPrompt.Api;
+using DevPrompt.ProcessWorkspace.Settings;
 using DevPrompt.ProcessWorkspace.UI;
 using DevPrompt.ProcessWorkspace.UI.ViewModels;
 using DevPrompt.ProcessWorkspace.Utility;
@@ -10,6 +11,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -70,7 +72,7 @@ namespace DevPrompt.ProcessWorkspace
             this.initialSnapshot = snapshot;
         }
 
-        private void InitTabs(ProcessWorkspaceSnapshot snapshot)
+        private async Task InitTabs(ProcessWorkspaceSnapshot snapshot)
         {
             try
             {
@@ -91,6 +93,17 @@ namespace DevPrompt.ProcessWorkspace
                 if (this.tabs.Count == 0)
                 {
                     foreach (Api.IConsoleSettings console in this.Window.App.Settings.ConsoleSettings)
+                    {
+                        if (console.RunAtStartup)
+                        {
+                            this.RunProcess(console);
+                        }
+                    }
+                }
+
+                if (this.tabs.Count == 0)
+                {
+                    foreach (IConsoleSettings console in await this.Window.App.Settings.GetVisualStudioConsoleSettingsAsync())
                     {
                         if (console.RunAtStartup)
                         {
@@ -210,14 +223,14 @@ namespace DevPrompt.ProcessWorkspace
             }
         }
 
-        private void OnViewElementLoaded(object sender, RoutedEventArgs args)
+        private async void OnViewElementLoaded(object sender, RoutedEventArgs args)
         {
             this.viewElement.Loaded -= this.OnViewElementLoaded;
 
             ProcessWorkspaceSnapshot snapshot = this.initialSnapshot;
             this.initialSnapshot = null;
 
-            this.InitTabs(snapshot);
+            await this.InitTabs(snapshot);
         }
 
         public Api.ITabHolder ActiveTab

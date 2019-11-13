@@ -1,8 +1,4 @@
-﻿using DevPrompt.ProcessWorkspace.Utility;
-using DevPrompt.Settings;
-using DevPrompt.UI.ViewModels;
-using DevPrompt.Utility;
-using System.Collections.Specialized;
+﻿using DevPrompt.UI.ViewModels;
 using System.Windows.Controls;
 
 namespace DevPrompt.UI.Settings

@@ -1,4 +1,5 @@
 ﻿using DevPrompt.ProcessWorkspace.Utility;
+using DevPrompt.Utility;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -11,7 +12,7 @@ namespace DevPrompt.Settings
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{ExeName}")]
-    internal class GrabConsoleSettings : PropertyNotifier
+    internal class GrabConsoleSettings : PropertyNotifier, IEquatable<GrabConsoleSettings>
     {
         private string exeName;
         private string tabName;
@@ -34,6 +35,26 @@ namespace DevPrompt.Settings
         public GrabConsoleSettings Clone()
         {
             return new GrabConsoleSettings(this);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is GrabConsoleSettings other && this.Equals(other);
+        }
+
+        public bool Equals(GrabConsoleSettings other)
+        {
+            return this.exeName == other.exeName &&
+                this.tabName == other.tabName &&
+                this.tabActivate == other.tabActivate;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashUtility.CombineHashCodes(
+                this.exeName.GetHashCode(),
+                this.tabName.GetHashCode(),
+                this.tabActivate.GetHashCode());
         }
 
         [DataMember]

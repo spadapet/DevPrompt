@@ -2,7 +2,7 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <!-- Shared properties for all projects -->
     <PropertyGroup>
-        <DevPromptVersion>1.8.4.0</DevPromptVersion>
+        <DevPromptVersion>1.8.5.0</DevPromptVersion>
         <DevPromptCompanyName>Peter Spada</DevPromptCompanyName>
         <DevPromptProductName>DevPrompt</DevPromptProductName>
 

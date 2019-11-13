@@ -74,11 +74,26 @@ namespace DevPrompt.UI
             }
         }
 
-        private void OnFileMenuOpened(object sender, RoutedEventArgs args)
+        private async void OnFileMenuOpened(object sender, RoutedEventArgs args)
         {
             MenuItem menu = (MenuItem)sender;
 
-            MainWindow.UpdateMenu(menu, this.App.Settings.Consoles, (ConsoleSettings settings) =>
+            this.AddPluginMenuItems(menu, Api.MenuType.File);
+            this.UpdateFileMenuConsoles(menu);
+
+            if (await this.ViewModel.UpdateVisualStudioConsolesAsync())
+            {
+                this.UpdateFileMenuConsoles(menu);
+            }
+        }
+
+        private void UpdateFileMenuConsoles(MenuItem fileMenu)
+        {
+            List<ConsoleSettings> consoles = new List<ConsoleSettings>(this.App.Settings.Consoles.Count + this.ViewModel.VisualStudioConsoles.Count);
+            consoles.AddRange(this.App.Settings.Consoles);
+            consoles.AddRange(this.ViewModel.VisualStudioConsoles);
+
+            MainWindow.UpdateMenu(fileMenu, consoles, (ConsoleSettings settings) =>
             {
                 return new MenuItem()
                 {
@@ -88,10 +103,13 @@ namespace DevPrompt.UI
                 };
             });
 
-            this.AddPluginMenuItems(menu, Api.MenuType.File);
+            MainWindow.SetFileMenuHotKeys(fileMenu);
+        }
 
+        private static void SetFileMenuHotKeys(MenuItem fileMenu)
+        {
             char hotKey = '1';
-            foreach (object obj in menu.Items)
+            foreach (object obj in fileMenu.Items)
             {
                 if (obj is MenuItem item)
                 {

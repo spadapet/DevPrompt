@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace DevPrompt.Api
 {
@@ -9,6 +10,7 @@ namespace DevPrompt.Api
     public interface IAppSettings : INotifyPropertyChanged
     {
         IEnumerable<IConsoleSettings> ConsoleSettings { get; }
+        Task<IEnumerable<IConsoleSettings>> GetVisualStudioConsoleSettingsAsync();
 
         bool ConsoleGrabEnabled { get; set; }
         bool SaveTabsOnExit { get; set; }

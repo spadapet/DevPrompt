@@ -1,4 +1,5 @@
 ﻿using DevPrompt.ProcessWorkspace.Utility;
+using DevPrompt.Utility;
 using System;
 using System.Diagnostics;
 using System.Runtime.Serialization;
@@ -10,7 +11,7 @@ namespace DevPrompt.Settings
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{Name}")]
-    internal class ToolSettings : PropertyNotifier
+    internal class ToolSettings : PropertyNotifier, IEquatable<ToolSettings>
     {
         private string name;
         private string command;
@@ -33,6 +34,26 @@ namespace DevPrompt.Settings
         public ToolSettings Clone()
         {
             return new ToolSettings(this);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ToolSettings other && this.Equals(other);
+        }
+
+        public bool Equals(ToolSettings other)
+        {
+            return this.name == other.name &&
+                this.command == other.command &&
+                this.arguments == other.arguments;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashUtility.CombineHashCodes(
+                this.name.GetHashCode(),
+                this.command.GetHashCode(),
+                this.arguments.GetHashCode());
         }
 
         [DataMember]

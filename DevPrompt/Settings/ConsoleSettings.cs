@@ -1,4 +1,5 @@
 ﻿using DevPrompt.ProcessWorkspace.Utility;
+using DevPrompt.Utility;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -12,7 +13,7 @@ namespace DevPrompt.Settings
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{MenuName}")]
-    internal class ConsoleSettings : PropertyNotifier, Api.IConsoleSettings
+    internal class ConsoleSettings : PropertyNotifier, IEquatable<ConsoleSettings>, Api.IConsoleSettings
     {
         string Api.IConsoleSettings.TabName => this.TabName;
         string Api.IConsoleSettings.Executable => this.Executable;
@@ -49,6 +50,29 @@ namespace DevPrompt.Settings
         public ConsoleSettings Clone()
         {
             return new ConsoleSettings(this);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ConsoleSettings other && this.Equals(other);
+        }
+
+        public bool Equals(ConsoleSettings other)
+        {
+            return this.menuName == other.menuName &&
+                this.tabName == other.tabName &&
+                this.startingDirectory == other.startingDirectory &&
+                this.arguments == other.arguments &&
+                this.runAtStartup == other.runAtStartup &&
+                this.consoleType == other.consoleType;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashUtility.CombineHashCodes(
+                HashUtility.CombineHashCodes(this.menuName.GetHashCode(), this.tabName.GetHashCode()),
+                HashUtility.CombineHashCodes(this.startingDirectory.GetHashCode(), this.arguments.GetHashCode()),
+                HashUtility.CombineHashCodes(this.runAtStartup.GetHashCode(), this.consoleType.GetHashCode()));
         }
 
         [DataMember]
