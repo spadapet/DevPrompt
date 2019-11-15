@@ -22,7 +22,7 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Margin="10">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="0" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="50" />
@@ -30,6 +30,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="5" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -44,14 +45,16 @@
                 </Style>
             </Grid.Resources>
             <TextBlock Grid.ColumnSpan="3" TextWrapping="Wrap" Text="{x:Static local:Resources.ImportDialog_Intro}" />
-            <TextBlock Grid.Row="2" Grid.Column="1" Text="{x:Static local:Resources.ImportDialog_Consoles}" />
-            <TextBlock Grid.Row="3" Grid.Column="1" Text="{x:Static local:Resources.ImportDialog_Grab}" />
-            <TextBlock Grid.Row="4" Grid.Column="1" Text="{x:Static local:Resources.ImportDialog_Links}" />
-            <TextBlock Grid.Row="5" Grid.Column="1" Text="{x:Static local:Resources.ImportDialog_Tools}" />
+            <Label Grid.Row="2" Grid.Column="1" Content="{x:Static local:Resources.ImportDialog_Consoles}" />
+            <Label Grid.Row="3" Grid.Column="1" Content="{x:Static local:Resources.ImportDialog_Grab}" />
+            <Label Grid.Row="4" Grid.Column="1" Content="{x:Static local:Resources.ImportDialog_Links}" />
+            <Label Grid.Row="5" Grid.Column="1" Content="{x:Static local:Resources.ImportDialog_Tools}" />
+            <Label Grid.Row="6" Grid.Column="1" Content="{x:Static local:Resources.ImportDialog_TabThemes}" />
             <ComboBox Grid.Row="2" Grid.Column="2" ItemsSource="{Binding ImportChoices}" SelectedIndex="{Binding ConsolesIndex}" />
             <ComboBox Grid.Row="3" Grid.Column="2" ItemsSource="{Binding ImportChoices}" SelectedIndex="{Binding GrabIndex}" />
             <ComboBox Grid.Row="4" Grid.Column="2" ItemsSource="{Binding ImportChoices}" SelectedIndex="{Binding LinksIndex}" />
             <ComboBox Grid.Row="5" Grid.Column="2" ItemsSource="{Binding ImportChoices}" SelectedIndex="{Binding ToolsIndex}" />
+            <ComboBox Grid.Row="6" Grid.Column="2" ItemsSource="{Binding ImportChoices}" SelectedIndex="{Binding TabThemesIndex}" />
         </Grid>
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,5,15,15" HorizontalAlignment="Right">
             <Button Content="{x:Static local:Resources.Dialog_OK}" IsDefault="true" MinWidth="70" Click="OnClickOk" />

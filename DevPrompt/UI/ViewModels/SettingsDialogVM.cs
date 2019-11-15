@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace DevPrompt.UI.ViewModels
 {
@@ -20,6 +21,7 @@ namespace DevPrompt.UI.ViewModels
         public SettingsDialog Dialog { get; }
         public App App => this.Window.App;
         public IList<SettingsTabVM> Tabs => this.tabs;
+        public IReadOnlyList<Color> TabThemeKeys => this.App.Settings.TabThemeKeys.ToList();
         public Api.IProgressBar ProgressBar => this.Dialog.progressBar;
         public Api.IInfoBar InfoBar => this.Dialog.infoBar;
 

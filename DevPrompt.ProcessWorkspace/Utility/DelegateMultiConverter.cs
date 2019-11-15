@@ -2,9 +2,9 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace DevPrompt.Utility.Converters
+namespace DevPrompt.ProcessWorkspace.Utility
 {
-    internal class DelegateMultiConverter : IMultiValueConverter
+    public class DelegateMultiConverter : IMultiValueConverter
     {
         public delegate object ConvertFunc(object[] values, Type targetType, object parameter);
         public delegate object[] ConvertBackFunc(object value, Type[] targetTypes, object parameter);

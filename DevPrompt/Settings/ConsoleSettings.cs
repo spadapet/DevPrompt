@@ -1,10 +1,11 @@
 ﻿using DevPrompt.ProcessWorkspace.Utility;
-using DevPrompt.Utility;
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Windows.Media;
 
 namespace DevPrompt.Settings
 {
@@ -27,6 +28,7 @@ namespace DevPrompt.Settings
         private string arguments;
         private bool runAtStartup;
         private ConsoleType consoleType;
+        private Color themeKeyColor;
 
         public ConsoleSettings()
         {
@@ -45,16 +47,12 @@ namespace DevPrompt.Settings
             this.arguments = copyFrom.arguments;
             this.consoleType = copyFrom.ConsoleType;
             this.runAtStartup = copyFrom.RunAtStartup;
+            this.themeKeyColor = copyFrom.themeKeyColor;
         }
 
         public ConsoleSettings Clone()
         {
             return new ConsoleSettings(this);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is ConsoleSettings other && this.Equals(other);
         }
 
         public bool Equals(ConsoleSettings other)
@@ -64,15 +62,8 @@ namespace DevPrompt.Settings
                 this.startingDirectory == other.startingDirectory &&
                 this.arguments == other.arguments &&
                 this.runAtStartup == other.runAtStartup &&
-                this.consoleType == other.consoleType;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashUtility.CombineHashCodes(
-                HashUtility.CombineHashCodes(this.menuName.GetHashCode(), this.tabName.GetHashCode()),
-                HashUtility.CombineHashCodes(this.startingDirectory.GetHashCode(), this.arguments.GetHashCode()),
-                HashUtility.CombineHashCodes(this.runAtStartup.GetHashCode(), this.consoleType.GetHashCode()));
+                this.consoleType == other.consoleType &&
+                this.themeKeyColor == other.themeKeyColor;
         }
 
         [DataMember]
@@ -136,6 +127,19 @@ namespace DevPrompt.Settings
         {
             get => this.runAtStartup;
             set => this.SetPropertyValue(ref this.runAtStartup, value);
+        }
+
+        [DataMember]
+        public string ThemeKeyColorString
+        {
+            get => WpfUtility.ColorToString(this.themeKeyColor);
+            set => this.SetPropertyValue(ref this.themeKeyColor, WpfUtility.ColorFromString(value));
+        }
+
+        public Color ThemeKeyColor
+        {
+            get => this.themeKeyColor;
+            set => this.SetPropertyValue(ref this.themeKeyColor, value);
         }
 
         public static string GetExecutable(ConsoleType type)

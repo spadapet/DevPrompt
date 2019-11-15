@@ -1,10 +1,11 @@
-﻿using System.Windows;
+﻿using System.Globalization;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace DevPrompt.ProcessWorkspace.Utility
 {
-    internal static class WpfUtility
+    public static class WpfUtility
     {
         public static T FindVisualAncestor<T>(DependencyObject item, bool includeSelf = false) where T : class
         {
@@ -38,6 +39,23 @@ namespace DevPrompt.ProcessWorkspace.Utility
             }
 
             return parent;
+        }
+
+        public static string ColorToString(Color color)
+        {
+            return color.ToString(CultureInfo.InvariantCulture);
+        }
+
+        public static Color ColorFromString(string text)
+        {
+            try
+            {
+                return (Color)ColorConverter.ConvertFromString(text);
+            }
+            catch
+            {
+                return default;
+            }
         }
     }
 }

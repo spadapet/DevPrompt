@@ -1,5 +1,4 @@
 ﻿using DevPrompt.ProcessWorkspace.Utility;
-using DevPrompt.Utility;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -37,21 +36,11 @@ namespace DevPrompt.Settings
             return new PluginDirectorySettings(this);
         }
 
-        public override bool Equals(object obj)
-        {
-            return obj is PluginDirectorySettings other && this.Equals(other);
-        }
-
         public bool Equals(PluginDirectorySettings other)
         {
             return this.directory == other.directory &&
                 this.enabled == other.enabled &&
                 this.readOnly == other.readOnly;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashUtility.CombineHashCodes(this.directory.GetHashCode(), this.enabled.GetHashCode(), this.readOnly.GetHashCode());
         }
 
         [DataMember]

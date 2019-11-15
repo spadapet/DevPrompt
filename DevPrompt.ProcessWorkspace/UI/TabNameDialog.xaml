@@ -5,10 +5,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DevPrompt.ProcessWorkspace"
+        xmlns:util="clr-namespace:DevPrompt.ProcessWorkspace.Utility"
         mc:Ignorable="d"
         Title="{x:Static local:Resources.SetTabName_Title}"
         Width="250"
-        Height="150"
+        Height="180"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         ShowInTaskbar="False"
@@ -16,13 +17,55 @@
         Loaded="OnLoaded"
         Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
         DataContext="{Binding ViewModel, RelativeSource={RelativeSource Mode=Self}}">
+    <Window.Resources>
+        <util:ColorToBrushConverter x:Key="ColorToBrush" />
+        <util:NullToCollapsedConverter x:Key="NullToCollapsed" />
+        <util:KeyColorTemplateSelector x:Key="KeyColorTemplateSelector">
+            <util:KeyColorTemplateSelector.ColorTemplate>
+                <DataTemplate DataType="Color">
+                    <Border
+                        BorderThickness="1"
+                        Width="60"
+                        Height="20"
+                        Visibility="{Binding Converter={StaticResource NullToCollapsed}}"
+                        BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}"
+                        Background="{Binding Converter={StaticResource ColorToBrush}}" />
+                </DataTemplate>
+            </util:KeyColorTemplateSelector.ColorTemplate>
+            <util:KeyColorTemplateSelector.DefaultTemplate>
+                <DataTemplate DataType="Color">
+                    <Border
+                        Width="60"
+                        Height="20"
+                        BorderThickness="1"
+                        BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}"
+                        Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
+                        <Canvas>
+                            <Line X1="0" X2="58" Y1="0" Y2="18" StrokeThickness="1" Stroke="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" />
+                            <Line X1="0" X2="58" Y1="18" Y2="0" StrokeThickness="1" Stroke="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" />
+                        </Canvas>
+                    </Border>
+                </DataTemplate>
+            </util:KeyColorTemplateSelector.DefaultTemplate>
+        </util:KeyColorTemplateSelector>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Margin="10">
+        <StackPanel Grid.Row="0" Margin="10" Orientation="Vertical">
             <TextBox Name="editControl" Text="{Binding Name, Mode=TwoWay}" />
+            <Label Content="Tab _color:" Margin="0,10,0,0" Target="{Binding ElementName=colorCombo}" />
+            <ComboBox
+                Name="colorCombo"
+                HorizontalAlignment="Left"
+                Padding="2"
+                HorizontalContentAlignment="Stretch"
+                VerticalContentAlignment="Stretch"
+                SelectedItem="{Binding ThemeKeyColor}"
+                ItemsSource="{Binding ThemeKeys}"
+                ItemTemplateSelector="{StaticResource KeyColorTemplateSelector}" />
         </StackPanel>
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,5,15,15" HorizontalAlignment="Right">
             <Button Content="{x:Static local:Resources.Button_OK}" IsDefault="true" MinWidth="70" Click="OnClickOk" />

@@ -1,5 +1,4 @@
-﻿using DevPrompt.Api;
-using DevPrompt.ProcessWorkspace.Settings;
+﻿using DevPrompt.ProcessWorkspace.Settings;
 using DevPrompt.ProcessWorkspace.UI;
 using DevPrompt.ProcessWorkspace.UI.ViewModels;
 using DevPrompt.ProcessWorkspace.Utility;
@@ -16,6 +15,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace DevPrompt.ProcessWorkspace
 {
@@ -103,7 +103,7 @@ namespace DevPrompt.ProcessWorkspace
 
                 if (this.tabs.Count == 0)
                 {
-                    foreach (IConsoleSettings console in await this.Window.App.Settings.GetVisualStudioConsoleSettingsAsync())
+                    foreach (Api.IConsoleSettings console in await this.Window.App.Settings.GetVisualStudioConsoleSettingsAsync())
                     {
                         if (console.RunAtStartup)
                         {
@@ -517,10 +517,10 @@ namespace DevPrompt.ProcessWorkspace
 
         public Api.ITabHolder RunProcess(Api.IConsoleSettings settings)
         {
-            return this.RunProcess(settings.Executable, settings.Arguments, settings.StartingDirectory, settings.TabName);
+            return this.RunProcess(settings.Executable, settings.Arguments, settings.StartingDirectory, settings.TabName, settings.ThemeKeyColor);
         }
 
-        public Api.ITabHolder RunProcess(string executable, string arguments, string startingDirectory, string tabName)
+        public Api.ITabHolder RunProcess(string executable, string arguments, string startingDirectory, string tabName, Color themeKeyColor)
         {
             Api.IProcess process = this.ProcessHost?.RunProcess(executable, arguments, startingDirectory);
             if (this.FindTab(process) is TabVM tab)
@@ -528,6 +528,7 @@ namespace DevPrompt.ProcessWorkspace
                 if (!string.IsNullOrEmpty(tabName) && tab.Tab is ProcessTab processTab)
                 {
                     processTab.RawName = tabName;
+                    processTab.ThemeKeyColor = themeKeyColor;
                 }
 
                 return tab;
@@ -536,7 +537,7 @@ namespace DevPrompt.ProcessWorkspace
             return null;
         }
 
-        public Api.ITabHolder RestoreProcess(string state, string tabName)
+        public Api.ITabHolder RestoreProcess(string state, string tabName, Color themeKeyColor)
         {
             Api.IProcess process = this.ProcessHost?.RestoreProcess(state);
             if (this.FindTab(process) is TabVM tab)
@@ -544,6 +545,7 @@ namespace DevPrompt.ProcessWorkspace
                 if (!string.IsNullOrEmpty(tabName) && tab.Tab is ProcessTab processTab)
                 {
                     processTab.RawName = tabName;
+                    processTab.ThemeKeyColor = themeKeyColor;
                 }
 
                 return tab;
@@ -552,7 +554,7 @@ namespace DevPrompt.ProcessWorkspace
             return null;
         }
 
-        public Api.ITabHolder CloneProcess(Api.ITab tab, string tabName)
+        public Api.ITabHolder CloneProcess(Api.ITab tab, string tabName, Color themeKeyColor)
         {
             if (tab is ProcessTab processTab)
             {
@@ -562,6 +564,7 @@ namespace DevPrompt.ProcessWorkspace
                     if (!string.IsNullOrEmpty(tabName) && cloneTab.Tab is ProcessTab cloneProcessTab)
                     {
                         cloneProcessTab.RawName = tabName;
+                        cloneProcessTab.ThemeKeyColor = themeKeyColor;
                     }
 
                     return cloneTab;

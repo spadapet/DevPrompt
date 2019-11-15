@@ -2,7 +2,9 @@
 using DevPrompt.ProcessWorkspace.Utility;
 using DevPrompt.UI.ViewModels;
 using System;
+using System.Globalization;
 using System.Runtime.Serialization;
+using System.Windows.Media;
 
 namespace DevPrompt.ProcessWorkspace.Settings
 {
@@ -10,16 +12,18 @@ namespace DevPrompt.ProcessWorkspace.Settings
     /// Saves the state of a process tab during shutdown so it can be restored on startup
     /// </summary>
     [DataContract]
-    internal class ProcessSnapshot : PropertyNotifier, Api.ITabSnapshot
+    internal class ProcessSnapshot : PropertyNotifier, Api.ITabSnapshot, Api.ITabThemeKey
     {
         Guid Api.ITabSnapshot.Id => Guid.Empty;
         string Api.ITabSnapshot.Name => this.CachedName;
         string Api.ITabSnapshot.Tooltip => this.CachedTooltip;
+        Color Api.ITabThemeKey.KeyColor => this.themeKeyColor;
 
         private string cachedName;
         private string cachedTooltip;
         private string rawName;
         private string state;
+        private Color themeKeyColor;
 
         public ProcessSnapshot()
         {
@@ -33,6 +37,7 @@ namespace DevPrompt.ProcessWorkspace.Settings
             this.cachedTooltip = process.Tooltip;
             this.rawName = process.RawName;
             this.state = process.State;
+            this.themeKeyColor = process.ThemeKeyColor;
         }
 
         public ProcessSnapshot(ProcessSnapshot copyFrom)
@@ -42,6 +47,7 @@ namespace DevPrompt.ProcessWorkspace.Settings
             this.cachedTooltip = copyFrom.cachedTooltip;
             this.rawName = copyFrom.rawName;
             this.state = copyFrom.state;
+            this.themeKeyColor = copyFrom.themeKeyColor;
         }
 
         [OnDeserializing]
@@ -51,6 +57,7 @@ namespace DevPrompt.ProcessWorkspace.Settings
             this.cachedTooltip = string.Empty;
             this.rawName = string.Empty;
             this.state = string.Empty;
+            this.themeKeyColor = default;
         }
 
         Api.ITabSnapshot Api.ITabSnapshot.Clone()
@@ -62,7 +69,7 @@ namespace DevPrompt.ProcessWorkspace.Settings
         {
             if (!string.IsNullOrEmpty(this.State) &&
                 workspace is Api.IProcessWorkspace processWorkspace &&
-                processWorkspace.RestoreProcess(this.State, this.RawName) is TabVM tab)
+                processWorkspace.RestoreProcess(this.State, this.RawName, this.themeKeyColor) is TabVM tab)
             {
                 return tab.Tab;
             }
@@ -73,57 +80,36 @@ namespace DevPrompt.ProcessWorkspace.Settings
         [DataMember]
         public string RawName
         {
-            get
-            {
-                return this.rawName;
-            }
-
-            set
-            {
-                this.SetPropertyValue(ref this.rawName, value ?? string.Empty);
-            }
+            get => this.rawName;
+            set => this.SetPropertyValue(ref this.rawName, value ?? string.Empty);
         }
 
         [DataMember]
         public string CachedName
         {
-            get
-            {
-                return this.cachedName;
-            }
-
-            set
-            {
-                this.SetPropertyValue(ref this.cachedName, value ?? string.Empty);
-            }
+            get => this.cachedName;
+            set => this.SetPropertyValue(ref this.cachedName, value ?? string.Empty);
         }
 
         [DataMember]
         public string CachedTooltip
         {
-            get
-            {
-                return this.cachedTooltip;
-            }
-
-            set
-            {
-                this.SetPropertyValue(ref this.cachedTooltip, value ?? string.Empty);
-            }
+            get => this.cachedTooltip;
+            set => this.SetPropertyValue(ref this.cachedTooltip, value ?? string.Empty);
         }
 
         [DataMember]
         public string State
         {
-            get
-            {
-                return this.state;
-            }
+            get => this.state;
+            set => this.SetPropertyValue(ref this.state, value ?? string.Empty);
+        }
 
-            set
-            {
-                this.SetPropertyValue(ref this.state, value ?? string.Empty);
-            }
+        [DataMember]
+        public string ThemeKeyColorString
+        {
+            get => WpfUtility.ColorToString(this.themeKeyColor);
+            set => this.SetPropertyValue(ref this.themeKeyColor, WpfUtility.ColorFromString(value));
         }
     }
 }

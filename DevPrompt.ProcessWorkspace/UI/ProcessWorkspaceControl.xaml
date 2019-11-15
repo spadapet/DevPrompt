@@ -18,12 +18,19 @@
         <util:ObjectToVisibilityConverter x:Key="ObjectToVisibility" />
         <util:ActiveToBoolConverter x:Key="ActiveToBool" />
         <util:VisibleToBoolConverter x:Key="VisibleToBool" />
+        <util:FirstBrushConverter x:Key="FirstBrush" />
+        <Grid x:Key="ControlDarkDarkElement" Background="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" />
+        <Grid x:Key="ControlElement" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
+        <Grid x:Key="WindowTextElement" Background="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+        <Grid x:Key="WindowElement" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
 
+        <!-- Panel that owns all of the tab buttons and computes layout -->
         <ItemsPanelTemplate x:Key="TabItemsPanelTemplate">
             <TabPanel Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
         </ItemsPanelTemplate>
 
-        <ControlTemplate x:Key="TabCommandButtonTemplate" TargetType="{x:Type Button}">
+        <!-- Simple look for the close button -->
+        <ControlTemplate x:Key="TabCloseButtonTemplate" TargetType="{x:Type Button}">
             <Border x:Name="BorderBack" Background="{TemplateBinding Background}">
                 <ContentPresenter Focusable="False" HorizontalAlignment="Center" VerticalAlignment="Center" />
             </Border>
@@ -34,8 +41,9 @@
             </ControlTemplate.Triggers>
         </ControlTemplate>
 
+        <!-- Title and close button -->
         <DataTemplate x:Key="TabButtonContentTemplate" DataType="{x:Type vm:TabVM}">
-            <Grid>
+            <Grid x:Name="RootGrid">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" MinWidth="48" />
                     <ColumnDefinition Width="16" />
@@ -51,11 +59,16 @@
                     Grid.Column="1"
                     Width="16"
                     Focusable="False"
-                    Background="#3FFF0000"
-                    Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"
+                    Background="#4FFF0000"
                     Command="{Binding CloseCommand}"
                     Visibility="{Binding CloseCommand, Converter={StaticResource ObjectToVisibility}}"
-                    Template="{StaticResource TabCommandButtonTemplate}">
+                    Template="{StaticResource TabCloseButtonTemplate}">
+                    <Button.Foreground>
+                        <MultiBinding Converter="{StaticResource FirstBrush}">
+                            <Binding Path="ForegroundSelectedBrush" />
+                            <Binding Source="{StaticResource WindowTextElement}" Path="Background" />
+                        </MultiBinding>
+                    </Button.Foreground>
                     <Path Data="M 0,0 L 8,8 M 0,8 L 8,0" StrokeThickness="1" Stroke="{Binding Foreground, Mode=OneWay, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" />
                 </Button>
             </Grid>
@@ -68,10 +81,26 @@
                     <Setter TargetName="CloseButton" Property="Visibility" Value="Collapsed" />
                 </MultiDataTrigger>
                 <DataTrigger Binding="{Binding ActiveState, Mode=OneWay, Converter={StaticResource ActiveToBool}}" Value="False">
-                    <Setter TargetName="CloseButton" Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" />
+                    <Setter TargetName="CloseButton" Property="Foreground">
+                        <Setter.Value>
+                            <MultiBinding Converter="{StaticResource FirstBrush}">
+                                <Binding Path="ForegroundUnselectedBrush" />
+                                <Binding Source="{StaticResource ControlDarkDarkElement}" Path="Background" />
+                            </MultiBinding>
+                        </Setter.Value>
+                    </Setter>
                 </DataTrigger>
             </DataTemplate.Triggers>
         </DataTemplate>
+
+        <!-- Look of the whole tab button -->
+        <ControlTemplate x:Key="TabButtonTemplate" TargetType="{x:Type Button}">
+            <Grid SnapsToDevicePixels="True">
+                <Border x:Name="BorderBack" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}">
+                    <ContentPresenter Focusable="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                </Border>
+            </Grid>
+        </ControlTemplate>
 
         <DataTemplate x:Key="TabItemTemplate" DataType="{x:Type vm:TabVM}">
             <Button
@@ -85,15 +114,12 @@
                 Loaded="OnTabButtonLoaded"
                 Unloaded="OnTabButtonUnloaded"
                 ContextMenuOpening="OnTabButtonContextMenuOpening"
-                Padding="0"
-                BorderThickness="1,1,1,0"
                 Focusable="False"
-                Foreground="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}"
-                Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+                BorderThickness="1,1,1,0"
                 BorderBrush="Transparent"
                 Content="{Binding}"
                 ToolTip="{Binding Tooltip}"
-                HorizontalContentAlignment="Stretch"
+                Template="{StaticResource TabButtonTemplate}"
                 ContentTemplate="{StaticResource TabButtonContentTemplate}">
                 <Button.ContextMenu>
                     <ContextMenu Opened="OnTabContextMenuOpened" Closed="OnTabContextMenuClosed">
@@ -102,14 +128,80 @@
                         <MenuItem Header="{x:Static local:Resources.Command_CloseAllButThis}" Command="{Binding CloseAllButThisCommand}" Visibility="{Binding CloseAllButThisCommand, Converter={StaticResource ObjectToVisibility}}" />
                     </ContextMenu>
                 </Button.ContextMenu>
+                <Button.Foreground>
+                    <MultiBinding Converter="{StaticResource FirstBrush}">
+                        <Binding Path="ForegroundUnselectedBrush" />
+                        <Binding Source="{StaticResource ControlDarkDarkElement}" Path="Background" />
+                    </MultiBinding>
+                </Button.Foreground>
+                <Button.Background>
+                    <MultiBinding Converter="{StaticResource FirstBrush}">
+                        <Binding Path="BackgroundUnselectedBrush" />
+                        <Binding Source="{StaticResource ControlElement}" Path="Background" />
+                    </MultiBinding>
+                </Button.Background>
             </Button>
+            <!-- Change colors for an active tab, the default colors are for inactive -->
             <DataTemplate.Triggers>
                 <DataTrigger Binding="{Binding ActiveState, Mode=OneWay, Converter={StaticResource ActiveToBool}}" Value="True">
-                    <Setter TargetName="RootButton" Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
-                    <Setter TargetName="RootButton" Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" />
-                    <Setter TargetName="RootButton" Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" />
+                    <Setter TargetName="RootButton" Property="Foreground">
+                        <Setter.Value>
+                            <MultiBinding Converter="{StaticResource FirstBrush}">
+                                <Binding Path="ForegroundSelectedBrush" />
+                                <Binding Source="{StaticResource WindowTextElement}" Path="Background" />
+                            </MultiBinding>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter TargetName="RootButton" Property="Background">
+                        <Setter.Value>
+                            <MultiBinding Converter="{StaticResource FirstBrush}">
+                                <Binding Path="BackgroundSelectedBrush" />
+                                <Binding Source="{StaticResource WindowElement}" Path="Background" />
+                            </MultiBinding>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter TargetName="RootButton" Property="BorderBrush" Value="{Binding Background, Source={StaticResource WindowTextElement}}" />
                 </DataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding ActiveState, Mode=OneWay, Converter={StaticResource ActiveToBool}}" Value="False" />
+                        <Condition Binding="{Binding IsMouseOver, ElementName=RootButton}" Value="True" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter TargetName="RootButton" Property="BorderBrush">
+                        <Setter.Value>
+                            <MultiBinding Converter="{StaticResource FirstBrush}">
+                                <Binding Path="ForegroundUnselectedBrush" />
+                                <Binding Source="{StaticResource ControlDarkDarkElement}" Path="Background" />
+                            </MultiBinding>
+                        </Setter.Value>
+                    </Setter>
+                </MultiDataTrigger>
             </DataTemplate.Triggers>
+        </DataTemplate>
+
+        <!-- Used by ProcessTab.CreateTabColorMenu -->
+        <DataTemplate x:Key="TabThemeMenuHeaderTemplate" DataType="{x:Type vm:TabThemeVM}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition Width="5" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Label Content="{Binding Header}" />
+                <Border
+                    Grid.Column="2"
+                    Width="100"
+                    Height="20"
+                    BorderThickness="1"
+                    BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"
+                    Background="{Binding BackgroundBrush}"
+                    SnapsToDevicePixels="True">
+                    <Canvas Visibility="{Binding DefaultVisibility}">
+                        <Line X1="0" Y1="0" X2="98" Y2="18" Stroke="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" StrokeThickness="1" />
+                        <Line X1="0" Y1="18" X2="98" Y2="0" Stroke="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" StrokeThickness="1" />
+                    </Canvas>
+                </Border>
+            </Grid>
         </DataTemplate>
     </UserControl.Resources>
 

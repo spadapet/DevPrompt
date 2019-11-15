@@ -7,19 +7,10 @@ namespace DevPrompt.ProcessWorkspace.UI
     {
         public TabNameDialogVM ViewModel { get; }
 
-        public TabNameDialog(string tabName)
+        public TabNameDialog(TabNameDialogVM viewModel)
         {
-            this.ViewModel = new TabNameDialogVM(tabName);
-
+            this.ViewModel = viewModel;
             this.InitializeComponent();
-        }
-
-        public string TabName
-        {
-            get
-            {
-                return this.ViewModel.Name;
-            }
         }
 
         private void OnClickOk(object sender, RoutedEventArgs args)

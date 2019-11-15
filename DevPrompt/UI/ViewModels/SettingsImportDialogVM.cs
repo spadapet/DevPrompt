@@ -15,6 +15,7 @@ namespace DevPrompt.UI.ViewModels
         private int grabIndex;
         private int linksIndex;
         private int toolsIndex;
+        private int tabThemesIndex;
         public IList<string> ImportChoices { get; }
 
         public SettingsImportDialogVM(AppSettings settings)
@@ -52,6 +53,12 @@ namespace DevPrompt.UI.ViewModels
         {
             get => this.toolsIndex;
             set => this.SetPropertyValue(ref this.toolsIndex, this.FilterIndex(value));
+        }
+
+        public int TabThemesIndex
+        {
+            get => this.tabThemesIndex;
+            set => this.SetPropertyValue(ref this.tabThemesIndex, this.FilterIndex(value));
         }
 
         public void Import(AppSettings targetSettings)
@@ -105,6 +112,25 @@ namespace DevPrompt.UI.ViewModels
                 foreach (ToolSettings setting in this.settings.Tools)
                 {
                     targetSettings.Tools.Add(setting.Clone());
+                }
+            }
+
+            if (this.TabThemesIndex == 0)
+            {
+                targetSettings.TabThemeStringKeys.Clear();
+                targetSettings.HasDefaultThemeKeys = this.settings.HasDefaultThemeKeys;
+            }
+
+            if (this.TabThemesIndex == 1 && this.settings.TabThemeStringKeys.Count > 0)
+            {
+                targetSettings.HasDefaultThemeKeys = targetSettings.HasDefaultThemeKeys && this.settings.HasDefaultThemeKeys;
+            }
+
+            if (this.TabThemesIndex != 2)
+            {
+                foreach (string setting in this.settings.TabThemeStringKeys)
+                {
+                    targetSettings.TabThemeStringKeys.Add(setting);
                 }
             }
 

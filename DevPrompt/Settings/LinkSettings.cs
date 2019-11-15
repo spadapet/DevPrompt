@@ -1,5 +1,4 @@
 ﻿using DevPrompt.ProcessWorkspace.Utility;
-using DevPrompt.Utility;
 using System;
 using System.Diagnostics;
 using System.Runtime.Serialization;
@@ -33,19 +32,9 @@ namespace DevPrompt.Settings
             return new LinkSettings(this);
         }
 
-        public override bool Equals(object obj)
-        {
-            return obj is LinkSettings other && this.Equals(other);
-        }
-
         public bool Equals(LinkSettings other)
         {
             return this.name == other.name && this.address == other.address;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashUtility.CombineHashCodes(this.name.GetHashCode(), this.address.GetHashCode());
         }
 
         [DataMember]

@@ -41,7 +41,9 @@
     <Compile Include="Settings\IWorkspaceSnapshot.cs" />
     <Compile Include="Settings\ITabSnapshot.cs" />
     <Compile Include="UI\ActiveState.cs" />
+    <Compile Include="UI\ITabThemeKey.cs" />
     <Compile Include="UI\IInfoBar.cs" />
+    <Compile Include="UI\ITabTheme.cs" />
     <Compile Include="UI\ITabHolder.cs" />
     <Compile Include="UI\IProgressBar.cs" />
     <Compile Include="UI\IWorkspaceProvider.cs" />

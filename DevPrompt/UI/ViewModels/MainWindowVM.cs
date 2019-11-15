@@ -2,7 +2,6 @@
 using DevPrompt.Settings;
 using DevPrompt.UI.Settings;
 using DevPrompt.Utility;
-using DevPrompt.Utility.Converters;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

@@ -1,4 +1,6 @@
-﻿namespace DevPrompt.Api
+﻿using System.Windows.Media;
+
+namespace DevPrompt.Api
 {
     public interface IConsoleSettings
     {
@@ -7,5 +9,6 @@
         string Arguments { get; }
         string StartingDirectory { get; }
         bool RunAtStartup { get; }
+        Color ThemeKeyColor { get; }
     }
 }

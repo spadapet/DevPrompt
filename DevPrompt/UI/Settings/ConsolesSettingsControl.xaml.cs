@@ -3,7 +3,9 @@ using DevPrompt.Settings;
 using DevPrompt.UI.ViewModels;
 using DevPrompt.Utility;
 using System.Collections.Specialized;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace DevPrompt.UI.Settings
 {
@@ -28,7 +30,7 @@ namespace DevPrompt.UI.Settings
             this.InitializeComponent();
         }
 
-        private void OnSelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs args)
+        private void OnSelectionChanged(object sender, SelectionChangedEventArgs args)
         {
             CommandUtility.UpdateCommands(this.Dispatcher, this.MoveUpCommand, this.MoveDownCommand, this.DeleteCommand);
         }
@@ -36,6 +38,30 @@ namespace DevPrompt.UI.Settings
         private void OnSettingsChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
             CommandUtility.UpdateCommands(this.Dispatcher, this.MoveUpCommand, this.MoveDownCommand, this.DeleteCommand);
+        }
+
+        private void OnComboCellKeyDown(object sender, KeyEventArgs args)
+        {
+            if (sender is DataGridCell cell && !cell.IsEditing)
+            {
+                switch (args.Key)
+                {
+                    case Key.Space:
+                        if (args.KeyboardDevice.Modifiers == ModifierKeys.None && !cell.IsEditing)
+                        {
+                            cell.IsEditing = true;
+                        }
+                        break;
+                }
+            }
+        }
+
+        private void OnColorComboBoxLoaded(object sender, RoutedEventArgs args)
+        {
+            if (sender is ComboBox combo)
+            {
+                combo.Focus();
+            }
         }
     }
 }

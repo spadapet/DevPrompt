@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace DevPrompt.Api
 {
@@ -11,6 +12,8 @@ namespace DevPrompt.Api
     {
         IEnumerable<IConsoleSettings> ConsoleSettings { get; }
         Task<IEnumerable<IConsoleSettings>> GetVisualStudioConsoleSettingsAsync();
+        IEnumerable<Color> TabThemeKeys { get; }
+        ITabTheme GetTabTheme(Color keyColor);
 
         bool ConsoleGrabEnabled { get; set; }
         bool SaveTabsOnExit { get; set; }

@@ -144,20 +144,23 @@
   <data name="ConsoleDialog.Header.Args" xml:space="preserve">
     <value>Arguments</value>
   </data>
+  <data name="ConsoleDialog.Header.Color" xml:space="preserve">
+    <value>Color</value>
+  </data>
   <data name="ConsoleDialog.Header.Executable" xml:space="preserve">
     <value>Executable</value>
   </data>
   <data name="ConsoleDialog.Header.MenuName" xml:space="preserve">
-    <value>Menu Name</value>
+    <value>Menu name</value>
   </data>
   <data name="ConsoleDialog.Header.RunAtStartup" xml:space="preserve">
     <value>Run at startup</value>
   </data>
   <data name="ConsoleDialog.Header.StartDir" xml:space="preserve">
-    <value>Starting Directory</value>
+    <value>Starting directory</value>
   </data>
   <data name="ConsoleDialog.Header.TabName" xml:space="preserve">
-    <value>Tab Name</value>
+    <value>Tab name</value>
   </data>
   <data name="ConsoleDialog.Intro" xml:space="preserve">
     <value>Use percent signs to reference environment variables. 'Run at startup' only applies when there are no saved tabs at startup.</value>
@@ -205,10 +208,10 @@
     <value>Activate on grab</value>
   </data>
   <data name="GrabDialog.Header.ExeName" xml:space="preserve">
-    <value>Executable Name</value>
+    <value>Executable name</value>
   </data>
   <data name="GrabDialog.Header.TabName" xml:space="preserve">
-    <value>Tab Name</value>
+    <value>Tab name</value>
   </data>
   <data name="GrabDialog.Intro" xml:space="preserve">
     <value>When a process from the following list starts to run, its console window can be "grabbed" and become a tab. You need to be running as admin to grab admin processes.</value>
@@ -226,22 +229,25 @@
     <value>Replace existing</value>
   </data>
   <data name="ImportDialog.Consoles" xml:space="preserve">
-    <value>Consoles:</value>
+    <value>_Consoles:</value>
   </data>
   <data name="ImportDialog.Grab" xml:space="preserve">
-    <value>Grab:</value>
+    <value>_Grab:</value>
   </data>
   <data name="ImportDialog.Intro" xml:space="preserve">
     <value>Choose how settings will be imported:</value>
   </data>
   <data name="ImportDialog.Links" xml:space="preserve">
-    <value>Links:</value>
+    <value>_Links:</value>
+  </data>
+  <data name="ImportDialog.TabThemes" xml:space="preserve">
+    <value>Colo_rs:</value>
   </data>
   <data name="ImportDialog.Title" xml:space="preserve">
     <value>Import Settings</value>
   </data>
   <data name="ImportDialog.Tools" xml:space="preserve">
-    <value>Tools:</value>
+    <value>_Tools:</value>
   </data>
   <data name="InstallBranch.Label" xml:space="preserve">
     <value>_Branch name:</value>

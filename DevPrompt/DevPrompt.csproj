@@ -63,6 +63,7 @@
     <Compile Include="Plugins\InstalledPluginInfo.cs" />
     <Compile Include="Settings\NuGetPluginSettings.cs" />
     <Compile Include="Settings\PluginDirectorySettings.cs" />
+    <Compile Include="Settings\TabTheme.cs" />
     <Compile Include="Settings\WorkspaceSnapshot.cs" />
     <Compile Include="Settings\AppSnapshot.cs" />
     <Compile Include="Settings\GrabConsoleSettings.cs" />
@@ -121,7 +122,6 @@
     <Compile Include="UI\ViewModels\SettingsImportDialogVM.cs" />
     <Compile Include="UI\ViewModels\WorkspaceVM.cs" />
     <Compile Include="Utility\Converters\BoolToNegativeConverter.cs" />
-    <Compile Include="Utility\Converters\DelegateMultiConverter.cs" />
     <Compile Include="Utility\Converters\DateToVisibilityConverter.cs" />
     <Compile Include="Utility\Converters\StringToVisibilityConverter.cs" />
     <Compile Include="Utility\HashUtility.cs" />

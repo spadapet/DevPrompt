@@ -7,10 +7,16 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace DevPrompt.ProcessWorkspace.UI.ViewModels
 {
-    internal class TabVM : PropertyNotifier, Api.ITabHolder, IDisposable
+    internal class TabVM
+        : PropertyNotifier
+        , Api.ITabHolder
+        , Api.ITabTheme
+        , Api.ITabThemeKey
+        , IDisposable
     {
         public string Title => this.Tab?.Title ?? string.Empty;
         public UIElement ViewElement => this.Tab?.ViewElement;
@@ -67,35 +73,109 @@ namespace DevPrompt.ProcessWorkspace.UI.ViewModels
                 this.OnPropertyChanged(nameof(this.Name));
                 this.OnPropertyChanged(nameof(this.Tooltip));
                 this.OnPropertyChanged(nameof(this.ContextMenuItems));
+                this.OnPropertyChanged(nameof(this.ForegroundSelectedBrush));
+                this.OnPropertyChanged(nameof(this.ForegroundUnselectedBrush));
+                this.OnPropertyChanged(nameof(this.BackgroundSelectedBrush));
+                this.OnPropertyChanged(nameof(this.BackgroundUnselectedBrush));
             }
         }
 
         private void OnTabPropertyChanged(object sender, PropertyChangedEventArgs args)
         {
-            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.ITab.Name))
+            bool all = string.IsNullOrEmpty(args.PropertyName);
+
+            if (all || args.PropertyName == nameof(Api.ITab.Name))
             {
                 this.OnPropertyChanged(nameof(this.Name));
             }
 
-            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.ITab.Title))
+            if (all || args.PropertyName == nameof(Api.ITab.Title))
             {
                 this.OnPropertyChanged(nameof(this.Title));
             }
 
-            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.ITab.Tooltip))
+            if (all || args.PropertyName == nameof(Api.ITab.Tooltip))
             {
                 this.OnPropertyChanged(nameof(this.Tooltip));
             }
 
-            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.ITab.ViewElement))
+            if (all || args.PropertyName == nameof(Api.ITab.ViewElement))
             {
                 this.OnPropertyChanged(nameof(this.ViewElement));
             }
 
-            if (string.IsNullOrEmpty(args.PropertyName) || args.PropertyName == nameof(Api.ITab.ContextMenuItems))
+            if (all || args.PropertyName == nameof(Api.ITab.ContextMenuItems))
             {
                 this.OnPropertyChanged(nameof(this.ContextMenuItems));
             }
+
+            if (all || args.PropertyName == nameof(Api.ITabTheme.BackgroundSelectedBrush))
+            {
+                this.OnPropertyChanged(nameof(this.BackgroundSelectedBrush));
+            }
+
+            if (all || args.PropertyName == nameof(Api.ITabTheme.BackgroundUnselectedBrush))
+            {
+                this.OnPropertyChanged(nameof(this.BackgroundUnselectedBrush));
+            }
+
+            if (all || args.PropertyName == nameof(Api.ITabTheme.ForegroundSelectedBrush))
+            {
+                this.OnPropertyChanged(nameof(this.ForegroundSelectedBrush));
+            }
+
+            if (all || args.PropertyName == nameof(Api.ITabTheme.ForegroundUnselectedBrush))
+            {
+                this.OnPropertyChanged(nameof(this.ForegroundUnselectedBrush));
+            }
+        }
+
+        public Brush BackgroundSelectedBrush => this.GetThemeBrush(c => c.BackgroundSelectedBrush);
+        public Brush BackgroundUnselectedBrush => this.GetThemeBrush(c => c.BackgroundUnselectedBrush);
+        public Brush ForegroundSelectedBrush => this.GetThemeBrush(c => c.ForegroundSelectedBrush);
+        public Brush ForegroundUnselectedBrush => this.GetThemeBrush(c => c.ForegroundUnselectedBrush);
+
+        public Color KeyColor
+        {
+            get
+            {
+                if (this.tab is Api.ITabThemeKey key1)
+                {
+                    return key1.KeyColor;
+                }
+
+                if (this.snapshot is Api.ITabThemeKey key2)
+                {
+                    return key2.KeyColor;
+                }
+
+                return default;
+            }
+        }
+
+        private Brush GetThemeBrush(Func<Api.ITabTheme, Brush> accessor)
+        {
+            if (this.tab is Api.ITabTheme colored1)
+            {
+                return accessor(colored1);
+            }
+
+            if (this.tab is Api.ITabThemeKey keyColor1 && this.window.App.Settings.GetTabTheme(keyColor1.KeyColor) is Api.ITabTheme colored2)
+            {
+                return accessor(colored2);
+            }
+
+            if (this.snapshot is Api.ITabTheme colored3)
+            {
+                return accessor(colored3);
+            }
+
+            if (this.snapshot is Api.ITabThemeKey keyColor2 && this.window.App.Settings.GetTabTheme(keyColor2.KeyColor) is Api.ITabTheme colored4)
+            {
+                return accessor(colored4);
+            }
+
+            return null;
         }
 
         public Guid Id

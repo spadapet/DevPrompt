@@ -141,6 +141,9 @@
   <data name="Command.Detach" xml:space="preserve">
     <value>D_etach</value>
   </data>
+  <data name="Command.SetTabColor" xml:space="preserve">
+    <value>Set tab colo_r</value>
+  </data>
   <data name="Command.SetTabName" xml:space="preserve">
     <value>_Set tab name...</value>
   </data>

@@ -1,19 +1,27 @@
 ﻿using DevPrompt.ProcessWorkspace;
 using DevPrompt.ProcessWorkspace.Settings;
 using DevPrompt.ProcessWorkspace.UI;
+using DevPrompt.ProcessWorkspace.UI.ViewModels;
 using DevPrompt.ProcessWorkspace.Utility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace DevPrompt.UI.ViewModels
 {
     /// <summary>
     /// View model for each process tab (handles context menu items, etc)
     /// </summary>
-    internal class ProcessTab : PropertyNotifier, Api.ITab, IDisposable
+    internal class ProcessTab
+        : PropertyNotifier
+        , Api.ITab
+        , Api.ITabTheme
+        , Api.ITabThemeKey
+        , IDisposable
     {
         public Guid Id => Guid.Empty;
         public string Name => this.Process.ExpandEnvironmentVariables(this.RawName);
@@ -25,8 +33,10 @@ namespace DevPrompt.UI.ViewModels
         public Api.ITabSnapshot Snapshot => new ProcessSnapshot(this);
         public Api.IProcess Process { get; }
 
+        private Api.IAppSettings Settings => this.window.App.Settings;
         private readonly Api.IWindow window;
         private readonly Api.IProcessWorkspace workspace;
+        private Color themeKeyColor;
         private string name;
 
         public ProcessTab(Api.IWindow window, Api.IProcessWorkspace workspace, Api.IProcess process)
@@ -34,7 +44,7 @@ namespace DevPrompt.UI.ViewModels
             this.window = window;
             this.workspace = workspace;
             this.Process = process;
-            this.RawName = string.Empty;
+            this.name = string.Empty;
 
             this.Process.PropertyChanged += this.OnProcessPropertyChanged;
         }
@@ -88,10 +98,7 @@ namespace DevPrompt.UI.ViewModels
 
         public string RawName
         {
-            get
-            {
-                return this.name ?? string.Empty;
-            }
+            get => this.name ?? string.Empty;
 
             set
             {
@@ -106,21 +113,44 @@ namespace DevPrompt.UI.ViewModels
         {
             this.window.App.Telemetry.TrackEvent("ProcessTab.SetTabName");
 
-            TabNameDialog dialog = new TabNameDialog(this.RawName)
+            TabNameDialogVM viewModel = new TabNameDialogVM(this.window.App.Settings, this.RawName, this.ThemeKeyColor);
+            TabNameDialog dialog = new TabNameDialog(viewModel)
             {
                 Owner = Application.Current.MainWindow
             };
 
             if (dialog.ShowDialog() == true)
             {
-                this.RawName = dialog.TabName;
+                this.RawName = viewModel.Name;
+                this.ThemeKeyColor = viewModel.ThemeKeyColor;
             }
         }
+
+        public Color ThemeKeyColor
+        {
+            get => this.themeKeyColor;
+            set
+            {
+                if (this.SetPropertyValue(ref this.themeKeyColor, value))
+                {
+                    this.OnPropertyChanged(nameof(this.ForegroundSelectedBrush));
+                    this.OnPropertyChanged(nameof(this.ForegroundUnselectedBrush));
+                    this.OnPropertyChanged(nameof(this.BackgroundSelectedBrush));
+                    this.OnPropertyChanged(nameof(this.BackgroundUnselectedBrush));
+                }
+            }
+        }
+
+        Color Api.ITabThemeKey.KeyColor => this.ThemeKeyColor;
+        public Brush ForegroundSelectedBrush => (this.Settings.GetTabTheme(this.ThemeKeyColor) is Api.ITabTheme theme) ? theme.ForegroundSelectedBrush : null;
+        public Brush ForegroundUnselectedBrush => (this.Settings.GetTabTheme(this.ThemeKeyColor) is Api.ITabTheme theme) ? theme.ForegroundUnselectedBrush : null;
+        public Brush BackgroundSelectedBrush => (this.Settings.GetTabTheme(this.ThemeKeyColor) is Api.ITabTheme theme) ? theme.BackgroundSelectedBrush : null;
+        public Brush BackgroundUnselectedBrush => (this.Settings.GetTabTheme(this.ThemeKeyColor) is Api.ITabTheme theme) ? theme.BackgroundUnselectedBrush : null;
 
         public void OnClone()
         {
             this.window.App.Telemetry.TrackEvent("ProcessTab.Clone");
-            this.workspace.CloneProcess(this, this.RawName);
+            this.workspace.CloneProcess(this, this.RawName, this.ThemeKeyColor);
         }
 
         public void OnDetach()
@@ -152,6 +182,11 @@ namespace DevPrompt.UI.ViewModels
                     Command = new DelegateCommand(this.OnSetTabName),
                 };
 
+                if (this.CreateTabColorMenu() is MenuItem tabColorMenu)
+                {
+                    yield return tabColorMenu;
+                }
+
                 yield return new Separator();
 
                 yield return new MenuItem()
@@ -182,6 +217,55 @@ namespace DevPrompt.UI.ViewModels
                     Command = new DelegateCommand(this.OnDetach),
                 };
             }
+        }
+
+        private MenuItem CreateTabColorMenu()
+        {
+            MenuItem tabColorMenu = null;
+
+            if (this.workspace.ViewElement is ProcessWorkspaceControl control)
+            {
+                tabColorMenu = new MenuItem()
+                {
+                    Header = Resources.Command_SetTabColor,
+                };
+
+                DataTemplate headerTemplate = (DataTemplate)control.Resources["TabThemeMenuHeaderTemplate"];
+
+                int i = 0;
+                foreach (Color keyColor in this.Settings.TabThemeKeys)
+                {
+                    i++;
+
+                    if (this.Settings.GetTabTheme(keyColor) is Api.ITabTheme theme)
+                    {
+                        string text = string.Empty;
+                        if (i < 10)
+                        {
+                            text = $"_{i.ToString(CultureInfo.InvariantCulture)}:";
+                        }
+                        else if (i - 10 < 26)
+                        {
+                            char ch = (char)('A' + (i - 10));
+                            text = $"_{ch.ToString(CultureInfo.InvariantCulture)}:";
+                        }
+
+                        tabColorMenu.Items.Add(this.CreateColorItem(text, keyColor, theme, headerTemplate));
+                    }
+                }
+            }
+
+            return tabColorMenu;
+        }
+
+        private MenuItem CreateColorItem(string header, Color keyColor, Api.ITabTheme theme, DataTemplate headerTemplate)
+        {
+            return new MenuItem()
+            {
+                HeaderTemplate = headerTemplate,
+                Header = new TabThemeVM(header, keyColor, theme),
+                Command = new DelegateCommand(() => this.ThemeKeyColor = keyColor),
+            };
         }
     }
 }

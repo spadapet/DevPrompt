@@ -142,6 +142,15 @@ namespace DevPrompt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Color.
+        /// </summary>
+        public static string ConsoleDialog_Header_Color {
+            get {
+                return ResourceManager.GetString("ConsoleDialog.Header.Color", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Executable.
         /// </summary>
         public static string ConsoleDialog_Header_Executable {
@@ -151,7 +160,7 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Menu Name.
+        ///   Looks up a localized string similar to Menu name.
         /// </summary>
         public static string ConsoleDialog_Header_MenuName {
             get {
@@ -169,7 +178,7 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Starting Directory.
+        ///   Looks up a localized string similar to Starting directory.
         /// </summary>
         public static string ConsoleDialog_Header_StartDir {
             get {
@@ -178,7 +187,7 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Tab Name.
+        ///   Looks up a localized string similar to Tab name.
         /// </summary>
         public static string ConsoleDialog_Header_TabName {
             get {
@@ -331,7 +340,7 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Executable Name.
+        ///   Looks up a localized string similar to Executable name.
         /// </summary>
         public static string GrabDialog_Header_ExeName {
             get {
@@ -340,7 +349,7 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Tab Name.
+        ///   Looks up a localized string similar to Tab name.
         /// </summary>
         public static string GrabDialog_Header_TabName {
             get {
@@ -385,7 +394,7 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Consoles:.
+        ///   Looks up a localized string similar to _Consoles:.
         /// </summary>
         public static string ImportDialog_Consoles {
             get {
@@ -394,7 +403,7 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Grab:.
+        ///   Looks up a localized string similar to _Grab:.
         /// </summary>
         public static string ImportDialog_Grab {
             get {
@@ -412,11 +421,20 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Links:.
+        ///   Looks up a localized string similar to _Links:.
         /// </summary>
         public static string ImportDialog_Links {
             get {
                 return ResourceManager.GetString("ImportDialog.Links", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Colo_rs:.
+        /// </summary>
+        public static string ImportDialog_TabThemes {
+            get {
+                return ResourceManager.GetString("ImportDialog.TabThemes", resourceCulture);
             }
         }
         
@@ -430,7 +448,7 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Tools:.
+        ///   Looks up a localized string similar to _Tools:.
         /// </summary>
         public static string ImportDialog_Tools {
             get {
