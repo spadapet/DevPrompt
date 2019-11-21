@@ -141,7 +141,6 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
-        Color Api.ITabThemeKey.KeyColor => this.ThemeKeyColor;
         public Brush ForegroundSelectedBrush => (this.Settings.GetTabTheme(this.ThemeKeyColor) is Api.ITabTheme theme) ? theme.ForegroundSelectedBrush : null;
         public Brush ForegroundUnselectedBrush => (this.Settings.GetTabTheme(this.ThemeKeyColor) is Api.ITabTheme theme) ? theme.ForegroundUnselectedBrush : null;
         public Brush BackgroundSelectedBrush => (this.Settings.GetTabTheme(this.ThemeKeyColor) is Api.ITabTheme theme) ? theme.BackgroundSelectedBrush : null;
@@ -169,6 +168,11 @@ namespace DevPrompt.UI.ViewModels
         {
             this.window.App.Telemetry.TrackEvent("ProcessTab.ConsoleProperties");
             this.Process.RunCommand(Api.ProcessCommand.PropertiesDialog);
+        }
+
+        public void OnEditColors()
+        {
+            this.window.ShowSettingsDialog(Api.SettingsTabType.Colors);
         }
 
         public IEnumerable<FrameworkElement> ContextMenuItems
@@ -231,41 +235,73 @@ namespace DevPrompt.UI.ViewModels
                 };
 
                 DataTemplate headerTemplate = (DataTemplate)control.Resources["TabThemeMenuHeaderTemplate"];
-
-                int i = 0;
-                foreach (Color keyColor in this.Settings.TabThemeKeys)
+                Separator separator = new Separator();
+                MenuItem editColorsItem = new MenuItem()
                 {
-                    i++;
+                    Header = Resources.Command_EditColors,
+                    Command = new DelegateCommand(this.OnEditColors),
+                };
 
-                    if (this.Settings.GetTabTheme(keyColor) is Api.ITabTheme theme)
-                    {
-                        string text = string.Empty;
-                        if (i < 10)
-                        {
-                            text = $"_{i.ToString(CultureInfo.InvariantCulture)}:";
-                        }
-                        else if (i - 10 < 26)
-                        {
-                            char ch = (char)('A' + (i - 10));
-                            text = $"_{ch.ToString(CultureInfo.InvariantCulture)}:";
-                        }
+                tabColorMenu.Items.Add(separator);
+                tabColorMenu.Items.Add(editColorsItem);
 
-                        tabColorMenu.Items.Add(this.CreateColorItem(text, keyColor, theme, headerTemplate));
-                    }
-                }
+                tabColorMenu.SubmenuOpened += (s, a) =>
+                {
+                    this.UpdateTabColorMenu(tabColorMenu, headerTemplate, separator, editColorsItem);
+                };
             }
 
             return tabColorMenu;
         }
 
-        private MenuItem CreateColorItem(string header, Color keyColor, Api.ITabTheme theme, DataTemplate headerTemplate)
+        private void UpdateTabColorMenu(MenuItem menu, DataTemplate colorHeaderTemplate, Separator separator, MenuItem editColorsItem)
         {
-            return new MenuItem()
+            int oldCount = menu.Items.IndexOf(separator);
+            IReadOnlyList<Api.ITabThemeKey> themeKeys = this.Settings.TabThemeKeys;
+            bool needsUpdate = (oldCount != themeKeys.Count);
+
+            for (int i = 0; !needsUpdate && i < oldCount; i++)
             {
-                HeaderTemplate = headerTemplate,
-                Header = new TabThemeVM(header, keyColor, theme),
-                Command = new DelegateCommand(() => this.ThemeKeyColor = keyColor),
-            };
+                if (!(menu.Items[i] is MenuItem item) || !(item.Header is TabThemeVM itemVM) || itemVM.ThemeKeyColor != themeKeys[i].ThemeKeyColor)
+                {
+                    needsUpdate = true;
+                }
+            }
+
+            if (needsUpdate)
+            {
+                menu.Items.Clear();
+
+                int count = 0;
+                foreach (Api.ITabThemeKey themeKey in themeKeys)
+                {
+                    count++;
+
+                    if (this.Settings.GetTabTheme(themeKey.ThemeKeyColor) is Api.ITabTheme theme)
+                    {
+                        string text = string.Empty;
+                        if (count < 10)
+                        {
+                            text = $"_{count.ToString(CultureInfo.InvariantCulture)}:";
+                        }
+                        else if (count - 10 < 26)
+                        {
+                            char ch = (char)('A' + (count - 10));
+                            text = $"_{ch.ToString(CultureInfo.InvariantCulture)}:";
+                        }
+
+                        menu.Items.Add(new MenuItem()
+                        {
+                            HeaderTemplate = colorHeaderTemplate,
+                            Header = new TabThemeVM(text, themeKey.ThemeKeyColor, theme),
+                            Command = new DelegateCommand(() => this.ThemeKeyColor = themeKey.ThemeKeyColor),
+                        });
+                    }
+                }
+
+                menu.Items.Add(separator);
+                menu.Items.Add(editColorsItem);
+            }
         }
     }
 }

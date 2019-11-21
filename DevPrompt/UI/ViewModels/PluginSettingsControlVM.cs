@@ -63,6 +63,7 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Code Quality", "IDE0067:Dispose objects before losing scope", Justification = "cancelSource is disposed")]
         public async void Refresh()
         {
             List<NuGetPluginVM> initialPlugins = this.plugins.OfType<NuGetPluginVM>().ToList();
@@ -255,6 +256,8 @@ namespace DevPrompt.UI.ViewModels
             }
         });
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Code Quality", "IDE0067:Dispose objects before losing scope", Justification = "dialogBusy is disposed")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0009:Member access should be qualified.", Justification = "false positive")]
         private IDisposable BeginBusy(out CancellationTokenSource cancelSource)
         {
             this.IsBusy = true;

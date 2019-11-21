@@ -6,28 +6,16 @@ using System.Windows;
 
 namespace DevPrompt.UI.ViewModels
 {
-    internal enum SettingsTabType
-    {
-        Consoles,
-        Grab,
-        Tools,
-        Links,
-        Plugins,
-        Telemetry,
-
-        Default = Consoles,
-    }
-
     /// <summary>
     /// View model for a settings tab
     /// </summary>
     internal class SettingsTabVM : PropertyNotifier, IDisposable
     {
-        public SettingsTabType TabType { get; }
+        public Api.SettingsTabType TabType { get; }
         private readonly SettingsDialogVM viewModel;
         private UIElement viewElement;
 
-        public SettingsTabVM(SettingsDialogVM viewModel, SettingsTabType tabType)
+        public SettingsTabVM(SettingsDialogVM viewModel, Api.SettingsTabType tabType)
         {
             this.TabType = tabType;
             this.viewModel = viewModel;
@@ -47,12 +35,13 @@ namespace DevPrompt.UI.ViewModels
             {
                 switch (this.TabType)
                 {
-                    case SettingsTabType.Consoles: return Resources.SettingsTabType_Consoles;
-                    case SettingsTabType.Grab: return Resources.SettingsTabType_Grab;
-                    case SettingsTabType.Links: return Resources.SettingsTabType_Links;
-                    case SettingsTabType.Tools: return Resources.SettingsTabType_Tools;
-                    case SettingsTabType.Plugins: return Resources.SettingsTabType_Plugins;
-                    case SettingsTabType.Telemetry: return Resources.SettingsTabType_Telemetry;
+                    case Api.SettingsTabType.Consoles: return Resources.SettingsTabType_Consoles;
+                    case Api.SettingsTabType.Grab: return Resources.SettingsTabType_Grab;
+                    case Api.SettingsTabType.Links: return Resources.SettingsTabType_Links;
+                    case Api.SettingsTabType.Tools: return Resources.SettingsTabType_Tools;
+                    case Api.SettingsTabType.Colors: return Resources.SettingsTabType_Colors;
+                    case Api.SettingsTabType.Plugins: return Resources.SettingsTabType_Plugins;
+                    case Api.SettingsTabType.Telemetry: return Resources.SettingsTabType_Telemetry;
 
                     default:
                         Debug.Fail($"Missing name for tab: {this.TabType}");
@@ -69,27 +58,31 @@ namespace DevPrompt.UI.ViewModels
                 {
                     switch (this.TabType)
                     {
-                        case SettingsTabType.Consoles:
+                        case Api.SettingsTabType.Consoles:
                             this.viewElement = new ConsolesSettingsControl(this.viewModel);
                             break;
 
-                        case SettingsTabType.Grab:
+                        case Api.SettingsTabType.Grab:
                             this.viewElement = new GrabSettingsControl(this.viewModel);
                             break;
 
-                        case SettingsTabType.Links:
+                        case Api.SettingsTabType.Links:
                             this.viewElement = new LinksSettingsControl(this.viewModel);
                             break;
 
-                        case SettingsTabType.Tools:
+                        case Api.SettingsTabType.Tools:
                             this.viewElement = new ToolsSettingsControl(this.viewModel);
                             break;
 
-                        case SettingsTabType.Plugins:
+                        case Api.SettingsTabType.Colors:
+                            this.viewElement = new ColorsSettingsControl(this.viewModel);
+                            break;
+
+                        case Api.SettingsTabType.Plugins:
                             this.viewElement = new PluginSettingsControl(this.viewModel);
                             break;
 
-                        case SettingsTabType.Telemetry:
+                        case Api.SettingsTabType.Telemetry:
                             this.viewElement = new TelemetrySettingsControl(this.viewModel);
                             break;
 

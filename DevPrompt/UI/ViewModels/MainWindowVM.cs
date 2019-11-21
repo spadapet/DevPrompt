@@ -14,7 +14,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Interop;
 
 namespace DevPrompt.UI.ViewModels
 {
@@ -28,7 +27,7 @@ namespace DevPrompt.UI.ViewModels
         public AppSettings AppSettings => this.App.Settings;
         public IReadOnlyList<ConsoleSettings> VisualStudioConsoles => this.visualStudioConsoles;
         Api.IApp Api.IWindow.App => this.App;
-        IntPtr Api.IWindow.Handle => new WindowInteropHelper(this.Window).Handle;
+        IntPtr Api.IWindow.Handle => this.Window.Handle;
         Api.IProgressBar Api.IWindow.ProgressBar => this.Window.progressBar;
         Api.IInfoBar Api.IWindow.InfoBar => this.Window.infoBar;
 
@@ -137,12 +136,13 @@ namespace DevPrompt.UI.ViewModels
             }
         });
 
-        private void ShowSettingsDialog(SettingsTabType tab)
+        public void ShowSettingsDialog(Api.SettingsTabType tab)
         {
             using (SettingsDialog dialog = new SettingsDialog(this.Window, this.AppSettings, tab))
             {
                 if (dialog.ShowDialog() == true)
                 {
+                    dialog.ViewModel.Settings.HasDefaultThemeKeys = false; // this will become true if the colors actually match the default
                     this.AppSettings.CopyFrom(dialog.ViewModel.Settings);
 
                     if (this.AppSettings.PluginsChanged)
@@ -166,32 +166,32 @@ namespace DevPrompt.UI.ViewModels
 
         public ICommand SettingsCommand => new DelegateCommand(() =>
         {
-            this.ShowSettingsDialog(SettingsTabType.Default);
+            this.ShowSettingsDialog(Api.SettingsTabType.Default);
         });
 
         public ICommand PluginsCommand => new DelegateCommand(() =>
         {
-            this.ShowSettingsDialog(SettingsTabType.Plugins);
+            this.ShowSettingsDialog(Api.SettingsTabType.Plugins);
         });
 
         public ICommand CustomizeConsoleGrabCommand => new DelegateCommand(() =>
         {
-            this.ShowSettingsDialog(SettingsTabType.Grab);
+            this.ShowSettingsDialog(Api.SettingsTabType.Grab);
         });
 
         public ICommand CustomizeToolsCommand => new DelegateCommand(() =>
         {
-            this.ShowSettingsDialog(SettingsTabType.Tools);
+            this.ShowSettingsDialog(Api.SettingsTabType.Tools);
         });
 
         public ICommand CustomizeLinksCommand => new DelegateCommand(() =>
         {
-            this.ShowSettingsDialog(SettingsTabType.Links);
+            this.ShowSettingsDialog(Api.SettingsTabType.Links);
         });
 
         public ICommand TelemetryCommand => new DelegateCommand(() =>
         {
-            this.ShowSettingsDialog(SettingsTabType.Telemetry);
+            this.ShowSettingsDialog(Api.SettingsTabType.Telemetry);
         });
 
         public ICommand ReportAnIssueCommand => new DelegateCommand(() =>

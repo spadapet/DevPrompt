@@ -135,21 +135,33 @@ namespace DevPrompt.ProcessWorkspace.UI.ViewModels
         public Brush ForegroundSelectedBrush => this.GetThemeBrush(c => c.ForegroundSelectedBrush);
         public Brush ForegroundUnselectedBrush => this.GetThemeBrush(c => c.ForegroundUnselectedBrush);
 
-        public Color KeyColor
+        public Color ThemeKeyColor
         {
             get
             {
                 if (this.tab is Api.ITabThemeKey key1)
                 {
-                    return key1.KeyColor;
+                    return key1.ThemeKeyColor;
                 }
 
                 if (this.snapshot is Api.ITabThemeKey key2)
                 {
-                    return key2.KeyColor;
+                    return key2.ThemeKeyColor;
                 }
 
                 return default;
+            }
+
+            set
+            {
+                if (this.tab is Api.ITabThemeKey key1)
+                {
+                    key1.ThemeKeyColor = value;
+                }
+                else if (this.snapshot is Api.ITabThemeKey key2)
+                {
+                    key2.ThemeKeyColor = value;
+                }
             }
         }
 
@@ -160,7 +172,7 @@ namespace DevPrompt.ProcessWorkspace.UI.ViewModels
                 return accessor(colored1);
             }
 
-            if (this.tab is Api.ITabThemeKey keyColor1 && this.window.App.Settings.GetTabTheme(keyColor1.KeyColor) is Api.ITabTheme colored2)
+            if (this.tab is Api.ITabThemeKey keyColor1 && this.window.App.Settings.GetTabTheme(keyColor1.ThemeKeyColor) is Api.ITabTheme colored2)
             {
                 return accessor(colored2);
             }
@@ -170,7 +182,7 @@ namespace DevPrompt.ProcessWorkspace.UI.ViewModels
                 return accessor(colored3);
             }
 
-            if (this.snapshot is Api.ITabThemeKey keyColor2 && this.window.App.Settings.GetTabTheme(keyColor2.KeyColor) is Api.ITabTheme colored4)
+            if (this.snapshot is Api.ITabThemeKey keyColor2 && this.window.App.Settings.GetTabTheme(keyColor2.ThemeKeyColor) is Api.ITabTheme colored4)
             {
                 return accessor(colored4);
             }

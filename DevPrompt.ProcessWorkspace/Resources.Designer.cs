@@ -133,6 +133,15 @@ namespace DevPrompt.ProcessWorkspace {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Edit Colors_....
+        /// </summary>
+        public static string Command_EditColors {
+            get {
+                return ResourceManager.GetString("Command.EditColors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Set tab colo_r.
         /// </summary>
         public static string Command_SetTabColor {

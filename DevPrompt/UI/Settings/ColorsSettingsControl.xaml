@@ -1,0 +1,36 @@
+﻿<UserControl
+    x:Class="DevPrompt.UI.Settings.ColorsSettingsControl"
+    x:ClassModifier="internal"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:DevPrompt"
+    xmlns:uis="clr-namespace:DevPrompt.UI.Settings"
+    mc:Ignorable="d"
+    MinWidth="350" MinHeight="200" d:DesignWidth="400" d:DesignHeight="250"
+    DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+    <UserControl.Resources>
+        <uis:SettingsStyles />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock TextWrapping="Wrap" Padding="5,10" Text="{x:Static local:Resources.ColorsDialog_Intro}"/>
+        <DataGrid Grid.Row="1" x:Name="dataGrid" ItemsSource="{Binding ViewModel.Settings.TabThemes}" BorderThickness="0,1" SelectionMode="Single" SelectionChanged="OnSelectionChanged" BeginningEdit="OnDataGridBeginningEdit">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="{x:Static local:Resources.ColorsDialog_Header_Name}" Width="120" Binding="{Binding ThemeKeyColorString}" />
+                <DataGridTemplateColumn x:Name="colorColumn" Header="{x:Static local:Resources.ColorsDialog_Header_Color}" Width="100" CellTemplate="{StaticResource ColorCellTemplate}" CellStyle="{StaticResource DataGridCellComboStyle}" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10">
+            <Button Command="{Binding MoveUpCommand}" Style="{StaticResource MoveUpButtonStyle}" />
+            <Button Command="{Binding MoveDownCommand}" Style="{StaticResource MoveDownButtonStyle}" />
+            <Button Command="{Binding DeleteCommand}" Style="{StaticResource DeleteButtonStyle}" />
+            <Button Command="{Binding ResetCommand}" Style="{StaticResource ResetButtonStyle}" />
+        </StackPanel>
+    </Grid>
+</UserControl>

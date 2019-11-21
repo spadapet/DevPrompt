@@ -14,6 +14,7 @@ namespace DevPrompt.Api
         IProgressBar ProgressBar { get; }
 
         void Focus();
+        void ShowSettingsDialog(SettingsTabType tab);
 
         // Workspaces
         IEnumerable<IWorkspaceHolder> Workspaces { get; }

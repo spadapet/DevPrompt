@@ -10,13 +10,13 @@ namespace DevPrompt.ProcessWorkspace.UI.ViewModels
     /// </summary>
     internal class TabNameDialogVM : PropertyNotifier
     {
-        public IReadOnlyList<Color> ThemeKeys { get; }
+        public IReadOnlyList<Color> TabThemeKeys { get; }
         private string name;
         private Color themeKeyColor;
 
         public TabNameDialogVM(Api.IAppSettings settings, string name, Color themeKeyColor)
         {
-            this.ThemeKeys = settings.TabThemeKeys.ToList();
+            this.TabThemeKeys = settings.TabThemeKeys.Select(t => t.ThemeKeyColor).ToList();
             this.name = name;
             this.themeKeyColor = themeKeyColor;
         }

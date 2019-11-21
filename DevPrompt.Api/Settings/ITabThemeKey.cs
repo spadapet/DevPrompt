@@ -7,6 +7,6 @@ namespace DevPrompt.Api
     /// </summary>
     public interface ITabThemeKey
     {
-        Color KeyColor { get; }
+        Color ThemeKeyColor { get; set; }
     }
 }

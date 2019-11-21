@@ -13,7 +13,7 @@ namespace DevPrompt.Utility.Converters
         {
         }
 
-        public static object Convert(object value, Type targetType, object parameter)
+        private static object Convert(object value, Type targetType, object parameter)
         {
             return (value is DateTime date && date >= DateToVisibilityConverter.OldestDate && date <= DateTime.Now) ? Visibility.Visible : Visibility.Collapsed;
         }

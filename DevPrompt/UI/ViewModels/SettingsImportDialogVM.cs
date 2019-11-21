@@ -117,20 +117,20 @@ namespace DevPrompt.UI.ViewModels
 
             if (this.TabThemesIndex == 0)
             {
-                targetSettings.TabThemeStringKeys.Clear();
+                targetSettings.TabThemes.Clear();
                 targetSettings.HasDefaultThemeKeys = this.settings.HasDefaultThemeKeys;
             }
 
-            if (this.TabThemesIndex == 1 && this.settings.TabThemeStringKeys.Count > 0)
+            if (this.TabThemesIndex == 1 && this.settings.TabThemes.Count > 0)
             {
                 targetSettings.HasDefaultThemeKeys = targetSettings.HasDefaultThemeKeys && this.settings.HasDefaultThemeKeys;
             }
 
             if (this.TabThemesIndex != 2)
             {
-                foreach (string setting in this.settings.TabThemeStringKeys)
+                foreach (TabTheme tabTheme in this.settings.TabThemes)
                 {
-                    targetSettings.TabThemeStringKeys.Add(setting);
+                    targetSettings.TabThemes.Add(tabTheme.Clone());
                 }
             }
 

@@ -32,6 +32,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Utility\ActiveToBoolConverter.cs" />
+    <Compile Include="Utility\ThemeKeyToColorConverter.cs" />
     <Compile Include="Utility\ColorToBrushConverter.cs" />
     <Compile Include="Utility\DelegateCommand.cs" />
     <Compile Include="Utility\DelegateConverter.cs" />

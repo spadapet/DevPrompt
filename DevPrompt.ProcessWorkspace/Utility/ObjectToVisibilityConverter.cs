@@ -10,7 +10,7 @@ namespace DevPrompt.ProcessWorkspace.Utility
         {
         }
 
-        public static object Convert(object value, Type targetType, object parameter)
+        private static object Convert(object value, Type targetType, object parameter)
         {
             return (value != null) ? Visibility.Visible : Visibility.Collapsed;
         }

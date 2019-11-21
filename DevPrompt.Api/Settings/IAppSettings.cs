@@ -10,9 +10,9 @@ namespace DevPrompt.Api
     /// </summary>
     public interface IAppSettings : INotifyPropertyChanged
     {
-        IEnumerable<IConsoleSettings> ConsoleSettings { get; }
+        IReadOnlyList<IConsoleSettings> ConsoleSettings { get; }
         Task<IEnumerable<IConsoleSettings>> GetVisualStudioConsoleSettingsAsync();
-        IEnumerable<Color> TabThemeKeys { get; }
+        IReadOnlyList<ITabThemeKey> TabThemeKeys { get; }
         ITabTheme GetTabTheme(Color keyColor);
 
         bool ConsoleGrabEnabled { get; set; }

@@ -64,7 +64,7 @@
                 HorizontalContentAlignment="Stretch"
                 VerticalContentAlignment="Stretch"
                 SelectedItem="{Binding ThemeKeyColor}"
-                ItemsSource="{Binding ThemeKeys}"
+                ItemsSource="{Binding TabThemeKeys}"
                 ItemTemplateSelector="{StaticResource KeyColorTemplateSelector}" />
         </StackPanel>
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,5,15,15" HorizontalAlignment="Right">

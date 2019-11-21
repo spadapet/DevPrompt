@@ -1,45 +1,99 @@
-﻿using System;
+﻿using DevPrompt.ProcessWorkspace.Utility;
+using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Windows.Media;
 
 namespace DevPrompt.Settings
 {
-    internal class TabTheme : Api.ITabTheme, Api.ITabThemeKey
+    [DataContract]
+    internal class TabTheme : PropertyNotifier, Api.ITabTheme, Api.ITabThemeKey, IEquatable<TabTheme>
     {
         public Brush ForegroundSelectedBrush => this.cachedBrushes.Value.ForegroundSelectedBrush;
         public Brush BackgroundSelectedBrush => this.cachedBrushes.Value.BackgroundSelectedBrush;
         public Brush ForegroundUnselectedBrush => this.cachedBrushes.Value.ForegroundUnselectedBrush;
         public Brush BackgroundUnselectedBrush => this.cachedBrushes.Value.BackgroundUnselectedBrush;
-        public Color KeyColor { get; }
 
-        private readonly Lazy<CachedBrushes> cachedBrushes;
+        private Lazy<CachedBrushes> cachedBrushes;
+        private Color themeKeyColor;
 
-        public TabTheme(Color keyColor)
+        public TabTheme()
         {
-            this.KeyColor = keyColor;
-            this.cachedBrushes = new Lazy<CachedBrushes>(() => new CachedBrushes(keyColor));
+            this.Initialize();
         }
 
-        public static IEnumerable<string> DefaultTabThemeStringKeys
+        public TabTheme(Color themeKeyColor)
+            : this()
+        {
+            this.themeKeyColor = themeKeyColor;
+        }
+
+        public TabTheme(TabTheme copyFrom)
+            : this()
+        {
+            this.themeKeyColor = copyFrom.themeKeyColor;
+        }
+
+        public bool Equals(TabTheme other)
+        {
+            return this.themeKeyColor == other.themeKeyColor;
+        }
+
+        public TabTheme Clone()
+        {
+            return new TabTheme(this);
+        }
+
+        [OnDeserializing]
+        private void Initialize(StreamingContext context = default)
+        {
+            this.cachedBrushes = new Lazy<CachedBrushes>(() => new CachedBrushes(this.themeKeyColor));
+        }
+
+        public Color ThemeKeyColor
+        {
+            get => this.themeKeyColor;
+            set
+            {
+                if (this.SetPropertyValue(ref this.themeKeyColor, value, null))
+                {
+                    if (this.cachedBrushes.IsValueCreated)
+                    {
+                        this.cachedBrushes = new Lazy<CachedBrushes>(() => new CachedBrushes(value));
+                    }
+
+                    this.OnPropertiesChanged();
+                }
+            }
+        }
+
+        [DataMember]
+        public string ThemeKeyColorString
+        {
+            get => WpfUtility.ColorToString(this.ThemeKeyColor);
+            set => this.ThemeKeyColor = WpfUtility.ColorFromString(value);
+        }
+
+        public static IEnumerable<TabTheme> DefaultTabThemes
         {
             get
             {
-                yield return "#00000000";
-                yield return "#FFD4D4D4"; // gray
-                yield return "#FF9D9D9D"; // gray
-                yield return "#FF4B4B4B"; // gray
-                yield return "#FFF9D381"; // yellow
-                yield return "#FFEAAF4D"; // orange
-                yield return "#FFFF8F83"; // red
-                yield return "#FFAE3934"; // red
-                yield return "#FF9AD1F9"; // blue
-                yield return "#FF58AEEE"; // blue
-                yield return "#FF8DEDA7"; // green
-                yield return "#FF44C55B"; // green
-                yield return "#FFC3A7E1"; // purple
-                yield return "#FF9569C8"; // purple
-                yield return "#FFBAB5AA"; // brown
-                yield return "#FF948E82"; // brown
+                yield return new TabTheme(default(Color));
+                yield return new TabTheme(Color.FromArgb(0xFF, 0xD4, 0xD4, 0xD4)); // gray
+                yield return new TabTheme(Color.FromArgb(0xFF, 0x9D, 0x9D, 0x9D)); // gray
+                yield return new TabTheme(Color.FromArgb(0xFF, 0x4B, 0x4B, 0x4B)); // gray
+                yield return new TabTheme(Color.FromArgb(0xFF, 0xF9, 0xD3, 0x81)); // yellow
+                yield return new TabTheme(Color.FromArgb(0xFF, 0xEA, 0xAF, 0x4D)); // orange
+                yield return new TabTheme(Color.FromArgb(0xFF, 0xFF, 0x8F, 0x83)); // red
+                yield return new TabTheme(Color.FromArgb(0xFF, 0xAE, 0x39, 0x34)); // red
+                yield return new TabTheme(Color.FromArgb(0xFF, 0x9A, 0xD1, 0xF9)); // blue
+                yield return new TabTheme(Color.FromArgb(0xFF, 0x58, 0xAE, 0xEE)); // blue
+                yield return new TabTheme(Color.FromArgb(0xFF, 0x8D, 0xED, 0xA7)); // green
+                yield return new TabTheme(Color.FromArgb(0xFF, 0x44, 0xC5, 0x5B)); // green
+                yield return new TabTheme(Color.FromArgb(0xFF, 0xC3, 0xA7, 0xE1)); // purple
+                yield return new TabTheme(Color.FromArgb(0xFF, 0x95, 0x69, 0xC8)); // purple
+                yield return new TabTheme(Color.FromArgb(0xFF, 0xBA, 0xB5, 0xAA)); // brown
+                yield return new TabTheme(Color.FromArgb(0xFF, 0x94, 0x8E, 0x82)); // brown
             }
         }
 

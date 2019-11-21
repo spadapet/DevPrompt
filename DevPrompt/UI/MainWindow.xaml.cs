@@ -14,10 +14,11 @@ using System.Windows.Interop;
 
 namespace DevPrompt.UI
 {
-    internal partial class MainWindow : Window
+    internal partial class MainWindow : Window, System.Windows.Forms.IWin32Window
     {
         public MainWindowVM ViewModel { get; }
         public App App { get; }
+        public IntPtr Handle => new WindowInteropHelper(this).Handle;
 
         private bool systemShuttingDown;
         private RestartOnClose restartOnClose;

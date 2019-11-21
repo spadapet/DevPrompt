@@ -10,7 +10,7 @@ namespace DevPrompt.Utility.Converters
         {
         }
 
-        public static object Convert(object value, Type targetType, object parameter)
+        private static object Convert(object value, Type targetType, object parameter)
         {
             if (value is bool b)
             {

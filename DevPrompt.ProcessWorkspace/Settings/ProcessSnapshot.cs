@@ -2,7 +2,6 @@
 using DevPrompt.ProcessWorkspace.Utility;
 using DevPrompt.UI.ViewModels;
 using System;
-using System.Globalization;
 using System.Runtime.Serialization;
 using System.Windows.Media;
 
@@ -17,7 +16,6 @@ namespace DevPrompt.ProcessWorkspace.Settings
         Guid Api.ITabSnapshot.Id => Guid.Empty;
         string Api.ITabSnapshot.Name => this.CachedName;
         string Api.ITabSnapshot.Tooltip => this.CachedTooltip;
-        Color Api.ITabThemeKey.KeyColor => this.themeKeyColor;
 
         private string cachedName;
         private string cachedTooltip;
@@ -110,6 +108,12 @@ namespace DevPrompt.ProcessWorkspace.Settings
         {
             get => WpfUtility.ColorToString(this.themeKeyColor);
             set => this.SetPropertyValue(ref this.themeKeyColor, WpfUtility.ColorFromString(value));
+        }
+
+        public Color ThemeKeyColor
+        {
+            get => this.themeKeyColor;
+            set => this.SetPropertyValue(ref this.themeKeyColor, value);
         }
     }
 }

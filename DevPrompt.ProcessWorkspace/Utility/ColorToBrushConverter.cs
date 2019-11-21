@@ -10,9 +10,22 @@ namespace DevPrompt.ProcessWorkspace.Utility
         {
         }
 
-        public static object Convert(object value, Type targetType, object parameter)
+        private static object Convert(object value, Type targetType, object parameter)
         {
-            return (value is Color color && color != default) ? new SolidColorBrush(color) : null;
+            if (value is Api.ITabThemeKey themeKey && themeKey.ThemeKeyColor != default)
+            {
+                return new SolidColorBrush(themeKey.ThemeKeyColor);
+            }
+            else if (value is Color color && color != default)
+            {
+                return new SolidColorBrush(color);
+            }
+            else if (value is string stringColor)
+            {
+                return new SolidColorBrush(WpfUtility.ColorFromString(stringColor));
+            }
+
+            return null;
         }
     }
 }

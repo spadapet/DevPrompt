@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
-using System.Windows.Media;
 
 namespace DevPrompt.UI.ViewModels
 {
@@ -21,7 +20,6 @@ namespace DevPrompt.UI.ViewModels
         public SettingsDialog Dialog { get; }
         public App App => this.Window.App;
         public IList<SettingsTabVM> Tabs => this.tabs;
-        public IReadOnlyList<Color> TabThemeKeys => this.App.Settings.TabThemeKeys.ToList();
         public Api.IProgressBar ProgressBar => this.Dialog.progressBar;
         public Api.IInfoBar InfoBar => this.Dialog.infoBar;
 
@@ -30,25 +28,26 @@ namespace DevPrompt.UI.ViewModels
         private bool isBusy;
 
         public SettingsDialogVM()
-            : this(null, null, null, SettingsTabType.Default)
+            : this(null, null, null, Api.SettingsTabType.Default)
         {
         }
 
-        public SettingsDialogVM(MainWindow window, SettingsDialog dialog, AppSettings settings, SettingsTabType activeTabType)
+        public SettingsDialogVM(MainWindow window, SettingsDialog dialog, AppSettings settings, Api.SettingsTabType activeTabType)
         {
             this.Window = window;
             this.Dialog = dialog;
             this.Settings = settings?.Clone();
 
             this.tabs = new SettingsTabVM[]
-                {
-                    new SettingsTabVM(this, SettingsTabType.Consoles),
-                    new SettingsTabVM(this, SettingsTabType.Grab),
-                    new SettingsTabVM(this, SettingsTabType.Tools),
-                    new SettingsTabVM(this, SettingsTabType.Links),
-                    new SettingsTabVM(this, SettingsTabType.Plugins),
-                    new SettingsTabVM(this, SettingsTabType.Telemetry),
-                };
+            {
+                new SettingsTabVM(this, Api.SettingsTabType.Consoles),
+                new SettingsTabVM(this, Api.SettingsTabType.Grab),
+                new SettingsTabVM(this, Api.SettingsTabType.Tools),
+                new SettingsTabVM(this, Api.SettingsTabType.Links),
+                new SettingsTabVM(this, Api.SettingsTabType.Colors),
+                new SettingsTabVM(this, Api.SettingsTabType.Plugins),
+                new SettingsTabVM(this, Api.SettingsTabType.Telemetry),
+            };
 
             this.ActiveTabType = activeTabType;
         }
@@ -73,7 +72,7 @@ namespace DevPrompt.UI.ViewModels
             return new DelegateDisposable(() => this.IsBusy = false);
         }
 
-        public SettingsTabType ActiveTabType
+        public Api.SettingsTabType ActiveTabType
         {
             get => this.activeTab.TabType;
 

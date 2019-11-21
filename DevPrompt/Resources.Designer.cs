@@ -133,6 +133,33 @@ namespace DevPrompt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Color.
+        /// </summary>
+        public static string ColorsDialog_Header_Color {
+            get {
+                return ResourceManager.GetString("ColorsDialog.Header.Color", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value.
+        /// </summary>
+        public static string ColorsDialog_Header_Name {
+            get {
+                return ResourceManager.GetString("ColorsDialog.Header.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This allows you to change and rearrange the tab color choices..
+        /// </summary>
+        public static string ColorsDialog_Intro {
+            get {
+                return ResourceManager.GetString("ColorsDialog.Intro", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Arguments.
         /// </summary>
         public static string ConsoleDialog_Header_Args {
@@ -335,7 +362,7 @@ namespace DevPrompt {
         /// </summary>
         public static string GrabDialog_GrabTooltip {
             get {
-                return ResourceManager.GetString("GrabDialog_GrabTooltip", resourceCulture);
+                return ResourceManager.GetString("GrabDialog.GrabTooltip", resourceCulture);
             }
         }
         
@@ -968,6 +995,15 @@ namespace DevPrompt {
         public static string SettingsDialog_Title {
             get {
                 return ResourceManager.GetString("SettingsDialog.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Colors.
+        /// </summary>
+        public static string SettingsTabType_Colors {
+            get {
+                return ResourceManager.GetString("SettingsTabType.Colors", resourceCulture);
             }
         }
         

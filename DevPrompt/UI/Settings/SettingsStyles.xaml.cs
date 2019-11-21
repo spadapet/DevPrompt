@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using DevPrompt.ProcessWorkspace.Utility;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -21,9 +22,11 @@ namespace DevPrompt.UI.Settings
 
         private void OnComboCellKeyDown(object sender, KeyEventArgs args)
         {
-            if (sender is DataGridCell cell && !cell.IsEditing && args.Key == Key.Space && args.KeyboardDevice.Modifiers == ModifierKeys.None)
+            if (sender is DataGridCell cell && !cell.IsEditing &&
+                args.Key == Key.Space && args.KeyboardDevice.Modifiers == ModifierKeys.None &&
+                WpfUtility.FindVisualAncestor<DataGrid>(args.OriginalSource as DependencyObject) is DataGrid dataGrid)
             {
-                cell.IsEditing = true;
+                dataGrid.BeginEdit(args);
             }
         }
     }

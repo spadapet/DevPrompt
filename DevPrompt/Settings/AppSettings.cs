@@ -29,7 +29,7 @@ namespace DevPrompt.Settings
         public ObservableCollection<ToolSettings> ObservableTools { get; private set; }
         public ObservableCollection<PluginDirectorySettings> ObservableUserPluginDirectories { get; private set; }
         public ObservableCollection<NuGetPluginSettings> ObservableNuGetPlugins { get; private set; }
-        public ObservableCollection<string> ObservableTabThemeKeys { get; private set; }
+        public ObservableCollection<TabTheme> ObservableTabThemes { get; private set; }
 
         private Dictionary<string, object> customProperties;
         private Dictionary<Color, TabTheme> cachedTabThemes;
@@ -72,7 +72,7 @@ namespace DevPrompt.Settings
             this.ObservableTools.Clear();
             this.ObservableUserPluginDirectories.Clear();
             this.ObservableNuGetPlugins.Clear();
-            this.ObservableTabThemeKeys.Clear();
+            this.ObservableTabThemes.Clear();
             this.customProperties.Clear();
             this.cachedTabThemes.Clear();
 
@@ -106,9 +106,9 @@ namespace DevPrompt.Settings
                 this.ObservableNuGetPlugins.Add(nuget.Clone());
             }
 
-            foreach (string themeKey in copyFrom.ObservableTabThemeKeys)
+            foreach (TabTheme tabTheme in copyFrom.ObservableTabThemes)
             {
-                this.ObservableTabThemeKeys.Add(themeKey);
+                this.ObservableTabThemes.Add(tabTheme.Clone());
             }
 
             foreach (KeyValuePair<string, object> pair in copyFrom.CustomProperties)
@@ -358,9 +358,11 @@ namespace DevPrompt.Settings
 
         private void AddDefaultTabThemeKeys()
         {
-            foreach (string key in TabTheme.DefaultTabThemeStringKeys)
+            this.ObservableTabThemes.Clear();
+
+            foreach (TabTheme tabTheme in TabTheme.DefaultTabThemes)
             {
-                this.TabThemeStringKeys.Add(key);
+                this.ObservableTabThemes.Add(tabTheme);
             }
         }
 
@@ -525,7 +527,7 @@ namespace DevPrompt.Settings
 
         [DataMember]
         public IList<ConsoleSettings> Consoles => this.ObservableConsoles;
-        IEnumerable<Api.IConsoleSettings> Api.IAppSettings.ConsoleSettings => this.Consoles;
+        IReadOnlyList<Api.IConsoleSettings> Api.IAppSettings.ConsoleSettings => this.ObservableConsoles;
 
         [DataMember]
         public IList<GrabConsoleSettings> GrabConsoles => this.ObservableGrabConsoles;
@@ -543,8 +545,8 @@ namespace DevPrompt.Settings
         public IList<NuGetPluginSettings> NuGetPlugins => this.ObservableNuGetPlugins;
 
         [DataMember]
-        public IList<string> TabThemeStringKeys => this.ObservableTabThemeKeys;
-        public IEnumerable<Color> TabThemeKeys => this.ObservableTabThemeKeys.Select(s => WpfUtility.ColorFromString(s));
+        public IList<TabTheme> TabThemes => this.ObservableTabThemes;
+        public IReadOnlyList<Api.ITabThemeKey> TabThemeKeys => this.ObservableTabThemes;
 
         [DataMember]
         public bool ConsoleGrabEnabled
@@ -660,7 +662,7 @@ namespace DevPrompt.Settings
             this.ObservableTools = new ObservableCollection<ToolSettings>();
             this.ObservableUserPluginDirectories = new ObservableCollection<PluginDirectorySettings>();
             this.ObservableNuGetPlugins = new ObservableCollection<NuGetPluginSettings>();
-            this.ObservableTabThemeKeys = new ObservableCollection<string>();
+            this.ObservableTabThemes = new ObservableCollection<TabTheme>();
 
             this.ObservableConsoles.CollectionChanged += this.OnObservableCollectionChanged;
             this.ObservableGrabConsoles.CollectionChanged += this.OnObservableCollectionChanged;
@@ -668,7 +670,7 @@ namespace DevPrompt.Settings
             this.ObservableTools.CollectionChanged += this.OnObservableCollectionChanged;
             this.ObservableUserPluginDirectories.CollectionChanged += this.OnObservableCollectionChanged;
             this.ObservableNuGetPlugins.CollectionChanged += this.OnObservableCollectionChanged;
-            this.ObservableTabThemeKeys.CollectionChanged += this.OnObservableCollectionChanged;
+            this.ObservableTabThemes.CollectionChanged += this.OnObservableCollectionChanged;
 
             this.customProperties = new Dictionary<string, object>();
             this.cachedTabThemes = new Dictionary<Color, TabTheme>();
@@ -706,6 +708,7 @@ namespace DevPrompt.Settings
                 yield return typeof(LinkSettings);
                 yield return typeof(NuGetPluginSettings);
                 yield return typeof(PluginDirectorySettings);
+                yield return typeof(TabTheme);
                 yield return typeof(ToolSettings);
             }
         }
@@ -726,13 +729,21 @@ namespace DevPrompt.Settings
 
             if (filter.HasFlag(DefaultSettingsFilter.TabThemeKeys))
             {
+                if (!this.ObservableTabThemes.Any(t => t.ThemeKeyColor == default))
+                {
+                    this.ObservableTabThemes.Insert(0, new TabTheme());
+                }
+
                 if (this.HasDefaultThemeKeys)
                 {
-                    if (!TabTheme.DefaultTabThemeStringKeys.SequenceEqual(this.TabThemeStringKeys))
+                    if (!TabTheme.DefaultTabThemes.SequenceEqual(this.ObservableTabThemes))
                     {
-                        this.ObservableTabThemeKeys.Clear();
                         this.AddDefaultTabThemeKeys();
                     }
+                }
+                else if (TabTheme.DefaultTabThemes.SequenceEqual(this.ObservableTabThemes))
+                {
+                    this.HasDefaultThemeKeys = true;
                 }
             }
         }

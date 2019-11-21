@@ -3,7 +3,7 @@
 namespace DevPrompt.Api
 {
     /// <summary>
-    /// This holds a tab that's alrady been added to a workspace
+    /// This holds a tab that's already been added to a workspace
     /// </summary>
     public interface ITabHolder
     {

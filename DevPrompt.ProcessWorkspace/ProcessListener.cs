@@ -21,6 +21,7 @@ namespace DevPrompt.ProcessWorkspace
             this.app = app;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Code Quality", "IDE0068:Use recommended dispose pattern", Justification = "The tab gets disposed by TabVM")]
         public void OnProcessOpening(Api.IProcess process, bool activate, string path)
         {
             foreach (Tuple<Api.IWindow, Api.IProcessWorkspace> pair in this.ProcessWorkspaces)

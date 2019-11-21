@@ -2,6 +2,7 @@
 using DevPrompt.UI.ViewModels;
 using System;
 using System.Windows;
+using System.Windows.Interop;
 
 namespace DevPrompt.UI.Settings
 {
@@ -9,7 +10,7 @@ namespace DevPrompt.UI.Settings
     {
         public SettingsDialogVM ViewModel { get; }
 
-        public SettingsDialog(MainWindow window, AppSettings settings, SettingsTabType activeTabType = SettingsTabType.Default)
+        public SettingsDialog(MainWindow window, AppSettings settings, Api.SettingsTabType activeTabType = Api.SettingsTabType.Default)
         {
             this.Owner = window;
             this.ViewModel = new SettingsDialogVM(window, this, settings, activeTabType);

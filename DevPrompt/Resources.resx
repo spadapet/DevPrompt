@@ -141,6 +141,15 @@
   <data name="About.Title" xml:space="preserve">
     <value>About DevPrompt</value>
   </data>
+  <data name="ColorsDialog.Header.Color" xml:space="preserve">
+    <value>Color</value>
+  </data>
+  <data name="ColorsDialog.Header.Name" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="ColorsDialog.Intro" xml:space="preserve">
+    <value>This allows you to change and rearrange the tab color choices.</value>
+  </data>
   <data name="ConsoleDialog.Header.Args" xml:space="preserve">
     <value>Arguments</value>
   </data>
@@ -207,6 +216,9 @@
   <data name="GrabDialog.AutoGrab" xml:space="preserve">
     <value>Auto grab</value>
   </data>
+  <data name="GrabDialog.GrabTooltip" xml:space="preserve">
+    <value>Automatically grabs an externally run console app into a tab. The list above determines which consoles are grabbed.</value>
+  </data>
   <data name="GrabDialog.Header.Activate" xml:space="preserve">
     <value>Activate on grab</value>
   </data>
@@ -218,9 +230,6 @@
   </data>
   <data name="GrabDialog.Intro" xml:space="preserve">
     <value>When a process from the following list starts to run, its console window can be "grabbed" and become a tab. You need to be running as admin to grab admin processes.</value>
-  </data>
-  <data name="GrabDialog_GrabTooltip" xml:space="preserve">
-    <value>Automatically grabs an externally run console app into a tab. The list above determines which consoles are grabbed.</value>
   </data>
   <data name="ImportDialog.ChoiceAdd" xml:space="preserve">
     <value>Add to existing</value>
@@ -421,6 +430,9 @@ Visual Studio=https://visualstudio.microsoft.com</value>
   </data>
   <data name="SettingsDialog.Title" xml:space="preserve">
     <value>Settings</value>
+  </data>
+  <data name="SettingsTabType.Colors" xml:space="preserve">
+    <value>Colors</value>
   </data>
   <data name="SettingsTabType.Consoles" xml:space="preserve">
     <value>Consoles</value>
