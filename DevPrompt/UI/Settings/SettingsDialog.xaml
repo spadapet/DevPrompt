@@ -8,6 +8,7 @@
         xmlns:conv="clr-namespace:DevPrompt.Utility.Converters"
         xmlns:control="clr-namespace:DevPrompt.UI.Controls"
         xmlns:local="clr-namespace:DevPrompt"
+        xmlns:uis="clr-namespace:DevPrompt.UI.Settings"
         mc:Ignorable="d"
         Title="{x:Static local:Resources.SettingsDialog_Title}"
         Width="700"
@@ -24,7 +25,7 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="SettingsStyles.xaml" />
+                <uis:SettingsStyles />
             </ResourceDictionary.MergedDictionaries>
             <conv:BoolToNegativeConverter x:Key="BoolToNegative" />
         </ResourceDictionary>

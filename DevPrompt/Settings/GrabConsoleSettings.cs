@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization;
+using System.Windows.Media;
 
 namespace DevPrompt.Settings
 {
@@ -16,6 +17,7 @@ namespace DevPrompt.Settings
         private string exeName;
         private string tabName;
         private bool tabActivate;
+        private Color themeKeyColor;
 
         public GrabConsoleSettings()
         {
@@ -29,6 +31,7 @@ namespace DevPrompt.Settings
             this.exeName = copyFrom.exeName;
             this.tabName = copyFrom.tabName;
             this.tabActivate = copyFrom.tabActivate;
+            this.themeKeyColor = copyFrom.themeKeyColor;
         }
 
         public GrabConsoleSettings Clone()
@@ -40,7 +43,8 @@ namespace DevPrompt.Settings
         {
             return this.exeName == other.exeName &&
                 this.tabName == other.tabName &&
-                this.tabActivate == other.tabActivate;
+                this.tabActivate == other.tabActivate &&
+                this.themeKeyColor == other.themeKeyColor;
         }
 
         [DataMember]
@@ -69,6 +73,25 @@ namespace DevPrompt.Settings
         {
             get => this.tabActivate;
             set => this.SetPropertyValue(ref this.tabActivate, value);
+        }
+
+        [DataMember]
+        public string ThemeKeyColorString
+        {
+            get => WpfUtility.ColorToString(this.themeKeyColor);
+            set => this.ThemeKeyColor = WpfUtility.ColorFromString(value);
+        }
+
+        public Color ThemeKeyColor
+        {
+            get => this.themeKeyColor;
+            set
+            {
+                if (this.SetPropertyValue(ref this.themeKeyColor, value))
+                {
+                    this.OnPropertyChanged(nameof(this.ThemeKeyColorString));
+                }
+            }
         }
 
         public string ExpandedExeName => Environment.ExpandEnvironmentVariables(this.ExeName);

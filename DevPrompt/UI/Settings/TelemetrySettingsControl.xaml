@@ -6,11 +6,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:DevPrompt"
+    xmlns:uis="clr-namespace:DevPrompt.UI.Settings"
     mc:Ignorable="d"
     MinWidth="350" MinHeight="200" d:DesignWidth="400" d:DesignHeight="250"
     DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
     <UserControl.Resources>
-        <ResourceDictionary Source="SettingsStyles.xaml" />
+        <uis:SettingsStyles />
     </UserControl.Resources>
     <Grid Margin="10">
         <Grid.RowDefinitions>

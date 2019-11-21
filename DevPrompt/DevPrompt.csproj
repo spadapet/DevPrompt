@@ -87,6 +87,9 @@
     <Compile Include="UI\AboutDialog.xaml.cs">
       <DependentUpon>AboutDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\Settings\SettingsStyles.xaml.cs">
+      <DependentUpon>SettingsStyles.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Settings\TelemetrySettingsControl.xaml.cs">
       <DependentUpon>TelemetrySettingsControl.xaml</DependentUpon>
     </Compile>

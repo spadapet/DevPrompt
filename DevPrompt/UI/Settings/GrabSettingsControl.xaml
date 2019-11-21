@@ -6,11 +6,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:DevPrompt"
+    xmlns:uis="clr-namespace:DevPrompt.UI.Settings"
     mc:Ignorable="d"
     MinWidth="350" MinHeight="200" d:DesignWidth="400" d:DesignHeight="250"
     DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
     <UserControl.Resources>
-        <ResourceDictionary Source="SettingsStyles.xaml" />
+        <uis:SettingsStyles />
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -24,7 +25,8 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="{x:Static local:Resources.GrabDialog_Header_ExeName}" Width="1*" Binding="{Binding ExeName}" />
                 <DataGridTextColumn Header="{x:Static local:Resources.GrabDialog_Header_TabName}" Width="1*" Binding="{Binding TabName}" />
-                <DataGridCheckBoxColumn Header="{x:Static local:Resources.GrabDialog_Header_Activate}" Width="1*" Binding="{Binding TabActivate}" />
+                <DataGridCheckBoxColumn Header="{x:Static local:Resources.GrabDialog_Header_Activate}" Width="100" Binding="{Binding TabActivate}" />
+                <DataGridTemplateColumn Header="{x:Static local:Resources.ConsoleDialog_Header_Color}" Width="55" CellTemplate="{StaticResource ColorCellTemplate}" CellEditingTemplate="{StaticResource ColorCellEditingTemplate}" CellStyle="{StaticResource DataGridCellComboStyle}" />
             </DataGrid.Columns>
         </DataGrid>
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10">

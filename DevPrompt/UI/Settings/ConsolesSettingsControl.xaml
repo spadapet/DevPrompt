@@ -9,80 +9,19 @@
     xmlns:settings="clr-namespace:DevPrompt.Settings"
     xmlns:uisettings="clr-namespace:DevPrompt.UI.Settings"
     xmlns:core="clr-namespace:System;assembly=mscorlib"
-    xmlns:pw="dev://DevPrompt.ProcessWorkspace"
     mc:Ignorable="d"
     MinWidth="350" MinHeight="200" d:DesignWidth="650" d:DesignHeight="250"
     DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="SettingsStyles.xaml" />
+                <uisettings:SettingsStyles />
             </ResourceDictionary.MergedDictionaries>
-
-            <pw:ColorToBrushConverter x:Key="ColorToBrush" />
-            <pw:NullToCollapsedConverter x:Key="NullToCollapsed" />
-            <pw:KeyColorTemplateSelector x:Key="KeyColorTemplateSelector">
-                <pw:KeyColorTemplateSelector.ColorTemplate>
-                    <DataTemplate DataType="Color">
-                        <Border
-                            BorderThickness="1"
-                            Visibility="{Binding Converter={StaticResource NullToCollapsed}}"
-                            BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}"
-                            Background="{Binding Converter={StaticResource ColorToBrush}}" />
-                    </DataTemplate>
-                </pw:KeyColorTemplateSelector.ColorTemplate>
-                <pw:KeyColorTemplateSelector.DefaultTemplate>
-                    <DataTemplate DataType="Color">
-                        <Border BorderThickness="1" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
-                            <Viewbox Stretch="Fill" StretchDirection="Both">
-                                <Canvas Width="58" Height="18">
-                                    <Line X1="0" X2="58" Y1="0" Y2="18" StrokeThickness="1" Stroke="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" />
-                                    <Line X1="0" X2="58" Y1="18" Y2="0" StrokeThickness="1" Stroke="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" />
-                                </Canvas>
-                            </Viewbox>
-                        </Border>
-                    </DataTemplate>
-                </pw:KeyColorTemplateSelector.DefaultTemplate>
-            </pw:KeyColorTemplateSelector>
-
             <ObjectDataProvider x:Key="ConsoleTypeEnum" MethodName="GetValues" ObjectType="{x:Type core:Enum}">
                 <ObjectDataProvider.MethodParameters>
                     <x:Type Type="settings:ConsoleType"/>
                 </ObjectDataProvider.MethodParameters>
             </ObjectDataProvider>
-
-            <Style x:Key="DataGridCellComboStyle" TargetType="DataGridCell">
-                <EventSetter Event="KeyDown" Handler="OnComboCellKeyDown" />
-            </Style>
-
-            <DataTemplate x:Key="ColorCellTemplate" DataType="{x:Type settings:ConsoleSettings}">
-                <ContentControl
-                    Focusable="False"
-                    HorizontalContentAlignment="Stretch"
-                    VerticalContentAlignment="Stretch"
-                    Content="{Binding ThemeKeyColor}"
-                    ContentTemplateSelector="{StaticResource KeyColorTemplateSelector}" />
-            </DataTemplate>
-            <DataTemplate x:Key="ColorCellEditingTemplate" DataType="{x:Type settings:ConsoleSettings}">
-                <ComboBox
-                    ItemsSource="{Binding ViewModel.TabThemeKeys, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type uisettings:ConsolesSettingsControl}}}"
-                    ItemTemplateSelector="{StaticResource KeyColorTemplateSelector}"
-                    SelectedItem="{Binding ThemeKeyColor}"
-                    Padding="2"
-                    Height="18"
-                    HorizontalContentAlignment="Stretch"
-                    VerticalContentAlignment="Stretch"
-                    Loaded="OnColorComboBoxLoaded">
-                    <ComboBox.ItemContainerStyle>
-                        <Style TargetType="ComboBoxItem">
-                            <Setter Property="Width" Value="60" />
-                            <Setter Property="Height" Value="20" />
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                            <Setter Property="VerticalContentAlignment" Value="Stretch" />
-                        </Style>
-                    </ComboBox.ItemContainerStyle>
-                </ComboBox>
-            </DataTemplate>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>

@@ -635,7 +635,20 @@ namespace DevPrompt.Settings
                 }
             }
 
-            return !string.IsNullOrEmpty(path) ? Path.GetFileName(path) : "Tab";
+            return !string.IsNullOrEmpty(path) ? Path.GetFileName(path) : Resources.Grab_DefaultTabName;
+        }
+
+        Color Api.IAppSettings.GetDefaultTabTheme(string path)
+        {
+            foreach (GrabConsoleSettings grab in this.GrabConsoles)
+            {
+                if (grab.CanGrab(path))
+                {
+                    return grab.ThemeKeyColor;
+                }
+            }
+
+            return default;
         }
 
         [OnDeserializing]

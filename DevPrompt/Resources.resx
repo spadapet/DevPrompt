@@ -201,6 +201,9 @@
   <data name="Exception.WrongDispatcherThread" xml:space="preserve">
     <value>Using Dispatcher from the wrong thread</value>
   </data>
+  <data name="Grab.DefaultTabName" xml:space="preserve">
+    <value>Tab</value>
+  </data>
   <data name="GrabDialog.AutoGrab" xml:space="preserve">
     <value>Auto grab</value>
   </data>

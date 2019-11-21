@@ -133,13 +133,19 @@ namespace DevPrompt.Settings
         public string ThemeKeyColorString
         {
             get => WpfUtility.ColorToString(this.themeKeyColor);
-            set => this.SetPropertyValue(ref this.themeKeyColor, WpfUtility.ColorFromString(value));
+            set => this.ThemeKeyColor = WpfUtility.ColorFromString(value);
         }
 
         public Color ThemeKeyColor
         {
             get => this.themeKeyColor;
-            set => this.SetPropertyValue(ref this.themeKeyColor, value);
+            set
+            {
+                if (this.SetPropertyValue(ref this.themeKeyColor, value))
+                {
+                    this.OnPropertyChanged(nameof(this.ThemeKeyColorString));
+                }
+            }
         }
 
         public static string GetExecutable(ConsoleType type)

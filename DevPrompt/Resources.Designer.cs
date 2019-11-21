@@ -313,6 +313,15 @@ namespace DevPrompt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Tab.
+        /// </summary>
+        public static string Grab_DefaultTabName {
+            get {
+                return ResourceManager.GetString("Grab.DefaultTabName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Auto grab.
         /// </summary>
         public static string GrabDialog_AutoGrab {

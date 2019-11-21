@@ -4,6 +4,7 @@ using DevPrompt.UI.ViewModels;
 using DevPrompt.Utility;
 using System.Collections.Specialized;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace DevPrompt.UI.Settings
 {

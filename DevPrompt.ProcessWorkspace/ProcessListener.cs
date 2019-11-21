@@ -32,7 +32,8 @@ namespace DevPrompt.ProcessWorkspace
                 {
                     ProcessTab tab = new ProcessTab(window, workspace, process)
                     {
-                        RawName = this.app.Settings.GetDefaultTabName(path)
+                        RawName = this.app.Settings.GetDefaultTabName(path),
+                        ThemeKeyColor = this.app.Settings.GetDefaultTabTheme(path),
                     };
 
                     TabVM tabVM = workspace.Tabs.OfType<TabVM>().FirstOrDefault(t => t.TakeRestoredTab(tab));
