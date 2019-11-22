@@ -4,6 +4,7 @@ using DevPrompt.UI.ViewModels;
 using DevPrompt.Utility;
 using System;
 using System.Collections.Specialized;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -69,14 +70,13 @@ namespace DevPrompt.UI.Settings
             }
         }
 
-        private class WindowWrapper : System.Windows.Forms.IWin32Window
+        private class WindowInterop : System.Windows.Forms.IWin32Window, IWin32Window
         {
-            private Window window;
-            IntPtr System.Windows.Forms.IWin32Window.Handle => new WindowInteropHelper(this.window).Handle;
+            public IntPtr Handle { get; }
 
-            public WindowWrapper(Window window)
+            public WindowInterop(Window window)
             {
-                this.window = window;
+                this.Handle = new WindowInteropHelper(window).Handle;
             }
         }
 
@@ -100,15 +100,20 @@ namespace DevPrompt.UI.Settings
 
             public bool ShowDialog(Window window)
             {
-                return this.ShowDialog(new WindowWrapper(window)) == System.Windows.Forms.DialogResult.OK;
+                return this.ShowDialog(new WindowInterop(window)) == System.Windows.Forms.DialogResult.OK;
             }
 
             protected override IntPtr HookProc(IntPtr hwnd, int msg, IntPtr wparam, IntPtr lparam)
             {
+                // Don't let the base class center the dialog on the screen, but still have to do the other work that it does for WM_INITDIALOG
                 if (msg == ColorDialog.WM_INITDIALOG)
                 {
-                    // For some reason the base class centers the dialog on the screen and then sets focus. I only want to set focus.
-                    ColorDialog.SetFocus(hwnd);
+                    if (typeof(System.Windows.Forms.CommonDialog).GetField("defaultControlHwnd", BindingFlags.Instance | BindingFlags.NonPublic) is FieldInfo defaultControlHwndField)
+                    {
+                        defaultControlHwndField.SetValue(this, wparam);
+                    }
+
+                    ColorDialog.SetFocus(wparam);
                     return IntPtr.Zero;
                 }
 
