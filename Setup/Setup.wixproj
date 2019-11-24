@@ -7,7 +7,7 @@
         <ProductVersion>3.10</ProductVersion>
         <ProjectGuid>9951a19f-7e8d-45d9-b06b-5c9a4865e9fc</ProjectGuid>
         <SchemaVersion>2.0</SchemaVersion>
-        <OutputName>DevPrompt</OutputName>
+        <OutputName>DevPrompt.$(DevPromptVersion)</OutputName>
         <OutputType>Package</OutputType>
         <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
         <WixTargetsPath Condition=" !Exists('$(WixTargetsPath)') ">$(MSBuildProgramFiles32)\MSBuild\Microsoft\WiX\v3.x\wix.targets</WixTargetsPath>
@@ -56,19 +56,23 @@
             <CopyFile Include="$(Bin32)Dev*32.exe" />
             <NuGetFile Include="$(Bin64)*.nupkg" />
         </ItemGroup>
+        
+        <PropertyGroup>
+            <OutputPathDevPrompt>$(OutputPath)DevPrompt.$(DevPromptVersion)</OutputPathDevPrompt>
+            <OutputPathSymbols>$(OutputPath)Symbols.$(DevPromptVersion)</OutputPathSymbols>
+        </PropertyGroup>
 
-        <MakeDir Directories="$(OutputPath)DevPrompt" />
-        <Copy DestinationFolder="$(OutputPath)DevPrompt" SourceFiles="@(CopyFile)" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" />
-        <ZipDirectory DestinationFile="$(OutputPath)DevPrompt.zip" SourceDirectory="$(OutputPath)DevPrompt" Overwrite="true" />
+        <MakeDir Directories="$(OutputPathDevPrompt)" />
+        <Copy DestinationFolder="$(OutputPathDevPrompt)" SourceFiles="@(CopyFile)" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" />
+        <ZipDirectory DestinationFile="$(OutputPath)DevPrompt.$(DevPromptVersion).zip" SourceDirectory="$(OutputPathDevPrompt)" Overwrite="true" />
 
-        <MakeDir Directories="$(OutputPath)Symbols" />
-        <Copy DestinationFolder="$(OutputPath)Symbols" SourceFiles="@(SymbolFile)" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" />
-        <ZipDirectory DestinationFile="$(OutputPath)DevPrompt.$(DevPromptVersion).Symbols.zip" SourceDirectory="$(OutputPath)Symbols" Overwrite="true" />
+        <MakeDir Directories="$(OutputPathSymbols)" />
+        <Copy DestinationFolder="$(OutputPathSymbols)" SourceFiles="@(SymbolFile)" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" />
+        <ZipDirectory DestinationFile="$(OutputPath)DevPrompt.$(DevPromptVersion).Symbols.zip" SourceDirectory="$(OutputPathSymbols)" Overwrite="true" />
 
         <Exec Condition=" '$(DevPromptPfxPassword)' != '' And '$(DevPromptPfxFile)' != '' And Exists('$(DevPromptPfxFile)')"
-              Command="signtool.exe sign /f &quot;$(DevPromptPfxFile)&quot; /p $(DevPromptPfxPassword) /t http://timestamp.digicert.com &quot;$(OutputPath)en-us\DevPrompt.msi&quot;" />
-        <Copy SourceFiles="$(OutputPath)en-us\DevPrompt.msi" DestinationFolder="$(OutputPath)" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" />
-        <Copy SourceFiles="$(OutputPath)DevPrompt.msi" DestinationFiles="$(OutputPath)DevPrompt.$(DevPromptVersion).msi" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" />
+              Command="signtool.exe sign /f &quot;$(DevPromptPfxFile)&quot; /p $(DevPromptPfxPassword) /t http://timestamp.digicert.com &quot;$(TargetPath)&quot;" />
+        <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(OutputPath)DevPrompt.$(DevPromptVersion).msi" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" />
         <Copy SourceFiles="@(NuGetFile)" DestinationFolder="$(OutputPath)" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" />
     </Target>
 </Project>
