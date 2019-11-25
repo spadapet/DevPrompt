@@ -23,7 +23,7 @@ namespace DevPrompt.UI.Settings
             this.MoveUpCommand = CommandUtility.CreateMoveUpCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableGrabConsoles);
             this.MoveDownCommand = CommandUtility.CreateMoveDownCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableGrabConsoles);
             this.DeleteCommand = CommandUtility.CreateDeleteCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableGrabConsoles);
-            this.ResetCommand = CommandUtility.CreateResetCommand((s) => s.GrabConsoles, this.ViewModel.Settings.ObservableGrabConsoles, AppSettings.DefaultSettingsFilter.Grabs);
+            this.ResetCommand = CommandUtility.CreateResetCommand(s => s.ObservableGrabConsoles, this.ViewModel.Settings, AppSettings.DefaultSettingsFilter.Grabs);
 
             this.InitializeComponent();
         }

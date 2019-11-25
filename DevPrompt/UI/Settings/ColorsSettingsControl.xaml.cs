@@ -31,7 +31,7 @@ namespace DevPrompt.UI.Settings
             this.MoveUpCommand = CommandUtility.CreateMoveUpCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableTabThemes);
             this.MoveDownCommand = CommandUtility.CreateMoveDownCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableTabThemes);
             this.DeleteCommand = CommandUtility.CreateDeleteCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableTabThemes);
-            this.ResetCommand = CommandUtility.CreateResetCommand((s) => s.TabThemes, this.ViewModel.Settings.ObservableTabThemes, AppSettings.DefaultSettingsFilter.TabThemeKeys);
+            this.ResetCommand = CommandUtility.CreateResetCommand(s => s.ObservableTabThemes, this.ViewModel.Settings, AppSettings.DefaultSettingsFilter.TabThemeKeys);
 
             this.InitializeComponent();
         }

@@ -178,10 +178,10 @@
     <value>Restore tabs at startup</value>
   </data>
   <data name="ConsoleDialog.ShowVsPrompts" xml:space="preserve">
-    <value>Show VS developer commands prompts</value>
+    <value>Include VS developer command prompts in the File menu</value>
   </data>
   <data name="ConsoleDialog.ShowVsPromptsTooltip" xml:space="preserve">
-    <value>Shows installed Visual Studio developer command prompts after your custom command prompts</value>
+    <value>Shows installed Visual Studio developer command prompts after your custom command prompts in the File menu</value>
   </data>
   <data name="Dialog.Cancel" xml:space="preserve">
     <value>Cancel</value>

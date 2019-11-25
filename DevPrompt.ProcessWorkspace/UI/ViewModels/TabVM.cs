@@ -73,6 +73,7 @@ namespace DevPrompt.ProcessWorkspace.UI.ViewModels
                 this.OnPropertyChanged(nameof(this.Name));
                 this.OnPropertyChanged(nameof(this.Tooltip));
                 this.OnPropertyChanged(nameof(this.ContextMenuItems));
+                this.OnPropertyChanged(nameof(this.ThemeKeyColor));
                 this.OnPropertyChanged(nameof(this.ForegroundSelectedBrush));
                 this.OnPropertyChanged(nameof(this.ForegroundUnselectedBrush));
                 this.OnPropertyChanged(nameof(this.BackgroundSelectedBrush));
@@ -107,6 +108,11 @@ namespace DevPrompt.ProcessWorkspace.UI.ViewModels
             if (all || args.PropertyName == nameof(Api.ITab.ContextMenuItems))
             {
                 this.OnPropertyChanged(nameof(this.ContextMenuItems));
+            }
+
+            if (all || args.PropertyName == nameof(Api.ITabThemeKey.ThemeKeyColor))
+            {
+                this.OnPropertyChanged(nameof(this.ThemeKeyColor));
             }
 
             if (all || args.PropertyName == nameof(Api.ITabTheme.BackgroundSelectedBrush))

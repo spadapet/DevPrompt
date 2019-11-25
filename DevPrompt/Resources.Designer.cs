@@ -241,7 +241,7 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Show VS developer commands prompts.
+        ///   Looks up a localized string similar to Include VS developer command prompts in the File menu.
         /// </summary>
         public static string ConsoleDialog_ShowVsPrompts {
             get {
@@ -250,7 +250,7 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Shows installed Visual Studio developer command prompts after your custom command prompts.
+        ///   Looks up a localized string similar to Shows installed Visual Studio developer command prompts after your custom command prompts in the File menu.
         /// </summary>
         public static string ConsoleDialog_ShowVsPromptsTooltip {
             get {

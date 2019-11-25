@@ -23,7 +23,7 @@ namespace DevPrompt.UI.Settings
             this.MoveUpCommand = CommandUtility.CreateMoveUpCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableTools);
             this.MoveDownCommand = CommandUtility.CreateMoveDownCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableTools);
             this.DeleteCommand = CommandUtility.CreateDeleteCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableTools);
-            this.ResetCommand = CommandUtility.CreateResetCommand((s) => s.Tools, this.ViewModel.Settings.ObservableTools, AppSettings.DefaultSettingsFilter.Tools);
+            this.ResetCommand = CommandUtility.CreateResetCommand(s => s.ObservableTools, this.ViewModel.Settings, AppSettings.DefaultSettingsFilter.Tools);
 
             this.InitializeComponent();
         }

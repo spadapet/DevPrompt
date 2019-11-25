@@ -29,6 +29,7 @@ namespace DevPrompt
         public HttpClientHelper HttpClient { get; }
         public Telemetry Telemetry { get; private set; }
         public PluginState PluginState { get; private set; }
+        public UpdateState UpdateState { get; private set; }
         public NativeApp NativeApp { get; private set; }
 
         private enum RunningState { Run, RestartWindow, RestartApp, ShutDown }
@@ -50,6 +51,7 @@ namespace DevPrompt
             this.Settings = new AppSettings();
             this.HttpClient = new HttpClientHelper();
             this.PluginState = new PluginState(this);
+            this.UpdateState = new UpdateState(this);
 
             this.Startup += this.OnStartup;
             this.Exit += this.OnExit;
@@ -63,6 +65,7 @@ namespace DevPrompt
             this.Settings.PropertyChanged -= this.OnSettingsPropertyChanged;
             this.Settings.CollectionChanged -= this.OnSettingsPropertyChanged;
 
+            this.UpdateState.Dispose();
             this.PluginState.Dispose();
             this.HttpClient.Dispose();
             this.NativeApp?.Dispose();
@@ -103,7 +106,7 @@ namespace DevPrompt
                 listener.OnStartup(this);
             }
 
-            AppSnapshot snapshot = await AppSnapshot.Load(this, AppSnapshot.DefaultPath);
+            AppSnapshot snapshot = await AppSnapshot.Load(this, AppSnapshot.DefaultSnapshotFile);
             this.MainWindow?.InitWorkspaces(snapshot);
 
             foreach (Api.IAppListener listener in this.PluginState.AppListeners)
@@ -113,6 +116,8 @@ namespace DevPrompt
                     listener.OnOpened(this, window);
                 }
             }
+
+            this.UpdateState.Start();
 
             TimeSpan pluginInitTime = timer.GetElapsedTimeAndStop();
 
@@ -181,7 +186,7 @@ namespace DevPrompt
         {
             if (this.settingsState == SettingsState.None)
             {
-                AppSettings settings = await AppSettings.Load(this, AppSettings.DefaultPath);
+                AppSettings settings = await AppSettings.Load(this, AppSettings.SettingsFile);
                 this.Settings.CopyFrom(settings);
 
                 this.Settings.PropertyChanged += this.OnSettingsPropertyChanged;
@@ -193,7 +198,7 @@ namespace DevPrompt
         {
             if (this.customSettingsState == SettingsState.None)
             {
-                AppCustomSettings customSettings = await AppSettings.LoadCustom(this, AppSettings.DefaultCustomPath);
+                AppCustomSettings customSettings = await AppSettings.LoadCustom(this, AppSettings.CustomSettingsFile);
                 this.Settings.CopyFrom(customSettings);
             }
         }

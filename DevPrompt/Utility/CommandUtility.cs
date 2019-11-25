@@ -77,18 +77,41 @@ namespace DevPrompt.Utility
             });
         }
 
-        public static DelegateCommand CreateResetCommand<T>(Func<AppSettings, IList<T>> newListAccessor, ObservableCollection<T> items, AppSettings.DefaultSettingsFilter filter)
+        public static DelegateCommand CreateResetCommand<T>(Func<AppSettings, ObservableCollection<T>> itemsAccessor, AppSettings settings, AppSettings.DefaultSettingsFilter filter)
         {
             return new DelegateCommand(() =>
             {
+                ObservableCollection<T> list = itemsAccessor(settings);
+                list.Clear();
+
                 AppSettings defaultSettings = AppSettings.GetDefaultSettings(filter);
-                IList<T> newList = newListAccessor(defaultSettings);
-
-                items.Clear();
-
-                foreach (T newItem in newList)
+                foreach (T newItem in itemsAccessor(defaultSettings))
                 {
-                    items.Add(newItem);
+                    list.Add(newItem);
+                }
+            });
+        }
+
+        public static DelegateCommand CreateConsolesResetCommand(AppSettings settings, AppSettings.DefaultSettingsFilter filter)
+        {
+            return new DelegateCommand(async () =>
+            {
+                ObservableCollection <ConsoleSettings> list = settings.ObservableConsoles;
+                list.Clear();
+
+                AppSettings defaultSettings = AppSettings.GetDefaultSettings(filter);
+                foreach (ConsoleSettings newItem in defaultSettings.ObservableConsoles)
+                {
+                    list.Add(newItem);
+                }
+
+                if (!settings.ShowVisualStudioPrompts)
+                {
+                    foreach (ConsoleSettings newItem in await AppSettings.GetVisualStudioConsolesAsync())
+                    {
+                        newItem.RunAtStartup = false;
+                        list.Add(newItem);
+                    }
                 }
             });
         }

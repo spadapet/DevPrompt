@@ -106,9 +106,9 @@ namespace DevPrompt.Plugins
 
                 try
                 {
-                    if (Directory.Exists(AppSettings.DefaultNuGetPath))
+                    if (Directory.Exists(AppSettings.NuGetPluginsPath))
                     {
-                        foreach (string path in Directory.GetDirectories(AppSettings.DefaultNuGetPath, "*", SearchOption.TopDirectoryOnly))
+                        foreach (string path in Directory.GetDirectories(AppSettings.NuGetPluginsPath, "*", SearchOption.TopDirectoryOnly))
                         {
                             string id = Path.GetFileName(path);
                             if (pluginMap.TryGetValue(id, out NuGetPluginSettings plugin) && plugin.IsInstalled)
@@ -137,9 +137,9 @@ namespace DevPrompt.Plugins
                         }
 
                         // Deleted the last plugin
-                        if (!Directory.EnumerateFileSystemEntries(AppSettings.DefaultNuGetPath).Any())
+                        if (!Directory.EnumerateFileSystemEntries(AppSettings.NuGetPluginsPath).Any())
                         {
-                            Directory.Delete(AppSettings.DefaultNuGetPath, recursive: true);
+                            Directory.Delete(AppSettings.NuGetPluginsPath, recursive: true);
                         }
                     }
                 }

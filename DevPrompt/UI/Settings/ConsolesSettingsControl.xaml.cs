@@ -23,7 +23,7 @@ namespace DevPrompt.UI.Settings
             this.MoveUpCommand = CommandUtility.CreateMoveUpCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableConsoles);
             this.MoveDownCommand = CommandUtility.CreateMoveDownCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableConsoles);
             this.DeleteCommand = CommandUtility.CreateDeleteCommand(() => this.dataGrid, this.ViewModel.Settings.ObservableConsoles);
-            this.ResetCommand = CommandUtility.CreateResetCommand((s) => s.Consoles, this.ViewModel.Settings.ObservableConsoles, AppSettings.DefaultSettingsFilter.InternalDevPrompts | AppSettings.DefaultSettingsFilter.RawPrompts);
+            this.ResetCommand = CommandUtility.CreateConsolesResetCommand(this.ViewModel.Settings, AppSettings.DefaultSettingsFilter.InternalDevPrompts | AppSettings.DefaultSettingsFilter.RawPrompts);
 
             this.InitializeComponent();
         }

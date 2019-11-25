@@ -143,9 +143,10 @@ namespace DevPrompt.Settings
         }
 
         private static string ExeName => Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().Location);
-        public static string DefaultPath => Path.Combine(AppSettings.AppDataPath, "Settings.xml");
-        public static string DefaultCustomPath => Path.Combine(AppSettings.AppDataPath, "Settings.Custom.xml");
-        public static string DefaultNuGetPath => Path.Combine(AppSettings.AppDataPath, "Plugins.NuGet");
+        public static string SettingsFile => Path.Combine(AppSettings.AppDataPath, "Settings.xml");
+        public static string CustomSettingsFile => Path.Combine(AppSettings.AppDataPath, "Settings.Custom.xml");
+        public static string NuGetPluginsPath => Path.Combine(AppSettings.AppDataPath, "Plugins.NuGet");
+        public static string UpdateCachePath => Path.Combine(AppSettings.AppDataPath, "UpdateCache");
 
         [Flags]
         public enum DefaultSettingsFilter
@@ -489,8 +490,8 @@ namespace DevPrompt.Settings
 
                         if (string.IsNullOrEmpty(path))
                         {
-                            path = AppSettings.DefaultPath;
-                            customPath = AppSettings.DefaultCustomPath;
+                            path = AppSettings.SettingsFile;
+                            customPath = AppSettings.CustomSettingsFile;
                         }
 
                         if (Directory.CreateDirectory(Path.GetDirectoryName(path)) != null)

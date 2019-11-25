@@ -175,7 +175,7 @@ namespace DevPrompt.Settings
 
         public bool IsInstalled => this.installedInfo != null;
         public string InstalledVersion => this.installedInfo?.Version ?? string.Empty;
-        public string InstalledRootPath => !string.IsNullOrEmpty(this.Id) ? Path.Combine(AppSettings.DefaultNuGetPath, this.Id) : string.Empty;
+        public string InstalledRootPath => !string.IsNullOrEmpty(this.Id) ? Path.Combine(AppSettings.NuGetPluginsPath, this.Id) : string.Empty;
         public string InstalledVersionPath => this.GetInstallPath(this.InstalledVersion);
 
         public string GetInstallPath(string version)

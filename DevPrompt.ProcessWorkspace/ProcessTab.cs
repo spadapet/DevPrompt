@@ -34,6 +34,7 @@ namespace DevPrompt.UI.ViewModels
         public Api.IProcess Process { get; }
 
         private Api.IAppSettings Settings => this.window.App.Settings;
+        private Api.ITelemetry Telemetry => this.window.App.Telemetry;
         private readonly Api.IWindow window;
         private readonly Api.IProcessWorkspace workspace;
         private Color themeKeyColor;
@@ -111,7 +112,7 @@ namespace DevPrompt.UI.ViewModels
 
         public void OnSetTabName()
         {
-            this.window.App.Telemetry.TrackEvent("ProcessTab.SetTabName");
+            this.Telemetry.TrackEvent("ProcessTab.SetTabName");
 
             TabNameDialogVM viewModel = new TabNameDialogVM(this.window.App.Settings, this.RawName, this.ThemeKeyColor);
             TabNameDialog dialog = new TabNameDialog(viewModel)
@@ -122,7 +123,19 @@ namespace DevPrompt.UI.ViewModels
             if (dialog.ShowDialog() == true)
             {
                 this.RawName = viewModel.Name;
-                this.ThemeKeyColor = viewModel.ThemeKeyColor;
+                this.UserSetThemeKeyColor(viewModel.ThemeKeyColor, "TabNameDialog");
+            }
+        }
+
+        public void UserSetThemeKeyColor(Color color, string source)
+        {
+            if (this.ThemeKeyColor != color)
+            {
+                this.ThemeKeyColor = color;
+                this.Telemetry.TrackEvent("ProcessTab.SetTabColor", new Dictionary<string, object>()
+                {
+                    { "Source", source },
+                });
             }
         }
 
@@ -148,25 +161,25 @@ namespace DevPrompt.UI.ViewModels
 
         public void OnClone()
         {
-            this.window.App.Telemetry.TrackEvent("ProcessTab.Clone");
+            this.Telemetry.TrackEvent("ProcessTab.Clone");
             this.workspace.CloneProcess(this, this.RawName, this.ThemeKeyColor);
         }
 
         public void OnDetach()
         {
-            this.window.App.Telemetry.TrackEvent("ProcessTab.Detach");
+            this.Telemetry.TrackEvent("ProcessTab.Detach");
             this.Process.Detach();
         }
 
         public void OnConsoleDefaults()
         {
-            this.window.App.Telemetry.TrackEvent("ProcessTab.ConsoleDefaults");
+            this.Telemetry.TrackEvent("ProcessTab.ConsoleDefaults");
             this.Process.RunCommand(Api.ProcessCommand.DefaultsDialog);
         }
 
         public void OnConsoleProperties()
         {
-            this.window.App.Telemetry.TrackEvent("ProcessTab.ConsoleProperties");
+            this.Telemetry.TrackEvent("ProcessTab.ConsoleProperties");
             this.Process.RunCommand(Api.ProcessCommand.PropertiesDialog);
         }
 
@@ -294,7 +307,7 @@ namespace DevPrompt.UI.ViewModels
                         {
                             HeaderTemplate = colorHeaderTemplate,
                             Header = new TabThemeVM(text, themeKey.ThemeKeyColor, theme),
-                            Command = new DelegateCommand(() => this.ThemeKeyColor = themeKey.ThemeKeyColor),
+                            Command = new DelegateCommand(() => this.UserSetThemeKeyColor(this.ThemeKeyColor, "ContextMenu")),
                         });
                     }
                 }
