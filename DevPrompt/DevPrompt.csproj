@@ -145,7 +145,7 @@
     <Compile Include="Settings\AppSettings.cs" />
     <Compile Include="Utility\Telemetry.cs" />
     <Compile Include="Utility\TimerUtility.cs" />
-    <Compile Include="Utility\UpdateState.cs" />
+    <Compile Include="Utility\AppUpdate.cs" />
     <Compile Include="Utility\VisualStudioSetup.cs" />
     <Compile Include="Utility\WorkspaceCommandWrapper.cs" />
     <Page Include="UI\Controls\InfoBar.xaml">

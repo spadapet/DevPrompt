@@ -29,7 +29,7 @@ namespace DevPrompt
         public HttpClientHelper HttpClient { get; }
         public Telemetry Telemetry { get; private set; }
         public PluginState PluginState { get; private set; }
-        public UpdateState UpdateState { get; private set; }
+        public AppUpdate AppUpdate { get; private set; }
         public NativeApp NativeApp { get; private set; }
 
         private enum RunningState { Run, RestartWindow, RestartApp, ShutDown }
@@ -51,7 +51,7 @@ namespace DevPrompt
             this.Settings = new AppSettings();
             this.HttpClient = new HttpClientHelper();
             this.PluginState = new PluginState(this);
-            this.UpdateState = new UpdateState(this);
+            this.AppUpdate = new AppUpdate(this);
 
             this.Startup += this.OnStartup;
             this.Exit += this.OnExit;
@@ -65,7 +65,7 @@ namespace DevPrompt
             this.Settings.PropertyChanged -= this.OnSettingsPropertyChanged;
             this.Settings.CollectionChanged -= this.OnSettingsPropertyChanged;
 
-            this.UpdateState.Dispose();
+            this.AppUpdate.Dispose();
             this.PluginState.Dispose();
             this.HttpClient.Dispose();
             this.NativeApp?.Dispose();
@@ -117,7 +117,7 @@ namespace DevPrompt
                 }
             }
 
-            this.UpdateState.Start();
+            this.AppUpdate.Start();
 
             TimeSpan pluginInitTime = timer.GetElapsedTimeAndStop();
 
@@ -395,6 +395,7 @@ namespace DevPrompt
         }
 
         Api.IAppSettings Api.IApp.Settings => this.Settings;
+        Api.IAppUpdate Api.IApp.AppUpdate => this.AppUpdate;
         Api.ITelemetry Api.IApp.Telemetry => this.Telemetry;
         Api.IWindow Api.IApp.ActiveWindow => this.MainWindow?.ViewModel;
         bool Api.IApp.IsElevated => Program.IsElevated;

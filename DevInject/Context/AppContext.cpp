@@ -13,13 +13,12 @@ static HANDLE findMainWindowThread = nullptr;
 static std::mutex ownerPipeMutex;
 static Pipe ownerPipe;
 
-static void SendToOwner(const Json::Dict& message)
+static bool SendToOwner(const Json::Dict& message)
 {
     std::scoped_lock<std::mutex> lock(::ownerPipeMutex);
-    if (::ownerPipe)
-    {
-        ::ownerPipe.Send(message);
-    }
+    bool success = ::ownerPipe && ::ownerPipe.Send(message);
+    assert(success);
+    return success;
 }
 
 // A thread that listens for commands coming from the owner process, and responds to them

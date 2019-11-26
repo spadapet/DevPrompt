@@ -39,6 +39,7 @@ namespace DevPrompt.Settings
         private bool telemetryEnabled;
         private bool pluginsChanged;
         private bool hasDefaultThemeKeys;
+        private bool checkForUpdates;
         private static readonly object fileLock = new object();
 
         public AppSettings()
@@ -584,6 +585,13 @@ namespace DevPrompt.Settings
             set => this.SetPropertyValue(ref this.hasDefaultThemeKeys, value);
         }
 
+        [DataMember]
+        public bool CheckForUpdates
+        {
+            get => this.checkForUpdates;
+            set => this.SetPropertyValue(ref this.checkForUpdates, value);
+        }
+
         // Do not persist this
         public bool PluginsChanged
         {
@@ -679,6 +687,7 @@ namespace DevPrompt.Settings
             this.showVisualStudioPrompts = true;
             this.telemetryEnabled = true;
             this.hasDefaultThemeKeys = true;
+            this.checkForUpdates = true;
         }
 
         private void OnObservableCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)

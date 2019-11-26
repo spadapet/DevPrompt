@@ -307,7 +307,7 @@ namespace DevPrompt.UI.ViewModels
                         {
                             HeaderTemplate = colorHeaderTemplate,
                             Header = new TabThemeVM(text, themeKey.ThemeKeyColor, theme),
-                            Command = new DelegateCommand(() => this.UserSetThemeKeyColor(this.ThemeKeyColor, "ContextMenu")),
+                            Command = new DelegateCommand(() => this.UserSetThemeKeyColor(themeKey.ThemeKeyColor, "ContextMenu")),
                         });
                     }
                 }

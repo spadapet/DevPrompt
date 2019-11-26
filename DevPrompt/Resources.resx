@@ -117,29 +117,20 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="About.Checking" xml:space="preserve">
-    <value>checking...</value>
-  </data>
-  <data name="About.CheckProgress" xml:space="preserve">
-    <value>Checking latest version</value>
-  </data>
   <data name="About.DownloadHere" xml:space="preserve">
-    <value>Download the latest version from here:</value>
-  </data>
-  <data name="About.Failed" xml:space="preserve">
-    <value>failed</value>
+    <value>Source code is on GitHub:</value>
   </data>
   <data name="About.IssuesLink" xml:space="preserve">
     <value>https://github.com/spadapet/DevPrompt/issues</value>
   </data>
-  <data name="About.LatestVersion" xml:space="preserve">
-    <value>Latest version:</value>
-  </data>
-  <data name="About.LatestVersionLink" xml:space="preserve">
-    <value>http://peterspada.com/DevPrompt/GetLatestVersion</value>
-  </data>
   <data name="About.Title" xml:space="preserve">
     <value>About DevPrompt</value>
+  </data>
+  <data name="AppUpdate.CheckProgress" xml:space="preserve">
+    <value>Checking latest version</value>
+  </data>
+  <data name="AppUpdate.LatestVersionLink" xml:space="preserve">
+    <value>http://peterspada.com/DevPrompt/GetLatestVersion</value>
   </data>
   <data name="ColorsDialog.Header.Color" xml:space="preserve">
     <value>Color</value>

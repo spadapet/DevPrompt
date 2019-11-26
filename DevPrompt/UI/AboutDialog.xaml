@@ -6,13 +6,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DevPrompt"
         mc:Ignorable="d"
-        Title="{x:Static local:Resources.About_Title}" Width="375" Height="250"
+        Title="{x:Static local:Resources.About_Title}" Width="375" Height="220"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         ShowInTaskbar="False"
-        Loaded="OnLoaded"
-        Unloaded="OnUnloaded"
         WindowStyle="SingleBorderWindow"
+        Loaded="OnLoaded"
         Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
     <Grid>
@@ -30,7 +29,6 @@
         <StackPanel Grid.Column="1" Margin="10" HorizontalAlignment="Left">
             <TextBlock><Bold><Run Text="DevPrompt "/></Bold><Run Text="{Binding AppVersion, Mode=OneTime}" /></TextBlock>
             <TextBlock Text="{Binding CopyrightYear, Mode=OneTime}" />
-            <TextBlock Margin="0,10,0,0"><Run Text="{x:Static local:Resources.About_LatestVersion}" /> <Bold><Run Text="{Binding AppLatestVersion, Mode=OneWay}" /></Bold></TextBlock>
             <TextBlock Margin="0,10,0,0" Text="{x:Static local:Resources.About_DownloadHere}" />
             <RichTextBox Margin="-5,0,0,10" IsReadOnly="True" BorderThickness="0" IsDocumentEnabled="True" Background="Transparent">
                 <FlowDocument PagePadding="0">

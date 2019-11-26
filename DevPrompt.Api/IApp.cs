@@ -9,6 +9,7 @@ namespace DevPrompt.Api
     public interface IApp
     {
         IAppSettings Settings { get; }
+        IAppUpdate AppUpdate { get; }
         ITelemetry Telemetry { get; }
         IWindow ActiveWindow { get; }
         IEnumerable<IWindow> Windows { get; }

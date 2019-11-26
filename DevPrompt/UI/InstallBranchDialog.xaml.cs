@@ -9,7 +9,7 @@ namespace DevPrompt.UI
 
         public InstallBranchDialog()
         {
-            this.ViewModel = new InstallBranchDialogVM(this, "d16.1");
+            this.ViewModel = new InstallBranchDialogVM(this, "master");
 
             this.InitializeComponent();
         }

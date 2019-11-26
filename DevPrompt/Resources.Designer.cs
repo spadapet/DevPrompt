@@ -61,38 +61,11 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to checking....
-        /// </summary>
-        public static string About_Checking {
-            get {
-                return ResourceManager.GetString("About.Checking", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Checking latest version.
-        /// </summary>
-        public static string About_CheckProgress {
-            get {
-                return ResourceManager.GetString("About.CheckProgress", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Download the latest version from here:.
+        ///   Looks up a localized string similar to Source code is on GitHub:.
         /// </summary>
         public static string About_DownloadHere {
             get {
                 return ResourceManager.GetString("About.DownloadHere", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to failed.
-        /// </summary>
-        public static string About_Failed {
-            get {
-                return ResourceManager.GetString("About.Failed", resourceCulture);
             }
         }
         
@@ -106,29 +79,29 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Latest version:.
+        ///   Looks up a localized string similar to About DevPrompt.
         /// </summary>
-        public static string About_LatestVersion {
+        public static string About_Title {
             get {
-                return ResourceManager.GetString("About.LatestVersion", resourceCulture);
+                return ResourceManager.GetString("About.Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Checking latest version.
+        /// </summary>
+        public static string AppUpdate_CheckProgress {
+            get {
+                return ResourceManager.GetString("AppUpdate.CheckProgress", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to http://peterspada.com/DevPrompt/GetLatestVersion.
         /// </summary>
-        public static string About_LatestVersionLink {
+        public static string AppUpdate_LatestVersionLink {
             get {
-                return ResourceManager.GetString("About.LatestVersionLink", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to About DevPrompt.
-        /// </summary>
-        public static string About_Title {
-            get {
-                return ResourceManager.GetString("About.Title", resourceCulture);
+                return ResourceManager.GetString("AppUpdate.LatestVersionLink", resourceCulture);
             }
         }
         
