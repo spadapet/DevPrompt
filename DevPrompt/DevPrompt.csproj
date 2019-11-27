@@ -130,8 +130,11 @@
     <Compile Include="UI\ViewModels\SettingsImportDialogVM.cs" />
     <Compile Include="UI\ViewModels\WorkspaceVM.cs" />
     <Compile Include="Utility\Converters\BoolToNegativeConverter.cs" />
+    <Compile Include="Utility\Converters\ErrorLevelToBrushConverter.cs" />
+    <Compile Include="Utility\Converters\HasUpdateToVisibilityConverter.cs" />
     <Compile Include="Utility\Converters\DateToVisibilityConverter.cs" />
     <Compile Include="Utility\Converters\StringToVisibilityConverter.cs" />
+    <Compile Include="Utility\FileUtility.cs" />
     <Compile Include="Utility\HashUtility.cs" />
     <Compile Include="Utility\HttpClientHelper.cs" />
     <Compile Include="Utility\NuGet\NuGetPackageVersionInfo.cs" />

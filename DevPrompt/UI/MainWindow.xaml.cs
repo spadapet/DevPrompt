@@ -216,8 +216,10 @@ namespace DevPrompt.UI
             this.AddPluginMenuItems((MenuItem)sender, Api.MenuType.Help);
         }
 
-        private void OnUpdateMenuOpened(object sender, RoutedEventArgs args)
+        private async void OnUpdateMenuOpened(object sender, RoutedEventArgs args)
         {
+            this.infoBar.Clear();
+            await this.App.AppUpdate.CheckUpdateVersionAsync();
         }
 
         /// <summary>

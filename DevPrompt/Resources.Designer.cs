@@ -97,11 +97,65 @@ namespace DevPrompt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Download file.
+        /// </summary>
+        public static string AppUpdate_DownloadDialogTitle {
+            get {
+                return ResourceManager.GetString("AppUpdate.DownloadDialogTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} file.
+        /// </summary>
+        public static string AppUpdate_DownloadFilter {
+            get {
+                return ResourceManager.GetString("AppUpdate.DownloadFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Downloading.
+        /// </summary>
+        public static string AppUpdate_Downloading {
+            get {
+                return ResourceManager.GetString("AppUpdate.Downloading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to http://peterspada.com/Download/DevPrompt?type={0}.
+        /// </summary>
+        public static string AppUpdate_LatestFileDownload {
+            get {
+                return ResourceManager.GetString("AppUpdate.LatestFileDownload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to http://peterspada.com/DevPrompt/GetLatestVersion.
         /// </summary>
         public static string AppUpdate_LatestVersionLink {
             get {
                 return ResourceManager.GetString("AppUpdate.LatestVersionLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have the latest version..
+        /// </summary>
+        public static string AppUpdate_NoUpdateAvailable {
+            get {
+                return ResourceManager.GetString("AppUpdate.NoUpdateAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An update is available. Click the &quot;up arrow&quot; on the menu bar to download the update..
+        /// </summary>
+        public static string AppUpdate_UpdateAvailable {
+            get {
+                return ResourceManager.GetString("AppUpdate.UpdateAvailable", resourceCulture);
             }
         }
         
@@ -531,11 +585,65 @@ namespace DevPrompt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to _Check for updates.
+        /// </summary>
+        public static string Menu_CheckForUpdates {
+            get {
+                return ResourceManager.GetString("Menu.CheckForUpdates", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Current version: {0}.
+        /// </summary>
+        public static string Menu_CurrentVersionFormat {
+            get {
+                return ResourceManager.GetString("Menu.CurrentVersionFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Customize....
         /// </summary>
         public static string Menu_Customize {
             get {
                 return ResourceManager.GetString("Menu.Customize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download _MSI File....
+        /// </summary>
+        public static string Menu_DownloadMsi {
+            get {
+                return ResourceManager.GetString("Menu.DownloadMsi", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This uses Windows Installer to automatically update DevPrompt (recommended).
+        /// </summary>
+        public static string Menu_DownloadMsiTooltip {
+            get {
+                return ResourceManager.GetString("Menu.DownloadMsiTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download _ZIP File....
+        /// </summary>
+        public static string Menu_DownloadZip {
+            get {
+                return ResourceManager.GetString("Menu.DownloadZip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This lets you manually unzip DevPrompt files and run from any location.
+        /// </summary>
+        public static string Menu_DownloadZipTooltip {
+            get {
+                return ResourceManager.GetString("Menu.DownloadZipTooltip", resourceCulture);
             }
         }
         
@@ -662,6 +770,24 @@ namespace DevPrompt {
         public static string Menu_Tools {
             get {
                 return ResourceManager.GetString("Menu.Tools", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update available.
+        /// </summary>
+        public static string Menu_UpdateTooltip {
+            get {
+                return ResourceManager.GetString("Menu.UpdateTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New version: {0}.
+        /// </summary>
+        public static string Menu_UpdateVersionFormat {
+            get {
+                return ResourceManager.GetString("Menu.UpdateVersionFormat", resourceCulture);
             }
         }
         

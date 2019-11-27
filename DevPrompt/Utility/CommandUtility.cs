@@ -1,7 +1,6 @@
 ﻿using DevPrompt.ProcessWorkspace.Utility;
 using DevPrompt.Settings;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -96,7 +95,7 @@ namespace DevPrompt.Utility
         {
             return new DelegateCommand(async () =>
             {
-                ObservableCollection <ConsoleSettings> list = settings.ObservableConsoles;
+                ObservableCollection<ConsoleSettings> list = settings.ObservableConsoles;
                 list.Clear();
 
                 AppSettings defaultSettings = AppSettings.GetDefaultSettings(filter);

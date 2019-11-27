@@ -7,6 +7,7 @@ namespace DevPrompt.Api
     {
         AppUpdateState State { get; }
         string UpdateVersionString { get; }
+        string CurrentVersionString { get; }
 
         Task CheckUpdateVersionAsync();
     }

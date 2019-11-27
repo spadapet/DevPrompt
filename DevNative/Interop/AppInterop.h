@@ -23,7 +23,7 @@ public:
     virtual HRESULT __stdcall GrabProcess(int id) override;
     virtual HRESULT __stdcall CreateProcessHostWindow(HWND parentHwnd, IProcessHost** obj) override;
     virtual HRESULT __stdcall MainWindowProc(HWND hwnd, int msg, WPARAM wp, LPARAM lp) override;
-
+    virtual HRESULT __stdcall GetDownloadsFolder(BSTR* processes) override;
 
 private:
     unsigned long refs;

@@ -32,6 +32,7 @@ interface IApp : IUnknown
     HRESULT GrabProcess(int id);
     HRESULT CreateProcessHostWindow(HWND parentHwnd, [out, retval] IProcessHost** obj);
     HRESULT MainWindowProc(HWND hwnd, int msg, WPARAM wp, LPARAM lp);
+    HRESULT GetDownloadsFolder(BSTR* path);
 };
 
 [object, uuid("cedddf4b-b229-4a17-8b10-140e53464efd")]

@@ -6,6 +6,7 @@
 #include <windows.h>
 #include <wrl.h>
 #include <Psapi.h>
+#include <ShlObj.h>
 #include <TlHelp32.h>
 #include <UserEnv.h>
 

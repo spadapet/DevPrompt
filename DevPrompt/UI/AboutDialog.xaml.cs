@@ -7,7 +7,7 @@ namespace DevPrompt.UI
 {
     internal partial class AboutDialog : Window
     {
-        public string AppVersion => Program.Version.ToString();
+        public string AppVersion => Program.VersionString;
         public Api.IAppUpdate AppUpdate => this.window.App.AppUpdate;
         private readonly Api.IWindow window;
 

@@ -13,6 +13,8 @@ namespace DevPrompt.UI.Controls
         public bool HasDetails => !string.IsNullOrEmpty(this.Details);
         private string text;
         private string details;
+        private Api.InfoErrorLevel errorLevel;
+        private FrameworkElement extraContent;
 
         public InfoBar()
         {
@@ -26,15 +28,49 @@ namespace DevPrompt.UI.Controls
             // If the user canceled a task, they don't need to know about it
             if (!(exception is TaskCanceledException))
             {
-                this.Text = string.IsNullOrEmpty(text) ? (exception?.Message ?? string.Empty) : text;
-                this.Details = exception?.ToString() ?? string.Empty;
+                this.SetInfo(Api.InfoErrorLevel.Error,
+                    string.IsNullOrEmpty(text) ? (exception?.Message ?? string.Empty) : text,
+                    exception?.ToString() ?? string.Empty);
+            }
+        }
+
+        public void SetInfo(Api.InfoErrorLevel level, string text, string details = null, FrameworkElement extraContent = null)
+        {
+            this.ErrorLevel = level;
+            this.Text = text ?? string.Empty;
+            this.Details = details ?? string.Empty;
+            this.ExtraContent = extraContent;
+        }
+
+        public Api.InfoErrorLevel ErrorLevel
+        {
+            get => this.errorLevel;
+            set
+            {
+                if (this.errorLevel != value)
+                {
+                    this.errorLevel = value;
+                    this.OnPropertyChanged(nameof(this.ErrorLevel));
+                }
+            }
+        }
+
+        public FrameworkElement ExtraContent
+        {
+            get => this.extraContent;
+            set
+            {
+                if (this.extraContent != value)
+                {
+                    this.extraContent = value;
+                    this.OnPropertyChanged(nameof(this.ExtraContent));
+                }
             }
         }
 
         public string Text
         {
             get => this.text;
-
             set
             {
                 if (!string.Equals(this.text, value ?? string.Empty, StringComparison.Ordinal))
@@ -49,7 +85,6 @@ namespace DevPrompt.UI.Controls
         public string Details
         {
             get => this.details;
-
             set
             {
                 if (!string.Equals(this.details, value ?? string.Empty, StringComparison.Ordinal))

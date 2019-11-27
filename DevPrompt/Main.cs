@@ -133,6 +133,7 @@ namespace DevPrompt
         public static bool IsElevated { get; }
         public static TimeSpan TimeSinceStart => Program.stopwatch.Elapsed;
         public static Version Version => Program.version;
+        public static string VersionString => Program.version.ToString();
 
         private static Version version;
         private static long isMainProcessCount;

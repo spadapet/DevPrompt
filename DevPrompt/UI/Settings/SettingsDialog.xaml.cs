@@ -2,7 +2,6 @@
 using DevPrompt.UI.ViewModels;
 using System;
 using System.Windows;
-using System.Windows.Interop;
 
 namespace DevPrompt.UI.Settings
 {

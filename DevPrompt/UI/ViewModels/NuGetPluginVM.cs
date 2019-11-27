@@ -1,6 +1,7 @@
 ﻿using DevPrompt.Plugins;
 using DevPrompt.ProcessWorkspace.Utility;
 using DevPrompt.Settings;
+using DevPrompt.Utility;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -259,8 +260,7 @@ namespace DevPrompt.UI.ViewModels
                     using (Stream stream = entry.Open())
                     using (FileStream fileStream = File.Create(path))
                     {
-                        const int defaultBufferSize = 81920;
-                        await stream.CopyToAsync(fileStream, defaultBufferSize, cancelToken);
+                        await stream.CopyToAsync(fileStream, FileUtility.DefaultStreamCopyBufferSize, cancelToken);
                     }
                 }
             }

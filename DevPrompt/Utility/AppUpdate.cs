@@ -1,9 +1,14 @@
-﻿using System;
+﻿using DevPrompt.Api;
+using DevPrompt.ProcessWorkspace.Utility;
+using DevPrompt.UI;
+using Microsoft.Win32;
+using System;
+using System.Diagnostics;
+using System.Globalization;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
-using DevPrompt.Api;
-using DevPrompt.ProcessWorkspace.Utility;
 
 namespace DevPrompt.Utility
 {
@@ -14,12 +19,13 @@ namespace DevPrompt.Utility
         private DispatcherTimer timer;
         private AppUpdateState state;
         private string updateVersionString;
-        private bool checkingForUpdate;
+        private int lastUpdateTicks;
 
         private static TimeSpan InitialInterval = TimeSpan.FromSeconds(10);
         private static TimeSpan RestartInterval = TimeSpan.FromSeconds(1);
         private const int MinIntervalSeconds = 16 * 60 * 60;
         private const int MaxIntervalSeconds = 24 * 60 * 60;
+        private const int MinTicksBetweenUpdates = 60 * 1000;
 
         public AppUpdate(App app)
         {
@@ -56,43 +62,111 @@ namespace DevPrompt.Utility
 
         public string UpdateVersionString
         {
-            get => this.updateVersionString ?? Program.Version.ToString();
+            get => this.updateVersionString ?? this.CurrentVersionString;
             set => this.SetPropertyValue(ref this.updateVersionString, value);
         }
 
+        public string CurrentVersionString => Program.VersionString;
+
         public async Task CheckUpdateVersionAsync()
         {
+            int ticks = Environment.TickCount;
+            if (this.lastUpdateTicks != 0 && ticks >= this.lastUpdateTicks && ticks - this.lastUpdateTicks < AppUpdate.MinTicksBetweenUpdates)
+            {
+                // Just recently checked
+                return;
+            }
+
+            this.lastUpdateTicks = ticks;
+
             // Automatically check again up to a day later (random)
             int intervalSeconds = this.random.Next(AppUpdate.MinIntervalSeconds, AppUpdate.MaxIntervalSeconds);
             this.timer.Interval = TimeSpan.FromSeconds(intervalSeconds);
 
             string versionString = null;
 
-            if (!this.checkingForUpdate && this.app is Api.IApp app && app.ActiveWindow is Api.IWindow window)
+            if (this.app is Api.IApp app && app.ActiveWindow is Api.IWindow window)
             {
                 using (HttpClient client = new HttpClient())
                 using (window.ProgressBar.Begin(client.CancelPendingRequests, Resources.AppUpdate_CheckProgress))
                 {
                     try
                     {
-                        this.checkingForUpdate = true;
                         versionString = await client.GetStringAsync(Resources.AppUpdate_LatestVersionLink);
                     }
                     catch
                     {
                         versionString = null;
                     }
-                    finally
-                    {
-                        this.checkingForUpdate = false;
-                    }
                 }
             }
 
-            if (versionString != null && Version.TryParse(versionString, out Version updateVersion))
+            if (!string.IsNullOrEmpty(versionString) && Version.TryParse(versionString, out Version updateVersion))
             {
                 this.UpdateVersionString = versionString;
-                this.State = (Program.Version.CompareTo(updateVersion) > 0) ? AppUpdateState.HasUpdate : AppUpdateState.NoUpdate;
+                this.State = (this.State == AppUpdateState.HasUpdate || Program.Version.CompareTo(updateVersion) < 0)
+                    ? AppUpdateState.HasUpdate
+                    : AppUpdateState.NoUpdate;
+            }
+        }
+
+        public async Task DownloadUpdate(MainWindow mainWindow, string type)
+        {
+            Api.IWindow window = mainWindow.ViewModel;
+            string url = string.Format(CultureInfo.CurrentCulture, Resources.AppUpdate_LatestFileDownload, type);
+
+            string downloadFolder;
+            try
+            {
+                downloadFolder = mainWindow.App.NativeApp.App.GetDownloadsFolder();
+            }
+            catch
+            {
+                downloadFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            }
+
+            using (CancellationTokenSource cancelSource = new CancellationTokenSource())
+            using (HttpClient client = new HttpClient())
+            using (window.ProgressBar.Begin(() => cancelSource.Cancel(), Resources.AppUpdate_Downloading))
+            using (HttpResponseMessage response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancelSource.Token))
+            {
+                response.EnsureSuccessStatusCode();
+
+                string suggestedFileName = response.Content?.Headers?.ContentDisposition?.FileName;
+                if (string.IsNullOrEmpty(suggestedFileName))
+                {
+                    suggestedFileName = $"DevPrompt.{type}";
+                }
+
+                Task<string> downloadTask = Task.Run(() => FileUtility.DownloadFileAsync(response.Content, cancelSource.Token), cancelSource.Token);
+
+                SaveFileDialog dialog = new SaveFileDialog
+                {
+                    Title = Resources.AppUpdate_DownloadDialogTitle,
+                    Filter = $"{string.Format(CultureInfo.InvariantCulture, Resources.AppUpdate_DownloadFilter, type.ToUpperInvariant())}|*.{type.ToLowerInvariant()}",
+                    DefaultExt = $".{type.ToLowerInvariant()}",
+                    InitialDirectory = downloadFolder,
+                    FileName = suggestedFileName,
+                };
+
+                if (dialog.ShowDialog(mainWindow) == true)
+                {
+                    string destFile = dialog.FileName;
+                    string tempFile = await downloadTask;
+
+                    if (!string.IsNullOrEmpty(tempFile) && FileUtility.TryMoveFile(tempFile, destFile))
+                    {
+                        Process.Start(new ProcessStartInfo("explorer.exe")
+                        {
+                            Arguments = $@"/e, /select, ""{destFile}""",
+                        });
+                    }
+                }
+                else
+                {
+                    cancelSource.Cancel();
+                    await downloadTask;
+                }
             }
         }
 

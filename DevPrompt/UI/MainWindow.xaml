@@ -5,8 +5,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:dp="clr-namespace:DevPrompt"
-        xmlns:dvm="clr-namespace:DevPrompt.UI.DesignerViewModels"
         xmlns:controls="clr-namespace:DevPrompt.UI.Controls"
+        xmlns:dvm="clr-namespace:DevPrompt.UI.DesignerViewModels"
+        xmlns:conv="clr-namespace:DevPrompt.Utility.Converters"
         mc:Ignorable="d"
         Width="980"
         Height="800"
@@ -26,6 +27,7 @@
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+        <conv:HasUpdateToVisibilityConverter x:Key="HasUpdateToVisibility" />
     </Window.Resources>
 
     <Window.InputBindings>
@@ -91,11 +93,30 @@
                 <MenuItem Header="{x:Static dp:Resources.Menu_Help}" SubmenuOpened="OnHelpMenuOpened">
                     <Separator Tag="[Plugins]" />
                     <MenuItem Header="{x:Static dp:Resources.Menu_ReportIssue}" Command="{Binding ReportAnIssueCommand}" />
+                    <MenuItem Header="{x:Static dp:Resources.Menu_CheckForUpdates}" Command="{Binding CheckForUpdatesCommand}" />
                     <MenuItem Header="{x:Static dp:Resources.Menu_Telemetry}" Command="{Binding TelemetryCommand}" />
                     <Separator />
                     <MenuItem Header="{x:Static dp:Resources.Menu_About}" Command="{Binding AboutCommand}" />
                 </MenuItem>
-                <MenuItem FontFamily="#Segoe UI Symbol" Header="&#xe110;" SubmenuOpened="OnUpdateMenuOpened" Visibility="Collapsed" />
+                <MenuItem ToolTip="{x:Static dp:Resources.Menu_UpdateTooltip}" Visibility="{Binding AppUpdate.State, Converter={StaticResource HasUpdateToVisibility}}" SubmenuOpened="OnUpdateMenuOpened">
+                    <MenuItem.Header>
+                        <Path Fill="{DynamicResource {x:Static SystemColors.MenuTextBrushKey}}" Data="M 0,7 6,1 12,7 8,7 8,12 4,12 4,7 Z" />
+                    </MenuItem.Header>
+                    <MenuItem IsEnabled="False">
+                        <MenuItem.Template>
+                            <ControlTemplate TargetType="MenuItem">
+                                <Border BorderThickness="1" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" Padding="4,2,2,2" Margin="2">
+                                    <StackPanel Orientation="Vertical">
+                                        <TextBlock Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" Text="{Binding AppUpdate.CurrentVersionString, StringFormat={x:Static dp:Resources.Menu_CurrentVersionFormat}}" />
+                                        <TextBlock Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" Text="{Binding AppUpdate.UpdateVersionString, StringFormat={x:Static dp:Resources.Menu_UpdateVersionFormat}}" />
+                                    </StackPanel>
+                                </Border>
+                            </ControlTemplate>
+                        </MenuItem.Template>
+                    </MenuItem>
+                    <MenuItem Header="{x:Static dp:Resources.Menu_DownloadMsi}" ToolTip="{x:Static dp:Resources.Menu_DownloadMsiTooltip}" Command="{Binding DownloadUpdateCommand}" CommandParameter="msi" />
+                    <MenuItem Header="{x:Static dp:Resources.Menu_DownloadZip}" ToolTip="{x:Static dp:Resources.Menu_DownloadZipTooltip}" Command="{Binding DownloadUpdateCommand}" CommandParameter="zip" />
+                </MenuItem>
             </Menu>
             <controls:TaskProgressBar x:Name="progressBar" Grid.Column="1" Width="250" Margin="0,0,5,0" />
         </Grid>

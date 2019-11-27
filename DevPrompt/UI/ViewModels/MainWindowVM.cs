@@ -1,5 +1,6 @@
 ﻿using DevPrompt.ProcessWorkspace.Utility;
 using DevPrompt.Settings;
+using DevPrompt.UI.Controls;
 using DevPrompt.UI.Settings;
 using DevPrompt.Utility;
 using System;
@@ -25,11 +26,13 @@ namespace DevPrompt.UI.ViewModels
         public MainWindow Window { get; }
         public App App => this.Window.App;
         public AppSettings AppSettings => this.App.Settings;
+        public AppUpdate AppUpdate => this.App.AppUpdate;
+        public InfoBar InfoBar => this.Window.infoBar;
         public IReadOnlyList<ConsoleSettings> VisualStudioConsoles => this.visualStudioConsoles;
         Api.IApp Api.IWindow.App => this.App;
         IntPtr Api.IWindow.Handle => this.Window.Handle;
         Api.IProgressBar Api.IWindow.ProgressBar => this.Window.progressBar;
-        Api.IInfoBar Api.IWindow.InfoBar => this.Window.infoBar;
+        Api.IInfoBar Api.IWindow.InfoBar => this.InfoBar;
 
         public ICommand ConsoleCommand { get; }
         public ICommand GrabConsoleCommand { get; }
@@ -115,16 +118,20 @@ namespace DevPrompt.UI.ViewModels
 
         public ICommand VisualStudioInstallerCommand => new DelegateCommand(() =>
         {
+            this.App.Telemetry.TrackEvent("Command.VisualStudioInstaller");
             this.RunExternalProcess(VisualStudioSetup.InstallerPath);
         });
 
         public ICommand VisualStudioDogfoodCommand => new DelegateCommand(() =>
         {
+            this.App.Telemetry.TrackEvent("Command.InstallVisualStudioDogfood");
             this.RunExternalProcess(VisualStudioSetup.DogfoodInstallerPath);
         });
 
         public ICommand InstallVisualStudioBranchCommand => new DelegateCommand(() =>
         {
+            this.App.Telemetry.TrackEvent("Command.InstallVisualStudioBranch");
+
             InstallBranchDialog dialog = new InstallBranchDialog()
             {
                 Owner = this.Window
@@ -138,6 +145,11 @@ namespace DevPrompt.UI.ViewModels
 
         public void ShowSettingsDialog(Api.SettingsTabType tab)
         {
+            this.App.Telemetry.TrackEvent("Command.Settings", new Dictionary<string, object>()
+            {
+                { "Tab", tab },
+            });
+
             using (SettingsDialog dialog = new SettingsDialog(this.Window, this.AppSettings, tab))
             {
                 if (dialog.ShowDialog() == true)
@@ -196,17 +208,47 @@ namespace DevPrompt.UI.ViewModels
 
         public ICommand ReportAnIssueCommand => new DelegateCommand(() =>
         {
+            this.App.Telemetry.TrackEvent("Command.ReportAnIssue");
             this.RunExternalProcess(Resources.About_IssuesLink);
+        });
+
+        public ICommand CheckForUpdatesCommand => new DelegateCommand(async () =>
+        {
+            this.App.Telemetry.TrackEvent("Command.CheckForUpdates");
+            await this.AppUpdate.CheckUpdateVersionAsync();
+            this.InfoBar.SetInfo(Api.InfoErrorLevel.Message, (this.AppUpdate.State == Api.AppUpdateState.HasUpdate) ? Resources.AppUpdate_UpdateAvailable : Resources.AppUpdate_NoUpdateAvailable);
         });
 
         public ICommand AboutCommand => new DelegateCommand(() =>
         {
+            this.App.Telemetry.TrackEvent("Command.About");
+
             AboutDialog dialog = new AboutDialog(this)
             {
                 Owner = this.Window
             };
 
             dialog.ShowDialog();
+        });
+
+        public ICommand DownloadUpdateCommand => new DelegateCommand(async typeObject =>
+        {
+            if (typeObject is string type)
+            {
+                this.App.Telemetry.TrackEvent("Command.DownloadUpdate", new Dictionary<string, object>()
+                {
+                    { "Type", type },
+                });
+
+                try
+                {
+                    await this.AppUpdate.DownloadUpdate(this.Window, type);
+                }
+                catch (Exception ex)
+                {
+                    this.InfoBar.SetError(ex);
+                }
+            }
         });
 
         public string WindowTitle
@@ -554,7 +596,7 @@ namespace DevPrompt.UI.ViewModels
 
         public void RunExternalProcess(string path, string arguments = null)
         {
-            this.Window.infoBar.Clear();
+            this.InfoBar.Clear();
 
             try
             {
@@ -572,7 +614,7 @@ namespace DevPrompt.UI.ViewModels
             }
             catch (Exception ex)
             {
-                this.Window.infoBar.SetError(ex, string.Format(CultureInfo.CurrentCulture, Resources.Error_FailedToStart, path));
+                this.InfoBar.SetError(ex, string.Format(CultureInfo.CurrentCulture, Resources.Error_FailedToStart, path));
             }
         }
     }

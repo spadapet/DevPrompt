@@ -16,12 +16,11 @@ namespace DevPrompt.Interop
         void Activate();
         void Deactivate();
 
-        [return: MarshalAs(UnmanagedType.BStr)]
-        string GetGrabProcesses();
+        [return: MarshalAs(UnmanagedType.BStr)] string GetGrabProcesses();
         void GrabProcess(int id);
 
-        [return: MarshalAs(UnmanagedType.Interface)]
-        IProcessHost CreateProcessHostWindow(IntPtr parentHwnd);
+        [return: MarshalAs(UnmanagedType.Interface)] IProcessHost CreateProcessHostWindow(IntPtr parentHwnd);
         void MainWindowProc(IntPtr hwnd, int msg, IntPtr wp, IntPtr lp);
+        [return: MarshalAs(UnmanagedType.BStr)] string GetDownloadsFolder();
     }
 }

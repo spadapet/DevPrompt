@@ -114,6 +114,26 @@ HRESULT AppInterop::GetGrabProcesses(BSTR* processes)
     return E_UNEXPECTED;
 }
 
+HRESULT AppInterop::GetDownloadsFolder(BSTR* path)
+{
+    if (!path)
+    {
+        return E_INVALIDARG;
+    }
+
+    *path = nullptr;
+
+    wchar_t *returnedPath = nullptr;
+    if (SUCCEEDED(::SHGetKnownFolderPath(FOLDERID_Downloads, KF_FLAG_CREATE, nullptr, &returnedPath)))
+    {
+        *path = ::SysAllocString(returnedPath);
+        ::CoTaskMemFree(returnedPath);
+        return S_OK;
+    }
+
+    return E_FAIL;
+}
+
 HRESULT AppInterop::GrabProcess(int id)
 {
     if (this->app)

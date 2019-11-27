@@ -30,7 +30,7 @@ namespace DevPrompt.Utility
 #endif
             this.client = new TelemetryClient(this.config);
             this.client.Context.Cloud.RoleInstance = "null"; // don't want it to use the computer name
-            this.client.Context.Component.Version = Program.Version.ToString();
+            this.client.Context.Component.Version = Program.VersionString;
             this.client.Context.Session.Id = Guid.NewGuid().ToString();
             this.client.Context.User.Id = Telemetry.GetUserId();
 

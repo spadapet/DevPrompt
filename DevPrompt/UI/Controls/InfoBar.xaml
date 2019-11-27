@@ -4,23 +4,41 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:conv="clr-namespace:DevPrompt.Utility.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="28" d:DesignWidth="300"
              DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisible" />
+        <conv:ErrorLevelToBrushConverter x:Key="LevelToBorderBrush">
+            <conv:ErrorLevelToBrushConverter.MessageBrush>ForestGreen</conv:ErrorLevelToBrushConverter.MessageBrush>
+            <conv:ErrorLevelToBrushConverter.WarningBrush>Orange</conv:ErrorLevelToBrushConverter.WarningBrush>
+            <conv:ErrorLevelToBrushConverter.ErrorBrush>Red</conv:ErrorLevelToBrushConverter.ErrorBrush>
+        </conv:ErrorLevelToBrushConverter>
+        <conv:ErrorLevelToBrushConverter x:Key="LevelToBackgroundBrush">
+            <conv:ErrorLevelToBrushConverter.MessageBrush>LightGreen</conv:ErrorLevelToBrushConverter.MessageBrush>
+            <conv:ErrorLevelToBrushConverter.WarningBrush>LightGoldenrodYellow</conv:ErrorLevelToBrushConverter.WarningBrush>
+            <conv:ErrorLevelToBrushConverter.ErrorBrush>#FFCCCC</conv:ErrorLevelToBrushConverter.ErrorBrush>
+        </conv:ErrorLevelToBrushConverter>
     </UserControl.Resources>
     <Grid>
         <Button
             Grid.Row="1"
             BorderThickness="1"
-            BorderBrush="#FF0000"
-            Background="#FFCCCC"
-            Padding="5"
+            BorderBrush="{Binding ErrorLevel, Converter={StaticResource LevelToBorderBrush}}"
+            Background="{Binding ErrorLevel, Converter={StaticResource LevelToBackgroundBrush}}"
+            Padding="0"
             Click="OnClickBar"
-            HorizontalContentAlignment="Left"
+            HorizontalContentAlignment="Stretch"
             Visibility="{Binding HasText, Converter={StaticResource BoolToVisible}}">
-            <TextBlock Text="{Binding Text}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip="{Binding Text}" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{Binding Text}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip="{Binding Text}" Margin="5,5,0,5" VerticalAlignment="Center" />
+                <ContentControl Grid.Column="1" Content="{Binding ExtraContent}" VerticalContentAlignment="Center" />
+            </Grid>
         </Button>
     </Grid>
 </UserControl>

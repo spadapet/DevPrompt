@@ -108,8 +108,7 @@ namespace DevPrompt.UI.ViewModels
             {
                 Title = Resources.Settings_ImportDialogTitle,
                 Filter = $"{Resources.Settings_XmlFilterName}|*.xml",
-                DefaultExt = "xml",
-                CheckFileExists = true
+                DefaultExt = ".xml",
             };
 
             if (dialog.ShowDialog(this.Dialog) == true)
@@ -141,14 +140,11 @@ namespace DevPrompt.UI.ViewModels
 
         public ICommand ExportCommand => new DelegateCommand(() =>
         {
-            OpenFileDialog dialog = new OpenFileDialog
+            SaveFileDialog dialog = new SaveFileDialog
             {
                 Title = Resources.Settings_ExportDialogTitle,
                 Filter = $"{Resources.Settings_XmlFilterName}|*.xml",
-                DefaultExt = "xml",
-                CheckPathExists = true,
-                CheckFileExists = false,
-                ValidateNames = true
+                DefaultExt = ".xml",
             };
 
             if (dialog.ShowDialog(this.Dialog) == true)

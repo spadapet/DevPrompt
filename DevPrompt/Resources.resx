@@ -129,8 +129,26 @@
   <data name="AppUpdate.CheckProgress" xml:space="preserve">
     <value>Checking latest version</value>
   </data>
+  <data name="AppUpdate.DownloadDialogTitle" xml:space="preserve">
+    <value>Download file</value>
+  </data>
+  <data name="AppUpdate.DownloadFilter" xml:space="preserve">
+    <value>{0} file</value>
+  </data>
+  <data name="AppUpdate.Downloading" xml:space="preserve">
+    <value>Downloading</value>
+  </data>
+  <data name="AppUpdate.LatestFileDownload" xml:space="preserve">
+    <value>http://peterspada.com/Download/DevPrompt?type={0}</value>
+  </data>
   <data name="AppUpdate.LatestVersionLink" xml:space="preserve">
     <value>http://peterspada.com/DevPrompt/GetLatestVersion</value>
+  </data>
+  <data name="AppUpdate.NoUpdateAvailable" xml:space="preserve">
+    <value>You have the latest version.</value>
+  </data>
+  <data name="AppUpdate.UpdateAvailable" xml:space="preserve">
+    <value>An update is available. Click the "up arrow" on the menu bar to download the update.</value>
   </data>
   <data name="ColorsDialog.Header.Color" xml:space="preserve">
     <value>Color</value>
@@ -275,8 +293,26 @@ Visual Studio=https://visualstudio.microsoft.com</value>
   <data name="Menu.AutoGrab" xml:space="preserve">
     <value>_Auto Grab</value>
   </data>
+  <data name="Menu.CheckForUpdates" xml:space="preserve">
+    <value>_Check for updates</value>
+  </data>
+  <data name="Menu.CurrentVersionFormat" xml:space="preserve">
+    <value>Current version: {0}</value>
+  </data>
   <data name="Menu.Customize" xml:space="preserve">
     <value>_Customize...</value>
+  </data>
+  <data name="Menu.DownloadMsi" xml:space="preserve">
+    <value>Download _MSI File...</value>
+  </data>
+  <data name="Menu.DownloadMsiTooltip" xml:space="preserve">
+    <value>This uses Windows Installer to automatically update DevPrompt (recommended)</value>
+  </data>
+  <data name="Menu.DownloadZip" xml:space="preserve">
+    <value>Download _ZIP File...</value>
+  </data>
+  <data name="Menu.DownloadZipTooltip" xml:space="preserve">
+    <value>This lets you manually unzip DevPrompt files and run from any location</value>
   </data>
   <data name="Menu.Exit" xml:space="preserve">
     <value>E_xit</value>
@@ -319,6 +355,12 @@ Visual Studio=https://visualstudio.microsoft.com</value>
   </data>
   <data name="Menu.Tools" xml:space="preserve">
     <value>_Tools</value>
+  </data>
+  <data name="Menu.UpdateTooltip" xml:space="preserve">
+    <value>Update available</value>
+  </data>
+  <data name="Menu.UpdateVersionFormat" xml:space="preserve">
+    <value>New version: {0}</value>
   </data>
   <data name="Menu.VS" xml:space="preserve">
     <value>_VS</value>
