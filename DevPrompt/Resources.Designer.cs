@@ -160,6 +160,33 @@ namespace DevPrompt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Default.
+        /// </summary>
+        public static string Browsers_DefaultBrowserName {
+            get {
+                return ResourceManager.GetString("Browsers.DefaultBrowserName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Microsoft Edge Legacy.
+        /// </summary>
+        public static string Browsers_EdgeLegacyName {
+            get {
+                return ResourceManager.GetString("Browsers.EdgeLegacyName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Microsoft Edge.
+        /// </summary>
+        public static string Browsers_EdgeName {
+            get {
+                return ResourceManager.GetString("Browsers.EdgeName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Color.
         /// </summary>
         public static string ColorsDialog_Header_Color {
@@ -543,6 +570,15 @@ namespace DevPrompt {
         public static string LinkDialog_Header_Address {
             get {
                 return ResourceManager.GetString("LinkDialog.Header.Address", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Browser.
+        /// </summary>
+        public static string LinkDialog_Header_Browser {
+            get {
+                return ResourceManager.GetString("LinkDialog.Header.Browser", resourceCulture);
             }
         }
         

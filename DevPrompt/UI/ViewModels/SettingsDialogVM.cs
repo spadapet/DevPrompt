@@ -6,6 +6,7 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace DevPrompt.UI.ViewModels
@@ -20,9 +21,11 @@ namespace DevPrompt.UI.ViewModels
         public SettingsDialog Dialog { get; }
         public App App => this.Window.App;
         public IList<SettingsTabVM> Tabs => this.tabs;
+        public IList<BrowserUtility.BrowserInfo> Browsers => this.browserInfoTask.Result;
         public Api.IProgressBar ProgressBar => this.Dialog.progressBar;
         public Api.IInfoBar InfoBar => this.Dialog.infoBar;
 
+        private readonly Task<BrowserUtility.BrowserInfo[]> browserInfoTask;
         private readonly SettingsTabVM[] tabs;
         private SettingsTabVM activeTab;
         private bool isBusy;
@@ -37,6 +40,7 @@ namespace DevPrompt.UI.ViewModels
             this.Window = window;
             this.Dialog = dialog;
             this.Settings = settings?.Clone();
+            this.browserInfoTask = Task.Run(() => BrowserUtility.GetInstalledBrowsers().ToArray());
 
             this.tabs = new SettingsTabVM[]
             {

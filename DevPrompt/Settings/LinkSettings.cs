@@ -14,17 +14,27 @@ namespace DevPrompt.Settings
     {
         private string name;
         private string address;
+        private string browser;
 
         public LinkSettings()
         {
+            this.Initialize();
             this.name = DevPrompt.Utility.CommandUtility.SeparatorName;
-            this.address = string.Empty;
         }
 
         public LinkSettings(LinkSettings copyFrom)
         {
             this.name = copyFrom.Name;
             this.address = copyFrom.Address;
+            this.browser = copyFrom.Browser;
+        }
+
+        [OnDeserializing]
+        private void Initialize(StreamingContext context = default(StreamingContext))
+        {
+            this.name = string.Empty;
+            this.address = string.Empty;
+            this.browser = string.Empty;
         }
 
         public LinkSettings Clone()
@@ -34,7 +44,9 @@ namespace DevPrompt.Settings
 
         public bool Equals(LinkSettings other)
         {
-            return this.name == other.name && this.address == other.address;
+            return this.name == other.name &&
+                this.address == other.address &&
+                this.browser == other.browser;
         }
 
         [DataMember]
@@ -49,6 +61,13 @@ namespace DevPrompt.Settings
         {
             get => this.address;
             set => this.SetPropertyValue(ref this.address, value ?? string.Empty);
+        }
+
+        [DataMember]
+        public string Browser
+        {
+            get => this.browser;
+            set => this.SetPropertyValue(ref this.browser, value ?? string.Empty);
         }
     }
 }

@@ -20,8 +20,8 @@ namespace DevPrompt.Settings
 
         public PluginDirectorySettings()
         {
+            this.Initialize();
             this.directory = ".";
-            this.enabled = true;
         }
 
         public PluginDirectorySettings(PluginDirectorySettings copyFrom)
@@ -29,6 +29,13 @@ namespace DevPrompt.Settings
             this.directory = copyFrom.directory;
             this.enabled = copyFrom.enabled;
             this.readOnly = copyFrom.readOnly;
+        }
+
+        [OnDeserializing]
+        private void Initialize(StreamingContext context = default(StreamingContext))
+        {
+            this.directory = string.Empty;
+            this.enabled = true;
         }
 
         public PluginDirectorySettings Clone()

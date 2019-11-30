@@ -18,9 +18,8 @@ namespace DevPrompt.Settings
 
         public ToolSettings()
         {
+            this.Initialize();
             this.name = DevPrompt.Utility.CommandUtility.SeparatorName;
-            this.command = string.Empty;
-            this.arguments = string.Empty;
         }
 
         public ToolSettings(ToolSettings copyFrom)
@@ -28,6 +27,14 @@ namespace DevPrompt.Settings
             this.name = copyFrom.Name;
             this.command = copyFrom.Command;
             this.arguments = copyFrom.arguments;
+        }
+
+        [OnDeserializing]
+        private void Initialize(StreamingContext context = default(StreamingContext))
+        {
+            this.name = string.Empty;
+            this.command = string.Empty;
+            this.arguments = string.Empty;
         }
 
         public ToolSettings Clone()

@@ -579,7 +579,7 @@ namespace DevPrompt.UI.ViewModels
         private void StartLink(LinkSettings settings)
         {
             this.App.Telemetry.TrackEvent("Start.Link");
-            this.RunExternalProcess(settings.Address);
+            this.RunExternalBrowser(settings.Browser, settings.Address);
         }
 
         private void StartTool(ToolSettings settings)
@@ -616,6 +616,12 @@ namespace DevPrompt.UI.ViewModels
             {
                 this.InfoBar.SetError(ex, string.Format(CultureInfo.CurrentCulture, Resources.Error_FailedToStart, path));
             }
+        }
+
+        public void RunExternalBrowser(string browserId, string url)
+        {
+            this.InfoBar.Clear();
+            BrowserUtility.Browse(browserId, url, this);
         }
     }
 }

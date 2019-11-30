@@ -12,6 +12,13 @@ using System.Windows.Threading;
 
 namespace DevPrompt.Utility
 {
+    /// <summary>
+    /// Checks for updates and allows an update file to be downloaded.
+    /// The update check happens:
+    /// - A short period of time after startup
+    /// - At least once a day afterwards
+    /// - When the user chooses a menu item to force a check
+    /// </summary>
     internal class AppUpdate : PropertyNotifier, Api.IAppUpdate, IDisposable
     {
         private readonly App app;

@@ -34,6 +34,14 @@ namespace DevPrompt.Settings
             this.themeKeyColor = copyFrom.themeKeyColor;
         }
 
+        [OnDeserializing]
+        private void Initialize(StreamingContext context = default(StreamingContext))
+        {
+            this.exeName = string.Empty;
+            this.tabName = string.Empty;
+            this.tabActivate = true;
+        }
+
         public GrabConsoleSettings Clone()
         {
             return new GrabConsoleSettings(this);

@@ -150,6 +150,15 @@
   <data name="AppUpdate.UpdateAvailable" xml:space="preserve">
     <value>An update is available. Click the "up arrow" on the menu bar to download the update.</value>
   </data>
+  <data name="Browsers.DefaultBrowserName" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="Browsers.EdgeLegacyName" xml:space="preserve">
+    <value>Microsoft Edge Legacy</value>
+  </data>
+  <data name="Browsers.EdgeName" xml:space="preserve">
+    <value>Microsoft Edge</value>
+  </data>
   <data name="ColorsDialog.Header.Color" xml:space="preserve">
     <value>Color</value>
   </data>
@@ -278,6 +287,9 @@
   </data>
   <data name="LinkDialog.Header.Address" xml:space="preserve">
     <value>Address</value>
+  </data>
+  <data name="LinkDialog.Header.Browser" xml:space="preserve">
+    <value>Browser</value>
   </data>
   <data name="LinkDialog.Header.Name" xml:space="preserve">
     <value>Name</value>

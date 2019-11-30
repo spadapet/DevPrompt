@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace DevPrompt.Utility
 {
+    /// <summary>
+    /// Helpers for dealing with the file system
+    /// </summary>
     internal static class FileUtility
     {
         public const int DefaultStreamCopyBufferSize = 81920;
