@@ -19,7 +19,7 @@
 
         <Border BorderThickness="1" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}">
             <ProgressBar
-                IsIndeterminate="True"
+                IsIndeterminate="{Binding IsLoading}"
                 IsHitTestVisible="False"
                 BorderThickness="0"
                 BorderBrush="{x:Null}"
