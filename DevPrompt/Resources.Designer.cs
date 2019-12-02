@@ -547,24 +547,6 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to _Branch name:.
-        /// </summary>
-        public static string InstallBranch_Label {
-            get {
-                return ResourceManager.GetString("InstallBranch.Label", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Install VS Branch.
-        /// </summary>
-        public static string InstallBranch_Title {
-            get {
-                return ResourceManager.GetString("InstallBranch.Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Address.
         /// </summary>
         public static string LinkDialog_Header_Address {
@@ -828,51 +810,6 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to _VS.
-        /// </summary>
-        public static string Menu_VS {
-            get {
-                return ResourceManager.GetString("Menu.VS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Install _Branch.
-        /// </summary>
-        public static string Menu_VsInstallBranch {
-            get {
-                return ResourceManager.GetString("Menu.VsInstallBranch", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to _Install Dogfood.
-        /// </summary>
-        public static string Menu_VsInstallDogfood {
-            get {
-                return ResourceManager.GetString("Menu.VsInstallDogfood", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to _Run VS Installer.
-        /// </summary>
-        public static string Menu_VsInstaller {
-            get {
-                return ResourceManager.GetString("Menu.VsInstaller", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to _Install From Web.
-        /// </summary>
-        public static string Menu_VsInstallFromWeb {
-            get {
-                return ResourceManager.GetString("Menu.VsInstallFromWeb", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to VS prompt {0}.
         /// </summary>
         public static string Menu_VsPromptName {
@@ -887,15 +824,6 @@ namespace DevPrompt {
         public static string Menu_VsPromptTabName {
             get {
                 return ResourceManager.GetString("Menu.VsPromptTabName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Updating....
-        /// </summary>
-        public static string Menu_VsUpdating {
-            get {
-                return ResourceManager.GetString("Menu.VsUpdating", resourceCulture);
             }
         }
         

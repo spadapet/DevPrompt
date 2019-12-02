@@ -251,7 +251,7 @@ namespace DevPrompt.Settings
 
         public static async Task<IEnumerable<ConsoleSettings>> GetVisualStudioConsolesAsync()
         {
-            List<VisualStudioSetup.Instance> instances = new List<VisualStudioSetup.Instance>(await VisualStudioSetup.GetInstances());
+            List<Api.IVisualStudioInstance> instances = new List<Api.IVisualStudioInstance>(await VisualStudioSetup.GetInstancesAsync());
             instances.Sort((x, y) =>
             {
                 if (!Version.TryParse(x.Version, out Version v1))
@@ -269,7 +269,7 @@ namespace DevPrompt.Settings
 
             List<ConsoleSettings> result = new List<ConsoleSettings>(instances.Count);
 
-            foreach (VisualStudioSetup.Instance instance in instances)
+            foreach (Api.IVisualStudioInstance instance in instances)
             {
                 string file = Path.Combine(instance.Path, "Common7", "Tools", "VsDevCmd.bat");
                 if (File.Exists(file))

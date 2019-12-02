@@ -1,6 +1,5 @@
 ﻿using DevPrompt.Settings;
 using DevPrompt.UI.ViewModels;
-using DevPrompt.Utility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -147,24 +146,6 @@ namespace DevPrompt.UI
             });
 
             this.AddPluginMenuItems(menu, Api.MenuType.Grab);
-        }
-
-        private async void OnVsMenuOpened(object sender, RoutedEventArgs args)
-        {
-            MenuItem menu = (MenuItem)sender;
-            IEnumerable<VisualStudioSetup.Instance> instances = await VisualStudioSetup.GetInstances();
-
-            MainWindow.UpdateMenu(menu, instances.ToArray(), (VisualStudioSetup.Instance instance) =>
-            {
-                return new MenuItem()
-                {
-                    Header = instance.DisplayName,
-                    Command = this.ViewModel.VisualStudioCommand,
-                    CommandParameter = instance,
-                };
-            });
-
-            this.AddPluginMenuItems(menu, Api.MenuType.VS);
         }
 
         private void OnToolsMenuOpened(object sender, RoutedEventArgs args)

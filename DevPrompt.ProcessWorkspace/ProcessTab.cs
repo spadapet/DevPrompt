@@ -117,7 +117,7 @@ namespace DevPrompt.UI.ViewModels
             TabNameDialogVM viewModel = new TabNameDialogVM(this.window.App.Settings, this.RawName, this.ThemeKeyColor);
             TabNameDialog dialog = new TabNameDialog(viewModel)
             {
-                Owner = Application.Current.MainWindow
+                Owner = this.window.Window,
             };
 
             if (dialog.ShowDialog() == true)

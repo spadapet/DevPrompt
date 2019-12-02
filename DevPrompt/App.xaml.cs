@@ -28,6 +28,7 @@ namespace DevPrompt
         public AppSettings Settings { get; }
         public HttpClientHelper HttpClient { get; }
         public Telemetry Telemetry { get; private set; }
+        public VisualStudioSetup VisualStudioSetup { get; private set; }
         public PluginState PluginState { get; private set; }
         public AppUpdate AppUpdate { get; private set; }
         public NativeApp NativeApp { get; private set; }
@@ -85,6 +86,7 @@ namespace DevPrompt
             bool firstStartup = (this.NativeApp == null);
 
             this.Telemetry = await Telemetry.Create(this);
+            this.VisualStudioSetup = new VisualStudioSetup();
             this.NativeApp = this.NativeApp ?? NativeMethods.CreateApp(this, out errorMessage);
             this.MainWindow = new MainWindow(this);
             this.MainWindow.infoBar.SetError(null, errorMessage);
@@ -397,6 +399,7 @@ namespace DevPrompt
         Api.IAppSettings Api.IApp.Settings => this.Settings;
         Api.IAppUpdate Api.IApp.AppUpdate => this.AppUpdate;
         Api.ITelemetry Api.IApp.Telemetry => this.Telemetry;
+        Api.IVisualStudioSetup Api.IApp.VisualStudioSetup => this.VisualStudioSetup;
         Api.IWindow Api.IApp.ActiveWindow => this.MainWindow?.ViewModel;
         bool Api.IApp.IsElevated => Program.IsElevated;
         bool Api.IApp.IsMainProcess => Program.IsMainProcess;

@@ -11,6 +11,7 @@ namespace DevPrompt.Api
         IAppSettings Settings { get; }
         IAppUpdate AppUpdate { get; }
         ITelemetry Telemetry { get; }
+        IVisualStudioSetup VisualStudioSetup { get; }
         IWindow ActiveWindow { get; }
         IEnumerable<IWindow> Windows { get; }
 

@@ -31,6 +31,7 @@ namespace DevPrompt.UI.ViewModels
         public IReadOnlyList<ConsoleSettings> VisualStudioConsoles => this.visualStudioConsoles;
         Api.IApp Api.IWindow.App => this.App;
         IntPtr Api.IWindow.Handle => this.Window.Handle;
+        Window Api.IWindow.Window => this.Window;
         Api.IProgressBar Api.IWindow.ProgressBar => this.Window.progressBar;
         Api.IInfoBar Api.IWindow.InfoBar => this.InfoBar;
 
@@ -59,7 +60,6 @@ namespace DevPrompt.UI.ViewModels
             this.GrabConsoleCommand = new DelegateCommand((object arg) => this.App.GrabProcess((int)arg));
             this.LinkCommand = new DelegateCommand((object arg) => this.StartLink((LinkSettings)arg));
             this.ToolCommand = new DelegateCommand((object arg) => this.StartTool((ToolSettings)arg));
-            this.VisualStudioCommand = new DelegateCommand((object arg) => this.StartVisualStudio((VisualStudioSetup.Instance)arg));
             this.QuickStartConsoleCommand = new DelegateCommand(async (object arg) => await this.QuickStartConsole((int)arg));
 
             this.visualStudioConsoles = new ObservableCollection<ConsoleSettings>();
@@ -115,33 +115,6 @@ namespace DevPrompt.UI.ViewModels
         }
 
         public ICommand ExitCommand => new DelegateCommand(() => this.Window.Close());
-
-        public ICommand VisualStudioInstallerCommand => new DelegateCommand(() =>
-        {
-            this.App.Telemetry.TrackEvent("Command.VisualStudioInstaller");
-            this.RunExternalProcess(VisualStudioSetup.InstallerPath);
-        });
-
-        public ICommand VisualStudioDogfoodCommand => new DelegateCommand(() =>
-        {
-            this.App.Telemetry.TrackEvent("Command.InstallVisualStudioDogfood");
-            this.RunExternalProcess(VisualStudioSetup.DogfoodInstallerPath);
-        });
-
-        public ICommand InstallVisualStudioBranchCommand => new DelegateCommand(() =>
-        {
-            this.App.Telemetry.TrackEvent("Command.InstallVisualStudioBranch");
-
-            InstallBranchDialog dialog = new InstallBranchDialog()
-            {
-                Owner = this.Window
-            };
-
-            if (dialog.ShowDialog() == true)
-            {
-                this.RunExternalProcess(dialog.ViewModel.Hyperlink);
-            }
-        });
 
         public void ShowSettingsDialog(Api.SettingsTabType tab)
         {
@@ -586,12 +559,6 @@ namespace DevPrompt.UI.ViewModels
         {
             this.App.Telemetry.TrackEvent("Start.Tool");
             this.RunExternalProcess(settings.ExpandedCommand, settings.ExpandedArguments);
-        }
-
-        private void StartVisualStudio(VisualStudioSetup.Instance instance)
-        {
-            this.App.Telemetry.TrackEvent("Start.VS");
-            this.RunExternalProcess(instance.ProductPath);
         }
 
         public void RunExternalProcess(string path, string arguments = null)

@@ -129,7 +129,6 @@ namespace DevPrompt
         }
 
         public static bool IsMicrosoftDomain { get; }
-        public static bool IsNotMicrosoftDomain => !Program.IsMicrosoftDomain;
         public static bool IsElevated { get; }
         public static TimeSpan TimeSinceStart => Program.stopwatch.Elapsed;
         public static Version Version => Program.version;

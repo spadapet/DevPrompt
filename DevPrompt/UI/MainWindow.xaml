@@ -26,7 +26,6 @@
         d:DataContext="{d:DesignInstance Type=dvm:MainWindowDesignerVM, IsDesignTimeCreatable=True}">
 
     <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
         <conv:HasUpdateToVisibilityConverter x:Key="HasUpdateToVisibility" />
     </Window.Resources>
 
@@ -70,15 +69,7 @@
                     <MenuItem Header="{x:Static dp:Resources.Menu_AutoGrab}" IsCheckable="True" IsChecked="{Binding AppSettings.ConsoleGrabEnabled, Mode=TwoWay}" />
                     <MenuItem Header="{x:Static dp:Resources.Menu_Customize}" Command="{Binding CustomizeConsoleGrabCommand}" />
                 </MenuItem>
-                <MenuItem Header="{x:Static dp:Resources.Menu_VS}" SubmenuOpened="OnVsMenuOpened">
-                    <MenuItem Header="{x:Static dp:Resources.Menu_VsUpdating}" IsEnabled="False" />
-                    <Separator Tag="[End]" />
-                    <Separator Tag="[Plugins]" />
-                    <MenuItem Header="{x:Static dp:Resources.Menu_VsInstallFromWeb}" Command="{Binding VisualStudioDogfoodCommand}" Visibility="{Binding Source={x:Static dp:Program.IsNotMicrosoftDomain}, Converter={StaticResource BoolToVisibility}}" />
-                    <MenuItem Header="{x:Static dp:Resources.Menu_VsInstallDogfood}" Command="{Binding VisualStudioDogfoodCommand}" Visibility="{Binding Source={x:Static dp:Program.IsMicrosoftDomain}, Converter={StaticResource BoolToVisibility}}" />
-                    <MenuItem Header="{x:Static dp:Resources.Menu_VsInstallBranch}" Command="{Binding InstallVisualStudioBranchCommand}" Visibility="{Binding Source={x:Static dp:Program.IsMicrosoftDomain}, Converter={StaticResource BoolToVisibility}}" />
-                    <MenuItem Header="{x:Static dp:Resources.Menu_VsInstaller}" Command="{Binding VisualStudioInstallerCommand}" />
-                </MenuItem>
+                <Separator Tag="[Plugins]" Visibility="Collapsed" />
                 <MenuItem Header="{x:Static dp:Resources.Menu_Tools}" SubmenuOpened="OnToolsMenuOpened">
                     <Separator Tag="[End]" />
                     <Separator Tag="[Plugins]" />
@@ -89,7 +80,6 @@
                     <Separator Tag="[Plugins]" />
                     <MenuItem Header="{x:Static dp:Resources.Menu_Customize}" Command="{Binding CustomizeLinksCommand}" />
                 </MenuItem>
-                <Separator Tag="[Plugins]" Visibility="Collapsed" />
                 <MenuItem Header="{x:Static dp:Resources.Menu_Help}" SubmenuOpened="OnHelpMenuOpened">
                     <Separator Tag="[Plugins]" />
                     <MenuItem Header="{x:Static dp:Resources.Menu_ReportIssue}" Command="{Binding ReportAnIssueCommand}" />

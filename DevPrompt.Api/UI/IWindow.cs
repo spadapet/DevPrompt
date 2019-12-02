@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows;
 
 namespace DevPrompt.Api
 {
@@ -10,6 +11,7 @@ namespace DevPrompt.Api
     {
         IApp App { get; }
         IntPtr Handle { get; }
+        Window Window { get; }
         IInfoBar InfoBar { get; }
         IProgressBar ProgressBar { get; }
 

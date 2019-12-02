@@ -279,12 +279,6 @@
   <data name="ImportDialog.Tools" xml:space="preserve">
     <value>_Tools:</value>
   </data>
-  <data name="InstallBranch.Label" xml:space="preserve">
-    <value>_Branch name:</value>
-  </data>
-  <data name="InstallBranch.Title" xml:space="preserve">
-    <value>Install VS Branch</value>
-  </data>
   <data name="LinkDialog.Header.Address" xml:space="preserve">
     <value>Address</value>
   </data>
@@ -374,29 +368,11 @@ Visual Studio=https://visualstudio.microsoft.com</value>
   <data name="Menu.UpdateVersionFormat" xml:space="preserve">
     <value>New version: {0}</value>
   </data>
-  <data name="Menu.VS" xml:space="preserve">
-    <value>_VS</value>
-  </data>
-  <data name="Menu.VsInstallBranch" xml:space="preserve">
-    <value>Install _Branch</value>
-  </data>
-  <data name="Menu.VsInstallDogfood" xml:space="preserve">
-    <value>_Install Dogfood</value>
-  </data>
-  <data name="Menu.VsInstaller" xml:space="preserve">
-    <value>_Run VS Installer</value>
-  </data>
-  <data name="Menu.VsInstallFromWeb" xml:space="preserve">
-    <value>_Install From Web</value>
-  </data>
   <data name="Menu.VsPromptName" xml:space="preserve">
     <value>VS prompt {0}</value>
   </data>
   <data name="Menu.VsPromptTabName" xml:space="preserve">
     <value>VS {0}</value>
-  </data>
-  <data name="Menu.VsUpdating" xml:space="preserve">
-    <value>Updating...</value>
   </data>
   <data name="PluginDialog.CreatedBy" xml:space="preserve">
     <value>Created by:</value>
