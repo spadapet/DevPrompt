@@ -1,17 +1,12 @@
-﻿using DevPrompt.ProcessWorkspace.Utility;
-using System;
+﻿using System;
+using System.Globalization;
 using System.Windows;
 
 namespace DevPrompt.Utility.Converters
 {
-    internal sealed class BoolToCollapsedConverter : DelegateConverter
+    internal sealed class BoolToCollapsedConverter : Api.Utility.ValueConverter
     {
-        public BoolToCollapsedConverter()
-            : base(BoolToCollapsedConverter.Convert)
-        {
-        }
-
-        private static object Convert(object value, Type targetType, object parameter)
+        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is bool b)
             {

@@ -5,7 +5,7 @@ using System.Windows;
 namespace DevPrompt.Api
 {
     /// <summary>
-    /// Public access to the main window
+    /// Access to the main window
     /// </summary>
     public interface IWindow
     {

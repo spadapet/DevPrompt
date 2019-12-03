@@ -1,5 +1,4 @@
 ﻿using DevPrompt.Plugins;
-using DevPrompt.ProcessWorkspace.Utility;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -12,7 +11,7 @@ namespace DevPrompt.Settings
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{Id}")]
-    internal class NuGetPluginSettings : PropertyNotifier
+    internal sealed class NuGetPluginSettings : Api.Utility.PropertyNotifier
     {
         private string id;
         private string title;

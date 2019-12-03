@@ -7,7 +7,7 @@ namespace DevPrompt.ProcessWorkspace
     /// <summary>
     /// Hooks the native process host window into WPF
     /// </summary>
-    internal class ProcessHostWindow : HwndHost
+    internal sealed class ProcessHostWindow : HwndHost
     {
         public Api.IProcessHost ProcessHost { get; private set; }
         private readonly Api.IApp app;
@@ -40,7 +40,7 @@ namespace DevPrompt.ProcessWorkspace
 
         protected override HandleRef BuildWindowCore(HandleRef hwndParent)
         {
-            this.ProcessHost = this.app.CreateProcessHost(hwndParent.Handle);
+            this.ProcessHost = this.app.AppProcesses.CreateProcessHost(hwndParent.Handle);
             return new HandleRef(null, this.ProcessHost?.Hwnd ?? IntPtr.Zero);
         }
 

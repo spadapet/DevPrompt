@@ -34,10 +34,7 @@
     <Compile Include="Utility\ActiveToBoolConverter.cs" />
     <Compile Include="Utility\ThemeKeyToColorConverter.cs" />
     <Compile Include="Utility\ColorToBrushConverter.cs" />
-    <Compile Include="Utility\DelegateCommand.cs" />
-    <Compile Include="Utility\DelegateConverter.cs" />
     <Compile Include="UI\Controls\DragItemsControl.cs" />
-    <Compile Include="Utility\DelegateMultiConverter.cs" />
     <Compile Include="Utility\FirstBrushConverter.cs" />
     <Compile Include="Utility\KeyColorTemplateSelector.cs" />
     <Compile Include="Utility\NullToCollapsedConverter.cs" />
@@ -51,14 +48,12 @@
       <DependentUpon>ProcessWorkspaceControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ProcessWorkspaceProvider.cs" />
-    <Compile Include="Settings\ProcessWorkspaceSnapshot.cs" />
-    <Compile Include="Utility\PropertyNotifier.cs" />
     <Compile Include="UI\TabNameDialog.xaml.cs">
       <DependentUpon>TabNameDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\ViewModels\TabNameDialogVM.cs" />
     <Compile Include="UI\ViewModels\TabVM.cs" />
-    <Compile Include="Settings\TabWorkspaceSnapshot.cs" />
+    <Compile Include="Settings\ProcessWorkspaceSnapshot.cs" />
     <Compile Include="Utility\VisibleToBoolConverter.cs" />
     <Compile Include="Utility\WpfUtility.cs" />
   </ItemGroup>

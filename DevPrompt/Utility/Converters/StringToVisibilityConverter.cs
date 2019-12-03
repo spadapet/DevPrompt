@@ -1,17 +1,12 @@
-﻿using DevPrompt.ProcessWorkspace.Utility;
-using System;
+﻿using System;
+using System.Globalization;
 using System.Windows;
 
 namespace DevPrompt.Utility.Converters
 {
-    internal sealed class StringToVisibilityConverter : DelegateConverter
+    internal sealed class StringToVisibilityConverter : Api.Utility.ValueConverter
     {
-        public StringToVisibilityConverter()
-            : base(StringToVisibilityConverter.Convert)
-        {
-        }
-
-        private static object Convert(object value, Type targetType, object parameter)
+        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return (value is string str && !string.IsNullOrEmpty(str)) ? Visibility.Visible : Visibility.Collapsed;
         }

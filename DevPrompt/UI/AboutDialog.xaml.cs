@@ -5,7 +5,7 @@ using System.Windows.Navigation;
 
 namespace DevPrompt.UI
 {
-    internal partial class AboutDialog : Window
+    internal sealed partial class AboutDialog : Window
     {
         public string AppVersion => Program.VersionString;
         public Api.IAppUpdate AppUpdate => this.window.App.AppUpdate;
@@ -35,7 +35,7 @@ namespace DevPrompt.UI
         {
             if (sender is Hyperlink hyperlink && hyperlink.NavigateUri != null)
             {
-                this.window.App.RunExternalProcess(hyperlink.NavigateUri.ToString());
+                this.window.App.AppProcesses.RunExternalProcess(hyperlink.NavigateUri.ToString());
             }
         }
     }

@@ -1,16 +1,12 @@
 ﻿using System;
+using System.Globalization;
 using System.Windows.Media;
 
 namespace DevPrompt.ProcessWorkspace.Utility
 {
-    public sealed class ColorToBrushConverter : DelegateConverter
+    public sealed class ColorToBrushConverter : Api.Utility.ValueConverter
     {
-        public ColorToBrushConverter()
-            : base(ColorToBrushConverter.Convert)
-        {
-        }
-
-        private static object Convert(object value, Type targetType, object parameter)
+        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is Api.ITabThemeKey themeKey && themeKey.ThemeKeyColor != default)
             {

@@ -1,5 +1,4 @@
-﻿using DevPrompt.ProcessWorkspace.Utility;
-using DevPrompt.UI.Settings;
+﻿using DevPrompt.UI.Settings;
 using System;
 using System.Diagnostics;
 using System.Windows;
@@ -9,7 +8,7 @@ namespace DevPrompt.UI.ViewModels
     /// <summary>
     /// View model for a settings tab
     /// </summary>
-    internal class SettingsTabVM : PropertyNotifier, IDisposable
+    internal sealed class SettingsTabVM : Api.Utility.PropertyNotifier, IDisposable
     {
         public Api.SettingsTabType TabType { get; }
         private readonly SettingsDialogVM viewModel;

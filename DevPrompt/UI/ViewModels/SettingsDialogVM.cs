@@ -1,5 +1,4 @@
-﻿using DevPrompt.ProcessWorkspace.Utility;
-using DevPrompt.Settings;
+﻿using DevPrompt.Settings;
 using DevPrompt.UI.Settings;
 using DevPrompt.Utility;
 using Microsoft.Win32;
@@ -14,7 +13,7 @@ namespace DevPrompt.UI.ViewModels
     /// <summary>
     /// View model for the settings dialog
     /// </summary>
-    internal class SettingsDialogVM : PropertyNotifier, IDisposable
+    internal sealed class SettingsDialogVM : Api.Utility.PropertyNotifier, IDisposable
     {
         public AppSettings Settings { get; }
         public MainWindow Window { get; }
@@ -73,7 +72,7 @@ namespace DevPrompt.UI.ViewModels
         public IDisposable BeginBusy()
         {
             this.IsBusy = true;
-            return new DelegateDisposable(() => this.IsBusy = false);
+            return new Api.Utility.DelegateDisposable(() => this.IsBusy = false);
         }
 
         public Api.SettingsTabType ActiveTabType
@@ -106,7 +105,7 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
-        public ICommand ImportCommand => new DelegateCommand(async () =>
+        public ICommand ImportCommand => new Api.Utility.DelegateCommand(async () =>
         {
             OpenFileDialog dialog = new OpenFileDialog
             {
@@ -142,7 +141,7 @@ namespace DevPrompt.UI.ViewModels
             }
         });
 
-        public ICommand ExportCommand => new DelegateCommand(() =>
+        public ICommand ExportCommand => new Api.Utility.DelegateCommand(() =>
         {
             SaveFileDialog dialog = new SaveFileDialog
             {

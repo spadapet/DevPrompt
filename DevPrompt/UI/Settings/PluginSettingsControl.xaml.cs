@@ -1,6 +1,6 @@
-﻿using DevPrompt.ProcessWorkspace.Utility;
-using DevPrompt.UI.ViewModels;
+﻿using DevPrompt.UI.ViewModels;
 using System;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -9,7 +9,7 @@ using System.Windows.Navigation;
 
 namespace DevPrompt.UI.Settings
 {
-    internal partial class PluginSettingsControl : UserControl, IDisposable
+    internal sealed partial class PluginSettingsControl : UserControl, IDisposable
     {
         public PluginSettingsControlVM ViewModel { get; }
 
@@ -33,7 +33,7 @@ namespace DevPrompt.UI.Settings
         }
     }
 
-    internal class PluginStateIconTemplateSelector : DataTemplateSelector
+    internal sealed class PluginStateIconTemplateSelector : DataTemplateSelector
     {
         public DataTemplate InstalledTemplate { get; set; }
         public DataTemplate UpdateAvailableTemplate { get; set; }
@@ -64,7 +64,7 @@ namespace DevPrompt.UI.Settings
         }
     }
 
-    internal class PluginIconTemplateSelector : DataTemplateSelector
+    internal sealed class PluginIconTemplateSelector : DataTemplateSelector
     {
         public DataTemplate IconTemplate { get; set; }
         public DataTemplate DefaultTemplate { get; set; }
@@ -80,14 +80,9 @@ namespace DevPrompt.UI.Settings
         }
     }
 
-    internal class PluginStateToUpdateAvailableVisibility : DelegateConverter
+    internal sealed class PluginStateToUpdateAvailableVisibility : Api.Utility.ValueConverter
     {
-        public PluginStateToUpdateAvailableVisibility()
-            : base(PluginStateToUpdateAvailableVisibility.Convert)
-        {
-        }
-
-        private static object Convert(object value, Type targetType, object parameter)
+        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is PluginState state)
             {
@@ -103,14 +98,9 @@ namespace DevPrompt.UI.Settings
         }
     }
 
-    internal class PluginStateToInstallVisibility : DelegateConverter
+    internal sealed class PluginStateToInstallVisibility : Api.Utility.ValueConverter
     {
-        public PluginStateToInstallVisibility()
-            : base(PluginStateToInstallVisibility.Convert)
-        {
-        }
-
-        private static object Convert(object value, Type targetType, object parameter)
+        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is PluginState state)
             {
@@ -126,14 +116,9 @@ namespace DevPrompt.UI.Settings
         }
     }
 
-    internal class PluginStateToUpdateVisibility : DelegateConverter
+    internal sealed class PluginStateToUpdateVisibility : Api.Utility.ValueConverter
     {
-        public PluginStateToUpdateVisibility()
-            : base(PluginStateToUpdateVisibility.Convert)
-        {
-        }
-
-        private static object Convert(object value, Type targetType, object parameter)
+        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is PluginState state)
             {
@@ -149,14 +134,9 @@ namespace DevPrompt.UI.Settings
         }
     }
 
-    internal class MultiBusyToEnabledConverter : DelegateMultiConverter
+    internal sealed class MultiBusyToEnabledConverter : Api.Utility.MultiValueConverter
     {
-        public MultiBusyToEnabledConverter()
-            : base(MultiBusyToEnabledConverter.Convert)
-        {
-        }
-
-        private static object Convert(object[] values, Type targetType, object parameter)
+        public override object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             foreach (object value in values)
             {

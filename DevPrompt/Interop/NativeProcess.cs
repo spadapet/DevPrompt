@@ -1,5 +1,4 @@
-﻿using DevPrompt.ProcessWorkspace.Utility;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,7 +7,7 @@ namespace DevPrompt.Interop
     /// <summary>
     /// Wrapper for native processes
     /// </summary>
-    internal class NativeProcess : PropertyNotifier, Api.IProcess
+    internal sealed class NativeProcess : Api.Utility.PropertyNotifier, Api.IProcess
     {
         public IProcess Process { get; }
         public IntPtr Hwnd { get; }

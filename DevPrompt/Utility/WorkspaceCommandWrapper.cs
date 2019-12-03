@@ -5,7 +5,7 @@ using System.Windows.Input;
 
 namespace DevPrompt.Utility
 {
-    internal class WorkspaceCommandWrapper : ICommand, IDisposable
+    internal sealed class WorkspaceCommandWrapper : ICommand, IDisposable
     {
         public event EventHandler CanExecuteChanged;
 

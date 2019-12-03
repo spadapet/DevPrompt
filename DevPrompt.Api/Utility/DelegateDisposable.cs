@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace DevPrompt.Utility
+namespace DevPrompt.Api.Utility
 {
     /// <summary>
     /// Just calls a delegate when Dispose() is called
     /// </summary>
-    internal class DelegateDisposable : IDisposable
+    public sealed class DelegateDisposable : IDisposable
     {
         private readonly Action disposeAction;
 

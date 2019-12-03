@@ -1,5 +1,4 @@
-﻿using DevPrompt.ProcessWorkspace.Utility;
-using DevPrompt.Settings;
+﻿using DevPrompt.Settings;
 using DevPrompt.UI.Controls;
 using DevPrompt.UI.Settings;
 using DevPrompt.Utility;
@@ -21,7 +20,7 @@ namespace DevPrompt.UI.ViewModels
     /// <summary>
     /// View model for the main window (handles all menu items, etc)
     /// </summary>
-    internal class MainWindowVM : PropertyNotifier, Api.IWindow
+    internal sealed class MainWindowVM : Api.Utility.PropertyNotifier, Api.IWindow
     {
         public MainWindow Window { get; }
         public App App => this.Window.App;
@@ -56,17 +55,17 @@ namespace DevPrompt.UI.ViewModels
             this.Window.Activated += this.OnWindowActivated;
             this.Window.Deactivated += this.OnWindowDeactivated;
 
-            this.ConsoleCommand = new DelegateCommand((object arg) => this.StartConsole((ConsoleSettings)arg));
-            this.GrabConsoleCommand = new DelegateCommand((object arg) => this.App.GrabProcess((int)arg));
-            this.LinkCommand = new DelegateCommand((object arg) => this.StartLink((LinkSettings)arg));
-            this.ToolCommand = new DelegateCommand((object arg) => this.StartTool((ToolSettings)arg));
-            this.QuickStartConsoleCommand = new DelegateCommand(async (object arg) => await this.QuickStartConsole((int)arg));
+            this.ConsoleCommand = new Api.Utility.DelegateCommand((object arg) => this.StartConsole((ConsoleSettings)arg));
+            this.GrabConsoleCommand = new Api.Utility.DelegateCommand((object arg) => this.App.GrabProcess((int)arg));
+            this.LinkCommand = new Api.Utility.DelegateCommand((object arg) => this.StartLink((LinkSettings)arg));
+            this.ToolCommand = new Api.Utility.DelegateCommand((object arg) => this.StartTool((ToolSettings)arg));
+            this.QuickStartConsoleCommand = new Api.Utility.DelegateCommand(async (object arg) => await this.QuickStartConsole((int)arg));
 
             this.visualStudioConsoles = new ObservableCollection<ConsoleSettings>();
             this.workspaces = new ObservableCollection<IWorkspaceVM>();
             this.workspaceMenuItems = new Dictionary<IWorkspaceVM, FrameworkElement[]>();
             this.workspaceKeyBindings = new Dictionary<IWorkspaceVM, KeyBinding[]>();
-            this.workspaceMenuItemVisibilityConverter = new DelegateMultiConverter(this.ConvertWorkspaceMenuItemVisibility);
+            this.workspaceMenuItemVisibilityConverter = new Api.Utility.DelegateMultiValueConverter(this.ConvertWorkspaceMenuItemVisibility);
         }
 
         private void Dispose()
@@ -83,12 +82,12 @@ namespace DevPrompt.UI.ViewModels
 
         private void OnWindowActivated(object sender, EventArgs args)
         {
-            this.ActiveWorkspace?.Workspace.OnWindowActivated();
+            this.ActiveWorkspace?.Workspace?.OnWindowActivated();
         }
 
         private void OnWindowDeactivated(object sender, EventArgs args)
         {
-            this.ActiveWorkspace?.Workspace.OnWindowDeactivated();
+            this.ActiveWorkspace?.Workspace?.OnWindowDeactivated();
         }
 
         public async Task<bool> UpdateVisualStudioConsolesAsync()
@@ -114,7 +113,7 @@ namespace DevPrompt.UI.ViewModels
             return true;
         }
 
-        public ICommand ExitCommand => new DelegateCommand(() => this.Window.Close());
+        public ICommand ExitCommand => new Api.Utility.DelegateCommand(() => this.Window.Close());
 
         public void ShowSettingsDialog(Api.SettingsTabType tab)
         {
@@ -149,50 +148,50 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
-        public ICommand SettingsCommand => new DelegateCommand(() =>
+        public ICommand SettingsCommand => new Api.Utility.DelegateCommand(() =>
         {
             this.ShowSettingsDialog(Api.SettingsTabType.Default);
         });
 
-        public ICommand PluginsCommand => new DelegateCommand(() =>
+        public ICommand PluginsCommand => new Api.Utility.DelegateCommand(() =>
         {
             this.ShowSettingsDialog(Api.SettingsTabType.Plugins);
         });
 
-        public ICommand CustomizeConsoleGrabCommand => new DelegateCommand(() =>
+        public ICommand CustomizeConsoleGrabCommand => new Api.Utility.DelegateCommand(() =>
         {
             this.ShowSettingsDialog(Api.SettingsTabType.Grab);
         });
 
-        public ICommand CustomizeToolsCommand => new DelegateCommand(() =>
+        public ICommand CustomizeToolsCommand => new Api.Utility.DelegateCommand(() =>
         {
             this.ShowSettingsDialog(Api.SettingsTabType.Tools);
         });
 
-        public ICommand CustomizeLinksCommand => new DelegateCommand(() =>
+        public ICommand CustomizeLinksCommand => new Api.Utility.DelegateCommand(() =>
         {
             this.ShowSettingsDialog(Api.SettingsTabType.Links);
         });
 
-        public ICommand TelemetryCommand => new DelegateCommand(() =>
+        public ICommand TelemetryCommand => new Api.Utility.DelegateCommand(() =>
         {
             this.ShowSettingsDialog(Api.SettingsTabType.Telemetry);
         });
 
-        public ICommand ReportAnIssueCommand => new DelegateCommand(() =>
+        public ICommand ReportAnIssueCommand => new Api.Utility.DelegateCommand(() =>
         {
             this.App.Telemetry.TrackEvent("Command.ReportAnIssue");
             this.RunExternalProcess(Resources.About_IssuesLink);
         });
 
-        public ICommand CheckForUpdatesCommand => new DelegateCommand(async () =>
+        public ICommand CheckForUpdatesCommand => new Api.Utility.DelegateCommand(async () =>
         {
             this.App.Telemetry.TrackEvent("Command.CheckForUpdates");
             await this.AppUpdate.CheckUpdateVersionAsync();
             this.InfoBar.SetInfo(Api.InfoErrorLevel.Message, (this.AppUpdate.State == Api.AppUpdateState.HasUpdate) ? Resources.AppUpdate_UpdateAvailable : Resources.AppUpdate_NoUpdateAvailable);
         });
 
-        public ICommand AboutCommand => new DelegateCommand(() =>
+        public ICommand AboutCommand => new Api.Utility.DelegateCommand(() =>
         {
             this.App.Telemetry.TrackEvent("Command.About");
 
@@ -204,7 +203,7 @@ namespace DevPrompt.UI.ViewModels
             dialog.ShowDialog();
         });
 
-        public ICommand DownloadUpdateCommand => new DelegateCommand(async typeObject =>
+        public ICommand DownloadUpdateCommand => new Api.Utility.DelegateCommand(async typeObject =>
         {
             if (typeObject is string type)
             {
@@ -346,7 +345,7 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
-        private object ConvertWorkspaceMenuItemVisibility(object[] values, Type targetType, object parameter)
+        private object ConvertWorkspaceMenuItemVisibility(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             IWorkspaceVM workspace = (IWorkspaceVM)parameter;
 

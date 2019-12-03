@@ -13,7 +13,7 @@ namespace DevPrompt.Settings
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{MenuName}")]
-    internal class ConsoleSettings : PropertyNotifier, IEquatable<ConsoleSettings>, Api.IConsoleSettings, Api.ITabThemeKey
+    internal sealed class ConsoleSettings : Api.Utility.PropertyNotifier, IEquatable<ConsoleSettings>, Api.IConsoleSettings, Api.ITabThemeKey
     {
         string Api.IConsoleSettings.TabName => this.TabName;
         string Api.IConsoleSettings.Executable => this.Executable;

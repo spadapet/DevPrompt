@@ -1,11 +1,10 @@
-﻿using DevPrompt.ProcessWorkspace.Utility;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
 namespace DevPrompt.UI.ViewModels
 {
-    internal class PluginSortVM : PropertyNotifier
+    internal sealed class PluginSortVM : Api.Utility.PropertyNotifier
     {
         public string Name { get; }
         public IComparer Comparer { get; }
@@ -17,7 +16,7 @@ namespace DevPrompt.UI.ViewModels
         }
     }
 
-    internal class PluginSortInstalled : IComparer, IComparer<IPluginVM>
+    internal sealed class PluginSortInstalled : IComparer, IComparer<IPluginVM>
     {
         int IComparer.Compare(object x, object y)
         {
@@ -45,7 +44,7 @@ namespace DevPrompt.UI.ViewModels
         }
     }
 
-    internal class PluginSortMostRecent : IComparer, IComparer<IPluginVM>
+    internal sealed class PluginSortMostRecent : IComparer, IComparer<IPluginVM>
     {
         int IComparer.Compare(object x, object y)
         {
@@ -73,7 +72,7 @@ namespace DevPrompt.UI.ViewModels
         }
     }
 
-    internal class PluginSortName : IComparer, IComparer<IPluginVM>
+    internal sealed class PluginSortName : IComparer, IComparer<IPluginVM>
     {
         int IComparer.Compare(object x, object y)
         {

@@ -23,7 +23,7 @@ namespace DevPrompt
     /// The native code will call into here using the IAppHost interface. We call into
     /// native code using the IApp interface.
     /// </summary>
-    internal partial class App : Application, IAppHost, Api.IApp
+    internal sealed partial class App : Application, IAppHost, Api.IApp, Api.IAppProcesses
     {
         public AppSettings Settings { get; }
         public HttpClientHelper HttpClient { get; }
@@ -398,6 +398,7 @@ namespace DevPrompt
 
         Api.IAppSettings Api.IApp.Settings => this.Settings;
         Api.IAppUpdate Api.IApp.AppUpdate => this.AppUpdate;
+        Api.IAppProcesses Api.IApp.AppProcesses => this;
         Api.ITelemetry Api.IApp.Telemetry => this.Telemetry;
         Api.IVisualStudioSetup Api.IApp.VisualStudioSetup => this.VisualStudioSetup;
         Api.IWindow Api.IApp.ActiveWindow => this.MainWindow?.ViewModel;
@@ -416,7 +417,7 @@ namespace DevPrompt
             }
         }
 
-        IEnumerable<Api.GrabProcess> Api.IApp.GrabProcesses
+        IEnumerable<Api.GrabProcess> Api.IAppProcesses.GrabProcesses
         {
             get
             {
@@ -425,14 +426,14 @@ namespace DevPrompt
             }
         }
 
-        // Api.IApp
+        // Api.IAppProcesses
         public void GrabProcess(int id)
         {
             this.Telemetry.TrackEvent("Grab.ManualGrabProcess");
             this.NativeApp?.GrabProcess(id);
         }
 
-        Api.IProcessHost Api.IApp.CreateProcessHost(IntPtr parentHwnd)
+        Api.IProcessHost Api.IAppProcesses.CreateProcessHost(IntPtr parentHwnd)
         {
             if (this.PluginState.ProcessCache != null)
             {
@@ -443,7 +444,7 @@ namespace DevPrompt
             return null;
         }
 
-        void Api.IApp.RunExternalProcess(string path, string arguments)
+        void Api.IAppProcesses.RunExternalProcess(string path, string arguments)
         {
             this.MainWindow?.ViewModel.RunExternalProcess(path, arguments);
         }

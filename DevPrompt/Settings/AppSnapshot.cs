@@ -1,5 +1,4 @@
-﻿using DevPrompt.ProcessWorkspace.Utility;
-using DevPrompt.UI.ViewModels;
+﻿using DevPrompt.UI.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,7 +14,7 @@ namespace DevPrompt.Settings
     /// Saves the state of the app during shutdown so it can be restored on startup
     /// </summary>
     [DataContract]
-    internal class AppSnapshot : PropertyNotifier
+    internal sealed class AppSnapshot : Api.Utility.PropertyNotifier
     {
         private ObservableCollection<WorkspaceSnapshot> workspaces;
         private Guid activeWorkspaceId;

@@ -7,7 +7,7 @@ using System.Windows.Media;
 namespace DevPrompt.Settings
 {
     [DataContract]
-    internal class TabTheme : PropertyNotifier, Api.ITabTheme, Api.ITabThemeKey, IEquatable<TabTheme>
+    internal sealed class TabTheme : Api.Utility.PropertyNotifier, Api.ITabTheme, Api.ITabThemeKey, IEquatable<TabTheme>
     {
         public Brush ForegroundSelectedBrush => this.cachedBrushes.Value.ForegroundSelectedBrush;
         public Brush BackgroundSelectedBrush => this.cachedBrushes.Value.BackgroundSelectedBrush;
@@ -97,7 +97,7 @@ namespace DevPrompt.Settings
             }
         }
 
-        private class CachedBrushes
+        private sealed class CachedBrushes
         {
             public Brush ForegroundSelectedBrush { get; }
             public Brush ForegroundUnselectedBrush { get; }

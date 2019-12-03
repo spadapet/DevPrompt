@@ -1,11 +1,9 @@
-﻿using DevPrompt.ProcessWorkspace.Utility;
-
-namespace DevPrompt.UI.DesignerViewModels
+﻿namespace DevPrompt.UI.DesignerViewModels
 {
     /// <summary>
     /// Sample data for the XAML designer
     /// </summary>
-    internal class MainWindowDesignerVM : PropertyNotifier
+    internal sealed class MainWindowDesignerVM : Api.Utility.PropertyNotifier
     {
         public MainWindowDesignerVM()
         {

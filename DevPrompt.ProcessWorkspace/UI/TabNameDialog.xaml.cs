@@ -3,7 +3,7 @@ using System.Windows;
 
 namespace DevPrompt.ProcessWorkspace.UI
 {
-    internal partial class TabNameDialog : Window
+    internal sealed partial class TabNameDialog : Window
     {
         public TabNameDialogVM ViewModel { get; }
 

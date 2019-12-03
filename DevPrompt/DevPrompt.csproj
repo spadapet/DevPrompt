@@ -142,7 +142,6 @@
     <Compile Include="Utility\NuGet\NuGetServiceIndex.cs" />
     <Compile Include="Utility\Converters\BoolToCollapsedConverter.cs" />
     <Compile Include="Utility\CommandUtility.cs" />
-    <Compile Include="Utility\DelegateDisposable.cs" />
     <Compile Include="Settings\AppSettings.cs" />
     <Compile Include="Utility\Telemetry.cs" />
     <Compile Include="Utility\TimerUtility.cs" />

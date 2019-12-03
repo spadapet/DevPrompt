@@ -7,7 +7,7 @@ namespace DevPrompt.Plugins
     /// <summary>
     /// Extra plugin exports that don't use the [Export] attribute.
     /// </summary>
-    internal class ExportProvider : ExportDescriptorProvider
+    internal sealed class ExportProvider : ExportDescriptorProvider
     {
         private readonly App app;
 

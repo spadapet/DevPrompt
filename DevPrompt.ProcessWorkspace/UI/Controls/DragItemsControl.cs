@@ -11,7 +11,7 @@ namespace DevPrompt.ProcessWorkspace.UI.Controls
     /// <summary>
     /// ItemsControl that allows drag/drop of items
     /// </summary>
-    internal class DragItemsControl : ItemsControl
+    internal sealed class DragItemsControl : ItemsControl
     {
         public interface IDragHost
         {
@@ -196,7 +196,7 @@ namespace DevPrompt.ProcessWorkspace.UI.Controls
             }
         }
 
-        private class DragItemAdorner : Adorner
+        private sealed class DragItemAdorner : Adorner
         {
             public bool Left { get; private set; }
 

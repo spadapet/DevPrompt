@@ -8,7 +8,7 @@ namespace DevPrompt.Settings
     /// Normally these custom settings live in AppSettings, but they are cloned here for persisting.
     /// </summary>
     [DataContract]
-    internal class AppCustomSettings
+    internal sealed class AppCustomSettings
     {
         private Dictionary<string, object> customProperties;
 

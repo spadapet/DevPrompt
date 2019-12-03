@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace DevPrompt.ProcessWorkspace.Utility
 {
-    public sealed class ThemeKeyToColorConverter : DelegateConverter
+    public sealed class ThemeKeyToColorConverter : Api.Utility.ValueConverter
     {
-        public ThemeKeyToColorConverter()
-            : base(ThemeKeyToColorConverter.Convert)
-        {
-        }
-
-        private static object Convert(object value, Type targetType, object parameter)
+        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is Api.ITabThemeKey themeKey && themeKey.ThemeKeyColor != default)
             {

@@ -1,16 +1,12 @@
 ﻿using System;
+using System.Globalization;
 using System.Windows;
 
 namespace DevPrompt.ProcessWorkspace.Utility
 {
-    public sealed class ObjectToVisibilityConverter : DelegateConverter
+    public sealed class ObjectToVisibilityConverter : Api.Utility.ValueConverter
     {
-        public ObjectToVisibilityConverter()
-            : base(ObjectToVisibilityConverter.Convert)
-        {
-        }
-
-        private static object Convert(object value, Type targetType, object parameter)
+        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return (value != null) ? Visibility.Visible : Visibility.Collapsed;
         }

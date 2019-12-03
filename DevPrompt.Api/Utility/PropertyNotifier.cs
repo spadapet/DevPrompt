@@ -3,13 +3,13 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
-namespace DevPrompt.ProcessWorkspace.Utility
+namespace DevPrompt.Api.Utility
 {
     /// <summary>
     /// Base class for all WPF models/view models that notify listeners of property changes
     /// </summary>
     [DataContract]
-    public class PropertyNotifier : INotifyPropertyChanging, INotifyPropertyChanged
+    public abstract class PropertyNotifier : INotifyPropertyChanging, INotifyPropertyChanged
     {
         public event PropertyChangingEventHandler PropertyChanging;
         public event PropertyChangedEventHandler PropertyChanged;

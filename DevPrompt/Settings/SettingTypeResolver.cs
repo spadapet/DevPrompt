@@ -6,7 +6,7 @@ using System.Xml;
 
 namespace DevPrompt.Settings
 {
-    internal class SettingTypeResolver : DataContractResolver
+    internal sealed class SettingTypeResolver : DataContractResolver
     {
         private readonly App app;
         private const string Uri = "dev://DevPrompt.Settings.SettingTypeResolver";

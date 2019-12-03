@@ -4,7 +4,7 @@ using System.Composition;
 namespace DevPrompt.Interop
 {
     [Export(typeof(IProcessCache))]
-    internal class NativeProcessCache : IProcessCache, IEqualityComparer<IProcess>
+    internal sealed class NativeProcessCache : IProcessCache, IEqualityComparer<IProcess>
     {
         private readonly Dictionary<IProcess, NativeProcess> processes;
 

@@ -1,5 +1,8 @@
 ﻿namespace DevPrompt.Api
 {
+    /// <summary>
+    /// Info about an installed version of Visual Studio
+    /// </summary>
     public interface IVisualStudioInstance
     {
         string Name { get; }

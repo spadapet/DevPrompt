@@ -1,5 +1,4 @@
 ﻿using DevPrompt.Plugins;
-using DevPrompt.ProcessWorkspace.Utility;
 using DevPrompt.Utility;
 using System;
 using System.Collections.Generic;
@@ -20,7 +19,7 @@ namespace DevPrompt.Settings
     /// Saves/loads application settings
     /// </summary>
     [DataContract]
-    internal class AppSettings : PropertyNotifier, INotifyCollectionChanged, Api.IAppSettings
+    internal sealed class AppSettings : Api.Utility.PropertyNotifier, INotifyCollectionChanged, Api.IAppSettings
     {
         public event NotifyCollectionChangedEventHandler CollectionChanged;
         public ObservableCollection<ConsoleSettings> ObservableConsoles { get; private set; }

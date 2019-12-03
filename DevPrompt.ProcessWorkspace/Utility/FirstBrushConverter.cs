@@ -1,17 +1,13 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Media;
 
 namespace DevPrompt.ProcessWorkspace.Utility
 {
-    internal sealed class FirstBrushConverter : DelegateMultiConverter
+    internal sealed class FirstBrushConverter : Api.Utility.MultiValueConverter
     {
-        public FirstBrushConverter()
-            : base(FirstBrushConverter.Convert)
-        {
-        }
-
-        private static object Convert(object[] values, Type targetType, object parameter)
+        public override object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             return values.OfType<Brush>().FirstOrDefault();
         }

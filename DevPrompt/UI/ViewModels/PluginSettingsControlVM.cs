@@ -1,6 +1,4 @@
-﻿using DevPrompt.ProcessWorkspace.Utility;
-using DevPrompt.Settings;
-using DevPrompt.Utility;
+﻿using DevPrompt.Settings;
 using DevPrompt.Utility.NuGet;
 using System;
 using System.Collections.Generic;
@@ -16,7 +14,7 @@ using System.Windows.Input;
 
 namespace DevPrompt.UI.ViewModels
 {
-    internal class PluginSettingsControlVM : PropertyNotifier, IDisposable
+    internal sealed class PluginSettingsControlVM : Api.Utility.PropertyNotifier, IDisposable
     {
         public IList<IPluginVM> Plugins => this.plugins;
         public IList<PluginSortVM> Sorts => this.sorts;
@@ -218,7 +216,7 @@ namespace DevPrompt.UI.ViewModels
             set => this.SetPropertyValue(ref this.currentPlugin, value);
         }
 
-        public ICommand InstallPluginCommand => new DelegateCommand(async (object obj) =>
+        public ICommand InstallPluginCommand => new Api.Utility.DelegateCommand(async (object obj) =>
         {
             if (obj is IPluginVM plugin)
             {
@@ -237,7 +235,7 @@ namespace DevPrompt.UI.ViewModels
             }
         });
 
-        public ICommand UninstallPluginCommand => new DelegateCommand(async (object obj) =>
+        public ICommand UninstallPluginCommand => new Api.Utility.DelegateCommand(async (object obj) =>
         {
             if (obj is IPluginVM plugin)
             {
@@ -269,7 +267,7 @@ namespace DevPrompt.UI.ViewModels
             void onUnloaded(object s, RoutedEventArgs a) => myCancelSource.Cancel();
             this.settingsVM.Dialog.Unloaded += onUnloaded;
 
-            return new DelegateDisposable(() =>
+            return new Api.Utility.DelegateDisposable(() =>
             {
                 this.settingsVM.Dialog.Unloaded -= onUnloaded;
                 myCancelSource.Dispose();

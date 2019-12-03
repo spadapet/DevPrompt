@@ -6,7 +6,7 @@ using System.Windows.Controls;
 
 namespace DevPrompt.UI.Controls
 {
-    internal partial class InfoBar : UserControl, INotifyPropertyChanged, Api.IInfoBar
+    internal sealed partial class InfoBar : UserControl, INotifyPropertyChanged, Api.IInfoBar
     {
         public event PropertyChangedEventHandler PropertyChanged;
         public bool HasText => !string.IsNullOrEmpty(this.Text);

@@ -1,6 +1,4 @@
-﻿using DevPrompt.Api;
-using DevPrompt.ProcessWorkspace.Utility;
-using DevPrompt.UI;
+﻿using DevPrompt.UI;
 using Microsoft.Win32;
 using System;
 using System.Diagnostics;
@@ -19,12 +17,12 @@ namespace DevPrompt.Utility
     /// - At least once a day afterwards
     /// - When the user chooses a menu item to force a check
     /// </summary>
-    internal class AppUpdate : PropertyNotifier, Api.IAppUpdate, IDisposable
+    internal sealed class AppUpdate : Api.Utility.PropertyNotifier, Api.IAppUpdate, IDisposable
     {
         private readonly App app;
         private readonly Random random;
         private DispatcherTimer timer;
-        private AppUpdateState state;
+        private Api.AppUpdateState state;
         private string updateVersionString;
         private int lastUpdateTicks;
 
@@ -61,7 +59,7 @@ namespace DevPrompt.Utility
             }
         }
 
-        public AppUpdateState State
+        public Api.AppUpdateState State
         {
             get => this.state;
             set => this.SetPropertyValue(ref this.state, value);
@@ -111,9 +109,9 @@ namespace DevPrompt.Utility
             if (!string.IsNullOrEmpty(versionString) && Version.TryParse(versionString, out Version updateVersion))
             {
                 this.UpdateVersionString = versionString;
-                this.State = (this.State == AppUpdateState.HasUpdate || Program.Version.CompareTo(updateVersion) < 0)
-                    ? AppUpdateState.HasUpdate
-                    : AppUpdateState.NoUpdate;
+                this.State = (this.State == Api.AppUpdateState.HasUpdate || Program.Version.CompareTo(updateVersion) < 0)
+                    ? Api.AppUpdateState.HasUpdate
+                    : Api.AppUpdateState.NoUpdate;
             }
         }
 

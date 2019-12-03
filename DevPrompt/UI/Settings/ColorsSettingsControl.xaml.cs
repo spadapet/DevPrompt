@@ -1,5 +1,4 @@
-﻿using DevPrompt.ProcessWorkspace.Utility;
-using DevPrompt.Settings;
+﻿using DevPrompt.Settings;
 using DevPrompt.UI.ViewModels;
 using DevPrompt.Utility;
 using System;
@@ -14,13 +13,13 @@ using System.Windows.Threading;
 
 namespace DevPrompt.UI.Settings
 {
-    internal partial class ColorsSettingsControl : UserControl
+    internal sealed partial class ColorsSettingsControl : UserControl
     {
         public SettingsDialogVM ViewModel { get; }
-        public DelegateCommand MoveUpCommand { get; }
-        public DelegateCommand MoveDownCommand { get; }
-        public DelegateCommand DeleteCommand { get; }
-        public DelegateCommand ResetCommand { get; }
+        public Api.Utility.DelegateCommand MoveUpCommand { get; }
+        public Api.Utility.DelegateCommand MoveDownCommand { get; }
+        public Api.Utility.DelegateCommand DeleteCommand { get; }
+        public Api.Utility.DelegateCommand ResetCommand { get; }
         private int[] previousCustomColors;
 
         public ColorsSettingsControl(SettingsDialogVM viewModel)
@@ -70,7 +69,7 @@ namespace DevPrompt.UI.Settings
             }
         }
 
-        private class WindowInterop : System.Windows.Forms.IWin32Window, IWin32Window
+        private sealed class WindowInterop : System.Windows.Forms.IWin32Window, IWin32Window
         {
             public IntPtr Handle { get; }
 
@@ -80,7 +79,7 @@ namespace DevPrompt.UI.Settings
             }
         }
 
-        private class ColorDialog : System.Windows.Forms.ColorDialog
+        private sealed class ColorDialog : System.Windows.Forms.ColorDialog
         {
             public ColorDialog(Color color)
             {

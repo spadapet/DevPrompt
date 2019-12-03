@@ -3,7 +3,7 @@ using System.Windows.Media;
 
 namespace DevPrompt.ProcessWorkspace.UI.ViewModels
 {
-    internal class TabThemeVM
+    internal sealed class TabThemeVM
     {
         public string Header { get; }
         public Color ThemeKeyColor { get; }

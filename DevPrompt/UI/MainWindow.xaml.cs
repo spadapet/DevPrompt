@@ -13,7 +13,7 @@ using System.Windows.Interop;
 
 namespace DevPrompt.UI
 {
-    internal partial class MainWindow : Window, System.Windows.Forms.IWin32Window
+    internal sealed partial class MainWindow : Window, System.Windows.Forms.IWin32Window
     {
         public MainWindowVM ViewModel { get; }
         public App App { get; }
@@ -132,7 +132,7 @@ namespace DevPrompt.UI
         private void OnGrabMenuOpened(object sender, RoutedEventArgs args)
         {
             Api.IApp app = this.App;
-            List<Api.GrabProcess> grabProcesses = new List<Api.GrabProcess>(app.GrabProcesses);
+            List<Api.GrabProcess> grabProcesses = new List<Api.GrabProcess>(app.AppProcesses.GrabProcesses);
             MenuItem menu = (MenuItem)sender;
 
             MainWindow.UpdateMenu(menu, grabProcesses, (Api.GrabProcess grabProcess) =>

@@ -1,5 +1,4 @@
 ﻿using DevPrompt.Plugins;
-using DevPrompt.ProcessWorkspace.Utility;
 using DevPrompt.Settings;
 using DevPrompt.Utility;
 using System;
@@ -14,7 +13,7 @@ using System.Windows.Media.Imaging;
 
 namespace DevPrompt.UI.ViewModels
 {
-    internal class NuGetPluginVM : PropertyNotifier, IPluginVM
+    internal sealed class NuGetPluginVM : Api.Utility.PropertyNotifier, IPluginVM
     {
         public NuGetPluginSettings PluginSettings { get; }
 

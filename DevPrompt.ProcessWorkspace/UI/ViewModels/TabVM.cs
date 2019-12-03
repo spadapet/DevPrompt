@@ -1,5 +1,4 @@
-﻿using DevPrompt.ProcessWorkspace.Utility;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -11,8 +10,8 @@ using System.Windows.Media;
 
 namespace DevPrompt.ProcessWorkspace.UI.ViewModels
 {
-    internal class TabVM
-        : PropertyNotifier
+    internal sealed class TabVM
+        : Api.Utility.PropertyNotifier
         , Api.ITabHolder
         , Api.ITabTheme
         , Api.ITabThemeKey
@@ -338,12 +337,12 @@ namespace DevPrompt.ProcessWorkspace.UI.ViewModels
             }
         }
 
-        public ICommand ActivateCommand => new DelegateCommand(() =>
+        public ICommand ActivateCommand => new Api.Utility.DelegateCommand(() =>
         {
             this.workspace.ActiveTab = this;
         });
 
-        public ICommand CloseCommand => new DelegateCommand(() =>
+        public ICommand CloseCommand => new Api.Utility.DelegateCommand(() =>
         {
             if (this.tab == null || this.tab.OnClosing())
             {
@@ -351,7 +350,7 @@ namespace DevPrompt.ProcessWorkspace.UI.ViewModels
             }
         });
 
-        public ICommand CloseAllButThisCommand => new DelegateCommand(() =>
+        public ICommand CloseAllButThisCommand => new Api.Utility.DelegateCommand(() =>
         {
             foreach (TabVM tab in this.workspace.Tabs.OfType<TabVM>().ToArray())
             {

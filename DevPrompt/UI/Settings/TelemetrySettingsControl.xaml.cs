@@ -3,7 +3,7 @@ using System.Windows.Controls;
 
 namespace DevPrompt.UI.Settings
 {
-    internal partial class TelemetrySettingsControl : UserControl
+    internal sealed partial class TelemetrySettingsControl : UserControl
     {
         public SettingsDialogVM ViewModel { get; }
 

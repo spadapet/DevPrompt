@@ -6,7 +6,7 @@ using System.Windows.Media;
 
 namespace DevPrompt.UI.DesignerViewModels
 {
-    internal class NuGetPluginDesignerVM : IPluginVM
+    internal sealed class NuGetPluginDesignerVM : IPluginVM
     {
         public string Title => "Plugin Title";
         public string Description => "This is my plugin description.";

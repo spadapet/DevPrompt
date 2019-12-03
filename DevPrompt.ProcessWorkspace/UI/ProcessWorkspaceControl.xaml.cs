@@ -7,7 +7,7 @@ using System.Windows.Input;
 
 namespace DevPrompt.ProcessWorkspace.UI
 {
-    internal partial class ProcessWorkspaceControl : UserControl, DragItemsControl.IDragHost
+    internal sealed partial class ProcessWorkspaceControl : UserControl, DragItemsControl.IDragHost
     {
         public ProcessWorkspace ViewModel { get; }
 

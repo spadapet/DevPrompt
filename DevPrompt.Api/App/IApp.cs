@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace DevPrompt.Api
 {
     /// <summary>
-    /// The global app
+    /// The global app, this can imported by extensions
     /// </summary>
     public interface IApp
     {
         IAppSettings Settings { get; }
         IAppUpdate AppUpdate { get; }
+        IAppProcesses AppProcesses { get; }
         ITelemetry Telemetry { get; }
         IVisualStudioSetup VisualStudioSetup { get; }
         IWindow ActiveWindow { get; }
@@ -18,10 +18,5 @@ namespace DevPrompt.Api
         bool IsElevated { get; }
         bool IsMainProcess { get; }
         bool IsMicrosoftDomain { get; }
-
-        IEnumerable<GrabProcess> GrabProcesses { get; }
-        void GrabProcess(int id);
-        IProcessHost CreateProcessHost(IntPtr parentHwnd);
-        void RunExternalProcess(string path, string arguments = null);
     }
 }

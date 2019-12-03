@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DevPrompt.Utility
 {
-    internal class Telemetry : IDisposable, Api.ITelemetry
+    internal sealed class Telemetry : IDisposable, Api.ITelemetry
     {
         private readonly App app;
         private readonly TelemetryConfiguration config;
@@ -77,19 +77,43 @@ namespace DevPrompt.Utility
 
         public void TrackEvent(string eventName, IEnumerable<KeyValuePair<string, object>> properties = null)
         {
-            if (string.IsNullOrEmpty(eventName) || !this.app.Settings.TelemetryEnabled)
+            if (!string.IsNullOrEmpty(eventName) && this.app.Settings.TelemetryEnabled)
             {
-                return;
-            }
+                Telemetry.ConvertProperties(properties,
+                    out Dictionary<string, string> eventProperties,
+                    out Dictionary<string, double> eventMetrics);
 
+                this.client.TrackEvent(eventName,
+                    (eventProperties != null && eventProperties.Count > 0) ? eventProperties : null,
+                    (eventMetrics != null && eventMetrics.Count > 0) ? eventMetrics : null);
+            }
+        }
+
+        public void TrackException(Exception exception, IEnumerable<KeyValuePair<string, object>> properties = null)
+        {
+            if (exception != null && this.app.Settings.TelemetryEnabled)
+            {
+                Telemetry.ConvertProperties(properties,
+                    out Dictionary<string, string> eventProperties,
+                    out Dictionary<string, double> eventMetrics);
+
+                this.client.TrackException(exception,
+                    (eventProperties != null && eventProperties.Count > 0) ? eventProperties : null,
+                    (eventMetrics != null && eventMetrics.Count > 0) ? eventMetrics : null);
+            }
+        }
+
+        private static void ConvertProperties(IEnumerable<KeyValuePair<string, object>> properties, out Dictionary<string, string> eventProperties, out Dictionary<string, double> eventMetrics)
+        {
             if (properties == null)
             {
-                this.client.TrackEvent(eventName);
+                eventProperties = null;
+                eventMetrics = null;
                 return;
             }
 
-            Dictionary<string, string> eventProperties = new Dictionary<string, string>();
-            Dictionary<string, double> eventMetrics = new Dictionary<string, double>();
+            eventProperties = new Dictionary<string, string>();
+            eventMetrics = new Dictionary<string, double>();
 
             foreach (KeyValuePair<string, object> pair in properties.Where(p => !string.IsNullOrEmpty(p.Key) && p.Value != null))
             {
@@ -162,8 +186,6 @@ namespace DevPrompt.Utility
                         break;
                 }
             }
-
-            this.client.TrackEvent(eventName, (eventProperties.Count > 0) ? eventProperties : null, (eventMetrics.Count > 0) ? eventMetrics : null);
         }
     }
 }

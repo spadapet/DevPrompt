@@ -1,12 +1,11 @@
-﻿using DevPrompt.ProcessWorkspace.Utility;
-using System;
+﻿using System;
 
 namespace DevPrompt.Interop
 {
     /// <summary>
     /// Wrapper for native process hosts
     /// </summary>
-    internal class NativeProcessHost : PropertyNotifier, Api.IProcessHost
+    internal sealed class NativeProcessHost : Api.Utility.PropertyNotifier, Api.IProcessHost
     {
         public IProcessHost Host { get; }
         private readonly IProcessCache processCache;

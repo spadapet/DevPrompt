@@ -7,7 +7,7 @@ namespace DevPrompt.UI.DesignerViewModels
     /// <summary>
     /// View model for the plugins dialog
     /// </summary>
-    internal class PluginsControlDesignerVM
+    internal sealed class PluginsControlDesignerVM
     {
         public AppSettings Settings { get; } = new AppSettings();
         public IPluginVM CurrentPlugin

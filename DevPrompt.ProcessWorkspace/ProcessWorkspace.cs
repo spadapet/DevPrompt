@@ -1,7 +1,6 @@
 ﻿using DevPrompt.ProcessWorkspace.Settings;
 using DevPrompt.ProcessWorkspace.UI;
 using DevPrompt.ProcessWorkspace.UI.ViewModels;
-using DevPrompt.ProcessWorkspace.Utility;
 using DevPrompt.UI.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -19,7 +18,7 @@ using System.Windows.Media;
 
 namespace DevPrompt.ProcessWorkspace
 {
-    internal class ProcessWorkspace : PropertyNotifier, Api.IProcessWorkspace
+    internal sealed class ProcessWorkspace : Api.Utility.PropertyNotifier, Api.IProcessWorkspace
     {
         public Api.IWindow Window { get; }
         public Guid Id => Api.Constants.ProcessWorkspaceId;
@@ -45,7 +44,7 @@ namespace DevPrompt.ProcessWorkspace
         private const int NewTabAtEnd = -1;
         private const int NewTabAtEndNoActivate = -2;
 
-        private class ButtonInfo
+        private sealed class ButtonInfo
         {
             public Button Button { get; }
             public ContextMenu ContextMenu => this.Button.ContextMenu;
@@ -178,13 +177,13 @@ namespace DevPrompt.ProcessWorkspace
 
         IEnumerable<KeyBinding> Api.IWorkspace.KeyBindings => new KeyBinding[]
         {
-            new KeyBinding(new DelegateCommand(this.TabClose), Key.F4, ModifierKeys.Control),
-            new KeyBinding(new DelegateCommand(this.TabDetach), Key.F4, ModifierKeys.Control | ModifierKeys.Shift),
-            new KeyBinding(new DelegateCommand(this.TabClone), Key.T, ModifierKeys.Control),
-            new KeyBinding(new DelegateCommand(this.TabSetName), Key.T, ModifierKeys.Control | ModifierKeys.Shift),
-            new KeyBinding(new DelegateCommand(this.TabCycleNext), Key.Tab, ModifierKeys.Control),
-            new KeyBinding(new DelegateCommand(this.TabCyclePrev), Key.Tab, ModifierKeys.Control | ModifierKeys.Shift),
-            new KeyBinding(new DelegateCommand(this.TabContextMenu), Key.F10, ModifierKeys.Shift),
+            new KeyBinding(new Api.Utility.DelegateCommand(this.TabClose), Key.F4, ModifierKeys.Control),
+            new KeyBinding(new Api.Utility.DelegateCommand(this.TabDetach), Key.F4, ModifierKeys.Control | ModifierKeys.Shift),
+            new KeyBinding(new Api.Utility.DelegateCommand(this.TabClone), Key.T, ModifierKeys.Control),
+            new KeyBinding(new Api.Utility.DelegateCommand(this.TabSetName), Key.T, ModifierKeys.Control | ModifierKeys.Shift),
+            new KeyBinding(new Api.Utility.DelegateCommand(this.TabCycleNext), Key.Tab, ModifierKeys.Control),
+            new KeyBinding(new Api.Utility.DelegateCommand(this.TabCyclePrev), Key.Tab, ModifierKeys.Control | ModifierKeys.Shift),
+            new KeyBinding(new Api.Utility.DelegateCommand(this.TabContextMenu), Key.F10, ModifierKeys.Shift),
         };
 
         void Api.IWorkspace.OnKeyEvent(KeyEventArgs args)

@@ -1,5 +1,4 @@
-﻿using DevPrompt.ProcessWorkspace.Utility;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media;
 
@@ -8,7 +7,7 @@ namespace DevPrompt.ProcessWorkspace.UI.ViewModels
     /// <summary>
     /// View model for the tab name dialog
     /// </summary>
-    internal class TabNameDialogVM : PropertyNotifier
+    internal sealed class TabNameDialogVM : Api.Utility.PropertyNotifier
     {
         public IReadOnlyList<Color> TabThemeKeys { get; }
         private string name;

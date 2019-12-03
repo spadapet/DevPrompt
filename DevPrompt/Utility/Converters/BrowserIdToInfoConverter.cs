@@ -5,7 +5,7 @@ using System.Windows.Data;
 
 namespace DevPrompt.Utility.Converters
 {
-    internal class BrowserIdToInfoConverter : IValueConverter
+    internal sealed class BrowserIdToInfoConverter : IValueConverter
     {
         object IValueConverter.Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

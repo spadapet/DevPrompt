@@ -5,7 +5,7 @@ using System.Windows;
 
 namespace DevPrompt.UI.Settings
 {
-    internal partial class SettingsDialog : Window, IDisposable
+    internal sealed partial class SettingsDialog : Window, IDisposable
     {
         public SettingsDialogVM ViewModel { get; }
 

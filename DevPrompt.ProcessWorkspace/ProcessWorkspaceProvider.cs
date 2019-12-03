@@ -5,7 +5,7 @@ namespace DevPrompt.ProcessWorkspace
 {
     [Export(typeof(Api.IWorkspaceProvider))]
     [Api.Order(Api.Constants.HigherPriority)]
-    internal class ProcessWorkspaceProvider : Api.IWorkspaceProvider
+    internal sealed class ProcessWorkspaceProvider : Api.IWorkspaceProvider
     {
         public Guid WorkspaceId => Api.Constants.ProcessWorkspaceId;
         public string WorkspaceName => ProcessWorkspace.StaticName;

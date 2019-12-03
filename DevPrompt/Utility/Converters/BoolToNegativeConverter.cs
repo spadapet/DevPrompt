@@ -1,16 +1,11 @@
-﻿using DevPrompt.ProcessWorkspace.Utility;
-using System;
+﻿using System;
+using System.Globalization;
 
 namespace DevPrompt.Utility.Converters
 {
-    internal sealed class BoolToNegativeConverter : DelegateConverter
+    internal sealed class BoolToNegativeConverter : Api.Utility.ValueConverter
     {
-        public BoolToNegativeConverter()
-            : base(BoolToNegativeConverter.Convert)
-        {
-        }
-
-        private static object Convert(object value, Type targetType, object parameter)
+        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is bool b)
             {

@@ -1,5 +1,4 @@
-﻿using DevPrompt.ProcessWorkspace.Utility;
-using DevPrompt.Settings;
+﻿using DevPrompt.Settings;
 using System;
 using System.Collections.ObjectModel;
 using System.Windows.Controls;
@@ -13,9 +12,9 @@ namespace DevPrompt.Utility
         public const string SeparatorName = "Separator";
         private const string NewItemPlaceholder = "{NewItemPlaceholder}";
 
-        public static DelegateCommand CreateMoveUpCommand<T>(Func<DataGrid> dataGridAccessor, ObservableCollection<T> items)
+        public static Api.Utility.DelegateCommand CreateMoveUpCommand<T>(Func<DataGrid> dataGridAccessor, ObservableCollection<T> items)
         {
-            return new DelegateCommand(() =>
+            return new Api.Utility.DelegateCommand(() =>
             {
                 DataGrid dataGrid = dataGridAccessor();
 
@@ -31,9 +30,9 @@ namespace DevPrompt.Utility
             });
         }
 
-        public static DelegateCommand CreateMoveDownCommand<T>(Func<DataGrid> dataGridAccessor, ObservableCollection<T> items)
+        public static Api.Utility.DelegateCommand CreateMoveDownCommand<T>(Func<DataGrid> dataGridAccessor, ObservableCollection<T> items)
         {
-            return new DelegateCommand(() =>
+            return new Api.Utility.DelegateCommand(() =>
             {
                 DataGrid dataGrid = dataGridAccessor();
                 if (dataGrid.SelectedIndex >= 0 && dataGrid.SelectedIndex + 1 < items.Count)
@@ -48,9 +47,9 @@ namespace DevPrompt.Utility
             });
         }
 
-        public static DelegateCommand CreateDeleteCommand<T>(Func<DataGrid> dataGridAccessor, ObservableCollection<T> items, Func<T, bool> readOnlyFunc = null)
+        public static Api.Utility.DelegateCommand CreateDeleteCommand<T>(Func<DataGrid> dataGridAccessor, ObservableCollection<T> items, Func<T, bool> readOnlyFunc = null)
         {
-            return new DelegateCommand(() =>
+            return new Api.Utility.DelegateCommand(() =>
             {
                 DataGrid dataGrid = dataGridAccessor();
                 int i = dataGrid.SelectedIndex;
@@ -76,9 +75,9 @@ namespace DevPrompt.Utility
             });
         }
 
-        public static DelegateCommand CreateResetCommand<T>(Func<AppSettings, ObservableCollection<T>> itemsAccessor, AppSettings settings, AppSettings.DefaultSettingsFilter filter)
+        public static Api.Utility.DelegateCommand CreateResetCommand<T>(Func<AppSettings, ObservableCollection<T>> itemsAccessor, AppSettings settings, AppSettings.DefaultSettingsFilter filter)
         {
-            return new DelegateCommand(() =>
+            return new Api.Utility.DelegateCommand(() =>
             {
                 ObservableCollection<T> list = itemsAccessor(settings);
                 list.Clear();
@@ -91,9 +90,9 @@ namespace DevPrompt.Utility
             });
         }
 
-        public static DelegateCommand CreateConsolesResetCommand(AppSettings settings, AppSettings.DefaultSettingsFilter filter)
+        public static Api.Utility.DelegateCommand CreateConsolesResetCommand(AppSettings settings, AppSettings.DefaultSettingsFilter filter)
         {
-            return new DelegateCommand(async () =>
+            return new Api.Utility.DelegateCommand(async () =>
             {
                 ObservableCollection<ConsoleSettings> list = settings.ObservableConsoles;
                 list.Clear();
@@ -115,11 +114,11 @@ namespace DevPrompt.Utility
             });
         }
 
-        public static void UpdateCommands(Dispatcher dispatcher, params DelegateCommand[] commands)
+        public static void UpdateCommands(Dispatcher dispatcher, params Api.Utility.DelegateCommand[] commands)
         {
             Action action = () =>
             {
-                foreach (DelegateCommand command in commands ?? new DelegateCommand[0])
+                foreach (Api.Utility.DelegateCommand command in commands ?? new Api.Utility.DelegateCommand[0])
                 {
                     command.UpdateCanExecute();
                 }

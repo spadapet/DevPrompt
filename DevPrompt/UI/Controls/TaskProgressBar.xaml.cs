@@ -7,12 +7,12 @@ using System.Windows.Controls;
 
 namespace DevPrompt.UI.Controls
 {
-    internal partial class TaskProgressBar : UserControl, INotifyPropertyChanged, Api.IProgressBar
+    internal sealed partial class TaskProgressBar : UserControl, INotifyPropertyChanged, Api.IProgressBar
     {
         public event PropertyChangedEventHandler PropertyChanged;
         private readonly List<TaskInfo> tasks;
 
-        private class TaskInfo : IDisposable
+        private sealed class TaskInfo : IDisposable
         {
             public TaskProgressBar Owner { get; set; }
             public Action CancelAction { get; set; }

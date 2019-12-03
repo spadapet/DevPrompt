@@ -11,7 +11,7 @@ namespace DevPrompt.ProcessWorkspace
     /// Manages the process tabs as processes are created and closed.
     /// </summary>
     [Export(typeof(Api.IProcessListener))]
-    internal class ProcessListener : Api.IProcessListener
+    internal sealed class ProcessListener : Api.IProcessListener
     {
         private readonly Api.IApp app;
 

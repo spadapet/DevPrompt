@@ -12,7 +12,7 @@ namespace DevPrompt.Settings
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{ExeName}")]
-    internal class GrabConsoleSettings : PropertyNotifier, IEquatable<GrabConsoleSettings>, Api.ITabThemeKey
+    internal sealed class GrabConsoleSettings : Api.Utility.PropertyNotifier, IEquatable<GrabConsoleSettings>, Api.ITabThemeKey
     {
         private string exeName;
         private string tabName;

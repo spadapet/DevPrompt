@@ -18,7 +18,7 @@ namespace DevPrompt.Utility
         private const string BrowsersKey32 = @"Software\WOW6432Node\Clients\StartMenuInternet";
         private const string CommandKey = @"shell\open\command";
 
-        internal class BrowserInfo : IEquatable<BrowserInfo>
+        internal sealed class BrowserInfo : IEquatable<BrowserInfo>
         {
             public string Id { get; }
             public string Name { get; }

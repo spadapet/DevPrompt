@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DevPrompt.Utility.NuGet
 {
-    internal class NuGetServiceIndex : IDisposable
+    internal sealed class NuGetServiceIndex : IDisposable
     {
         public const string NuGetOrg = "https://api.nuget.org/v3/index.json";
         private const string SearchQueryService = "SearchQueryService";

@@ -8,7 +8,7 @@ namespace DevPrompt.Interop
     /// Keeps the cached NativeProcess up to date with changes to the native IProcess
     /// </summary>
     [Export(typeof(IProcessListener))]
-    internal class NativeProcessListener : IProcessListener
+    internal sealed class NativeProcessListener : IProcessListener
     {
         private readonly IProcessCache processCache;
         private readonly Api.IProcessListener[] processListeners;

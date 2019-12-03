@@ -6,7 +6,7 @@ using System.Reflection;
 namespace DevPrompt.Plugins
 {
     [DebuggerDisplay("{PluginInfo}")]
-    internal class PluginSource
+    internal sealed class PluginSource
     {
         public Assembly[] Assemblies { get; }
         public PluginSourceType PluginType { get; }

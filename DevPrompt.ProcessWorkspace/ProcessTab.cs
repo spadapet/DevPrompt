@@ -2,7 +2,6 @@
 using DevPrompt.ProcessWorkspace.Settings;
 using DevPrompt.ProcessWorkspace.UI;
 using DevPrompt.ProcessWorkspace.UI.ViewModels;
-using DevPrompt.ProcessWorkspace.Utility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,8 +15,8 @@ namespace DevPrompt.UI.ViewModels
     /// <summary>
     /// View model for each process tab (handles context menu items, etc)
     /// </summary>
-    internal class ProcessTab
-        : PropertyNotifier
+    internal sealed class ProcessTab
+        : Api.Utility.PropertyNotifier
         , Api.ITab
         , Api.ITabTheme
         , Api.ITabThemeKey
@@ -196,7 +195,7 @@ namespace DevPrompt.UI.ViewModels
                 {
                     Header = Resources.Command_SetTabName,
                     InputGestureText = "Ctrl+Shift+T",
-                    Command = new DelegateCommand(this.OnSetTabName),
+                    Command = new Api.Utility.DelegateCommand(this.OnSetTabName),
                 };
 
                 if (this.CreateTabColorMenu() is MenuItem tabColorMenu)
@@ -210,19 +209,19 @@ namespace DevPrompt.UI.ViewModels
                 {
                     Header = Resources.Command_Clone,
                     InputGestureText = "Ctrl+T",
-                    Command = new DelegateCommand(this.OnClone),
+                    Command = new Api.Utility.DelegateCommand(this.OnClone),
                 };
 
                 yield return new MenuItem()
                 {
                     Header = Resources.Command_ConsoleDefaults,
-                    Command = new DelegateCommand(this.OnConsoleDefaults),
+                    Command = new Api.Utility.DelegateCommand(this.OnConsoleDefaults),
                 };
 
                 yield return new MenuItem()
                 {
                     Header = Resources.Command_ConsoleProperties,
-                    Command = new DelegateCommand(this.OnConsoleProperties),
+                    Command = new Api.Utility.DelegateCommand(this.OnConsoleProperties),
                 };
 
                 yield return new Separator();
@@ -231,7 +230,7 @@ namespace DevPrompt.UI.ViewModels
                 {
                     Header = Resources.Command_Detach,
                     InputGestureText = "Ctrl+Shift+F4",
-                    Command = new DelegateCommand(this.OnDetach),
+                    Command = new Api.Utility.DelegateCommand(this.OnDetach),
                 };
             }
         }
@@ -252,7 +251,7 @@ namespace DevPrompt.UI.ViewModels
                 MenuItem editColorsItem = new MenuItem()
                 {
                     Header = Resources.Command_EditColors,
-                    Command = new DelegateCommand(this.OnEditColors),
+                    Command = new Api.Utility.DelegateCommand(this.OnEditColors),
                 };
 
                 tabColorMenu.Items.Add(separator);
@@ -307,7 +306,7 @@ namespace DevPrompt.UI.ViewModels
                         {
                             HeaderTemplate = colorHeaderTemplate,
                             Header = new TabThemeVM(text, themeKey.ThemeKeyColor, theme),
-                            Command = new DelegateCommand(() => this.UserSetThemeKeyColor(themeKey.ThemeKeyColor, "ContextMenu")),
+                            Command = new Api.Utility.DelegateCommand(() => this.UserSetThemeKeyColor(themeKey.ThemeKeyColor, "ContextMenu")),
                         });
                     }
                 }

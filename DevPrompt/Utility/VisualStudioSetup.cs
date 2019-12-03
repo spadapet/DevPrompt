@@ -9,7 +9,7 @@ namespace DevPrompt.Utility
     /// <summary>
     /// Helper for getting all the installed versions of Visual Studio
     /// </summary>
-    internal class VisualStudioSetup : Api.IVisualStudioSetup
+    internal sealed class VisualStudioSetup : Api.IVisualStudioSetup
     {
         public static async Task<IEnumerable<Api.IVisualStudioInstance>> GetInstancesAsync()
         {

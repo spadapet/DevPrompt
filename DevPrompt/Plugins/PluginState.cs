@@ -1,5 +1,4 @@
 ﻿using DevPrompt.Interop;
-using DevPrompt.ProcessWorkspace.Utility;
 using DevPrompt.Settings;
 using System;
 using System.Collections.Generic;
@@ -14,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace DevPrompt.Plugins
 {
-    internal class PluginState : IDisposable
+    internal sealed class PluginState : IDisposable
     {
         public IProcessCache ProcessCache { get; private set; }
         public bool Initialized => this.ProcessCache != null;
@@ -276,7 +275,7 @@ namespace DevPrompt.Plugins
             return null;
         }
 
-        private class PluginSourceComparer : IEqualityComparer<PluginSource>
+        private sealed class PluginSourceComparer : IEqualityComparer<PluginSource>
         {
             public bool Equals(PluginSource x, PluginSource y) => x.PluginInfo.RootPath.Equals(y.PluginInfo.RootPath, StringComparison.OrdinalIgnoreCase);
             public int GetHashCode(PluginSource obj) => StringComparer.OrdinalIgnoreCase.GetHashCode(obj.PluginInfo.RootPath);
@@ -288,7 +287,7 @@ namespace DevPrompt.Plugins
             PluginSource[] defaultPlugins = new PluginSource[]
             {
                 PluginState.CreatePluginSource(Assembly.GetExecutingAssembly()),
-                PluginState.CreatePluginSource(typeof(PropertyNotifier).Assembly),
+                PluginState.CreatePluginSource(typeof(ProcessWorkspace.Resources).Assembly),
             };
 
             HashSet<PluginSource> plugins = new HashSet<PluginSource>(new PluginSourceComparer());

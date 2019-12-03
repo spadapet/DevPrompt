@@ -5,7 +5,7 @@ using System.Windows.Input;
 
 namespace DevPrompt.UI.Settings
 {
-    internal partial class SettingsStyles : ResourceDictionary
+    internal sealed partial class SettingsStyles : ResourceDictionary
     {
         public SettingsStyles()
         {

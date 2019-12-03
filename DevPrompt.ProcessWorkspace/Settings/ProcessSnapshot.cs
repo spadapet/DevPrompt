@@ -11,7 +11,7 @@ namespace DevPrompt.ProcessWorkspace.Settings
     /// Saves the state of a process tab during shutdown so it can be restored on startup
     /// </summary>
     [DataContract]
-    internal class ProcessSnapshot : PropertyNotifier, Api.ITabSnapshot, Api.ITabThemeKey
+    internal sealed class ProcessSnapshot : Api.Utility.PropertyNotifier, Api.ITabSnapshot, Api.ITabThemeKey
     {
         Guid Api.ITabSnapshot.Id => Guid.Empty;
         string Api.ITabSnapshot.Name => this.CachedName;

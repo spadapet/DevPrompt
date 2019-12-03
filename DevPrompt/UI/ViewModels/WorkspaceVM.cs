@@ -1,5 +1,4 @@
-﻿using DevPrompt.ProcessWorkspace.Utility;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -11,13 +10,14 @@ namespace DevPrompt.UI.ViewModels
     /// <summary>
     /// View model to wrap IWorkspace model
     /// </summary>
-    public class WorkspaceVM : PropertyNotifier, IWorkspaceVM
+    public class WorkspaceVM : Api.Utility.PropertyNotifier, IWorkspaceVM
     {
         public string Title => this.Workspace?.Title ?? string.Empty;
         public bool CreatedWorkspace => this.workspace != null;
         public UIElement ViewElement => this.Workspace?.ViewElement;
         public IEnumerable<FrameworkElement> MenuItems => this.workspace?.MenuItems ?? Enumerable.Empty<FrameworkElement>();
         public IEnumerable<KeyBinding> KeyBindings => this.workspace?.KeyBindings ?? Enumerable.Empty<KeyBinding>();
+        public Api.IWorkspaceSnapshot Snapshot => this.workspace?.Snapshot ?? this.snapshot;
 
         private readonly Api.IWindow window;
         private Api.IWorkspace workspace;
@@ -52,7 +52,7 @@ namespace DevPrompt.UI.ViewModels
             }
         }
 
-        public ICommand ActivateCommand => new DelegateCommand((object arg) =>
+        public ICommand ActivateCommand => new Api.Utility.DelegateCommand((object arg) =>
         {
             if (this.Workspace != null)
             {
@@ -111,14 +111,6 @@ namespace DevPrompt.UI.ViewModels
                 }
 
                 return string.Empty;
-            }
-        }
-
-        public Api.IWorkspaceSnapshot Snapshot
-        {
-            get
-            {
-                return this.workspace?.Snapshot ?? this.snapshot;
             }
         }
 
@@ -200,23 +192,19 @@ namespace DevPrompt.UI.ViewModels
 
         public Api.ActiveState ActiveState
         {
-            get
-            {
-                return this.activeState;
-            }
-
+            get => this.activeState;
             set
             {
                 if (this.SetPropertyValue(ref this.activeState, value))
                 {
                     if (this.activeState == Api.ActiveState.Hidden)
                     {
-                        this.Workspace.OnHiding();
+                        this.Workspace?.OnHiding();
                     }
                     else
                     {
-                        this.Workspace.OnShowing();
-                        this.Workspace.Focus();
+                        this.Workspace?.OnShowing();
+                        this.Focus();
                     }
                 }
             }

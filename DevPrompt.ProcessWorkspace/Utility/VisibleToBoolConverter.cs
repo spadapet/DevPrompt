@@ -1,15 +1,11 @@
 ﻿using System;
+using System.Globalization;
 
 namespace DevPrompt.ProcessWorkspace.Utility
 {
-    internal sealed class VisibleToBoolConverter : DelegateConverter
+    internal sealed class VisibleToBoolConverter : Api.Utility.ValueConverter
     {
-        public VisibleToBoolConverter()
-            : base(VisibleToBoolConverter.Convert)
-        {
-        }
-
-        private static object Convert(object value, Type targetType, object parameter)
+        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is Api.ActiveState state)
             {

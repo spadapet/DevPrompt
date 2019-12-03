@@ -6,7 +6,7 @@ namespace DevPrompt.Interop
     /// <summary>
     /// Wrapper for native app
     /// </summary>
-    internal class NativeApp : IDisposable
+    internal sealed class NativeApp : IDisposable
     {
         internal IApp App { get; }
 

@@ -4,7 +4,7 @@ using System.Windows;
 
 namespace DevPrompt.UI.Settings
 {
-    internal partial class SettingsImportDialog : Window
+    internal sealed partial class SettingsImportDialog : Window
     {
         public SettingsImportDialogVM ViewModel { get; }
 

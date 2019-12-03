@@ -1,5 +1,4 @@
-﻿using DevPrompt.ProcessWorkspace.Utility;
-using DevPrompt.Settings;
+﻿using DevPrompt.Settings;
 using DevPrompt.UI.ViewModels;
 using DevPrompt.Utility;
 using System.Collections.Specialized;
@@ -7,13 +6,13 @@ using System.Windows.Controls;
 
 namespace DevPrompt.UI.Settings
 {
-    internal partial class ToolsSettingsControl : UserControl
+    internal sealed partial class ToolsSettingsControl : UserControl
     {
         public SettingsDialogVM ViewModel { get; }
-        public DelegateCommand MoveUpCommand { get; }
-        public DelegateCommand MoveDownCommand { get; }
-        public DelegateCommand DeleteCommand { get; }
-        public DelegateCommand ResetCommand { get; }
+        public Api.Utility.DelegateCommand MoveUpCommand { get; }
+        public Api.Utility.DelegateCommand MoveDownCommand { get; }
+        public Api.Utility.DelegateCommand DeleteCommand { get; }
+        public Api.Utility.DelegateCommand ResetCommand { get; }
 
         public ToolsSettingsControl(SettingsDialogVM viewModel)
         {

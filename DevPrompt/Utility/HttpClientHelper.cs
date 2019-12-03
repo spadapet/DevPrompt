@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DevPrompt.Utility
 {
-    internal class HttpClientHelper : IDisposable
+    internal sealed class HttpClientHelper : IDisposable
     {
         public HttpClient Client { get; }
 

@@ -1,5 +1,4 @@
-﻿using DevPrompt.ProcessWorkspace.Utility;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -12,7 +11,7 @@ namespace DevPrompt.Settings
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{Directory}")]
-    internal class PluginDirectorySettings : PropertyNotifier, IEquatable<PluginDirectorySettings>
+    internal sealed class PluginDirectorySettings : Api.Utility.PropertyNotifier, IEquatable<PluginDirectorySettings>
     {
         private string directory;
         private bool enabled;

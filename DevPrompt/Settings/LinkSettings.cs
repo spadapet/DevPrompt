@@ -1,5 +1,4 @@
-﻿using DevPrompt.ProcessWorkspace.Utility;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Runtime.Serialization;
 
@@ -10,7 +9,7 @@ namespace DevPrompt.Settings
     /// </summary>
     [DataContract]
     [DebuggerDisplay("{Name}")]
-    internal class LinkSettings : PropertyNotifier, IEquatable<LinkSettings>
+    internal sealed class LinkSettings : Api.Utility.PropertyNotifier, IEquatable<LinkSettings>
     {
         private string name;
         private string address;

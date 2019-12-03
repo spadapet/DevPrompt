@@ -1,20 +1,14 @@
-﻿using DevPrompt.Api;
-using DevPrompt.ProcessWorkspace.Utility;
-using System;
+﻿using System;
+using System.Globalization;
 using System.Windows;
 
 namespace DevPrompt.Utility.Converters
 {
-    internal sealed class HasUpdateToVisibilityConverter : DelegateConverter
+    internal sealed class HasUpdateToVisibilityConverter : Api.Utility.ValueConverter
     {
-        public HasUpdateToVisibilityConverter()
-            : base(HasUpdateToVisibilityConverter.Convert)
+        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-        }
-
-        private static object Convert(object value, Type targetType, object parameter)
-        {
-            return (value is AppUpdateState state && state == AppUpdateState.HasUpdate) ? Visibility.Visible : Visibility.Collapsed;
+            return (value is Api.AppUpdateState state && state == Api.AppUpdateState.HasUpdate) ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 }

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace DevPrompt.ProcessWorkspace.Utility
+namespace DevPrompt.Api.Utility
 {
-    public class DelegateCommand : PropertyNotifier, ICommand
+    public sealed class DelegateCommand : PropertyNotifier, ICommand
     {
         public event EventHandler CanExecuteChanged;
 

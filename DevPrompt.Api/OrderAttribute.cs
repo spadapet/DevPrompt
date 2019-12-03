@@ -6,7 +6,7 @@ namespace DevPrompt.Api
 {
     [MetadataAttribute]
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    public class OrderAttribute : Attribute
+    public sealed class OrderAttribute : Attribute
     {
         [DefaultValue(Constants.NormalPriority)]
         public int Order { get; set; }
