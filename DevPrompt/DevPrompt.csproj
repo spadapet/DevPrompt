@@ -233,7 +233,7 @@
       <Name>DevPrompt.ProcessWorkspace</Name>
     </ProjectReference>
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.11.0" />
-    <PackageReference Include="System.Composition" Version="1.3.0" />
+    <PackageReference Include="System.Composition" Version="1.4.0" />
     <PackageReference Include="Efficient.Json" Version="1.1.4" />
   </ItemGroup>
   <ItemGroup>
