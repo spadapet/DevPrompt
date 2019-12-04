@@ -100,14 +100,37 @@ static bool InjectDllOppositeBitness(_In_ HANDLE process, HANDLE stopEvent)
     commandLineBuffer << L"\"" << exePath << L"\" " << ::GetProcessId(process) << L" " << reinterpret_cast<size_t>(process);
     std::wstring commandLine = commandLineBuffer.str();
 
-    STARTUPINFO si{};
-    si.cb = sizeof(si);
+    STARTUPINFOEX si{};
+    si.StartupInfo.cb = sizeof(si);
+
+    ULONG_PTR attributeListSize = 0;
+    if (!::InitializeProcThreadAttributeList(nullptr, 1, 0, &attributeListSize) && ::GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+    {
+        assert(false);
+        return false;
+    }
+
+    std::vector<BYTE> attributeListData;
+    attributeListData.resize(attributeListSize);
+    si.lpAttributeList = reinterpret_cast<LPPROC_THREAD_ATTRIBUTE_LIST>(attributeListData.data());
+
+    if (!::InitializeProcThreadAttributeList(si.lpAttributeList, 1, 0, &attributeListSize))
+    {
+        assert(false);
+        return false;
+    }
+
+    if (!::UpdateProcThreadAttribute(si.lpAttributeList, 0, PROC_THREAD_ATTRIBUTE_HANDLE_LIST, &process, sizeof(HANDLE), nullptr, nullptr))
+    {
+        assert(false);
+        return false;
+    }
 
     PROCESS_INFORMATION pi;
-    DWORD flags = CREATE_SUSPENDED | CREATE_UNICODE_ENVIRONMENT;
+    DWORD flags = CREATE_SUSPENDED | CREATE_UNICODE_ENVIRONMENT | EXTENDED_STARTUPINFO_PRESENT;
     bool status = false;
 
-    if (::CreateProcess(nullptr, &commandLine[0], nullptr, nullptr, TRUE, flags, nullptr, nullptr, &si, &pi))
+    if (::CreateProcess(nullptr, &commandLine[0], nullptr, nullptr, TRUE, flags, nullptr, nullptr, &si.StartupInfo, &pi))
     {
         ::ResumeThread(pi.hThread);
         ::WaitForSingleObject(pi.hProcess, INFINITE);
