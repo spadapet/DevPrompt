@@ -1,5 +1,4 @@
-﻿// Called Process2.h because Process.h conflicts with a Windows header (only started with v142 toolset)
-#pragma once
+﻿#pragma once
 
 #include "Json/Message.h"
 #include "Pipe.h"
@@ -7,11 +6,11 @@
 
 class App;
 
-class Process : public std::enable_shared_from_this<Process>, public IWindowProc
+class ConsoleProcess : public std::enable_shared_from_this<ConsoleProcess>, public IWindowProc
 {
 public:
-    Process(App& app);
-    ~Process();
+    ConsoleProcess(App& app);
+    ~ConsoleProcess();
 
     void Initialize(HWND processHostWindow);
     void Dispose();
@@ -19,7 +18,7 @@ public:
 
     bool Attach(HANDLE process);
     bool Start(const Json::Dict& info);
-    bool Clone(const std::shared_ptr<Process>& process);
+    bool Clone(const std::shared_ptr<ConsoleProcess>& process);
     HWND GetHostWindow() const;
     DWORD GetProcessId() const;
     std::wstring GetProcessState();
@@ -41,7 +40,7 @@ private:
 
     void BackgroundAttach(HANDLE process, HANDLE mainThread = nullptr, const Json::Dict* info = nullptr);
     void BackgroundStart(const Json::Dict& info);
-    void BackgroundClone(const std::shared_ptr<Process>& process);
+    void BackgroundClone(const std::shared_ptr<ConsoleProcess>& process);
     void BackgroundSendCommands(HANDLE process);
     void BackgroundInjectConhost(HWND conhostHwnd);
     void InitNewProcess(const Json::Dict& info);

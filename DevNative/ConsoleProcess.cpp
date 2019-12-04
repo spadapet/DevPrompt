@@ -1,11 +1,11 @@
 ﻿#include "stdafx.h"
 #include "App.h"
+#include "ConsoleProcess.h"
 #include "DevPrompt_h.h"
 #include "Json/Persist.h"
-#include "Process2.h"
 #include "Utility.h"
 
-Process::Process(App& app)
+ConsoleProcess::ConsoleProcess(App& app)
     : app(app.shared_from_this())
     , disposeEvent(::CreateEventEx(nullptr, nullptr, CREATE_EVENT_MANUAL_RESET, EVENT_ALL_ACCESS))
     , messageEvent(::CreateEventEx(nullptr, nullptr, CREATE_EVENT_MANUAL_RESET, EVENT_ALL_ACCESS))
@@ -15,7 +15,7 @@ Process::Process(App& app)
     this->app->OnProcessCreated(this);
 }
 
-Process::~Process()
+ConsoleProcess::~ConsoleProcess()
 {
     this->Dispose();
 
@@ -49,14 +49,14 @@ Process::~Process()
     this->app->OnProcessDestroyed(this);
 }
 
-void Process::Initialize(HWND processHostWindow)
+void ConsoleProcess::Initialize(HWND processHostWindow)
 {
     assert(App::IsMainThread() && processHostWindow);
 
     WNDCLASSEX windowClass{};
     windowClass.cbSize = sizeof(windowClass);
     windowClass.hInstance = this->app->GetInstance();
-    windowClass.lpszClassName = L"Process::Host";
+    windowClass.lpszClassName = L"ConsoleProcess::Host";
     windowClass.hCursor = ::LoadCursor(nullptr, IDC_ARROW);
     windowClass.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_BTNFACE + 1);
 
@@ -65,7 +65,7 @@ void Process::Initialize(HWND processHostWindow)
     this->hostWnd = IWindowProc::Create(this, windowClass, WS_CHILD | WS_CLIPCHILDREN, rect, processHostWindow);
 }
 
-void Process::Dispose()
+void ConsoleProcess::Dispose()
 {
     if (App::IsMainThread() && this->hostWnd)
     {
@@ -75,7 +75,7 @@ void Process::Dispose()
     ::SetEvent(this->disposeEvent);
 }
 
-void Process::Detach()
+void ConsoleProcess::Detach()
 {
     assert(App::IsMainThread());
 
@@ -89,14 +89,14 @@ void Process::Detach()
     this->Dispose();
 }
 
-bool Process::Attach(HANDLE process)
+bool ConsoleProcess::Attach(HANDLE process)
 {
     assert(App::IsMainThread());
 
     HANDLE dupeProcess = nullptr;
     if (::DuplicateHandle(::GetCurrentProcess(), process, ::GetCurrentProcess(), &dupeProcess, PROCESS_ALL_ACCESS, TRUE, 0))
     {
-        std::shared_ptr<Process> self = shared_from_this();
+        std::shared_ptr<ConsoleProcess> self = shared_from_this();
 
         this->backgroundThread = std::thread([self, dupeProcess]()
         {
@@ -109,11 +109,11 @@ bool Process::Attach(HANDLE process)
     return false;
 }
 
-bool Process::Start(const Json::Dict& info)
+bool ConsoleProcess::Start(const Json::Dict& info)
 {
     assert(App::IsMainThread());
 
-    std::shared_ptr<Process> self = shared_from_this();
+    std::shared_ptr<ConsoleProcess> self = shared_from_this();
 
     this->backgroundThread = std::thread([self, info]()
     {
@@ -123,11 +123,11 @@ bool Process::Start(const Json::Dict& info)
     return true;
 }
 
-bool Process::Clone(const std::shared_ptr<Process>& process)
+bool ConsoleProcess::Clone(const std::shared_ptr<ConsoleProcess>& process)
 {
     assert(App::IsMainThread());
 
-    std::shared_ptr<Process> self = shared_from_this();
+    std::shared_ptr<ConsoleProcess> self = shared_from_this();
 
     this->backgroundThread = std::thread([self, process]()
     {
@@ -137,19 +137,19 @@ bool Process::Clone(const std::shared_ptr<Process>& process)
     return true;
 }
 
-HWND Process::GetHostWindow() const
+HWND ConsoleProcess::GetHostWindow() const
 {
     assert(App::IsMainThread());
 
     return this->hostWnd;
 }
 
-DWORD Process::GetProcessId() const
+DWORD ConsoleProcess::GetProcessId() const
 {
     return ::InterlockedXor(const_cast<long*>(reinterpret_cast<const long*>(&this->processId)), 0);
 }
 
-std::wstring Process::GetProcessState()
+std::wstring ConsoleProcess::GetProcessState()
 {
     assert(App::IsMainThread());
 
@@ -162,14 +162,14 @@ std::wstring Process::GetProcessState()
     return std::wstring();
 }
 
-void Process::SendDpiChanged()
+void ConsoleProcess::SendDpiChanged()
 {
     assert(App::IsMainThread());
 
     this->SendMessageAsync(PIPE_COMMAND_CHECK_WINDOW_DPI);
 }
 
-void Process::SendSystemCommand(UINT id)
+void ConsoleProcess::SendSystemCommand(UINT id)
 {
     assert(App::IsMainThread());
 
@@ -187,7 +187,7 @@ void Process::SendSystemCommand(UINT id)
     }
 }
 
-void Process::Activate()
+void ConsoleProcess::Activate()
 {
     assert(App::IsMainThread());
 
@@ -199,7 +199,7 @@ void Process::Activate()
     this->SendMessageAsync(PIPE_COMMAND_ACTIVATED);
 }
 
-void Process::Deactivate()
+void ConsoleProcess::Deactivate()
 {
     assert(App::IsMainThread());
 
@@ -211,7 +211,7 @@ void Process::Deactivate()
     this->SendMessageAsync(PIPE_COMMAND_DEACTIVATED);
 }
 
-bool Process::IsActive()
+bool ConsoleProcess::IsActive()
 {
     assert(App::IsMainThread());
 
@@ -224,7 +224,7 @@ bool Process::IsActive()
     return false;
 }
 
-void Process::SetChildWindow(HWND hwnd, DWORD processId)
+void ConsoleProcess::SetChildWindow(HWND hwnd, DWORD processId)
 {
     assert(App::IsMainThread());
 
@@ -287,7 +287,7 @@ void Process::SetChildWindow(HWND hwnd, DWORD processId)
     }
 }
 
-LRESULT Process::WindowProc(HWND hwnd, UINT message, WPARAM wp, LPARAM lp)
+LRESULT ConsoleProcess::WindowProc(HWND hwnd, UINT message, WPARAM wp, LPARAM lp)
 {
     assert(App::IsMainThread());
 
@@ -325,16 +325,16 @@ LRESULT Process::WindowProc(HWND hwnd, UINT message, WPARAM wp, LPARAM lp)
     return ::DefWindowProc(hwnd, message, wp, lp);
 }
 
-HWND Process::GetChildWindow() const
+HWND ConsoleProcess::GetChildWindow() const
 {
     assert(App::IsMainThread());
 
     return this->hostWnd ? ::GetTopWindow(this->hostWnd) : nullptr;
 }
 
-void Process::PostDispose()
+void ConsoleProcess::PostDispose()
 {
-    std::shared_ptr<Process> self = shared_from_this();
+    std::shared_ptr<ConsoleProcess> self = shared_from_this();
 
     this->app->PostToMainThread([self]()
     {
@@ -342,11 +342,11 @@ void Process::PostDispose()
     });
 }
 
-void Process::InjectConhost(HWND conhostHwnd)
+void ConsoleProcess::InjectConhost(HWND conhostHwnd)
 {
     assert(App::IsMainThread());
 
-    std::shared_ptr<Process> self = shared_from_this();
+    std::shared_ptr<ConsoleProcess> self = shared_from_this();
 
     this->injectConhostThread = std::thread([self, conhostHwnd]()
     {
@@ -356,15 +356,15 @@ void Process::InjectConhost(HWND conhostHwnd)
 
 // Creates a pipe server to listen to the other process, and injects a thread
 // into that process to create another pipe server that listens to this process. Whew...
-void Process::BackgroundAttach(HANDLE process, HANDLE mainThread, const Json::Dict* info)
+void ConsoleProcess::BackgroundAttach(HANDLE process, HANDLE mainThread, const Json::Dict* info)
 {
     assert(!App::IsMainThread());
-    std::shared_ptr<Process> self = shared_from_this();
+    std::shared_ptr<ConsoleProcess> self = shared_from_this();
     ::InterlockedExchange(&this->processId, ::GetProcessId(process));
 
     std::wstringstream threadName;
     threadName << L"[" << this->GetProcessId() << L"] AppPipeServer";
-    DevInject::SetDebuggerThreadName(threadName.str());
+    ::SetThreadDescription(::GetCurrentThread(), threadName.str().c_str());
 
     Pipe pipe = Pipe::Create(process, this->disposeEvent);
     bool injected = DevInject::InjectDll(process, this->disposeEvent, true);
@@ -387,7 +387,7 @@ void Process::BackgroundAttach(HANDLE process, HANDLE mainThread, const Json::Di
             {
                 std::wstringstream threadName;
                 threadName << L"[" << self->GetProcessId() << L"] SendCommands";
-                DevInject::SetDebuggerThreadName(threadName.str());
+                ::SetThreadDescription(::GetCurrentThread(), threadName.str().c_str());
 
                 self->BackgroundSendCommands(process);
             });
@@ -455,7 +455,7 @@ static bool DirectoryExists(const wchar_t* path)
     return false;
 }
 
-void Process::BackgroundStart(const Json::Dict& info)
+void ConsoleProcess::BackgroundStart(const Json::Dict& info)
 {
     assert(!App::IsMainThread());
 
@@ -505,7 +505,7 @@ void Process::BackgroundStart(const Json::Dict& info)
     }
 }
 
-void Process::BackgroundClone(const std::shared_ptr<Process>& process)
+void ConsoleProcess::BackgroundClone(const std::shared_ptr<ConsoleProcess>& process)
 {
     assert(!App::IsMainThread());
 
@@ -521,7 +521,7 @@ void Process::BackgroundClone(const std::shared_ptr<Process>& process)
 }
 
 // Thread that just sends messages to the other pipe server when a command is put in a queue
-void Process::BackgroundSendCommands(HANDLE process)
+void ConsoleProcess::BackgroundSendCommands(HANDLE process)
 {
     std::array<HANDLE, 3> handles = { this->messageEvent, this->disposeEvent, process };
     while (::WaitForMultipleObjects(static_cast<DWORD>(handles.size()), handles.data(), FALSE, INFINITE) == WAIT_OBJECT_0)
@@ -543,9 +543,9 @@ void Process::BackgroundSendCommands(HANDLE process)
     }
 }
 
-void Process::BackgroundInjectConhost(HWND conhostHwnd)
+void ConsoleProcess::BackgroundInjectConhost(HWND conhostHwnd)
 {
-    std::shared_ptr<Process> self = shared_from_this();
+    std::shared_ptr<ConsoleProcess> self = shared_from_this();
     DWORD conhostProcessId = 0;
     HANDLE conhostProcess = nullptr;
 
@@ -573,7 +573,7 @@ void Process::BackgroundInjectConhost(HWND conhostHwnd)
     {
         std::wstringstream threadName;
         threadName << L"[" << conhostProcessId << L"] ConhostPipeServer";
-        DevInject::SetDebuggerThreadName(threadName.str());
+        ::SetThreadDescription(::GetCurrentThread(), threadName.str().c_str());
 
         Pipe pipe = Pipe::Create(conhostProcess, this->disposeEvent);
         bool injected = DevInject::InjectDll(conhostProcess, this->disposeEvent, true);
@@ -593,7 +593,7 @@ void Process::BackgroundInjectConhost(HWND conhostHwnd)
 }
 
 // Initialize a newly created process after pipes are connected
-void Process::InitNewProcess(const Json::Dict& info)
+void ConsoleProcess::InitNewProcess(const Json::Dict& info)
 {
     Json::Dict infoCopy = info;
 
@@ -610,7 +610,7 @@ void Process::InitNewProcess(const Json::Dict& info)
     }
 }
 
-void Process::SendMessageAsync(std::wstring&& name)
+void ConsoleProcess::SendMessageAsync(std::wstring&& name)
 {
     Json::Dict message;
     message.Set(PIPE_PROPERTY_COMMAND, Json::Value(std::move(name)));
@@ -618,7 +618,7 @@ void Process::SendMessageAsync(std::wstring&& name)
 }
 
 // Adds a command to the queue to send to the other process. It may never be sent if the other process dies.
-void Process::SendMessageAsync(Json::Dict&& command)
+void ConsoleProcess::SendMessageAsync(Json::Dict&& command)
 {
     // call from any thread
 
@@ -627,7 +627,7 @@ void Process::SendMessageAsync(Json::Dict&& command)
     ::SetEvent(this->messageEvent);
 }
 
-void Process::SendMessages(HANDLE process, const std::vector<Json::Dict>& messages)
+void ConsoleProcess::SendMessages(HANDLE process, const std::vector<Json::Dict>& messages)
 {
     for (const Json::Dict& message : messages)
     {
@@ -647,14 +647,14 @@ void Process::SendMessages(HANDLE process, const std::vector<Json::Dict>& messag
 }
 
 // Blocks while a command is sent
-bool Process::TransactMessage(std::wstring&& name)
+bool ConsoleProcess::TransactMessage(std::wstring&& name)
 {
     Json::Dict output;
     return this->TransactMessage(std::move(name), output);
 }
 
 // Blocks while a command is sent
-bool Process::TransactMessage(std::wstring&& name, Json::Dict& output)
+bool ConsoleProcess::TransactMessage(std::wstring&& name, Json::Dict& output)
 {
     Json::Dict message;
     message.Set(PIPE_PROPERTY_COMMAND, Json::Value(std::move(name)));
@@ -662,7 +662,7 @@ bool Process::TransactMessage(std::wstring&& name, Json::Dict& output)
 }
 
 // Blocks while a command is sent
-bool Process::TransactMessage(const Json::Dict& input, Json::Dict& output)
+bool ConsoleProcess::TransactMessage(const Json::Dict& input, Json::Dict& output)
 {
     Json::Value name = input.Get(PIPE_PROPERTY_COMMAND);
     bool result = false;
@@ -680,7 +680,7 @@ bool Process::TransactMessage(const Json::Dict& input, Json::Dict& output)
 }
 
 // Called after the BackgroundSendCommands thread is gone to flush any remaining messages
-void Process::FlushRemainingMessages(HANDLE process)
+void ConsoleProcess::FlushRemainingMessages(HANDLE process)
 {
     while (true)
     {
@@ -703,12 +703,12 @@ void Process::FlushRemainingMessages(HANDLE process)
 }
 
 // Handles messages that come in from the other process through my pipe server
-Json::Dict Process::HandleMessage(HANDLE process, const Json::Dict& input)
+Json::Dict ConsoleProcess::HandleMessage(HANDLE process, const Json::Dict& input)
 {
     assert(!App::IsMainThread());
 
     Json::Dict result;
-    std::shared_ptr<Process> self = this->shared_from_this();
+    std::shared_ptr<ConsoleProcess> self = this->shared_from_this();
     std::wstring name = input.Get(PIPE_PROPERTY_COMMAND).TryGetString();
 
     if (name == PIPE_COMMAND_PIPE_CREATED)
@@ -741,7 +741,7 @@ Json::Dict Process::HandleMessage(HANDLE process, const Json::Dict& input)
     return result;
 }
 
-Json::Dict Process::HandleConhostMessage(HANDLE process, HWND conhostHwnd, const Json::Dict& input)
+Json::Dict ConsoleProcess::HandleConhostMessage(HANDLE process, HWND conhostHwnd, const Json::Dict& input)
 {
     assert(!App::IsMainThread());
 
@@ -757,7 +757,7 @@ Json::Dict Process::HandleConhostMessage(HANDLE process, HWND conhostHwnd, const
 }
 
 // Handles command responses that come from the other process after we send it a command
-void Process::HandleResponse(const std::wstring& name, const Json::Dict& output)
+void ConsoleProcess::HandleResponse(const std::wstring& name, const Json::Dict& output)
 {
     if (name == PIPE_COMMAND_GET_STATE)
     {
@@ -766,9 +766,9 @@ void Process::HandleResponse(const std::wstring& name, const Json::Dict& output)
 }
 
 // Handles PIPE_COMMAND_GET_STATE response or PIPE_COMMAND_STATE_CHANGED message
-void Process::HandleNewState(const Json::Dict& state)
+void ConsoleProcess::HandleNewState(const Json::Dict& state)
 {
-    std::shared_ptr<Process> self = this->shared_from_this();
+    std::shared_ptr<ConsoleProcess> self = this->shared_from_this();
 
     Json::Value title = state.Get(PIPE_PROPERTY_TITLE);
     if (title.IsString())

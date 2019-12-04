@@ -7,8 +7,8 @@
 #define QUOTED(x) QUOTED2(x)
 
 #if PLATFORM_BITS == 64
-#define MY_NAME "DevNative"
-#define MY_FILENAME "DevNative.dll"
+#define MY_NAME "DevNative64"
+#define MY_FILENAME "DevNative64.dll"
 #else
 #define MY_NAME "DevNative32"
 #define MY_FILENAME "DevNative32.dll"

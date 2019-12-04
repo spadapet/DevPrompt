@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
 #include "App.h"
+#include "ConsoleProcess.h"
 #include "Json/Dict.h"
 #include "Json/Persist.h"
-#include "Process2.h"
 #include "ProcessInterop.h"
 #include "ProcessHostInterop.h"
 

@@ -3,7 +3,7 @@
 #include "Json/Dict.h"
 #include "WindowProc.h"
 
-class Process;
+class ConsoleProcess;
 struct IAppHost;
 
 struct IAppListener
@@ -58,19 +58,19 @@ public:
     void NoAutoGrabWindow(HWND hwnd);
 
     // Notifications from Process objects
-    void OnProcessCreated(Process* process);
-    void OnProcessDestroyed(Process* process);
-    void OnProcessClosing(Process* process);
-    void OnProcessEnvChanged(Process* process, const Json::Dict& env);
-    void OnProcessTitleChanged(Process* process, const std::wstring& title);
+    void OnProcessCreated(ConsoleProcess* process);
+    void OnProcessDestroyed(ConsoleProcess* process);
+    void OnProcessClosing(ConsoleProcess* process);
+    void OnProcessEnvChanged(ConsoleProcess* process, const Json::Dict& env);
+    void OnProcessTitleChanged(ConsoleProcess* process, const std::wstring& title);
 
     // IWindowProc
     virtual LRESULT WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) override;
 
 private:
-    std::shared_ptr<Process> FindProcess(HWND hwnd);
-    std::shared_ptr<Process> FindProcess(DWORD procId);
-    std::shared_ptr<Process> FindActiveProcess();
+    std::shared_ptr<ConsoleProcess> FindProcess(HWND hwnd);
+    std::shared_ptr<ConsoleProcess> FindProcess(DWORD procId);
+    std::shared_ptr<ConsoleProcess> FindActiveProcess();
 
     void UpdateEnvironmentVariables();
     void DisposeMessageWindow();
@@ -110,7 +110,7 @@ private:
     std::list<Task> tasks;
 
     // Processes
-    std::vector<std::shared_ptr<Process>> processes;
+    std::vector<std::shared_ptr<ConsoleProcess>> processes;
     std::vector<HWND> processHostWindows;
     int processCount;
     CRITICAL_SECTION processCountCS;

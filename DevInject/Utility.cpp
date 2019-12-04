@@ -4,6 +4,7 @@
 
 static UINT WM_CUSTOM_DETACH = ::RegisterWindowMessage(L"DevInject::WM_CUSTOM_DETACH");
 static UINT WM_CUSTOM_ATTACHED = ::RegisterWindowMessage(L"DevInject::WM_CUSTOM_ATTACHED");
+static const bool IsMyProcess64 = (PLATFORM_BITS == 64);
 
 UINT DevInject::GetDetachMessage()
 {
@@ -37,8 +38,6 @@ std::wstring DevInject::GetModuleFileName(HMODULE handle)
         }
     }
 }
-
-static const bool IsMyProcess64 = (PLATFORM_BITS == 64);
 
 static bool InjectDllSameBitness(HANDLE process, HANDLE stopEvent)
 {
@@ -100,9 +99,6 @@ static bool InjectDllOppositeBitness(_In_ HANDLE process, HANDLE stopEvent)
     commandLineBuffer << L"\"" << exePath << L"\" " << ::GetProcessId(process) << L" " << reinterpret_cast<size_t>(process);
     std::wstring commandLine = commandLineBuffer.str();
 
-    STARTUPINFOEX si{};
-    si.StartupInfo.cb = sizeof(si);
-
     ULONG_PTR attributeListSize = 0;
     if (!::InitializeProcThreadAttributeList(nullptr, 1, 0, &attributeListSize) && ::GetLastError() != ERROR_INSUFFICIENT_BUFFER)
     {
@@ -112,19 +108,18 @@ static bool InjectDllOppositeBitness(_In_ HANDLE process, HANDLE stopEvent)
 
     std::vector<BYTE> attributeListData;
     attributeListData.resize(attributeListSize);
-    si.lpAttributeList = reinterpret_cast<LPPROC_THREAD_ATTRIBUTE_LIST>(attributeListData.data());
+    LPPROC_THREAD_ATTRIBUTE_LIST attributeList = reinterpret_cast<LPPROC_THREAD_ATTRIBUTE_LIST>(attributeListData.data());
 
-    if (!::InitializeProcThreadAttributeList(si.lpAttributeList, 1, 0, &attributeListSize))
+    if (!::InitializeProcThreadAttributeList(attributeList, 1, 0, &attributeListSize) || attributeList == nullptr ||
+        !::UpdateProcThreadAttribute(attributeList, 0, PROC_THREAD_ATTRIBUTE_HANDLE_LIST, &process, sizeof(HANDLE), nullptr, nullptr))
     {
         assert(false);
         return false;
     }
 
-    if (!::UpdateProcThreadAttribute(si.lpAttributeList, 0, PROC_THREAD_ATTRIBUTE_HANDLE_LIST, &process, sizeof(HANDLE), nullptr, nullptr))
-    {
-        assert(false);
-        return false;
-    }
+    STARTUPINFOEX si{};
+    si.StartupInfo.cb = sizeof(si);
+    si.lpAttributeList = attributeList;
 
     PROCESS_INFORMATION pi;
     DWORD flags = CREATE_SUSPENDED | CREATE_UNICODE_ENVIRONMENT | EXTENDED_STARTUPINFO_PRESENT;
@@ -216,37 +211,4 @@ void DevInject::BeginDetach(HWND waitForWindowToRespond)
     {
         ::CloseHandle(thread);
     }
-}
-
-void DevInject::SetDebuggerThreadName(const std::wstring& name, DWORD threadId)
-{
-#ifdef _DEBUG
-    if (IsDebuggerPresent())
-    {
-        char nameAcp[512] = "";
-        ::WideCharToMultiByte(CP_ACP, 0, name.c_str(), -1, nameAcp, _countof(nameAcp), nullptr, nullptr);
-
-        typedef struct tagTHREADNAME_INFO
-        {
-            ULONG_PTR dwType; // must be 0x1000
-            const char* szName; // pointer to name (in user addr space)
-            ULONG_PTR dwThreadID; // thread ID (-1=caller thread)
-            ULONG_PTR dwFlags; // reserved for future use, must be zero
-        } THREADNAME_INFO;
-
-        THREADNAME_INFO info;
-        info.dwType = 0x1000;
-        info.szName = nameAcp;
-        info.dwThreadID = threadId ? threadId : ::GetCurrentThreadId();
-        info.dwFlags = 0;
-
-        __try
-        {
-            RaiseException(0x406D1388, 0, sizeof(info) / sizeof(ULONG_PTR), reinterpret_cast<ULONG_PTR*>(&info));
-        }
-        __except (EXCEPTION_CONTINUE_EXECUTION)
-        {
-        }
-    }
-#endif
 }

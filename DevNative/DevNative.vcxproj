@@ -21,7 +21,7 @@
     <ClInclude Include="Interop\ProcessInterop.h" />
     <ClInclude Include="Interop\VisualStudioInstance.h" />
     <ClInclude Include="Interop\VisualStudioInstances.h" />
-    <ClInclude Include="Process2.h" />
+    <ClInclude Include="ConsoleProcess.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="WindowProc.h" />
@@ -34,7 +34,7 @@
     <ClCompile Include="Interop\VisualStudioInstance.cpp" />
     <ClCompile Include="Interop\VisualStudioInstances.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Process2.cpp" />
+    <ClCompile Include="ConsoleProcess.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>

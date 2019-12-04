@@ -1,9 +1,9 @@
 ﻿#include "stdafx.h"
 #include "App.h"
+#include "ConsoleProcess.h"
 #include "DevPrompt_h.h"
 #include "Interop/ProcessInterop.h"
 #include "Json/Persist.h"
-#include "Process2.h"
 
 static App* app = nullptr;
 static const UINT_PTR WINDOWS_CHANGED_TIMER = 1;
@@ -367,9 +367,9 @@ void App::DisposeAllProcessesAndWait()
 {
     assert(App::IsMainThread());
 
-    std::vector<std::shared_ptr<Process>> processes = this->processes;
+    std::vector<std::shared_ptr<ConsoleProcess>> processes = this->processes;
 
-    for (std::shared_ptr<Process>& process : processes)
+    for (std::shared_ptr<ConsoleProcess>& process : processes)
     {
         process->Dispose();
     }
@@ -504,7 +504,7 @@ void App::ProcessHostWindowDpiChanged(HWND hwnd)
 
     this->PostToMainThread([self, hwnd]()
     {
-        for (std::shared_ptr<Process>& i : self->processes)
+        for (std::shared_ptr<ConsoleProcess>& i : self->processes)
         {
             if (i->GetHostWindow() && ::GetParent(i->GetHostWindow()) == hwnd)
             {
@@ -518,7 +518,7 @@ HWND App::RunProcess(HWND processHostWindow, const Json::Dict& info)
 {
     assert(App::IsMainThread());
 
-    std::shared_ptr<Process> process = std::make_shared<Process>(*this);
+    std::shared_ptr<ConsoleProcess> process = std::make_shared<ConsoleProcess>(*this);
     process->Initialize(processHostWindow);
     assert(process->GetHostWindow());
 
@@ -540,12 +540,12 @@ HWND App::CloneProcess(HWND processHostWindow, HWND hwnd)
 {
     assert(App::IsMainThread());
 
-    std::shared_ptr<Process> process;
-    std::shared_ptr<Process> firstProcess = this->FindProcess(hwnd);
+    std::shared_ptr<ConsoleProcess> process;
+    std::shared_ptr<ConsoleProcess> firstProcess = this->FindProcess(hwnd);
 
     if (firstProcess)
     {
-        process = std::make_shared<Process>(*this);
+        process = std::make_shared<ConsoleProcess>(*this);
         process->Initialize(processHostWindow);
         assert(process->GetHostWindow());
 
@@ -578,12 +578,12 @@ HWND App::AttachProcess(HWND processHostWindow, HANDLE handle, bool activate)
         }
     }
 
-    std::shared_ptr<Process> process;
-    std::shared_ptr<Process> firstProcess = handle ? this->FindProcess(::GetProcessId(handle)) : nullptr;
+    std::shared_ptr<ConsoleProcess> process;
+    std::shared_ptr<ConsoleProcess> firstProcess = handle ? this->FindProcess(::GetProcessId(handle)) : nullptr;
 
     if (handle && !firstProcess && ::GetProcessId(handle) != ::GetCurrentProcessId())
     {
-        process = std::make_shared<Process>(*this);
+        process = std::make_shared<ConsoleProcess>(*this);
         process->Initialize(processHostWindow);
         assert(process->GetHostWindow());
 
@@ -606,11 +606,11 @@ HWND App::AttachProcess(HWND processHostWindow, HANDLE handle, bool activate)
     return process ? process->GetHostWindow() : nullptr;
 }
 
-std::shared_ptr<Process> App::FindProcess(HWND hwnd)
+std::shared_ptr<ConsoleProcess> App::FindProcess(HWND hwnd)
 {
     assert(App::IsMainThread());
 
-    for (std::shared_ptr<Process>& i : this->processes)
+    for (std::shared_ptr<ConsoleProcess>& i : this->processes)
     {
         if (i->GetHostWindow() == hwnd)
         {
@@ -621,11 +621,11 @@ std::shared_ptr<Process> App::FindProcess(HWND hwnd)
     return nullptr;
 }
 
-std::shared_ptr<Process> App::FindProcess(DWORD procId)
+std::shared_ptr<ConsoleProcess> App::FindProcess(DWORD procId)
 {
     assert(App::IsMainThread());
 
-    for (std::shared_ptr<Process>& i : this->processes)
+    for (std::shared_ptr<ConsoleProcess>& i : this->processes)
     {
         if (i->GetProcessId() == procId)
         {
@@ -636,11 +636,11 @@ std::shared_ptr<Process> App::FindProcess(DWORD procId)
     return nullptr;
 }
 
-std::shared_ptr<Process> App::FindActiveProcess()
+std::shared_ptr<ConsoleProcess> App::FindActiveProcess()
 {
     assert(App::IsMainThread());
 
-    for (std::shared_ptr<Process>& i : this->processes)
+    for (std::shared_ptr<ConsoleProcess>& i : this->processes)
     {
         if (i->IsActive())
         {
@@ -653,7 +653,7 @@ std::shared_ptr<Process> App::FindActiveProcess()
 
 void App::ActivateProcess(HWND hwnd)
 {
-    std::shared_ptr<Process> process = this->FindProcess(hwnd);
+    std::shared_ptr<ConsoleProcess> process = this->FindProcess(hwnd);
     if (process)
     {
         ::SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
@@ -663,7 +663,7 @@ void App::ActivateProcess(HWND hwnd)
 
 void App::DeactivateProcess(HWND hwnd)
 {
-    std::shared_ptr<Process> process = this->FindProcess(hwnd);
+    std::shared_ptr<ConsoleProcess> process = this->FindProcess(hwnd);
     if (process)
     {
         process->Deactivate();
@@ -672,7 +672,7 @@ void App::DeactivateProcess(HWND hwnd)
 
 void App::DisposeProcess(HWND hwnd)
 {
-    std::shared_ptr<Process> process = this->FindProcess(hwnd);
+    std::shared_ptr<ConsoleProcess> process = this->FindProcess(hwnd);
     if (process)
     {
         process->Dispose();
@@ -681,7 +681,7 @@ void App::DisposeProcess(HWND hwnd)
 
 void App::DetachProcess(HWND hwnd)
 {
-    std::shared_ptr<Process> process = this->FindProcess(hwnd);
+    std::shared_ptr<ConsoleProcess> process = this->FindProcess(hwnd);
     if (process)
     {
         process->Detach();
@@ -690,7 +690,7 @@ void App::DetachProcess(HWND hwnd)
 
 void App::SendProcessSystemCommand(HWND hwnd, UINT id)
 {
-    std::shared_ptr<Process> process = this->FindProcess(hwnd);
+    std::shared_ptr<ConsoleProcess> process = this->FindProcess(hwnd);
     if (process)
     {
         process->SendSystemCommand(id);
@@ -699,11 +699,11 @@ void App::SendProcessSystemCommand(HWND hwnd, UINT id)
 
 std::wstring App::GetProcessState(HWND hwnd)
 {
-    std::shared_ptr<Process> process = this->FindProcess(hwnd);
+    std::shared_ptr<ConsoleProcess> process = this->FindProcess(hwnd);
     return process ? process->GetProcessState() : std::wstring();
 }
 
-void App::OnProcessCreated(Process* process)
+void App::OnProcessCreated(ConsoleProcess* process)
 {
     ::EnterCriticalSection(&this->processCountCS);
 
@@ -712,7 +712,7 @@ void App::OnProcessCreated(Process* process)
     ::LeaveCriticalSection(&this->processCountCS);
 }
 
-void App::OnProcessDestroyed(Process* process)
+void App::OnProcessDestroyed(ConsoleProcess* process)
 {
     ::EnterCriticalSection(&this->processCountCS);
 
@@ -726,13 +726,13 @@ void App::OnProcessDestroyed(Process* process)
     }
 }
 
-void App::OnProcessClosing(Process* process)
+void App::OnProcessClosing(ConsoleProcess* process)
 {
     assert(App::IsMainThread());
 
     for (auto i = this->processes.begin(); i != this->processes.end(); i++)
     {
-        std::shared_ptr<Process> pi = *i;
+        std::shared_ptr<ConsoleProcess> pi = *i;
         if (pi.get() == process)
         {
             Microsoft::WRL::ComPtr<IProcess> processInterop = new ProcessInterop(this, pi->GetHostWindow());
@@ -744,13 +744,13 @@ void App::OnProcessClosing(Process* process)
     }
 }
 
-void App::OnProcessEnvChanged(Process* process, const Json::Dict& env)
+void App::OnProcessEnvChanged(ConsoleProcess* process, const Json::Dict& env)
 {
     Microsoft::WRL::ComPtr<IProcess> processInterop = new ProcessInterop(this, process->GetHostWindow());
     this->host->OnProcessEnvChanged(processInterop.Get(), Json::WriteNameValuePairs(env, L'\n').c_str());
 }
 
-void App::OnProcessTitleChanged(Process* process, const std::wstring& title)
+void App::OnProcessTitleChanged(ConsoleProcess* process, const std::wstring& title)
 {
     Microsoft::WRL::ComPtr<IProcess> processInterop = new ProcessInterop(this, process->GetHostWindow());
     this->host->OnProcessTitleChanged(processInterop.Get(), title.c_str());
