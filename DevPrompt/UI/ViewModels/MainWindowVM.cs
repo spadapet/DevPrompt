@@ -153,11 +153,6 @@ namespace DevPrompt.UI.ViewModels
             this.ShowSettingsDialog(Api.SettingsTabType.Default);
         });
 
-        public ICommand PluginsCommand => new Api.Utility.DelegateCommand(() =>
-        {
-            this.ShowSettingsDialog(Api.SettingsTabType.Plugins);
-        });
-
         public ICommand CustomizeConsoleGrabCommand => new Api.Utility.DelegateCommand(() =>
         {
             this.ShowSettingsDialog(Api.SettingsTabType.Grab);
@@ -171,11 +166,6 @@ namespace DevPrompt.UI.ViewModels
         public ICommand CustomizeLinksCommand => new Api.Utility.DelegateCommand(() =>
         {
             this.ShowSettingsDialog(Api.SettingsTabType.Links);
-        });
-
-        public ICommand TelemetryCommand => new Api.Utility.DelegateCommand(() =>
-        {
-            this.ShowSettingsDialog(Api.SettingsTabType.Telemetry);
         });
 
         public ICommand ReportAnIssueCommand => new Api.Utility.DelegateCommand(() =>

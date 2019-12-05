@@ -594,7 +594,7 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to _Auto Grab.
+        ///   Looks up a localized string similar to _Auto grab.
         /// </summary>
         public static string Menu_AutoGrab {
             get {

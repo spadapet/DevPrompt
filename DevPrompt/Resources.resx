@@ -297,7 +297,7 @@ Visual Studio=https://visualstudio.microsoft.com</value>
     <value>_About</value>
   </data>
   <data name="Menu.AutoGrab" xml:space="preserve">
-    <value>_Auto Grab</value>
+    <value>_Auto grab</value>
   </data>
   <data name="Menu.CheckForUpdates" xml:space="preserve">
     <value>_Check for updates</value>

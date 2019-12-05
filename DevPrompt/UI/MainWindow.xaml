@@ -57,10 +57,8 @@
             <Menu x:Name="mainMenu">
                 <MenuItem Header="{x:Static dp:Resources.Menu_File}" SubmenuOpened="OnFileMenuOpened">
                     <Separator Tag="[End]" />
-                    <MenuItem Header="{x:Static dp:Resources.Menu_Settings}" Command="{Binding SettingsCommand}" />
-                    <MenuItem Header="{x:Static dp:Resources.Menu_Plugins}" Command="{Binding PluginsCommand}" />
-                    <Separator />
                     <Separator Tag="[Plugins]" />
+                    <MenuItem Header="{x:Static dp:Resources.Menu_Settings}" Command="{Binding SettingsCommand}" />
                     <MenuItem Header="{x:Static dp:Resources.Menu_Exit}" InputGestureText="Alt+F4" Command="{Binding ExitCommand}" />
                 </MenuItem>
                 <MenuItem Header="{x:Static dp:Resources.Menu_Grab}" SubmenuOpened="OnGrabMenuOpened">
@@ -81,11 +79,10 @@
                     <MenuItem Header="{x:Static dp:Resources.Menu_Customize}" Command="{Binding CustomizeLinksCommand}" />
                 </MenuItem>
                 <MenuItem Header="{x:Static dp:Resources.Menu_Help}" SubmenuOpened="OnHelpMenuOpened">
-                    <Separator Tag="[Plugins]" />
                     <MenuItem Header="{x:Static dp:Resources.Menu_ReportIssue}" Command="{Binding ReportAnIssueCommand}" />
                     <MenuItem Header="{x:Static dp:Resources.Menu_CheckForUpdates}" Command="{Binding CheckForUpdatesCommand}" />
-                    <MenuItem Header="{x:Static dp:Resources.Menu_Telemetry}" Command="{Binding TelemetryCommand}" />
                     <Separator />
+                    <Separator Tag="[Plugins]" />
                     <MenuItem Header="{x:Static dp:Resources.Menu_About}" Command="{Binding AboutCommand}" />
                 </MenuItem>
                 <MenuItem ToolTip="{x:Static dp:Resources.Menu_UpdateTooltip}" Visibility="{Binding AppUpdate.State, Converter={StaticResource HasUpdateToVisibility}}" SubmenuOpened="OnUpdateMenuOpened">
