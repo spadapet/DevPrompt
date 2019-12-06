@@ -87,7 +87,7 @@
                 </MenuItem>
                 <MenuItem ToolTip="{x:Static dp:Resources.Menu_UpdateTooltip}" Visibility="{Binding AppUpdate.State, Converter={StaticResource HasUpdateToVisibility}}" SubmenuOpened="OnUpdateMenuOpened">
                     <MenuItem.Header>
-                        <Path Fill="{DynamicResource {x:Static SystemColors.MenuTextBrushKey}}" Data="M 0,7 6,1 12,7 8,7 8,12 4,12 4,7 Z" />
+                        <Path Stroke="{DynamicResource {x:Static SystemColors.MenuTextBrushKey}}" StrokeThickness="0.675" Data="M 0,7 6,1 12,7 8,7 8,12 4,12 4,7 Z" />
                     </MenuItem.Header>
                     <MenuItem IsEnabled="False">
                         <MenuItem.Template>
@@ -103,6 +103,7 @@
                     </MenuItem>
                     <MenuItem Header="{x:Static dp:Resources.Menu_DownloadMsi}" ToolTip="{x:Static dp:Resources.Menu_DownloadMsiTooltip}" Command="{Binding DownloadUpdateCommand}" CommandParameter="msi" />
                     <MenuItem Header="{x:Static dp:Resources.Menu_DownloadZip}" ToolTip="{x:Static dp:Resources.Menu_DownloadZipTooltip}" Command="{Binding DownloadUpdateCommand}" CommandParameter="zip" />
+                    <!--<MenuItem Header="{x:Static dp:Resources.Menu_DownloadNow}" ToolTip="{x:Static dp:Resources.Menu_DownloadNowTooltip}" Command="{Binding DownloadNowCommand}" />-->
                 </MenuItem>
             </Menu>
             <controls:TaskProgressBar x:Name="progressBar" Grid.Column="1" Width="250" Margin="0,0,5,0" />

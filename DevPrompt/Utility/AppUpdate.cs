@@ -175,6 +175,13 @@ namespace DevPrompt.Utility
             }
         }
 
+        public async Task UpdateNow(MainWindow mainWindow)
+        {
+            // Needs to download DevPrompt.Update.exe, run it, and exit this process
+            // (might not ever be implemented)
+            await Task.CompletedTask;
+        }
+
         private async void OnTimer(object sender, EventArgs args)
         {
             await this.CheckUpdateVersionAsync();

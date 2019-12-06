@@ -8,7 +8,11 @@ namespace DevPrompt.Utility.Converters
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (value is Api.AppUpdateState state && state == Api.AppUpdateState.HasUpdate) ? Visibility.Visible : Visibility.Collapsed;
+            bool inverse = parameter is bool boolParameter && boolParameter;
+
+            return (value is Api.AppUpdateState state && state == Api.AppUpdateState.HasUpdate)
+                ? (inverse ? Visibility.Collapsed : Visibility.Visible)
+                : (inverse ? Visibility.Visible : Visibility.Collapsed);
         }
     }
 }

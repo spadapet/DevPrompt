@@ -38,6 +38,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget", "Nuget", "{AFEE30EE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevPrompt.ProcessWorkspace", "DevPrompt.ProcessWorkspace\DevPrompt.ProcessWorkspace.csproj", "{BA155622-DDBD-48CC-942A-33DA3A9FEF1F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevPrompt.Update", "DevPrompt.Update\DevPrompt.Update.csproj", "{C84D77A0-58C1-460D-AC28-050396388980}"
+	ProjectSection(ProjectDependencies) = postProject
+		{69E79ABB-E387-479B-B007-64C25966DED6} = {69E79ABB-E387-479B-B007-64C25966DED6}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -94,6 +99,14 @@ Global
 		{BA155622-DDBD-48CC-942A-33DA3A9FEF1F}.Release|x64.Build.0 = Release|x64
 		{BA155622-DDBD-48CC-942A-33DA3A9FEF1F}.Release|x86.ActiveCfg = Release|x86
 		{BA155622-DDBD-48CC-942A-33DA3A9FEF1F}.Release|x86.Build.0 = Release|x86
+		{C84D77A0-58C1-460D-AC28-050396388980}.Debug|x64.ActiveCfg = Debug|x64
+		{C84D77A0-58C1-460D-AC28-050396388980}.Debug|x64.Build.0 = Debug|x64
+		{C84D77A0-58C1-460D-AC28-050396388980}.Debug|x86.ActiveCfg = Debug|x86
+		{C84D77A0-58C1-460D-AC28-050396388980}.Debug|x86.Build.0 = Debug|x86
+		{C84D77A0-58C1-460D-AC28-050396388980}.Release|x64.ActiveCfg = Release|x64
+		{C84D77A0-58C1-460D-AC28-050396388980}.Release|x64.Build.0 = Release|x64
+		{C84D77A0-58C1-460D-AC28-050396388980}.Release|x86.ActiveCfg = Release|x86
+		{C84D77A0-58C1-460D-AC28-050396388980}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

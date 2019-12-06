@@ -213,6 +213,20 @@ namespace DevPrompt.UI.ViewModels
             }
         });
 
+        public ICommand DownloadNowCommand => new Api.Utility.DelegateCommand(async () =>
+        {
+            this.App.Telemetry.TrackEvent("Command.DownloadNow");
+
+            try
+            {
+                await this.AppUpdate.UpdateNow(this.Window);
+            }
+            catch (Exception ex)
+            {
+                this.InfoBar.SetError(ex);
+            }
+        });
+
         public string WindowTitle
         {
             get

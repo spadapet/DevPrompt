@@ -42,7 +42,7 @@
     <Target Name="EnsureWixToolsetInstalled" Condition=" !Exists('$(WixTargetsPath)') ">
         <Error Text="The WiX Toolset v3.11 (or newer) build tools must be installed to build this project. To download the WiX Toolset, see http://wixtoolset.org/releases/" />
     </Target>
-    <Target Name="AfterBuild" Outputs="$(OutputPath)DevPrompt.$(DevPromptVersion).Symbols.zip">
+    <Target Name="AfterBuild">
         <ItemGroup>
             <SymbolFile Include="$(Bin64)Dev*.pdb" />
             <SymbolFile Include="$(Bin32)Dev*32.pdb" />
@@ -55,11 +55,13 @@
             <CopyFile Include="$(Bin32)Dev*32.dll" />
             <CopyFile Include="$(Bin32)Dev*32.exe" />
             <NuGetFile Include="$(Bin64)*.nupkg" />
+            <UpdateExe Include="$(Bin64)DevPrompt.Update.exe" />
         </ItemGroup>
         
         <PropertyGroup>
             <OutputPathDevPrompt>$(OutputPath)DevPrompt.$(DevPromptVersion)</OutputPathDevPrompt>
             <OutputPathSymbols>$(OutputPath)Symbols.$(DevPromptVersion)</OutputPathSymbols>
+            <OutputPathUpdateExe>$(OutputPath)DevPrompt.Update.$(DevPromptVersion)</OutputPathUpdateExe>
         </PropertyGroup>
 
         <MakeDir Directories="$(OutputPathDevPrompt)" />
@@ -69,6 +71,10 @@
         <MakeDir Directories="$(OutputPathSymbols)" />
         <Copy DestinationFolder="$(OutputPathSymbols)" SourceFiles="@(SymbolFile)" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" />
         <ZipDirectory DestinationFile="$(OutputPath)DevPrompt.$(DevPromptVersion).Symbols.zip" SourceDirectory="$(OutputPathSymbols)" Overwrite="true" />
+
+        <MakeDir Directories="$(OutputPathUpdateExe)" />
+        <Copy DestinationFolder="$(OutputPathUpdateExe)" SourceFiles="@(UpdateExe)" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" />
+        <ZipDirectory DestinationFile="$(OutputPath)DevPrompt.Update.$(DevPromptVersion).zip" SourceDirectory="$(OutputPathUpdateExe)" Overwrite="true" />
 
         <Exec Condition=" '$(DevPromptPfxPassword)' != '' And '$(DevPromptPfxFile)' != '' And Exists('$(DevPromptPfxFile)')"
               Command="signtool.exe sign /f &quot;$(DevPromptPfxFile)&quot; /p $(DevPromptPfxPassword) /t http://timestamp.digicert.com &quot;$(TargetPath)&quot;" />

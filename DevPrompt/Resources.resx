@@ -309,16 +309,22 @@ Visual Studio=https://visualstudio.microsoft.com</value>
     <value>_Customize...</value>
   </data>
   <data name="Menu.DownloadMsi" xml:space="preserve">
-    <value>Download _MSI File...</value>
+    <value>Download _MSI file...</value>
   </data>
   <data name="Menu.DownloadMsiTooltip" xml:space="preserve">
-    <value>This uses Windows Installer to automatically update DevPrompt (recommended)</value>
+    <value>This uses Windows Installer to update DevPrompt (recommended)</value>
+  </data>
+  <data name="Menu.DownloadNow" xml:space="preserve">
+    <value>_Update and restart now</value>
+  </data>
+  <data name="Menu.DownloadNowTooltip" xml:space="preserve">
+    <value>Downloads the latest update and restarts DevPrompt automatically. This is not recommended since unexpected failure can require manually installing again. But it's cool when it works :)</value>
   </data>
   <data name="Menu.DownloadZip" xml:space="preserve">
-    <value>Download _ZIP File...</value>
+    <value>Download _ZIP file...</value>
   </data>
   <data name="Menu.DownloadZipTooltip" xml:space="preserve">
-    <value>This lets you manually unzip DevPrompt files and run from any location</value>
+    <value>This lets you manually unzip and update DevPrompt</value>
   </data>
   <data name="Menu.Exit" xml:space="preserve">
     <value>E_xit</value>

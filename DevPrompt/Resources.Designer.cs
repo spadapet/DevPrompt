@@ -630,7 +630,7 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Download _MSI File....
+        ///   Looks up a localized string similar to Download _MSI file....
         /// </summary>
         public static string Menu_DownloadMsi {
             get {
@@ -639,7 +639,7 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This uses Windows Installer to automatically update DevPrompt (recommended).
+        ///   Looks up a localized string similar to This uses Windows Installer to update DevPrompt (recommended).
         /// </summary>
         public static string Menu_DownloadMsiTooltip {
             get {
@@ -648,7 +648,25 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Download _ZIP File....
+        ///   Looks up a localized string similar to _Update and restart now.
+        /// </summary>
+        public static string Menu_DownloadNow {
+            get {
+                return ResourceManager.GetString("Menu.DownloadNow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Downloads the latest update and restarts DevPrompt automatically. This is not recommended since unexpected failure can require manually installing again. But it&apos;s cool when it works :).
+        /// </summary>
+        public static string Menu_DownloadNowTooltip {
+            get {
+                return ResourceManager.GetString("Menu.DownloadNowTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Download _ZIP file....
         /// </summary>
         public static string Menu_DownloadZip {
             get {
@@ -657,7 +675,7 @@ namespace DevPrompt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This lets you manually unzip DevPrompt files and run from any location.
+        ///   Looks up a localized string similar to This lets you manually unzip and update DevPrompt.
         /// </summary>
         public static string Menu_DownloadZipTooltip {
             get {

@@ -2,7 +2,6 @@
 Tabbed command prompts for developers
 
 ## Download
-Latest version 1.10.1.0
 * [Download MSI file](http://www.peterspada.com/Download/DevPrompt)
 * [Download ZIP file](http://www.peterspada.com/Download/DevPrompt?type=zip)
 

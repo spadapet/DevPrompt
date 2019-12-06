@@ -92,7 +92,6 @@
     <FileUpdate Files="$(DevRoot)DevPrompt\App.config" Regex="oldVersion.*?DevPromptVersion" ReplacementText="oldVersion=&quot;0.0.0.0-$(DevPromptVersion)&quot; xmlns:v=&quot;DevPromptVersion" />
     <FileUpdate Files="$(DevRoot)DevPrompt\App.config" Regex="(xmlns:v=&quot;DevPromptVersion&quot; .*?=)&quot;.*?&quot;" ReplacementText="$1&quot;$(DevPromptVersion)&quot;" />
     <FileUpdate Files="$(DevRoot)DevPrompt\app.manifest" Regex="assemblyIdentity version=&quot;.*?&quot;" ReplacementText="assemblyIdentity version=&quot;$(DevPromptVersion)&quot;" />
-    <FileUpdate Files="$(DevRoot)README.md" Regex="Latest version \d+\.\d+\.\d+\.\d+" ReplacementText="Latest version $(DevPromptVersion)" />
   </Target>
   <Target Name="AfterBuild" Outputs="$(OutputPath)DevPrompt.Api.nupkg" Condition=" '$(Configuration)' == 'Release' ">
     <PropertyGroup>

@@ -222,6 +222,11 @@
     <None Include="App.config" />
     <None Include="app.manifest" />
     <Resource Include="appicon.ico" />
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DevPrompt.Api\DevPrompt.Api.csproj">
@@ -236,13 +241,5 @@
     <PackageReference Include="System.Composition" Version="1.4.0" />
     <PackageReference Include="Efficient.Json" Version="1.1.4" />
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
