@@ -63,6 +63,14 @@ void ConsoleProcess::Initialize(HWND processHostWindow)
     RECT rect;
     ::GetClientRect(processHostWindow, &rect);
     this->hostWnd = IWindowProc::Create(this, windowClass, WS_CHILD | WS_CLIPCHILDREN, rect, processHostWindow);
+
+    // If this process is running as admin and hosts a non-admin console, that console still needs to be able to relay key messages
+    ::ChangeWindowMessageFilterEx(this->hostWnd, WM_CHAR, MSGFLT_ALLOW, nullptr);
+    ::ChangeWindowMessageFilterEx(this->hostWnd, WM_KEYDOWN, MSGFLT_ALLOW, nullptr);
+    ::ChangeWindowMessageFilterEx(this->hostWnd, WM_KEYUP, MSGFLT_ALLOW, nullptr);
+    ::ChangeWindowMessageFilterEx(this->hostWnd, WM_SYSCHAR, MSGFLT_ALLOW, nullptr);
+    ::ChangeWindowMessageFilterEx(this->hostWnd, WM_SYSKEYDOWN, MSGFLT_ALLOW, nullptr);
+    ::ChangeWindowMessageFilterEx(this->hostWnd, WM_SYSKEYUP, MSGFLT_ALLOW, nullptr);
 }
 
 void ConsoleProcess::Dispose()
