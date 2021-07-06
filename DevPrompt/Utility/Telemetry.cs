@@ -24,6 +24,8 @@ namespace DevPrompt.Utility
         private Telemetry(App app)
         {
             this.app = app;
+
+#if ENABLE_TELEMETRY
             this.config = new TelemetryConfiguration("5c831494-8408-4371-922d-497edc9a7d64");
 #if DEBUG
             this.config.TelemetryChannel.DeveloperMode = true;
@@ -39,14 +41,19 @@ namespace DevPrompt.Utility
             object internalValue = internalProperty?.GetValue(this.client.Context);
             PropertyInfo nodeNameProperty = internalValue?.GetType().GetProperty("NodeName");
             nodeNameProperty?.SetValue(internalValue, "null");
+#else
+            this.config = null;
+            this.client = null;
+#endif
         }
 
         public void Dispose()
         {
-            this.client.Flush();
-            this.config.Dispose();
+            this.client?.Flush();
+            this.config?.Dispose();
         }
 
+#if ENABLE_TELEMETRY
         private static string GetUserId()
         {
             try
@@ -74,6 +81,7 @@ namespace DevPrompt.Utility
 
             return null;
         }
+#endif
 
         public void TrackEvent(string eventName, IEnumerable<KeyValuePair<string, object>> properties = null)
         {
@@ -83,7 +91,7 @@ namespace DevPrompt.Utility
                     out Dictionary<string, string> eventProperties,
                     out Dictionary<string, double> eventMetrics);
 
-                this.client.TrackEvent(eventName,
+                this.client?.TrackEvent(eventName,
                     (eventProperties != null && eventProperties.Count > 0) ? eventProperties : null,
                     (eventMetrics != null && eventMetrics.Count > 0) ? eventMetrics : null);
             }
@@ -97,7 +105,7 @@ namespace DevPrompt.Utility
                     out Dictionary<string, string> eventProperties,
                     out Dictionary<string, double> eventMetrics);
 
-                this.client.TrackException(exception,
+                this.client?.TrackException(exception,
                     (eventProperties != null && eventProperties.Count > 0) ? eventProperties : null,
                     (eventMetrics != null && eventMetrics.Count > 0) ? eventMetrics : null);
             }

@@ -76,8 +76,8 @@
         <Copy DestinationFolder="$(OutputPathUpdateExe)" SourceFiles="@(UpdateExe)" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" />
         <ZipDirectory DestinationFile="$(OutputPath)DevPrompt.Update.$(DevPromptVersion).zip" SourceDirectory="$(OutputPathUpdateExe)" Overwrite="true" />
 
-        <Exec Condition=" '$(DevPromptPfxPassword)' != '' And '$(DevPromptPfxFile)' != '' And Exists('$(DevPromptPfxFile)')"
-              Command="signtool.exe sign /f &quot;$(DevPromptPfxFile)&quot; /p $(DevPromptPfxPassword) /t http://timestamp.digicert.com &quot;$(TargetPath)&quot;" />
+        <Exec Condition=" '$(DevPromptMsiPfxPassword)' != '' And '$(DevPromptMsiPfxFile)' != '' And Exists('$(DevPromptMsiPfxFile)')"
+              Command="signtool.exe sign /f &quot;$(DevPromptMsiPfxFile)&quot; /p $(DevPromptMsiPfxPassword) /t http://timestamp.digicert.com &quot;$(TargetPath)&quot;" />
         <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(OutputPath)DevPrompt.$(DevPromptVersion).msi" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" />
         <Copy SourceFiles="@(NuGetFile)" DestinationFolder="$(OutputPath)" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" />
     </Target>

@@ -10,7 +10,7 @@
         <license type="expression">Apache-2.0</license>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Plugin API for DevPrompt</description>
-        <copyright>Copyright 2019</copyright>
+        <copyright>Copyright 2021</copyright>
         <tags>DevPrompt</tags>
     </metadata>
     <files>

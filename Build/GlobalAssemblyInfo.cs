@@ -4,10 +4,10 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyCompany("Peter Spada")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCopyright("Copyright © 2019")]
+[assembly: AssemblyCopyright("Copyright © 2021")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyProduct("DevPrompt")]
 [assembly: AssemblyTrademark("")]
-[assembly: AssemblyVersion("1.10.4.0")]
+[assembly: AssemblyVersion("1.10.6.0")]
 [assembly: ComVisible(false)]
 [assembly: NeutralResourcesLanguage("en", UltimateResourceFallbackLocation.MainAssembly)]
