@@ -76,6 +76,7 @@
         <ProgressBar
             Grid.Row="1"
             Height="10"
+            d:IsIndeterminate="False"
             IsIndeterminate="{Binding CurrentStageType, Converter={StaticResource StageToProgressBarRunning}}"
             Visibility="{Binding CurrentStageType, Converter={StaticResource StageToProgressBarVisible}}" />
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">

@@ -237,8 +237,8 @@
       <Project>{ba155622-ddbd-48cc-942a-33da3a9fef1f}</Project>
       <Name>DevPrompt.ProcessWorkspace</Name>
     </ProjectReference>
-    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.11.0" />
-    <PackageReference Include="System.Composition" Version="1.4.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.18.0" />
+    <PackageReference Include="System.Composition" Version="5.0.1" />
     <PackageReference Include="Efficient.Json" Version="1.1.4" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

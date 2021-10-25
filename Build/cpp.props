@@ -18,11 +18,11 @@
         <DefaultLanguage Condition=" '$(DefaultLanguage)' == '' ">en-US</DefaultLanguage>
         <Keyword Condition=" '$(Keyword)' == '' ">Win32Proj</Keyword>
         <WindowsTargetPlatformVersion Condition=" '$(WindowsTargetPlatformVersion)' == '' ">$(TPV)</WindowsTargetPlatformVersion>
-        <PlatformToolset Condition=" '$(PlatformToolset)' == '' ">v142</PlatformToolset>
+        <PlatformToolset Condition=" '$(PlatformToolset)' == '' ">v143</PlatformToolset>
         <ProjectName Condition=" '$(ProjectName)' == '' ">$(MSBuildProjectName)</ProjectName>
         <RootNamespace Condition=" '$(RootNamespace)' == '' ">$(ProjectName)</RootNamespace>
         <TargetName Condition=" '$(TargetName)' == '' ">$(ProjectName)$(PlatformBits)</TargetName>
-        <VCProjectVersion Condition=" '$(VCProjectVersion)' == '' ">15.0</VCProjectVersion>
+        <VCProjectVersion Condition=" '$(VCProjectVersion)' == '' ">17.0</VCProjectVersion>
         <VCProjectUpgraderObjectName Condition=" '$(VCProjectUpgraderObjectName)' == '' ">NoUpgrade</VCProjectUpgraderObjectName>
 
         <!-- Output paths -->

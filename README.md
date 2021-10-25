@@ -23,7 +23,7 @@ To build and run you MUST either:
 * Quickly access developer tools and links that you use often
 
 ## Project overview
-* Open __DevPrompt.sln__ in Visual Studio 2019/2022 on Windows 10
+* Open __DevPrompt.sln__ in Visual Studio 2022 on Windows 10
 * __DevPrompt__: C# project with UI written in WPF. This is the shell that hosts processes owned by DevNative.
 * __DevPrompt.Api__: C# project for defining public interfaces for plugins to use.
 * __DevPrompt.ProcessWorkspace__: C# project that implements the tabbed user interface for hosting command prompts. It's written as a plugin to DevPrompt.exe.

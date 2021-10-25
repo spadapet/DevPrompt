@@ -58,7 +58,7 @@
     <Compile Include="Utility\WpfUtility.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Composition.AttributedModel" Version="1.4.0" />
+    <PackageReference Include="System.Composition.AttributedModel" Version="5.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DevPrompt.Api\DevPrompt.Api.csproj">

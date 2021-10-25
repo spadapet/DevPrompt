@@ -76,12 +76,12 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="NuGet.CommandLine">
-      <Version>5.3.1</Version>
+      <Version>5.11.0</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Composition.AttributedModel">
-      <Version>1.4.0</Version>
+      <Version>5.0.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup />
@@ -95,7 +95,7 @@
   </Target>
   <Target Name="AfterBuild" Outputs="$(OutputPath)DevPrompt.Api.nupkg" Condition=" '$(Configuration)' == 'Release' ">
     <PropertyGroup>
-      <NuGetExeFile>$(UserProfile)\.nuget\packages\NuGet.CommandLine\5.3.1\tools\nuget.exe</NuGetExeFile>
+      <NuGetExeFile>$(UserProfile)\.nuget\packages\NuGet.CommandLine\5.11.0\tools\nuget.exe</NuGetExeFile>
     </PropertyGroup>
     <Exec Command="&quot;$(NuGetExeFile)&quot; pack &quot;DevPrompt.Api.nuspec&quot; -OutputDirectory &quot;$(OutputPath).&quot; -BasePath &quot;$(OutputPath).&quot; -Version $(DevPromptVersion) -Properties &quot;OutputPath=$(OutputPath);Configuration=$(Configuration);Platform=$(Platform);Version=$(DevPromptVersion)&quot;" />
   </Target>
