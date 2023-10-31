@@ -110,7 +110,7 @@ namespace DevPrompt.Utility
             {
                 using (RegistryKey key = Registry.CurrentUser.OpenSubKey(BrowserUtility.EdgePackageKey))
                 {
-                    if (key != null & key.GetValue(BrowserUtility.EdgePackageValue) != null)
+                    if (key != null && key.GetValue(BrowserUtility.EdgePackageValue) != null)
                     {
                         browsers.Add(new BrowserInfo(BrowserUtility.EdgeId,
                             found.Any(s => s.StartsWith(BrowserUtility.NewEdgePrefix))

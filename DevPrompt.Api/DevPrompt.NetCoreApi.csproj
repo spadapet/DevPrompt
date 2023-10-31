@@ -10,6 +10,9 @@
 
   <ItemGroup>
     <None Remove="DevPrompt.Api.nuspec" />
+    <Content Include="..\Build\appicon64.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

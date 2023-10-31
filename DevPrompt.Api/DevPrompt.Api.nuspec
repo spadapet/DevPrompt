@@ -6,14 +6,19 @@
         <authors>Peter Spada</authors>
         <owners>Peter Spada</owners>
         <projectUrl>https://github.com/spadapet/DevPrompt</projectUrl>
+        <icon>appicon64.png</icon>
         <iconUrl>https://raw.githubusercontent.com/spadapet/DevPrompt/master/Build/appicon64.png</iconUrl>
         <license type="expression">Apache-2.0</license>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>Plugin API for DevPrompt</description>
-        <copyright>Copyright 2021</copyright>
+        <copyright>Copyright 2023</copyright>
         <tags>DevPrompt</tags>
+        <dependencies>
+            <group targetFramework=".NETFramework4.8" />
+        </dependencies>
     </metadata>
     <files>
-        <file src="DevPrompt.Api.dll" target="lib\net40" />
+        <file src="appicon64.png" />
+        <file src="DevPrompt.Api.dll" target="lib\net48" />
     </files>
 </package>

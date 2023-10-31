@@ -168,7 +168,7 @@ namespace DevPrompt.Settings
 
             if (filter.HasFlag(DefaultSettingsFilter.InternalDevPrompts))
             {
-                settings.AddVisualStudioEnlistments();
+                // Razzle isn't used anymore
             }
 
             if (filter.HasFlag(DefaultSettingsFilter.RawPrompts))
@@ -204,38 +204,6 @@ namespace DevPrompt.Settings
             settings.EnsureValid(filter);
 
             return settings;
-        }
-
-        private void AddVisualStudioEnlistments()
-        {
-            if (!Program.IsMicrosoftDomain)
-            {
-                return;
-            }
-
-            // Try to detect VS enlistments on all drives
-            foreach (DriveInfo info in DriveInfo.GetDrives())
-            {
-                if (info.DriveType != DriveType.Fixed)
-                {
-                    continue;
-                }
-
-                for (int i = 0; i < 10; i++)
-                {
-                    string enlistment = Path.Combine(info.RootDirectory.FullName, "VS" + ((i == 0) ? string.Empty : i.ToString()));
-                    if (Directory.Exists(enlistment) && File.Exists(Path.Combine(enlistment, "init.cmd")))
-                    {
-                        this.Consoles.Add(new ConsoleSettings()
-                        {
-                            MenuName = $"Razzle ({enlistment})",
-                            TabName = $"%BaseDir,{enlistment.Substring(Path.GetPathRoot(enlistment).Length)}%, %_ParentBranch,...%",
-                            StartingDirectory = enlistment,
-                            Arguments = "/k init.cmd -skipexportsprune",
-                        });
-                    }
-                }
-            }
         }
 
         async Task<IEnumerable<Api.IConsoleSettings>> Api.IAppSettings.GetVisualStudioConsoleSettingsAsync()
@@ -319,7 +287,7 @@ namespace DevPrompt.Settings
 
             this.GrabConsoles.Add(new GrabConsoleSettings()
             {
-                ExeName = "powershell.exe",
+                ExeName = "PowerShell.exe",
                 TabName = Resources.Menu_RawPowerShellTabName,
                 TabActivate = true,
             });
@@ -603,9 +571,9 @@ namespace DevPrompt.Settings
 
         public bool TryGetProperty<T>(string name, out T value)
         {
-            if (!string.IsNullOrEmpty(name) && this.customProperties.TryGetValue(name, out object objectValue) && objectValue is T)
+            if (!string.IsNullOrEmpty(name) && this.customProperties.TryGetValue(name, out object objectValue) && objectValue is T value2)
             {
-                value = (T)objectValue;
+                value = value2;
                 return true;
             }
             else
